@@ -22,3 +22,33 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# ML Weights & Checkpoints (Never commit large weights)
+*.pt
+*.pth
+*.onnx
+*.bin
+*.safetensors
+*.ckpt
+
+# Medical Data & Scans
+*.nii
+*.nii.gz
+*.dcm
+storage/
+weights/
+data/
+
+# Environment variables
+.env
+.env.*
+!.env.example
