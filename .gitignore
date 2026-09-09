@@ -40,6 +40,11 @@ env/
 *.safetensors
 *.ckpt
 
+# 3D Models & Atlas Assets (Stored locally in public/models/ or downloaded via script)
+public/models/
+*.glb
+*.gltf
+
 # Medical Data & Scans
 *.nii
 *.nii.gz
