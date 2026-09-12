@@ -1,209 +1,165 @@
 import React from 'react'
 import type { OrganMetadata, Hotspot } from '../../types/organ'
-import {
-  Activity,
-  Database,
-  Layers,
-  FileCheck,
-  CheckCircle2,
-  Stethoscope,
-  HeartPulse,
-  Droplets,
-  BookOpen,
-  MapPin,
-  Flame
-} from 'lucide-react'
 
 interface OrganInfoCardProps {
   readonly organ: OrganMetadata
+  readonly plateNo: string
   readonly activeHotspot: Hotspot | null
   readonly onSelectHotspot: (hotspot: Hotspot | null) => void
 }
 
+const ROMANS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'] as const
+
+const RomanSection: React.FC<{
+  index: number
+  of: number
+  title: string
+  children: React.ReactNode
+}> = ({ index, of, title, children }) => (
+  <section className="sec-block">
+    <div className="sec-rule">
+      <span className="roman">{ROMANS[index]}.</span>
+      <span className="sec-title">{title}</span>
+      <span className="page-of">
+        {String(index + 1).padStart(3, '0')} / {String(of).padStart(3, '0')}
+      </span>
+    </div>
+    {children}
+  </section>
+)
+
+const romanOfSpot = (i: number): string => ROMANS[i] ?? String(i + 1)
+
 export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
   organ,
+  plateNo,
   activeHotspot,
   onSelectHotspot,
 }) => {
   const profile = organ.clinicalProfile
+  const sectionCount = 6
 
   return (
-    <div className="organ-info-card">
-      {/* Header */}
-      <div className="info-card-header">
-        <div className="info-badge-row">
-          <span
-            className="modality-badge"
-            style={{
-              borderColor: `${organ.accentColor}66`,
-              color: organ.accentColor,
-              backgroundColor: `${organ.accentColor}15`,
-            }}
-          >
-            <Activity size={12} />
-            <span>{organ.modality}</span>
-          </span>
-
-          <span className="pipeline-status-badge">
-            <CheckCircle2 size={12} className="text-emerald-400" />
-            <span>AI Pipeline Verified</span>
-          </span>
+    <div className="dossier-body">
+      {/* Plate header */}
+      <header className="dossier-head">
+        <div className="badge-row">
+          <span className="mono-badge">{organ.modality}</span>
+          <span className="veri-line">Verified · Terminologia Anatomica TA2</span>
         </div>
 
-        <div className="organ-title-block">
-          <span className="organ-large-icon">{organ.icon}</span>
-          <div>
-            <div className="title-with-poetic">
-              <h2 className="organ-main-title">{organ.name}</h2>
-              {profile?.poeticTitle && (
-                <span className="poetic-badge">"{profile.poeticTitle}"</span>
-              )}
-            </div>
-            <p className="organ-latin-subtitle">{organ.anatomicalTerm}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Physiological Function */}
-      <div className="clinical-overview-box">
-        <div className="overview-header">
-          <HeartPulse size={13} className="text-rose-400" />
-          <span>Physiological Function</span>
-        </div>
-        <p className="overview-content">
-          {profile?.physiology || organ.description}
+        <h2 className="dossier-title">
+          {organ.name}
+          <span className="dot">.</span>
+          {profile?.poeticTitle && (
+            <span className="serif">{profile.poeticTitle}</span>
+          )}
+        </h2>
+        <p className="dossier-latin">
+          Plate Nº {plateNo} — {organ.anatomicalTerm}
         </p>
-      </div>
 
-      {/* Daily Clinical Stat & Fact */}
-      {profile && (
-        <div className="daily-fact-card">
-          <div className="daily-fact-icon">
-            <Flame size={16} className="text-amber-400" />
-          </div>
-          <div className="daily-fact-text">
-            <span className="daily-fact-title">Physiological Constant</span>
-            <p className="daily-fact-body">{profile.dailyFact}</p>
-          </div>
-        </div>
+        <p className="dossier-lead">
+          {organ.description}
+        </p>
+      </header>
+
+      {/* I — Observatio */}
+      <RomanSection index={0} of={sectionCount} title="Observatio — Physiology">
+        <p className="sec-copy">{profile?.physiology ?? organ.description}</p>
+        {profile?.medicalNote && <p className="sec-copy">{profile.medicalNote}</p>}
+      </RomanSection>
+
+      {/* II — Constantia — daily fact as pull-quote */}
+      {profile?.dailyFact && (
+        <RomanSection index={1} of={sectionCount} title="Constantia — Physiological Fact">
+          <figure className="pull-quote">
+            <span className="pq-mark" aria-hidden="true">“</span>
+            <p>{profile.dailyFact}</p>
+            <figcaption>Nº Dies — {profile.system}</figcaption>
+          </figure>
+        </RomanSection>
       )}
 
-      {/* Anatomical Landmarks (Interactive Points) */}
-      {organ.hotspots && organ.hotspots.length > 0 && (
-        <div className="landmarks-section">
-          <div className="landmarks-header">
-            <div className="flex items-center gap-2">
-              <MapPin size={13} className="text-cyan-400" />
-              <span>Anatomical Landmarks ({organ.hotspots.length})</span>
-            </div>
-            <span className="landmarks-subhint">Click point to inspect</span>
-          </div>
-
-          <div className="landmarks-list">
-            {organ.hotspots.map((spot) => {
+      {/* III — Landmarks */}
+      {organ.hotspots.length > 0 && (
+        <RomanSection index={2} of={sectionCount} title={`Landmarks — ${organ.hotspots.length} Points`}>
+          <div className="lm-list">
+            {organ.hotspots.map((spot, i) => {
               const isSelected = activeHotspot?.id === spot.id
               return (
                 <button
                   key={spot.id}
                   type="button"
-                  className={`landmark-item-btn ${isSelected ? 'selected' : ''}`}
+                  className={`lm-item ${isSelected ? 'selected' : ''}`}
                   onClick={() => onSelectHotspot(isSelected ? null : spot)}
-                  style={
-                    isSelected
-                      ? {
-                          borderColor: spot.color,
-                          backgroundColor: `${spot.color}15`,
-                        }
-                      : undefined
-                  }
+                  aria-pressed={isSelected}
                 >
-                  <div
-                    className="landmark-bullet"
-                    style={{ backgroundColor: spot.color }}
-                  />
-                  <div className="landmark-text">
-                    <div className="landmark-name-row">
-                      <strong className="landmark-title">{spot.label}</strong>
-                      <span className="landmark-latin">{spot.latinTerm}</span>
-                    </div>
-                    <p className="landmark-brief">{spot.detail}</p>
-                  </div>
+                  <span className="lm-idx">{romanOfSpot(i)}</span>
+                  <span className="lm-swatch" style={{ backgroundColor: spot.color }} />
+                  <span className="lm-body">
+                    <span className="lm-name">
+                      {spot.label}
+                      <span className="latin">{spot.latinTerm}</span>
+                    </span>
+                    <span className="lm-detail">{spot.detail}</span>
+                  </span>
                 </button>
               )
             })}
           </div>
-        </div>
+        </RomanSection>
       )}
 
-      {/* Datasets Section */}
-      <div className="datasets-grid">
-        <div className="dataset-item">
-          <div className="dataset-label">
-            <Database size={13} className="text-cyan-400" />
-            <span>Classification Benchmark</span>
-          </div>
-          <span className="dataset-value">{organ.classificationDataset}</span>
+      {/* IV — Data */}
+      <RomanSection index={3} of={sectionCount} title="Data — Benchmarks">
+        <div className="data-row">
+          <span className="k">Classification</span>
+          <span className="v">{organ.classificationDataset}</span>
         </div>
+        <div className="data-row">
+          <span className="k">Segmentation</span>
+          <span className="v">{organ.segmentationDataset}</span>
+        </div>
+      </RomanSection>
 
-        <div className="dataset-item">
-          <div className="dataset-label">
-            <Layers size={13} className="text-emerald-400" />
-            <span>Segmentation Benchmark</span>
-          </div>
-          <span className="dataset-value">{organ.segmentationDataset}</span>
-        </div>
-      </div>
-
-      {/* Clinical Diagnostic Tasks */}
-      <div className="clinical-tasks-section">
-        <div className="tasks-header">
-          <Stethoscope size={13} className="text-purple-400" />
-          <span>Active Diagnostic Targets</span>
-        </div>
-        <div className="tasks-tags-list">
-          {organ.clinicalTasks.map((task, index) => (
-            <span key={index} className="task-tag">
-              <FileCheck size={11} className="text-cyan-400" />
-              <span>{task}</span>
-            </span>
+      {/* V — Targetes */}
+      <RomanSection index={4} of={sectionCount} title="Targetes — Diagnostic Tasks">
+        <div>
+          {organ.clinicalTasks.map((task, i) => (
+            <div key={task} className="target-row">
+              <span className="t-idx">{String(i + 1).padStart(2, '0')}</span>
+              <span className="t-arr" aria-hidden="true">→</span>
+              <span className="t-name">{task}</span>
+            </div>
           ))}
         </div>
-      </div>
+      </RomanSection>
 
-      {/* Clinical Conditions */}
-      {profile?.commonConditions && profile.commonConditions.length > 0 && (
-        <div className="conditions-section">
-          <div className="conditions-header">
-            <BookOpen size={13} className="text-indigo-400" />
-            <span>Associated Clinical Pathologies</span>
+      {/* VI — Vasa & Pathologiae */}
+      <RomanSection index={5} of={sectionCount} title="Vasa & Pathologiae">
+        {profile?.bloodSupply && (
+          <div className="data-row">
+            <span className="k">Vascular Supply</span>
+            <span className="v prose">{profile.bloodSupply}</span>
           </div>
-          <div className="conditions-chips">
-            {profile.commonConditions.map((cond, idx) => (
-              <span key={idx} className="condition-chip">
-                {cond}
-              </span>
+        )}
+        {profile?.commonConditions && profile.commonConditions.length > 0 && (
+          <div className="cond-row">
+            {profile.commonConditions.map((cond) => (
+              <span key={cond} className="cond-chip">{cond}</span>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </RomanSection>
 
-      {/* Blood Supply */}
-      {profile?.bloodSupply && (
-        <div className="blood-supply-box">
-          <Droplets size={13} className="text-rose-400" />
-          <span>Vascular Supply: <strong>{profile.bloodSupply}</strong></span>
-        </div>
-      )}
-
-      {/* 3D Metadata Footer */}
-      <div className="info-card-footer">
-        <span className="footer-meta-item">
-          System: <strong>{profile?.system || 'Homo Sapiens Anatomy'}</strong>
+      {/* Colophon footer */}
+      <footer className="dossier-foot">
+        <span>
+          Asset — {organ.modelFile.split('/').pop()} · {profile?.system ?? 'Homo Sapiens'}
         </span>
-        <span className="footer-meta-item">
-          Asset: <code>{organ.modelFile.split('/').pop()}</code>
-        </span>
-      </div>
+        <span className="fin">fin.</span>
+      </footer>
     </div>
   )
 }

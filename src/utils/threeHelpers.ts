@@ -102,16 +102,16 @@ export function createHotspotSprite(colorHex: string, isSelected = false): THREE
   ctx.arc(c, c, c, 0, tau)
   ctx.fill()
 
-  // High-contrast dark backing ring
+  // High-contrast ink backing ring
   ctx.beginPath()
   ctx.arc(c, c, size * 0.3, 0, tau)
-  ctx.fillStyle = 'rgba(11, 15, 25, 0.8)'
+  ctx.fillStyle = 'rgba(21, 20, 15, 0.85)'
   ctx.fill()
 
-  // Crisp white inner ring
+  // Crisp bone inner ring (paper, never pure white on ink)
   ctx.beginPath()
   ctx.arc(c, c, size * 0.26, 0, tau)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.98)'
+  ctx.fillStyle = 'rgba(247, 241, 222, 0.98)'
   ctx.fill()
 
   // Core saturated color dot
@@ -187,8 +187,8 @@ export function applyRenderMode(
   showWireframeOverlay = false
 ): void {
   const accentThreeColor = new THREE.Color(accentColor)
-  const medicalCyan = new THREE.Color('#38bdf8')
-  const lesionAmber = new THREE.Color('#f43f5e')
+  const xrayBone = new THREE.Color('#efe7d2')
+  const lesionCoral = new THREE.Color('#ed6f5c')
 
   object.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
@@ -220,7 +220,7 @@ export function applyRenderMode(
 
         case 'xray': {
           mesh.material = new THREE.MeshPhysicalMaterial({
-            color: medicalCyan,
+            color: xrayBone,
             transparent: true,
             opacity: 0.38,
             roughness: 0.2,
@@ -245,8 +245,8 @@ export function applyRenderMode(
 
         case 'segmentation': {
           mesh.material = new THREE.MeshStandardMaterial({
-            color: lesionAmber,
-            emissive: lesionAmber,
+            color: lesionCoral,
+            emissive: lesionCoral,
             emissiveIntensity: 0.55,
             roughness: 0.35,
             metalness: 0.1,

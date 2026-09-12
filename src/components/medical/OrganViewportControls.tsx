@@ -44,126 +44,126 @@ export const OrganViewportControls: React.FC<OrganViewportControlsProps> = ({
   }
 
   return (
-    <div className="viewport-controls-hud">
-      {/* Top Left: Shading Modes */}
-      <div className="controls-group">
-        <span className="controls-group-label">Shading & Diagnostics</span>
-        <div className="controls-buttons-row">
+    <div className="plate-hud">
+      {/* Shading modes */}
+      <div className="hud-group">
+        <span className="hud-label">Pl. I — Shading</span>
+        <div className="hud-chip" role="group" aria-label="Shading modes">
           <button
             type="button"
-            className={`control-btn ${settings.renderMode === 'pbr' ? 'active' : ''}`}
+            className={`hud-btn ${settings.renderMode === 'pbr' ? 'active' : ''}`}
             onClick={() => setRenderMode('pbr')}
             title="Anatomical PBR Solid"
           >
-            <Box size={14} />
-            <span>Anatomical</span>
+            <Box size={13} className="ico" />
+            <span>Solid</span>
           </button>
 
           <button
             type="button"
-            className={`control-btn ${settings.renderMode === 'xray' ? 'active' : ''}`}
+            className={`hud-btn ${settings.renderMode === 'xray' ? 'active' : ''}`}
             onClick={() => setRenderMode('xray')}
-            title="Translucent Holographic X-Ray"
+            title="Translucent X-Ray"
           >
-            <Eye size={14} />
+            <Eye size={13} className="ico" />
             <span>X-Ray</span>
           </button>
 
           <button
             type="button"
-            className={`control-btn ${settings.renderMode === 'wireframe' ? 'active' : ''}`}
+            className={`hud-btn ${settings.renderMode === 'wireframe' ? 'active' : ''}`}
             onClick={() => setRenderMode('wireframe')}
             title="Topological Wireframe"
           >
-            <Layers size={14} />
+            <Layers size={13} className="ico" />
             <span>Wireframe</span>
           </button>
 
           <button
             type="button"
-            className={`control-btn lesion-btn ${settings.renderMode === 'segmentation' ? 'active' : ''}`}
+            className={`hud-btn ${settings.renderMode === 'segmentation' ? 'active' : ''}`}
             onClick={() => setRenderMode('segmentation')}
             title="AI Segmentation Lesion Layer"
           >
-            <Sparkles size={14} />
-            <span>AI Lesion Mask</span>
+            <Sparkles size={13} className="ico" />
+            <span>AI Mask</span>
           </button>
         </div>
       </div>
 
-      {/* Top Right: Camera Presets & Movement */}
-      <div className="controls-group">
-        <span className="controls-group-label">Inspection & Points</span>
-        <div className="controls-buttons-row">
+      {/* Inspection & camera */}
+      <div className="hud-group right">
+        <span className="hud-label">Pl. II — Inspection</span>
+        <div className="hud-chip" role="group" aria-label="Inspection controls">
           {hotspotsCount > 0 && (
             <button
               type="button"
-              className={`control-btn landmarks-btn ${settings.showHotspots ? 'active' : ''}`}
+              className={`hud-btn ${settings.showHotspots ? 'active' : ''}`}
               onClick={toggleHotspots}
-              title="Toggle Anatomical Landmarks & Points"
+              title="Toggle anatomical landmark points"
             >
-              <MapPin size={14} />
+              <MapPin size={13} className="ico" />
               <span>Points ({hotspotsCount})</span>
             </button>
           )}
 
           <button
             type="button"
-            className="control-btn"
+            className="hud-btn"
             onClick={() => onSetCameraPreset('anterior')}
-            title="Anterior (Frontal Plane)"
+            title="Anterior (frontal plane)"
           >
-            <Compass size={14} />
+            <Compass size={13} className="ico" />
             <span>Anterior</span>
           </button>
 
           <button
             type="button"
-            className="control-btn"
+            className="hud-btn"
             onClick={() => onSetCameraPreset('lateral')}
-            title="Lateral (Sagittal Plane)"
+            title="Lateral (sagittal plane)"
           >
-            <Compass size={14} />
+            <Compass size={13} className="ico" />
             <span>Lateral</span>
           </button>
 
           <button
             type="button"
-            className="control-btn"
+            className="hud-btn"
             onClick={() => onSetCameraPreset('superior')}
-            title="Superior (Axial Plane)"
+            title="Superior (axial plane)"
           >
-            <Compass size={14} />
+            <Compass size={13} className="ico" />
             <span>Superior</span>
           </button>
 
           <button
             type="button"
-            className={`control-btn ${settings.autoRotate ? 'active' : ''}`}
+            className={`hud-btn ${settings.autoRotate ? 'active' : ''}`}
             onClick={toggleAutoRotate}
-            title="Toggle 360° Auto-Rotation"
+            title="Toggle 360° auto-rotation"
           >
-            <RotateCw size={14} className={settings.autoRotate ? 'spin-slow' : ''} />
+            <RotateCw size={13} className={`ico ${settings.autoRotate ? 'spin-slow' : ''}`} />
             <span>Rotate</span>
           </button>
 
           <button
             type="button"
-            className={`control-btn ${settings.wireframeOverlay ? 'active' : ''}`}
+            className={`hud-btn ${settings.wireframeOverlay ? 'active' : ''}`}
             onClick={toggleWireframeOverlay}
-            title="Toggle Wireframe Grid Overlay"
+            title="Toggle wireframe grid overlay"
           >
-            <Maximize2 size={14} />
+            <Maximize2 size={13} className="ico" />
             <span>Grid</span>
           </button>
 
           <button
             type="button"
-            className="control-btn reset-btn"
+            className="hud-btn"
             onClick={onResetCamera}
-            title="Recenter & Reset Camera"
+            title="Recenter & reset camera"
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={13} className="ico" />
             <span>Reset</span>
           </button>
         </div>

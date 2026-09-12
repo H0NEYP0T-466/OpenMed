@@ -16,10 +16,10 @@ import {
 } from '../../utils/threeHelpers'
 import { OrganViewportControls } from './OrganViewportControls'
 import { HotspotCallout } from './HotspotCallout'
-import { AlertCircle, Loader2 } from 'lucide-react'
 
 interface OrganViewer3DProps {
   readonly organ: OrganMetadata
+  readonly plateNo: string
   readonly settings: ViewerSettings
   readonly onUpdateSettings: (updater: (prev: ViewerSettings) => ViewerSettings) => void
   readonly activeHotspot: Hotspot | null
@@ -28,6 +28,7 @@ interface OrganViewer3DProps {
 
 export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
   organ,
+  plateNo,
   settings,
   onUpdateSettings,
   activeHotspot,
@@ -58,7 +59,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     activeHotspotRef.current = activeHotspot
   }, [activeHotspot])
 
-  // Initialize Three.js Scene once
+  // Initialize Three.js scene once — warm museum lighting on an ink plate
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -94,15 +95,15 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     controls.zoomSpeed = 0.9
     controlsRef.current = controls
 
-    // Clinical Studio Lighting Rig
-    scene.add(new THREE.AmbientLight(0xffffff, 0.45))
-    scene.add(new THREE.HemisphereLight(0xfff8ee, 0x1a2233, 0.75))
+    // Studio lighting rig — warm paper key, muted olive-warm fill, coral rim
+    scene.add(new THREE.AmbientLight(0xfff6e3, 0.45))
+    scene.add(new THREE.HemisphereLight(0xfff8ee, 0x241f16, 0.75))
 
     const keyLight = new THREE.DirectionalLight(0xfff3e7, 3.2)
     keyLight.position.set(4.8, 6.5, 6.8)
     scene.add(keyLight)
 
-    const fillLight = new THREE.DirectionalLight(0xe6ecff, 1.1)
+    const fillLight = new THREE.DirectionalLight(0xf0e8d4, 1.1)
     fillLight.position.set(-4.5, 1.2, 5.2)
     scene.add(fillLight)
 
@@ -118,12 +119,12 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     const envMap = buildEnvironmentMap(renderer)
     scene.environment = envMap
 
-    // Subtle anatomical floor grid
-    const grid = new THREE.GridHelper(12, 24, 0x1e293b, 0x0f172a)
+    // Hairline drafting grid in warm ink tones
+    const grid = new THREE.GridHelper(12, 24, 0x2a2620, 0x1d1a13)
     grid.position.y = -2.2
     scene.add(grid)
 
-    // Raycaster for interactive Hotspot picking
+    // Raycaster for interactive hotspot picking
     const raycaster = new THREE.Raycaster()
     const mouse = new THREE.Vector2()
 
@@ -169,7 +170,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     domElement.addEventListener('pointerdown', onPointerDown)
     domElement.addEventListener('pointermove', onPointerMove)
 
-    // Responsive resize handler
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width: w, height: h } = entry.contentRect
@@ -182,7 +182,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     })
     resizeObserver.observe(container)
 
-    // Animation Render Loop
     const animate = () => {
       animFrameIdRef.current = requestAnimationFrame(animate)
 
@@ -190,7 +189,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
         controlsRef.current.update()
       }
 
-      // Smooth auto-rotation if active
       const currentSettings = settingsRef.current
       if (currentSettings.autoRotate && organPivotRef.current) {
         organPivotRef.current.rotation.y += 0.0035 * currentSettings.rotationSpeed
@@ -216,9 +214,9 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
         container.removeChild(renderer.domElement)
       }
     }
-  }, [onSelectHotspot]) // run once on mount
+  }, [onSelectHotspot])
 
-  // Load organ model whenever selected organ changes
+  // Load the organ model whenever the selected organ changes
   useEffect(() => {
     const scene = sceneRef.current
     const camera = cameraRef.current
@@ -230,7 +228,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     setLoadingProgress(0)
     setLoadError(null)
 
-    // Clear previously loaded organ pivot
     if (organPivotRef.current) {
       scene.remove(organPivotRef.current)
       disposeObjectTree(organPivotRef.current)
@@ -246,20 +243,16 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       (gltf) => {
         const model = gltf.scene
 
-        // Create unified organ pivot group
         const organPivot = new THREE.Group()
         organPivot.name = 'organ-pivot'
         organPivotRef.current = organPivot
 
-        // Enhance baked PBR materials & texture anisotropy
         const maxAnisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy())
         enhancePBRMaterials(model, maxAnisotropy)
 
-        // Normalize model to standard FIT_SIZE space (3.8 units)
         normalizeModelToFitSize(model, FIT_SIZE)
         organPivot.add(model)
 
-        // Create Hotspots layer
         const hotspotsGroup = new THREE.Group()
         hotspotsGroup.name = 'hotspots-group'
         hotspotsGroupRef.current = hotspotsGroup
@@ -279,12 +272,10 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
 
         scene.add(organPivot)
 
-        // Fit camera cleanly to normalized pivot
         const dist = organ.cameraDistance ? organ.cameraDistance * 4.2 : 7.5
         defaultDistanceRef.current = dist
         fitCameraToNormalizedPivot(camera, controls, dist)
 
-        // Apply current render mode
         applyRenderMode(
           model,
           settingsRef.current.renderMode,
@@ -303,20 +294,18 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       },
       (error) => {
         console.warn(`Failed to load ${organ.modelFile}:`, error)
-        setLoadError(`Unable to load 3D file for ${organ.name}. Model is caching or unavailable.`)
+        setLoadError(`Unable to load the print plate for ${organ.name}. The mesh is caching or off-press.`)
         setIsLoading(false)
       }
     )
   }, [organ.id, organ.name, organ.modelFile, organ.accentColor, organ.cameraDistance, organ.hotspots])
 
-  // Update hotspots visibility when setting changes
   useEffect(() => {
     if (hotspotsGroupRef.current) {
       hotspotsGroupRef.current.visible = settings.showHotspots
     }
   }, [settings.showHotspots])
 
-  // Re-scale active hotspot sprite
   useEffect(() => {
     if (hotspotsGroupRef.current) {
       hotspotsGroupRef.current.children.forEach((child) => {
@@ -331,7 +320,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     }
   }, [activeHotspot])
 
-  // Update shaders/materials when settings change
   useEffect(() => {
     if (organPivotRef.current) {
       applyRenderMode(
@@ -343,7 +331,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     }
   }, [settings.renderMode, settings.wireframeOverlay, organ.accentColor])
 
-  // Camera Preset Actions
   const handleSetCameraPreset = useCallback((preset: CameraPreset) => {
     const camera = cameraRef.current
     const controls = controlsRef.current
@@ -376,41 +363,66 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
   }, [handleSetCameraPreset])
 
   return (
-    <div className="organ-viewer-container">
-      {/* 3D WebGL Canvas mount point */}
-      <div ref={containerRef} className="three-canvas-root" />
+    <>
+      {/* WebGL canvas mount */}
+      <div ref={containerRef} className="plate-canvas" />
 
-      {/* Loading Overlay */}
+      {/* Corner brackets — mandatory plate annotation */}
+      <span className="brk tl" aria-hidden="true" />
+      <span className="brk tr" aria-hidden="true" />
+      <span className="brk bl" aria-hidden="true" />
+      <span className="brk br" aria-hidden="true" />
+
+      {/* Plate caption */}
+      <div className="plate-caption">
+        <span className="p-num">
+          Plate <i>Nº {plateNo}</i> — {organ.name}
+        </span>
+        <span className="p-hair" aria-hidden="true" />
+        <span className="p-term">{organ.anatomicalTerm}</span>
+      </div>
+
+      {/* Coordinate / mesh stamp */}
+      <div className="plate-coord">
+        FIG. {plateNo} / OM-26<span className="sep">·</span>PBR glTF<span className="sep">·</span>
+        {organ.hotspots.length} landmarks<span className="sep">·</span>drag to orbit — scroll to zoom
+      </div>
+
+      {/* Loading note */}
       {isLoading && (
-        <div className="viewer-overlay loading-overlay">
-          <div className="loading-card">
-            <Loader2 className="animate-spin text-cyan-400" size={32} />
-            <span className="loading-text">Loading 3D Anatomy: {organ.name}</span>
-            <div className="progress-bar-track">
+        <div className="plate-overlay">
+          <div className="plate-note">
+            <span className="note-eyebrow">Off-press — Plate Nº {plateNo}</span>
+            <span className="note-title">
+              Setting the type: {organ.name}<span className="dot">.</span>
+            </span>
+            <div className="progress-track">
               <div
-                className="progress-bar-fill"
+                className="progress-fill"
                 style={{ width: `${Math.max(loadingProgress, 8)}%` }}
               />
             </div>
-            <span className="loading-subtext">
-              {loadingProgress > 0 ? `${loadingProgress}% loaded` : 'Decompressing PBR Mesh...'}
+            <span className="progress-sub">
+              {loadingProgress > 0 ? `${loadingProgress}% of the mesh assembled` : 'Decompressing PBR geometry…'}
             </span>
           </div>
         </div>
       )}
 
-      {/* Error Overlay */}
+      {/* Error note */}
       {loadError && !isLoading && (
-        <div className="viewer-overlay error-overlay">
-          <div className="error-card">
-            <AlertCircle size={28} className="text-rose-400" />
-            <span className="error-title">3D Model Offline</span>
-            <p className="error-description">{loadError}</p>
+        <div className="plate-overlay">
+          <div className="plate-note">
+            <span className="note-eyebrow">Press halt — Plate Nº {plateNo}</span>
+            <span className="note-title">
+              Plate offline<span className="dot">.</span>
+            </span>
+            <p className="note-body">{loadError}</p>
           </div>
         </div>
       )}
 
-      {/* Controls HUD */}
+      {/* HUD */}
       <OrganViewportControls
         settings={settings}
         onUpdateSettings={onUpdateSettings}
@@ -419,27 +431,26 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
         hotspotsCount={organ.hotspots?.length ?? 0}
       />
 
-      {/* Hover Tooltip */}
+      {/* Hover tooltip */}
       {hoveredHotspot && !activeHotspot && (
-        <div className="hotspot-hover-tooltip">
-          <div
-            className="tooltip-dot"
+        <div className="hot-tip">
+          <span
+            className="tip-swatch"
             style={{ backgroundColor: hoveredHotspot.color }}
+            aria-hidden="true"
           />
-          <div className="tooltip-text">
-            <strong>{hoveredHotspot.label}</strong>
-            <span>{hoveredHotspot.latinTerm}</span>
-          </div>
+          <strong>{hoveredHotspot.label}</strong>
+          <span>{hoveredHotspot.latinTerm}</span>
         </div>
       )}
 
-      {/* Active Selected Hotspot Callout */}
+      {/* Selected landmark callout */}
       {activeHotspot && (
         <HotspotCallout
           hotspot={activeHotspot}
           onClose={() => onSelectHotspot(null)}
         />
       )}
-    </div>
+    </>
   )
 }

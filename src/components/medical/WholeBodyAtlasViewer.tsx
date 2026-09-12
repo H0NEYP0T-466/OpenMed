@@ -11,6 +11,7 @@ import type {
 } from '../../types/atlas'
 import { ATLAS_SYSTEMS, DEFAULT_ATLAS_SYSTEMS } from '../../types/atlas'
 import type { OrganId } from '../../types/organ'
+import { ORGANS_REGISTRY } from '../../types/organ'
 import {
   createExplosionLayout,
   PointerTap,
@@ -21,22 +22,19 @@ import {
   RotateCw,
   Compass,
   Sliders,
-  CheckSquare,
-  Square,
   Maximize2,
   ExternalLink,
-  Info,
-  Loader2,
-  AlertCircle,
   X
 } from 'lucide-react'
 
 interface WholeBodyAtlasViewerProps {
   readonly onNavigateToOrgan: (organId: OrganId) => void
+  readonly plateNo: string
 }
 
 export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
   onNavigateToOrgan,
+  plateNo,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [atlasData, setAtlasData] = useState<AtlasData | null>(null)
@@ -106,7 +104,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
       powerPreference: 'high-performance',
     })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.setClearColor('#080d18')
+    renderer.setClearColor('#16130d')
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.15
@@ -132,9 +130,9 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
       dirty = true
     })
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55))
-    scene.add(new THREE.HemisphereLight(0xfff8ee, 0x1e293b, 0.85))
+    // Lighting — warm paper key over an ink ground
+    scene.add(new THREE.AmbientLight(0xfff6e3, 0.55))
+    scene.add(new THREE.HemisphereLight(0xfff8ee, 0x241f16, 0.85))
 
     const keyLight = new THREE.DirectionalLight(0xfffaf4, 2.5)
     keyLight.position.set(-2, 4, 3)
@@ -147,12 +145,12 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
     // Floor Platform
     const platform = new THREE.Mesh(
       new THREE.CylinderGeometry(0.7, 0.72, 0.03, 64),
-      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 })
+      new THREE.MeshStandardMaterial({ color: 0x1c1812, roughness: 0.8 })
     )
     platform.position.y = -0.016
     scene.add(platform)
 
-    const grid = new THREE.GridHelper(8, 16, 0x1e293b, 0x0f172a)
+    const grid = new THREE.GridHelper(8, 16, 0x2a2620, 0x1d1a13)
     grid.position.y = -0.018
     scene.add(grid)
 
@@ -221,7 +219,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
 
         shader.fragmentShader = shader.fragmentShader.replace(
           '#include <color_fragment>',
-          '#include <color_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.22, 0.74, 0.98), partSelected * 0.85);'
+          '#include <color_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.929, 0.435, 0.361), partSelected * 0.85);'
         )
       }
 
@@ -540,221 +538,233 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
   const mappedOrganId = selectedPart ? mapPartToOrgan(selectedPart.name) : null
 
   return (
-    <div className="whole-body-atlas-root">
-      {/* 3D Canvas Mount */}
-      <div ref={containerRef} className="atlas-canvas-host" />
+    <>
+      {/* WebGL canvas mount */}
+      <div ref={containerRef} className="plate-canvas" />
 
-      {/* Top HUD Controls */}
-      <div className="atlas-hud-top">
-        {/* Dissection Explode Slider */}
-        <div className="atlas-hud-card explode-control-card">
-          <div className="explode-label-row">
-            <div className="flex items-center gap-2">
-              <Sliders size={13} className="text-cyan-400" />
-              <span className="hud-title">Anatomical Dissection (Explode)</span>
-            </div>
-            <span className="explode-val-badge">
-              {Math.round(sceneState.explode * 100)}%
-            </span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={sceneState.explode}
-            onChange={(e) =>
-              setSceneState((prev) => ({
-                ...prev,
-                explode: parseFloat(e.target.value),
-              }))
-            }
-            className="explode-range-slider"
-          />
+      {/* Corner brackets */}
+      <span className="brk tl" aria-hidden="true" />
+      <span className="brk tr" aria-hidden="true" />
+      <span className="brk bl" aria-hidden="true" />
+      <span className="brk br" aria-hidden="true" />
+
+      {/* Plate caption */}
+      <div className="plate-caption">
+        <span className="p-num">
+          Plate <i>Nº {plateNo}</i> — Corpus Integrum
+        </span>
+        <span className="p-hair" aria-hidden="true" />
+        <span className="p-term">Homo Sapiens · 2,234 parts</span>
+      </div>
+
+      {/* Coordinate / mesh stamp */}
+      <div className="plate-coord">
+        FIG. {plateNo} / OM-26<span className="sep">·</span>15 physiological systems
+        <span className="sep">·</span>tap a structure to inspect
+      </div>
+
+      {/* Dissection slider — top left */}
+      <div className="atlas-card explode-card">
+        <div className="explode-head">
+          <span className="card-label">
+            <Sliders size={12} style={{ verticalAlign: -2, marginRight: 7 }} />
+            Dissection (Explode)
+          </span>
+          <span className="val-badge">{Math.round(sceneState.explode * 100)}%</span>
         </div>
-
-        {/* View Presets & Orbit */}
-        <div className="atlas-hud-card view-presets-card">
-          <div className="hud-buttons-row">
-            <button
-              type="button"
-              className={`hud-btn ${sceneState.viewAngle === 'front' ? 'active' : ''}`}
-              onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'front' }))}
-              title="Anterior (Frontal)"
-            >
-              <Compass size={13} />
-              <span>Front</span>
-            </button>
-
-            <button
-              type="button"
-              className={`hud-btn ${sceneState.viewAngle === 'back' ? 'active' : ''}`}
-              onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'back' }))}
-              title="Posterior (Back)"
-            >
-              <Compass size={13} />
-              <span>Back</span>
-            </button>
-
-            <button
-              type="button"
-              className={`hud-btn ${sceneState.viewAngle === 'side' ? 'active' : ''}`}
-              onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'side' }))}
-              title="Lateral (Side)"
-            >
-              <Compass size={13} />
-              <span>Side</span>
-            </button>
-
-            <button
-              type="button"
-              className={`hud-btn ${sceneState.viewAngle === 'three-quarter' ? 'active' : ''}`}
-              onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'three-quarter' }))}
-              title="Three-Quarter Isometric"
-            >
-              <Compass size={13} />
-              <span>Iso</span>
-            </button>
-
-            <button
-              type="button"
-              className={`hud-btn ${sceneState.autoRotate ? 'active' : ''}`}
-              onClick={() =>
-                setSceneState((prev) => ({ ...prev, autoRotate: !prev.autoRotate }))
-              }
-              title="Toggle Auto-Rotation"
-            >
-              <RotateCw size={13} className={sceneState.autoRotate ? 'spin-slow' : ''} />
-              <span>Spin</span>
-            </button>
-          </div>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={sceneState.explode}
+          onChange={(e) =>
+            setSceneState((prev) => ({ ...prev, explode: parseFloat(e.target.value) }))
+          }
+          className="range"
+          aria-label="Anatomical dissection amount"
+        />
+        <div className="range-foot">
+          <span>In situ</span>
+          <span>Plate layout</span>
         </div>
       </div>
 
-      {/* Left Drawer: 15 Anatomical System Toggles */}
-      <aside className="atlas-systems-drawer">
-        <div className="systems-drawer-header">
-          <div className="flex items-center gap-2">
-            <Layers size={14} className="text-cyan-400" />
-            <span className="drawer-title">Physiological Systems</span>
-          </div>
-          <span className="drawer-count">
-            {sceneState.visibleSystems.length}/{ATLAS_SYSTEMS.length} Active
+      {/* View presets — top right */}
+      <div style={{ position: 'absolute', top: 48, right: 20, zIndex: 35 }}>
+        <div className="hud-chip" role="group" aria-label="Atlas view presets">
+          <button
+            type="button"
+            className={`hud-btn ${sceneState.viewAngle === 'front' ? 'active' : ''}`}
+            onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'front' }))}
+            title="Anterior (frontal)"
+          >
+            <Compass size={13} className="ico" />
+            <span>Front</span>
+          </button>
+          <button
+            type="button"
+            className={`hud-btn ${sceneState.viewAngle === 'back' ? 'active' : ''}`}
+            onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'back' }))}
+            title="Posterior (back)"
+          >
+            <Compass size={13} className="ico" />
+            <span>Back</span>
+          </button>
+          <button
+            type="button"
+            className={`hud-btn ${sceneState.viewAngle === 'side' ? 'active' : ''}`}
+            onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'side' }))}
+            title="Lateral (side)"
+          >
+            <Compass size={13} className="ico" />
+            <span>Side</span>
+          </button>
+          <button
+            type="button"
+            className={`hud-btn ${sceneState.viewAngle === 'three-quarter' ? 'active' : ''}`}
+            onClick={() => setSceneState((prev) => ({ ...prev, viewAngle: 'three-quarter' }))}
+            title="Three-quarter isometric"
+          >
+            <Compass size={13} className="ico" />
+            <span>Iso</span>
+          </button>
+          <button
+            type="button"
+            className={`hud-btn ${sceneState.autoRotate ? 'active' : ''}`}
+            onClick={() => setSceneState((prev) => ({ ...prev, autoRotate: !prev.autoRotate }))}
+            title="Toggle auto-rotation"
+          >
+            <RotateCw size={13} className={`ico ${sceneState.autoRotate ? 'spin-slow' : ''}`} />
+            <span>Spin</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Systems table of contents — left drawer */}
+      <aside className="sys-drawer">
+        <div className="sys-drawer-head">
+          <span className="card-label">
+            <Layers size={12} style={{ verticalAlign: -2, marginRight: 7 }} />
+            Physiological Systems
           </span>
+          <span className="count">{sceneState.visibleSystems.length}/{ATLAS_SYSTEMS.length}</span>
         </div>
 
-        <div className="systems-list-scroll">
+        <div className="sys-scroll">
           {ATLAS_SYSTEMS.map((sys) => {
             const isVisible = sceneState.visibleSystems.includes(sys.id)
             return (
               <button
                 key={sys.id}
                 type="button"
-                className={`system-item-toggle ${isVisible ? 'visible' : 'hidden-sys'}`}
+                className={`sys-item ${isVisible ? '' : 'off'}`}
                 onClick={() => toggleSystem(sys.id)}
+                aria-pressed={isVisible}
+                title={sys.description}
               >
-                <div
-                  className="system-color-tag"
-                  style={{ backgroundColor: sys.color }}
-                />
-                <span className="system-name">{sys.name}</span>
-                {isVisible ? (
-                  <CheckSquare size={13} className="text-cyan-400 ml-auto" />
-                ) : (
-                  <Square size={13} className="text-slate-600 ml-auto" />
-                )}
+                <span className="sys-swatch" style={{ backgroundColor: sys.color }} />
+                <span className="sys-name">{sys.name}</span>
+                <span className="sys-tick">{isVisible ? '✓' : '—'}</span>
               </button>
             )
           })}
         </div>
       </aside>
 
-      {/* Selected Anatomical Structure Inspector */}
+      {/* Selected structure inspector */}
       {selectedPart && (
-        <div className="atlas-part-inspector-card">
-          <div className="inspector-header">
-            <div className="inspector-badge">
-              <Info size={13} className="text-cyan-400" />
-              <span>Anatomical Part Inspector</span>
-            </div>
+        <div className="part-inspector" role="dialog" aria-label="Anatomical part inspector">
+          <div className="co-head">
+            <span className="co-eyebrow">Part Inspector</span>
             <button
               type="button"
-              className="inspector-close"
+              className="icon-btn"
               onClick={() => setSelectedPart(null)}
+              aria-label="Close inspector"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           </div>
 
-          <div className="inspector-body">
-            <h3 className="inspector-part-name">{selectedPart.name}</h3>
-            <div className="inspector-meta-row">
-              <span className="inspector-system-tag">
-                System: <strong>{selectedPart.system}</strong>
+          <div>
+            <h3 className="pi-name">
+              {selectedPart.name}
+              <span className="dot">.</span>
+            </h3>
+            <div className="pi-meta">
+              <span className="sys-chip">
+                <i
+                  style={{
+                    backgroundColor:
+                      ATLAS_SYSTEMS.find((s) => s.id === selectedPart.system)?.color ?? '#aebbb8',
+                  }}
+                />
+                {selectedPart.system}
               </span>
-              <span className="inspector-concept-tag">
-                Concept: <code>{selectedPart.conceptId}</code>
-              </span>
+              <span className="pi-latin">Concept {selectedPart.conceptId}</span>
             </div>
+          </div>
 
-            <div className="inspector-actions-row">
+          <div className="pi-actions">
+            <button
+              type="button"
+              className={`btn-sm ${sceneState.isolate ? 'active' : ''}`}
+              onClick={() => setSceneState((prev) => ({ ...prev, isolate: !prev.isolate }))}
+            >
+              <Maximize2 size={13} />
+              <span>{sceneState.isolate ? 'Show All Systems' : 'Isolate Structure'}</span>
+            </button>
+
+            {mappedOrganId && (
               <button
                 type="button"
-                className={`inspector-btn ${sceneState.isolate ? 'active' : ''}`}
-                onClick={() =>
-                  setSceneState((prev) => ({ ...prev, isolate: !prev.isolate }))
-                }
+                className="btn-sm hot"
+                onClick={() => onNavigateToOrgan(mappedOrganId)}
               >
-                <Maximize2 size={13} />
-                <span>{sceneState.isolate ? 'Show All Systems' : 'Isolate Structure'}</span>
+                <ExternalLink size={13} />
+                <span>Inspect in {ORGANS_REGISTRY[mappedOrganId].name} workspace</span>
               </button>
-
-              {mappedOrganId && (
-                <button
-                  type="button"
-                  className="inspector-btn primary-workspace-btn"
-                  onClick={() => onNavigateToOrgan(mappedOrganId)}
-                >
-                  <ExternalLink size={13} />
-                  <span>Inspect in {mappedOrganId.toUpperCase()} Workspace</span>
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Loading Overlay */}
+      {/* Loading note */}
       {isLoading && (
-        <div className="atlas-overlay loading-overlay">
-          <div className="loading-card">
-            <Loader2 className="animate-spin text-cyan-400" size={32} />
-            <span className="loading-text">Assembling BodyParts3D Atlas</span>
-            <div className="progress-bar-track">
+        <div className="plate-overlay">
+          <div className="plate-note">
+            <span className="note-eyebrow">Off-press — assembling the macro plate</span>
+            <span className="note-title">
+              Imposing BodyParts3D<span className="dot">.</span>
+            </span>
+            <div className="progress-track">
               <div
-                className="progress-bar-fill"
+                className="progress-fill"
                 style={{ width: `${Math.max(loadingProgress, 8)}%` }}
               />
             </div>
-            <span className="loading-subtext">
+            <span className="progress-sub">
               {loadingProgress > 0
-                ? `${loadingProgress}% chunks assembled (2,234 parts)`
-                : 'Loading progressive chunks...'}
+                ? `${loadingProgress}% of chunks bound (2,234 parts)`
+                : 'Fetching progressive chunks…'}
             </span>
           </div>
         </div>
       )}
 
-      {/* Error Overlay */}
+      {/* Error note */}
       {errorMessage && !isLoading && (
-        <div className="atlas-overlay error-overlay">
-          <div className="error-card">
-            <AlertCircle size={28} className="text-rose-400" />
-            <span className="error-title">Atlas Initialization Error</span>
-            <p className="error-description">{errorMessage}</p>
+        <div className="plate-overlay">
+          <div className="plate-note">
+            <span className="note-eyebrow">Press halt</span>
+            <span className="note-title">
+              Atlas initialization error<span className="dot">.</span>
+            </span>
+            <p className="note-body">{errorMessage}</p>
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

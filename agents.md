@@ -18,9 +18,11 @@ This project is a high-stakes university **Final Year Project (FYP)**. It is not
 ## 📜 The 10 Mandatory Agent Rules
 
 ### 1. Visual & Design Consistency (Zero Drift)
+* **Canonical Design System — Atelier Zero:** The frontend implements the **Atelier Zero** editorial design system (vault: `opendesign/design-systems/atelier-zero/`, contract documented in `[[design-system-atelier-zero]]` in the OpenMed Obsidian vault). The app presents as a printed medical annual: warm paper canvas (`#efe7d2`), ink hierarchy (`#15140f` → `#8b8676`), bone card surfaces (`#f7f1de`), 3D viewports styled as dark ink "plates" with corner brackets and `Plate Nº` captions, Roman-numeral section rules, and a **single coral accent (`#ed6f5c`)** per viewport.
 * **Never invent new styles:** Strictly adhere to the established visual language, theme, and component patterns of the application.
-* **Palette Preservation:** Do not add, remove, tweak, or substitute theme colors, border radii, typography sizes, or UI palettes unless explicitly instructed by the user.
-* **Component Reuse:** Reuse existing UI components from `src/components/`. Do not create one-off ad-hoc styled variants when a canonical component already exists.
+* **Palette Preservation:** All colors must come from the token block in `src/index.css` (which copies the Atelier Zero schema exactly: `--paper`, `--bone`, `--ink*`, `--accent`, `--mustard`, `--olive`). Do not add, remove, tweak, or substitute theme colors, border radii, typography sizes, or UI palettes unless explicitly instructed by the user. Mustard is jewelry (≤1%, one nav ★); never a CTA fill. No pure white, no pure black, no glassmorphism, no emoji in UI copy.
+* **Typography:** Inter Tight (display), Playfair Display Italic 500 (emotional nouns, Roman numerals, `fin.`), Inter (body), JetBrains Mono (coordinates, plate numbers, data rows) — all self-hosted via Fontsource, imported in `src/main.tsx`.
+* **Component Reuse:** Reuse existing UI primitives from `src/components/` and the shared classes in `src/App.css` (`.plate`, `.eyebrow`, `.sec-rule`, `.hud-chip`, `.btn-primary/.btn-ghost`, `.pill`, `.dot`). Do not create one-off ad-hoc styled variants when a canonical component already exists.
 
 ---
 

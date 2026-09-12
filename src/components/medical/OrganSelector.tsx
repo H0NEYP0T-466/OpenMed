@@ -1,5 +1,5 @@
-import React from 'react'
-import type { OrganId, OrganMetadata } from '../../types/organ'
+import React, { useEffect, useRef } from 'react'
+import type { OrganId } from '../../types/organ'
 import { ORGANS_REGISTRY } from '../../types/organ'
 
 interface OrganSelectorProps {
@@ -11,48 +11,44 @@ export const OrganSelector: React.FC<OrganSelectorProps> = ({
   selectedId,
   onSelectOrgan,
 }) => {
-  const organsList: OrganMetadata[] = Object.values(ORGANS_REGISTRY)
+  const organs = Object.values(ORGANS_REGISTRY)
+  const selectedNo = organs.findIndex((organ) => organ.id === selectedId) + 1
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const idx = organs.findIndex((organ) => organ.id === selectedId)
+    const pill = scrollRef.current?.children[idx] as HTMLElement | undefined
+    pill?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId])
 
   return (
-    <div className="organ-selector-bar">
-      <div className="organ-selector-header">
-        <span className="selector-title">Clinical Organ Systems</span>
-        <span className="selector-count">{organsList.length} Entities Online</span>
+    <div className="organ-index">
+      <div className="index-head">
+        <span className="eyebrow">Index of Specimens</span>
+        <span className="page-of">
+          <b>{String(selectedNo).padStart(3, '0')}</b> / {String(organs.length).padStart(3, '0')}
+        </span>
       </div>
 
-      <div className="organ-pills-scroll">
-        {organsList.map((organ) => {
+      <nav ref={scrollRef} className="pill-scroll" aria-label="Specimen index">
+        {organs.map((organ, i) => {
           const isSelected = organ.id === selectedId
           return (
             <button
               key={organ.id}
               type="button"
-              className={`organ-pill ${isSelected ? 'selected' : ''}`}
+              className={`pill ${isSelected ? 'selected' : ''}`}
               onClick={() => onSelectOrgan(organ.id)}
-              style={
-                isSelected
-                  ? {
-                      borderColor: organ.accentColor,
-                      boxShadow: `0 0 12px ${organ.accentColor}33`,
-                    }
-                  : undefined
-              }
+              aria-pressed={isSelected}
             >
-              <span className="organ-pill-icon">{organ.icon}</span>
-              <div className="organ-pill-content">
-                <span className="organ-pill-name">{organ.name}</span>
-                <span className="organ-pill-modality">{organ.modality}</span>
-              </div>
-              {isSelected && (
-                <div
-                  className="active-dot"
-                  style={{ backgroundColor: organ.accentColor }}
-                />
-              )}
+              <span className="p-num">{String(i + 1).padStart(2, '0')}</span>
+              <span className="p-name">{organ.name}</span>
+              <span className="p-mod">{organ.modality}</span>
             </button>
           )
         })}
-      </div>
+      </nav>
     </div>
   )
 }

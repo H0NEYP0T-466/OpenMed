@@ -1,20 +1,17 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import type { OrganId, ViewerSettings, Hotspot } from '../../types/organ'
 import { ORGANS_REGISTRY } from '../../types/organ'
 import { OrganViewer3D } from '../../components/medical/OrganViewer3D'
 import { WholeBodyAtlasViewer } from '../../components/medical/WholeBodyAtlasViewer'
 import { OrganSelector } from '../../components/medical/OrganSelector'
 import { OrganInfoCard } from '../../components/medical/OrganInfoCard'
-import {
-  Activity,
-  Cpu,
-  User,
-  GitBranch,
-  Layers
-} from 'lucide-react'
+
+const ORGAN_ORDER: readonly OrganId[] = Object.keys(ORGANS_REGISTRY) as OrganId[]
 
 export const OrganDashboard: React.FC = () => {
-  const [selectedOrganId, setSelectedOrganId] = useState<OrganId>('body')
+  const initialOrgan = (new URLSearchParams(window.location.search).get('organ') as OrganId) || 'body'
+  const [selectedOrganId, setSelectedOrganId] = useState<OrganId>(initialOrgan)
+  const [lastOrganId, setLastOrganId] = useState<OrganId>(initialOrgan !== 'body' ? initialOrgan : 'heart')
   const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(null)
   const [settings, setSettings] = useState<ViewerSettings>({
     renderMode: 'pbr',
@@ -26,71 +23,111 @@ export const OrganDashboard: React.FC = () => {
   })
 
   const currentOrgan = ORGANS_REGISTRY[selectedOrganId]
+  const plateNo = useMemo(
+    () => String(ORGAN_ORDER.indexOf(selectedOrganId) + 1).padStart(2, '0'),
+    [selectedOrganId]
+  )
 
   const handleSelectOrgan = (id: OrganId) => {
     setSelectedOrganId(id)
     setActiveHotspot(null)
+    if (id !== 'body') setLastOrganId(id)
   }
 
   const isWholeBodyView = selectedOrganId === 'body'
 
   return (
-    <div className="hospital-cockpit">
-      {/* Top Navigation Bar */}
-      <header className="cockpit-navbar">
-        <div className="navbar-brand">
-          <div className="brand-logo-gem">
-            <Activity className="text-cyan-400" size={20} />
-          </div>
-          <div>
-            <div className="brand-name-row">
-              <span className="brand-title">OpenMed</span>
-              <span className="brand-version-badge">v0.1 FYP</span>
+    <div className="om-page">
+      {/* Side rails — 36px fixed strips, rotated editorial labels */}
+      <div className="om-rail left" aria-hidden="true">
+        <span>OpenMed — Anatomia Digitalis · MMXXVI</span>
+      </div>
+      <div className="om-rail right" aria-hidden="true">
+        <span>Terminologia Anatomica · TA2 · Lahore</span>
+      </div>
+
+      {/* Top metadata strip — Vol/Issue, Filed under, live status */}
+      <div className="meta-strip">
+        <span className="m-left">
+          Vol. 01 / Issue Nº 26 — <b>Anatomia Digitalis</b>
+        </span>
+        <span className="m-mid">
+          <span className="filed">Filed under</span> — Medical AI · 3D Anatomy · MICCAI Benchmarks
+        </span>
+        <span className="m-right">
+          <span className="pulse-dot" aria-hidden="true" />
+          Live build 0.1.0 · en-PK · 31.5204° N — 74.3587° E
+        </span>
+      </div>
+
+      {/* Masthead */}
+      <header className="masthead">
+        <div className="brand">
+          <div className="brand-mark" aria-hidden="true">Ø</div>
+          <div style={{ minWidth: 0 }}>
+            <div>
+              <span className="brand-word">
+                OpenMed<span className="dot">.</span>
+              </span>
+              <span className="brand-edition">FYP Edition · AI Hospital</span>
             </div>
-            <span className="brand-subtitle">AI Hospital • Multi-Organ Diagnostic Platform</span>
+            <span className="brand-tag">A multi-organ diagnostic annual — edited by M. Fezan</span>
           </div>
         </div>
 
-        <div className="navbar-stats">
-          <div className="stat-pill">
-            <Cpu size={14} className="text-cyan-400" />
-            <span>12+ Organs Online</span>
+        <div className="masthead-stats">
+          <div className="stat-fig">
+            <span className="fig">12</span>
+            <span className="cap">Organs</span>
           </div>
-          <div className="stat-pill">
-            <GitBranch size={14} className="text-purple-400" />
-            <span>20+ AI Models</span>
+          <div className="stat-fig">
+            <span className="fig">
+              20<em>+</em>
+            </span>
+            <span className="cap">AI Models</span>
           </div>
-          <div className="stat-pill">
-            <Layers size={14} className="text-emerald-400" />
-            <span>BodyParts3D Atlas</span>
+          <div className="stat-fig">
+            <span className="fig">2,234</span>
+            <span className="cap">Atlas Parts</span>
           </div>
         </div>
 
-        <div className="navbar-actions">
-          <button
-            type="button"
-            className={`view-mode-toggle ${isWholeBodyView ? 'active' : ''}`}
-            onClick={() => handleSelectOrgan('body')}
-          >
-            <User size={15} />
-            <span>Whole Body Macro Atlas</span>
-          </button>
+        <div className="masthead-actions">
+          {isWholeBodyView ? (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => handleSelectOrgan(lastOrganId)}
+            >
+              <span>Organ Workspaces</span>
+              <span className="arr" aria-hidden="true">↗</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => handleSelectOrgan('body')}
+            >
+              <span>Whole-Body Atlas</span>
+              <span className="nav-star" aria-hidden="true">★</span>
+              <span className="arr" aria-hidden="true">↗</span>
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Main Clinical Diagnostic Workspace */}
-      <main className="cockpit-main-workspace">
+      {/* Main workspace — the plate, optionally with a dossier column */}
+      <main className={`stage ${isWholeBodyView ? 'stage-atlas' : ''}`}>
         {isWholeBodyView ? (
-          /* Full Body Multi-System Atlas Viewer (from ashemag/human-atlas) */
-          <section className="viewport-panel full-viewport-atlas">
-            <WholeBodyAtlasViewer onNavigateToOrgan={handleSelectOrgan} />
+          <section className="plate">
+            <WholeBodyAtlasViewer onNavigateToOrgan={handleSelectOrgan} plateNo={plateNo} />
           </section>
         ) : (
-          /* Isolated Organ Diagnostic Workspace (with PBR textures & 3D Hotspot Points) */
           <>
-            <section className="viewport-panel">
+            <section className="plate">
               <OrganViewer3D
                 organ={currentOrgan}
+                plateNo={plateNo}
                 settings={settings}
                 onUpdateSettings={setSettings}
                 activeHotspot={activeHotspot}
@@ -98,9 +135,10 @@ export const OrganDashboard: React.FC = () => {
               />
             </section>
 
-            <aside className="telemetry-panel">
+            <aside className="dossier">
               <OrganInfoCard
                 organ={currentOrgan}
+                plateNo={plateNo}
                 activeHotspot={activeHotspot}
                 onSelectHotspot={setActiveHotspot}
               />
@@ -109,8 +147,11 @@ export const OrganDashboard: React.FC = () => {
         )}
       </main>
 
-      {/* Bottom Organ Selector Bar */}
-      <footer className="cockpit-footer-bar">
+      {/* Index of specimens — pill filters + clipped mega wordmark */}
+      <footer className="index-bar">
+        <div className="index-word" aria-hidden="true">
+          OpenMed<span className="dot">.</span>
+        </div>
         <OrganSelector
           selectedId={selectedOrganId}
           onSelectOrgan={handleSelectOrgan}
