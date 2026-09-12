@@ -15,6 +15,7 @@ import {
   PointerTap,
   decodeModelResponse,
 } from '../../utils/atlasHelpers'
+import './plate.css'
 
 interface WholeBodyAtlasViewerProps {
   readonly plateNo: string

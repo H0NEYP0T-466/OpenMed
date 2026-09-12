@@ -11,6 +11,7 @@ import {
   MapPin
 } from 'lucide-react'
 import type { RenderMode, CameraPreset, ViewerSettings } from '../../types/organ'
+import './rail.css'
 
 interface OrganViewportControlsProps {
   readonly settings: ViewerSettings

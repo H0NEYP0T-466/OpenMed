@@ -1,0 +1,243 @@
+/* Paper control rail — shared by OrganViewportControls and
+   AtlasControlsRail (beside the plate, never on it) */
+
+.controls-rail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bone);
+  border: 1px solid var(--line-soft);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(21, 20, 15, 0.05),
+  0 30px 60px -34px rgba(21, 20, 15, 0.18);
+  padding: 18px 16px;
+  overflow-y: auto;
+}
+
+.rail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.rail-group:first-child {
+  padding-top: 2px;
+}
+
+.rail-group:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+
+.rail-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.rail-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rail-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.rail-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rail-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+}
+
+.rail-btn .ico {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.rail-btn:hover {
+  color: var(--ink);
+  background: rgba(21, 20, 15, 0.045);
+}
+
+.rail-btn.active {
+  background: var(--ink);
+  color: var(--bone);
+}
+
+.rail-btn.active .ico {
+  color: var(--accent-soft);
+  opacity: 1;
+}
+
+.rail-systems {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rail-hint {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.val-badge {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--accent);
+  border: 1px solid rgba(237, 111, 92, 0.4);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--paper-dark);
+  outline: none;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 3px solid var(--accent);
+  cursor: grab;
+  box-shadow: 0 2px 6px -2px rgba(21, 20, 15, 0.5);
+  transition: transform 0.15s ease;
+}
+
+.range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 3px solid var(--accent);
+  cursor: grab;
+}
+
+.range-foot {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.sys-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s ease;
+  width: 100%;
+  font: inherit;
+}
+
+.sys-item:hover {
+  background: rgba(21, 20, 15, 0.04);
+}
+
+.sys-item .sys-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid rgba(21, 20, 15, 0.35);
+}
+
+.sys-item .sys-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sys-item .sys-tick {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.sys-item.off {
+  opacity: 0.42;
+}
+
+.sys-item.off .sys-swatch {
+  background: transparent !important;
+}
+
+.sys-item.off .sys-tick {
+  color: var(--ink-faint);
+}
+
+@media (max-width: 980px) {
+  .controls-rail {
+    max-height: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 6px 24px;
+
+  }
+  .rail-group {
+    border-bottom: none;
+  }
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import type { Hotspot } from '../../types/organ'
 import { X } from 'lucide-react'
+import './HotspotCallout.css'
 
 interface HotspotCalloutProps {
   readonly hotspot: Hotspot

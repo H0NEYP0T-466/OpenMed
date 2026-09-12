@@ -1,10 +1,7 @@
 import React from 'react'
 import { ATLAS_SYSTEMS } from '../../types/atlas'
 import { RomanSection } from '../common/RomanSection'
-
-interface AtlasDossierProps {
-  readonly plateNo: string
-}
+import './essay.css'
 
 const READING_LINES = [
   'Drag the plate to orbit the figure — scroll to zoom toward a structure.',
@@ -17,37 +14,13 @@ const READING_LINES = [
 /**
  * Centre-page essay for the whole-body atlas — what the plate is,
  * how to read it, and the fifteen systems it carries.
+ * (The title block lives above the plate in EssayHead.)
  */
-export const AtlasDossier: React.FC<AtlasDossierProps> = ({ plateNo }) => {
+export const AtlasDossier: React.FC = () => {
   const sectionCount = 4
 
   return (
     <article className="organ-essay">
-      <header className="essay-head">
-        <div className="eh-left">
-          <div className="badge-row">
-            <span className="mono-badge">3D Atlas · BodyParts3D 4.0</span>
-            <span className="veri-line">Terminologia Anatomica concepts · CC BY 4.0</span>
-          </div>
-
-          <h2 className="dossier-title">
-            Corpus Integrum
-            <span className="dot">.</span>
-            <span className="serif">The Whole Figure</span>
-          </h2>
-          <p className="dossier-latin">
-            Plate Nº {plateNo} — 2,234 named structures · 15 physiological systems
-          </p>
-        </div>
-        <p className="dossier-lead">
-          The centre page of the annual: one adult male reference body, segmented into every
-          structure the anatomists of BodyParts3D chose to name — from the dura mater to the
-          semitendinosus. Nothing here is a sculptor&rsquo;s guess. Each of the 2,234 meshes
-          carries its own anatomical concept id, so naming, isolating and dissecting the figure
-          stays truthful to the source atlas at every zoom.
-        </p>
-      </header>
-
       <div className="dossier-grid">
         {/* I — De Tabula */}
         <RomanSection index={0} of={sectionCount} title="De Tabula — On the Plate" className="sp7">

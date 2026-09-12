@@ -1,0 +1,108 @@
+/* OrganSelector — index of specimens (structured pill grid) */
+
+.index-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 2px 10px;
+}
+
+.index-head .page-of {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+}
+
+.index-head .page-of b {
+  color: var(--ink);
+}
+
+.pill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+  padding-bottom: 16px;
+}
+
+.pill {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 9px;
+  align-items: baseline;
+  min-width: 0;
+  padding: 9px 13px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font: inherit;
+}
+
+.pill:hover {
+  background: rgba(21, 20, 15, 0.04);
+  border-color: rgba(21, 20, 15, 0.32);
+  transform: translateY(-1px);
+}
+
+.pill .p-num {
+  grid-row: 1 / 3;
+  align-self: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 16.5px;
+  color: var(--ink-faint);
+  line-height: 1;
+}
+
+.pill .p-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pill .p-star {
+  color: var(--mustard);
+  font-size: 10px;
+}
+
+.pill .p-mod {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pill.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 14px 26px -20px rgba(21, 20, 15, 0.8);
+}
+
+.pill.selected .p-name {
+  color: var(--paper);
+}
+
+.pill.selected .p-num {
+  color: var(--accent);
+}
+
+.pill.selected .p-mod {
+  color: rgba(239, 231, 210, 0.6);
+}

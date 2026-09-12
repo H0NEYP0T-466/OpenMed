@@ -2,6 +2,7 @@ import React from 'react'
 import type { AtlasSceneState, SystemId } from '../../types/atlas'
 import { ATLAS_SYSTEMS } from '../../types/atlas'
 import { RotateCw, Compass } from 'lucide-react'
+import './rail.css'
 
 interface AtlasControlsRailProps {
   readonly state: AtlasSceneState

@@ -1,10 +1,10 @@
 import React from 'react'
 import type { OrganMetadata, Hotspot } from '../../types/organ'
 import { RomanSection } from '../common/RomanSection'
+import './essay.css'
 
 interface OrganInfoCardProps {
   readonly organ: OrganMetadata
-  readonly plateNo: string
   readonly activeHotspot: Hotspot | null
   readonly onSelectHotspot: (hotspot: Hotspot | null) => void
 }
@@ -13,12 +13,12 @@ const romanOfSpot = (i: number): string =>
   ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][i] ?? String(i + 1)
 
 /**
- * The organ essay — full-width editorial spread rendered below the plate.
+ * The organ essay full-width editorial sections rendered below the plate.
  * Six Roman-numbered sections per the Atelier Zero section-rule grammar.
+ * (The specimen title block lives above the plate in EssayHead.)
  */
 export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
   organ,
-  plateNo,
   activeHotspot,
   onSelectHotspot,
 }) => {
@@ -27,26 +27,6 @@ export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
 
   return (
     <article className="organ-essay">
-      {/* Essay head */}
-      <header className="essay-head">
-        <div className="eh-left">
-          <div className="badge-row">
-            <span className="mono-badge">{organ.modality}</span>
-            <span className="veri-line">Verified · Terminologia Anatomica TA2</span>
-          </div>
-
-          <h2 className="dossier-title">
-            {organ.name}
-            <span className="dot">.</span>
-            {profile?.poeticTitle && <span className="serif">{profile.poeticTitle}</span>}
-          </h2>
-          <p className="dossier-latin">
-            Plate Nº {plateNo} — {organ.anatomicalTerm}
-          </p>
-        </div>
-        <p className="dossier-lead">{organ.description}</p>
-      </header>
-
       <div className="dossier-grid">
         {/* I — Observatio */}
         <RomanSection index={0} of={sectionCount} title="Observatio — Physiology" className="sp7">

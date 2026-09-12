@@ -15,6 +15,7 @@ import {
   FIT_SIZE
 } from '../../utils/threeHelpers'
 import { HotspotCallout } from './HotspotCallout'
+import './plate.css'
 
 interface OrganCameraApi {
   readonly setPreset: (preset: CameraPreset) => void

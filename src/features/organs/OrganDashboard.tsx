@@ -10,7 +10,9 @@ import { AtlasControlsRail } from '../../components/medical/AtlasControlsRail'
 import { OrganSelector } from '../../components/medical/OrganSelector'
 import { OrganInfoCard } from '../../components/medical/OrganInfoCard'
 import { AtlasDossier } from '../../components/medical/AtlasDossier'
+import { EssayHead } from '../../components/medical/EssayHead'
 import { Maximize2, ExternalLink, X } from 'lucide-react'
+import './OrganDashboard.css'
 
 const ORGAN_ORDER: readonly OrganId[] = Object.keys(ORGANS_REGISTRY) as OrganId[]
 
@@ -130,20 +132,6 @@ export const OrganDashboard: React.FC = () => {
         <span>Terminologia Anatomica · TA2 · Lahore</span>
       </div>
 
-      {/* Top metadata strip — Vol/Issue, Filed under, live status */}
-      <div className="meta-strip">
-        <span className="m-left">
-          Vol. 01 / Issue Nº 26 — <b>Anatomia Digitalis</b>
-        </span>
-        <span className="m-mid">
-          <span className="filed">Filed under</span> — Medical AI · 3D Anatomy · MICCAI Benchmarks
-        </span>
-        <span className="m-right">
-          <span className="pulse-dot" aria-hidden="true" />
-          Live build 0.1.0 · en-PK · 31.5204° N — 74.3587° E
-        </span>
-      </div>
-
       {/* Masthead */}
       <header className="masthead">
         <div className="brand">
@@ -193,6 +181,27 @@ export const OrganDashboard: React.FC = () => {
           )}
         </div>
       </header>
+
+      {/* Specimen title block — read it, then see it */}
+      {isWholeBodyView ? (
+        <EssayHead
+          badge="3D Atlas · BodyParts3D 4.0"
+          verified="Terminologia Anatomica concepts · CC BY 4.0"
+          title="Corpus Integrum"
+          serif="The Whole Figure"
+          latin={`Plate Nº ${plateNo} — 2,234 named structures · 15 physiological systems`}
+          lead="The centre page of the annual: one adult male reference body, segmented into every structure the anatomists of BodyParts3D chose to name — from the dura mater to the semitendinosus. Nothing here is a sculptor’s guess; each of the 2,234 meshes carries its own anatomical concept id, so naming, isolating and dissecting the figure stays truthful to the source atlas at every zoom."
+        />
+      ) : (
+        <EssayHead
+          badge={currentOrgan.modality}
+          verified="Verified · Terminologia Anatomica TA2"
+          title={currentOrgan.name}
+          serif={currentOrgan.clinicalProfile?.poeticTitle}
+          latin={`Plate Nº ${plateNo} — ${currentOrgan.anatomicalTerm}`}
+          lead={currentOrgan.description}
+        />
+      )}
 
       {/* Stage — the plate stays clear; all controls live in the rail */}
       <main className={`stage ${isWholeBodyView ? 'stage-atlas' : ''}`}>
@@ -291,11 +300,10 @@ export const OrganDashboard: React.FC = () => {
       {/* The essay — below the plate, reached by scrolling */}
       <section className="dossier-flow">
         {isWholeBodyView ? (
-          <AtlasDossier plateNo={plateNo} />
+          <AtlasDossier />
         ) : (
           <OrganInfoCard
             organ={currentOrgan}
-            plateNo={plateNo}
             activeHotspot={activeHotspot}
             onSelectHotspot={handleSelectHotspot}
           />

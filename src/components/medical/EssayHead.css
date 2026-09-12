@@ -1,0 +1,40 @@
+/* EssayHead — specimen title fold between masthead and plate */
+
+.fold-wrap {
+  padding: 26px 64px 0;
+}
+
+.fold-wrap .essay-head {
+  padding-bottom: 22px;
+}
+
+.essay-head {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  align-items: end;
+  gap: 20px 64px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid rgba(21, 20, 15, 0.75);
+  margin-bottom: 0;
+}
+
+.eh-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+@media (max-width: 980px) {
+  .essay-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+
+  }
+}
+
+@media (max-width: 560px) {
+  .fold-wrap {
+    padding: 18px 16px 0;
+  }
+}

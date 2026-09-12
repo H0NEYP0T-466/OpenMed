@@ -117,7 +117,7 @@ body {
   align-items: center;
   gap: 10px;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -145,7 +145,7 @@ body {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--accent);
   white-space: nowrap;
 }
@@ -153,7 +153,7 @@ body {
 .sec-rule .sec-title {
   flex: 1;
   font-family: var(--font-display);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -162,7 +162,7 @@ body {
 
 .sec-rule .page-of {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 500;
   letter-spacing: 0.08em;
   color: var(--ink-faint);
@@ -178,7 +178,7 @@ body {
   padding: 14px 22px;
   border-radius: 999px;
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
@@ -188,7 +188,7 @@ body {
 }
 
 .btn .arr {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
 }
 
@@ -250,4 +250,39 @@ body {
 ::selection {
   background: rgba(237, 111, 92, 0.25);
   color: var(--ink);
+}
+/* --- Shared icon button (callout + inspector) --- */
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+.icon-btn:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bone);
+}
+
+/* --- Turntable utility --- */
+
+.spin-slow {
+  animation: om-spin 6s linear infinite;
+}
+.spin-fast {
+  animation: om-spin 1.4s linear infinite;
+}
+
+@keyframes om-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

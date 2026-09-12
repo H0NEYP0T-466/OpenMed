@@ -1,6 +1,7 @@
 import React from 'react'
 import type { OrganId } from '../../types/organ'
 import { ORGANS_REGISTRY } from '../../types/organ'
+import './OrganSelector.css'
 
 interface OrganSelectorProps {
   readonly selectedId: OrganId

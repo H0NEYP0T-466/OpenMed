@@ -1,0 +1,289 @@
+/* Plate chrome — dark print plate shared by OrganViewer3D and
+   WholeBodyAtlasViewer: frame, brackets, captions, overlays, tooltips.
+   @keyframes rise lives here (callout + inspector) */
+
+.plate {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  height: clamp(575px, 54vh, 620px);
+  border: 1px solid rgba(21, 20, 15, 0.5);
+  background:
+  radial-gradient(120% 90% at 50% 42%, var(--plate-hi) 0%, var(--plate) 74%);
+  box-shadow: 0 30px 60px -30px rgba(21, 20, 15, 0.45);
+  overflow: hidden;
+}
+
+.stage-atlas .plate {
+  height: clamp(575px, 57vh, 660px);
+}
+
+.plate-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.plate-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.brk {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.brk.tl {
+  top: 14px; left: 14px; border-top: 1px solid rgba(247, 241, 222, 0.5); border-left: 1px solid rgba(247, 241, 222, 0.5);
+}
+
+.brk.tr {
+  top: 14px; right: 14px; border-top: 1px solid rgba(247, 241, 222, 0.5); border-right: 1px solid rgba(247, 241, 222, 0.5);
+}
+
+.brk.bl {
+  bottom: 14px; left: 14px; border-bottom: 1px solid rgba(247, 241, 222, 0.5); border-left: 1px solid rgba(247, 241, 222, 0.5);
+}
+
+.brk.br {
+  bottom: 14px; right: 14px; border-bottom: 1px solid rgba(247, 241, 222, 0.5); border-right: 1px solid rgba(247, 241, 222, 0.5);
+}
+
+.plate-caption {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 32;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.plate-caption .p-num {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--plate-text);
+}
+
+.plate-caption .p-num i {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--accent-soft);
+}
+
+.plate-caption .p-term {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--plate-mute);
+}
+
+.plate-caption .p-hair {
+  width: 44px;
+  height: 1px;
+  background: var(--plate-line);
+  align-self: center;
+}
+
+.plate-coord {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 32;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--plate-mute);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.plate-coord .sep {
+  color: var(--accent-soft);
+  margin: 0 6px;
+}
+
+.plate-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(21, 20, 15, 0.82);
+}
+
+.plate-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 26px 34px;
+  max-width: 400px;
+  text-align: center;
+  background: var(--plate-hi);
+  border: 1px solid var(--plate-line);
+  border-radius: 18px;
+}
+
+.plate-note .note-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.plate-note .note-title {
+  font-family: var(--font-display);
+  font-size: 19.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--plate-text);
+}
+
+.plate-note .note-title .dot {
+  color: var(--accent);
+}
+
+.plate-note .note-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--plate-mute);
+}
+
+.progress-track {
+  width: 220px;
+  height: 3px;
+  background: rgba(247, 241, 222, 0.14);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+
+.progress-sub {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  color: var(--plate-mute);
+}
+
+.hot-tip {
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 38;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 14px;
+  background: var(--bone);
+  border: 1px solid rgba(21, 20, 15, 0.5);
+  border-radius: 999px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 14px 26px -18px rgba(21, 20, 15, 0.8);
+}
+
+.hot-tip .tip-swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  align-self: center;
+  border: 1px solid rgba(21, 20, 15, 0.35);
+}
+
+.hot-tip strong {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.hot-tip span {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-mute);
+}
+
+.part-tip {
+  position: absolute;
+  z-index: 38;
+  pointer-events: none;
+  max-width: 250px;
+  background: var(--bone);
+  border: 1px solid rgba(21, 20, 15, 0.55);
+  border-radius: 12px;
+  padding: 8px 13px;
+  box-shadow: 0 14px 26px -18px rgba(21, 20, 15, 0.9);
+}
+
+.part-tip[hidden] {
+  display: none;
+}
+
+.part-tip .pt-name {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.part-tip .pt-sys {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 980px) {
+  .plate {
+    height: clamp(360px, 52vh, 520px);
+  }
+}
+
+@media (max-width: 560px) {
+  .plate {
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 700px) {
+  .plate-coord {
+    font-size: 9.5px;
+  }
+}
