@@ -14,25 +14,29 @@ import {
   createHotspotSprite,
   FIT_SIZE
 } from '../../utils/threeHelpers'
-import { OrganViewportControls } from './OrganViewportControls'
 import { HotspotCallout } from './HotspotCallout'
+
+interface OrganCameraApi {
+  readonly setPreset: (preset: CameraPreset) => void
+  readonly reset: () => void
+}
 
 interface OrganViewer3DProps {
   readonly organ: OrganMetadata
   readonly plateNo: string
   readonly settings: ViewerSettings
-  readonly onUpdateSettings: (updater: (prev: ViewerSettings) => ViewerSettings) => void
   readonly activeHotspot: Hotspot | null
   readonly onSelectHotspot: (hotspot: Hotspot | null) => void
+  readonly onRegisterCamera: (api: OrganCameraApi) => void
 }
 
 export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
   organ,
   plateNo,
   settings,
-  onUpdateSettings,
   activeHotspot,
   onSelectHotspot,
+  onRegisterCamera,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -362,6 +366,11 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     handleSetCameraPreset('anterior')
   }, [handleSetCameraPreset])
 
+  // Expose camera plumbing to the paper rail rendered by the dashboard
+  useEffect(() => {
+    onRegisterCamera({ setPreset: handleSetCameraPreset, reset: handleResetCamera })
+  }, [onRegisterCamera, handleSetCameraPreset, handleResetCamera])
+
   return (
     <>
       {/* WebGL canvas mount */}
@@ -421,15 +430,6 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
           </div>
         </div>
       )}
-
-      {/* HUD */}
-      <OrganViewportControls
-        settings={settings}
-        onUpdateSettings={onUpdateSettings}
-        onSetCameraPreset={handleSetCameraPreset}
-        onResetCamera={handleResetCamera}
-        hotspotsCount={organ.hotspots?.length ?? 0}
-      />
 
       {/* Hover tooltip */}
       {hoveredHotspot && !activeHotspot && (

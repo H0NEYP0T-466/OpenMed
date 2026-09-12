@@ -22,7 +22,7 @@ This project is a high-stakes university **Final Year Project (FYP)**. It is not
 * **Never invent new styles:** Strictly adhere to the established visual language, theme, and component patterns of the application.
 * **Palette Preservation:** All colors must come from the token block in `src/index.css` (which copies the Atelier Zero schema exactly: `--paper`, `--bone`, `--ink*`, `--accent`, `--mustard`, `--olive`). Do not add, remove, tweak, or substitute theme colors, border radii, typography sizes, or UI palettes unless explicitly instructed by the user. Mustard is jewelry (≤1%, one nav ★); never a CTA fill. No pure white, no pure black, no glassmorphism, no emoji in UI copy.
 * **Typography:** Inter Tight (display), Playfair Display Italic 500 (emotional nouns, Roman numerals, `fin.`), Inter (body), JetBrains Mono (coordinates, plate numbers, data rows) — all self-hosted via Fontsource, imported in `src/main.tsx`.
-* **Component Reuse:** Reuse existing UI primitives from `src/components/` and the shared classes in `src/App.css` (`.plate`, `.eyebrow`, `.sec-rule`, `.hud-chip`, `.btn-primary/.btn-ghost`, `.pill`, `.dot`). Do not create one-off ad-hoc styled variants when a canonical component already exists.
+* **Component Reuse:** Reuse existing UI primitives from `src/components/` and the shared classes in `src/App.css` (`.plate`, `.eyebrow`, `.sec-rule`, `.controls-rail` + `.rail-group/.rail-btn`, `.btn-primary/.btn-ghost`, `.pill`, `.dot`, `.part-tip`). Controls live on the paper rail beside the plate — never overlay the 3D model. Do not create one-off ad-hoc styled variants when a canonical component already exists.
 
 ---
 
