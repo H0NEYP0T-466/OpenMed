@@ -233,6 +233,8 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     setLoadingProgress(0)
     setLoadError(null)
 
+    let cancelled = false
+
     if (organPivotRef.current) {
       scene.remove(organPivotRef.current)
       disposeObjectTree(organPivotRef.current)
@@ -246,6 +248,10 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     loader.load(
       organ.modelFile,
       (gltf) => {
+        if (cancelled) {
+          disposeObjectTree(gltf.scene)
+          return
+        }
         const model = gltf.scene
 
         const organPivot = new THREE.Group()
@@ -292,17 +298,22 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
         setLoadingProgress(100)
       },
       (xhr) => {
-        if (xhr.total > 0) {
+        if (!cancelled && xhr.total > 0) {
           const percent = Math.round((xhr.loaded / xhr.total) * 100)
           setLoadingProgress(percent)
         }
       },
       (error) => {
+        if (cancelled) return
         console.warn(`Failed to load ${organ.modelFile}:`, error)
         setLoadError(`Unable to load the print plate for ${organ.name}. The mesh is caching or off-press.`)
         setIsLoading(false)
       }
     )
+
+    return () => {
+      cancelled = true
+    }
   }, [organ.id, organ.name, organ.modelFile, organ.accentColor, organ.cameraDistance, organ.hotspots])
 
   useEffect(() => {

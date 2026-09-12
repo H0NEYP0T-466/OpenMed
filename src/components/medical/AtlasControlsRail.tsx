@@ -30,7 +30,7 @@ export const AtlasControlsRail: React.FC<AtlasControlsRailProps> = ({
       <div className="rail-group">
         <div className="rail-head">
           <span className="rail-label">Pl. I — Systems</span>
-          <span className="rail-count">{state.visibleSystems.length}/15</span>
+          <span className="rail-count">{state.visibleSystems.length}/15 · scroll</span>
         </div>
         <div className="rail-systems">
           {ATLAS_SYSTEMS.map((sys) => {

@@ -108,12 +108,12 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: rgba(21, 20, 15, 0.35) transparent;
+  scrollbar-color: rgba(21, 20, 15, 0.55) transparent;
   padding-right: 2px;
 }
 
 .rail-systems::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .rail-systems::-webkit-scrollbar-track {
@@ -121,7 +121,7 @@
 }
 
 .rail-systems::-webkit-scrollbar-thumb {
-  background: rgba(21, 20, 15, 0.3);
+  background: rgba(21, 20, 15, 0.55);
   border-radius: 999px;
 }
 
