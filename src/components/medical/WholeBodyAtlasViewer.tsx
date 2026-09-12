@@ -688,7 +688,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
 
       {/* Coordinate / mesh stamp */}
       <div className="plate-coord">
-        FIG. {plateNo} / OM-26<span className="sep">·</span>15 physiological systems
+        <span className="sep">·</span>15 physiological systems
         <span className="sep">·</span>hover past 50% dissection to name structures — click to inspect
       </div>
 
