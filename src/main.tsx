@@ -7,6 +7,9 @@ import '@fontsource/playfair-display/500.css'
 import '@fontsource/playfair-display/500-italic.css'
 import './index.css'
 import App from './App.tsx'
+import { attachLiquidButtons } from './utils/liquidButtons'
+
+attachLiquidButtons()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

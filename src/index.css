@@ -169,9 +169,12 @@ body {
   white-space: nowrap;
 }
 
-/* --- Buttons (DESIGN.md §6) --- */
+/* --- Buttons (DESIGN.md §6) — transparent outline, liquid coral pour --- */
 
 .btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -182,27 +185,78 @@ body {
   font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
-  transition: transform 0.18s ease, background-color 0.18s ease,
-    border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.25s ease, color 0.3s ease, transform 0.18s ease;
   white-space: nowrap;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.btn > span {
+  position: relative;
+  z-index: 1;
+}
+
+/* the pour — coral pours in from wherever the cursor enters */
+.btn::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: var(--lx, 50%);
+  top: var(--ly, 50%);
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  background: var(--accent);
+  border-radius: 42% 58% 55% 45% / 48% 52% 45% 55%;
+  transform: scale(0);
+  transition: transform 0.65s cubic-bezier(0.22, 0.8, 0.26, 1);
+  will-change: transform;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.btn:hover::before {
+  transform: scale(52);
+  animation: liquid-slosh 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes liquid-slosh {
+  0% {
+    border-radius: 42% 58% 55% 45% / 48% 52% 45% 55%;
+  }
+  50% {
+    border-radius: 56% 44% 45% 55% / 44% 56% 52% 48%;
+  }
+  100% {
+    border-radius: 46% 54% 58% 42% / 54% 46% 40% 60%;
+  }
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.985);
 }
 
 .btn .arr {
   font-size: 15px;
   line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+.btn:hover .arr {
+  transform: translateX(3px);
 }
 
 .btn-primary {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: var(--bone);
-  box-shadow: 0 14px 26px -16px rgba(237, 111, 92, 0.55);
+  border-color: var(--ink);
 }
 
 .btn-primary:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-soft);
-  transform: translateY(-1px);
+  border-color: var(--accent);
 }
 
 .btn-ghost {
@@ -212,9 +266,17 @@ body {
 }
 
 .btn-ghost:hover {
-  background: var(--line-hair);
-  border-color: rgba(21, 20, 15, 0.32);
-  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn::before {
+    display: none;
+  }
+  .btn:hover {
+    background: var(--accent);
+    transform: none;
+  }
 }
 
 /* --- Focus visibility (accessibility) --- */

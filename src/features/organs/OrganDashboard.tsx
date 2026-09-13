@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { OrganId, ViewerSettings, Hotspot, CameraPreset } from '../../types/organ'
 import { ORGANS_REGISTRY } from '../../types/organ'
 import type { AtlasSceneState, Part, SystemId } from '../../types/atlas'
@@ -12,6 +13,7 @@ import { OrganInfoCard } from '../../components/medical/OrganInfoCard'
 import { AtlasDossier } from '../../components/medical/AtlasDossier'
 import { EssayHead } from '../../components/medical/EssayHead'
 import { Maximize2, ExternalLink, X } from 'lucide-react'
+import { AppShell } from '../../components/common/AppShell'
 import './OrganDashboard.css'
 
 const ORGAN_ORDER: readonly OrganId[] = Object.keys(ORGANS_REGISTRY) as OrganId[]
@@ -48,9 +50,18 @@ const mapPartToOrgan = (name: string): OrganId | null => {
   return null
 }
 
+const organFromParam = (raw: string | null): OrganId | null =>
+  raw && raw in ORGANS_REGISTRY ? (raw as OrganId) : null
+
 export const OrganDashboard: React.FC = () => {
-  const [selectedOrganId, setSelectedOrganId] = useState<OrganId>('body')
-  const [lastOrganId, setLastOrganId] = useState<OrganId>('heart')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const urlOrgan = organFromParam(searchParams.get('organ'))
+  const initialOrgan: OrganId = urlOrgan ?? 'body'
+
+  const [selectedOrganId, setSelectedOrganId] = useState<OrganId>(initialOrgan)
+  const [lastOrganId, setLastOrganId] = useState<OrganId>(
+    initialOrgan === 'body' ? 'heart' : initialOrgan
+  )
   const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(null)
   const [settings, setSettings] = useState<ViewerSettings>({
     renderMode: 'pbr',
@@ -78,7 +89,15 @@ export const OrganDashboard: React.FC = () => {
     setSelectedOrganId(id)
     setActiveHotspot(null)
     if (id !== 'body') setLastOrganId(id)
+    setSearchParams(id === 'body' ? {} : { organ: id }, { replace: true })
   }
+
+  // Browser back/forward rewrites ?organ= — mirror it into state.
+  useEffect(() => {
+    const target = urlOrgan ?? 'body'
+    setSelectedOrganId((prev) => (prev === target ? prev : target))
+    setActiveHotspot(null)
+  }, [urlOrgan])
 
   // Selecting a landmark from the essay below scrolls the plate back into view.
   const handleSelectHotspot = useCallback((hotspot: Hotspot | null) => {
@@ -123,64 +142,30 @@ export const OrganDashboard: React.FC = () => {
     : undefined
 
   return (
-    <div className="om-page">
-      {/* Side rails — 36px fixed strips, rotated editorial labels */}
-      <div className="om-rail left" aria-hidden="true">
-        <span>OpenMed — Anatomia Digitalis · MMXXVI</span>
-      </div>
-      <div className="om-rail right" aria-hidden="true">
-        <span>Terminologia Anatomica · TA2 · Lahore</span>
-      </div>
-
-      {/* Masthead */}
-      <header className="masthead">
-        <div className="brand">
-          <div className="brand-mark" aria-hidden="true">Ø</div>
-          <span className="brand-word">
-            OpenMed<span className="dot">.</span>
-          </span>
-        </div>
-
-        <div className="masthead-stats">
-          <div className="stat-fig">
-            <span className="fig">12</span>
-            <span className="cap">Organs</span>
-          </div>
-          <div className="stat-fig">
-            <span className="fig">
-              20<em>+</em>
-            </span>
-            <span className="cap">AI Models</span>
-          </div>
-          <div className="stat-fig">
-            <span className="fig">2,234</span>
-            <span className="cap">Atlas Parts</span>
-          </div>
-        </div>
-
-        <div className="masthead-actions">
-          {isWholeBodyView ? (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => handleSelectOrgan(lastOrganId)}
-            >
-              <span>Organ Workspaces</span>
-              <span className="arr" aria-hidden="true">↗</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => handleSelectOrgan('body')}
-            >
-              <span>Whole-Body Atlas</span>
-              <span className="nav-star" aria-hidden="true">★</span>
-              <span className="arr" aria-hidden="true">↗</span>
-            </button>
-          )}
-        </div>
-      </header>
+    <AppShell
+      cta={
+        isWholeBodyView ? (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => handleSelectOrgan(lastOrganId)}
+          >
+            <span>Organ Workspaces</span>
+            <span className="arr" aria-hidden="true">↗</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => handleSelectOrgan('body')}
+          >
+            <span>Whole-Body Atlas</span>
+            <span className="nav-star" aria-hidden="true">★</span>
+            <span className="arr" aria-hidden="true">↗</span>
+          </button>
+        )
+      }
+    >
 
       {/* Specimen title block — read it, then see it */}
       {isWholeBodyView ? (
@@ -320,6 +305,6 @@ export const OrganDashboard: React.FC = () => {
           onSelectOrgan={handleSelectOrgan}
         />
       </footer>
-    </div>
+    </AppShell>
   )
 }

@@ -57,3 +57,4 @@ data/
 .env
 .env.*
 !.env.example
+.shots/

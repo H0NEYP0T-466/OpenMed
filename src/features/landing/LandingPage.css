@@ -1,0 +1,205 @@
+/* LandingPage — hero, six-movements pipeline, department index and
+   colophon. Reuses essay/pill classes. */
+
+.lp-hero {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 900px;
+  padding: 64px 64px 40px;
+}
+
+.lp-hero-sub {
+  margin: -6px 0 10px;
+  font-size: clamp(21px, 1.9vw, 29px);
+  color: var(--olive);
+}
+
+.lp-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.lp-edition {
+  margin: 16px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* Six movements */
+.lp-pipeline {
+  flex: 0 0 auto;
+  padding: 50px 64px 6px;
+}
+
+.lp-sect-head {
+  margin-bottom: 26px;
+}
+
+.lp-sect-title {
+  margin: 14px 0 0;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
+  color: var(--ink-soft);
+  max-width: 56ch;
+}
+
+.lp-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.lp-step {
+  background: var(--bone);
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+}
+
+.lp-step-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lp-num {
+  font-style: italic;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink-faint);
+}
+
+.lp-status {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+.lp-status--live {
+  color: var(--accent);
+  border: 1px solid rgba(237, 111, 92, 0.45);
+}
+
+.lp-status--press {
+  color: var(--olive);
+  border: 1px solid rgba(110, 116, 72, 0.5);
+}
+
+.lp-status--draft {
+  color: var(--ink-faint);
+  border: 1px solid var(--line-soft);
+}
+
+.lp-step-name {
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.lp-step-term {
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.lp-step-copy {
+  margin: 10px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-mute);
+}
+
+/* Departments */
+.lp-departments {
+  flex: 0 0 auto;
+  padding: 50px 64px 0;
+}
+
+a.lp-pill {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Colophon */
+.lp-foot {
+  flex: 0 0 auto;
+  margin-top: 64px;
+  position: relative;
+  border-top: 1px solid var(--line);
+  background: var(--paper-warm);
+  padding: 0 64px 22px;
+  overflow: hidden;
+}
+
+.lp-wordmark {
+  position: absolute;
+  right: 40px;
+  top: -14px;
+  z-index: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(56px, 9vw, 150px);
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  color: rgba(21, 20, 15, 0.07);
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.lp-foot-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 22px;
+}
+
+/* Responsive — page gutters track the workspace rhythm */
+@media (max-width: 1279px) {
+  .lp-hero, .lp-pipeline, .lp-departments, .lp-foot {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 1079px) {
+  .lp-hero, .lp-pipeline, .lp-departments, .lp-foot {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 980px) {
+  .lp-hero {
+    padding-top: 34px;
+  }
+}
+
+@media (max-width: 560px) {
+  .lp-hero, .lp-pipeline, .lp-departments, .lp-foot {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .lp-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
