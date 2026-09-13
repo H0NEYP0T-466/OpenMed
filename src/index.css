@@ -169,12 +169,14 @@ body {
   white-space: nowrap;
 }
 
-/* --- Buttons (DESIGN.md §6) — transparent outline, liquid coral pour --- */
+/* --- Buttons (DESIGN.md §6) — transparent outline, cursor-follow color spot --- */
 
 .btn {
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
+  isolation: isolate; /* keeps the spot's z-index:-1 inside the button */
+  overflow: hidden; /* clips the spot to the pill */
+  --x: 50%; /* cursor position, written by buttonSpotlight.ts */
+  --y: 50%;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -185,66 +187,56 @@ body {
   font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
-  transition: border-color 0.25s ease, color 0.3s ease, transform 0.18s ease;
   white-space: nowrap;
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink);
+  text-decoration: none;
+}
+
+/*
+ * Small blurred coral spot that trails the cursor. Position never
+ * transitions — only opacity does — so on leave the spot simply fades
+ * out where it last was instead of jerking back to center.
+ */
+.btn::before {
+  content: '';
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 45px;
+  height: 45px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--accent);
+  filter: blur(16px);
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.btn:hover::before {
+  opacity: 0.75;
 }
 
 .btn > span {
   position: relative;
-  z-index: 1;
-}
-
-/* the pour — coral pours in from wherever the cursor enters */
-.btn::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  left: var(--lx, 50%);
-  top: var(--ly, 50%);
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-  background: var(--accent);
-  border-radius: 42% 58% 55% 45% / 48% 52% 45% 55%;
-  transform: scale(0);
-  transition: transform 0.65s cubic-bezier(0.22, 0.8, 0.26, 1);
-  will-change: transform;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-  border-color: var(--accent);
-  color: var(--ink);
-}
-
-.btn:hover::before {
-  transform: scale(52);
-  animation: liquid-slosh 2.4s ease-in-out infinite alternate;
-}
-
-@keyframes liquid-slosh {
-  0% {
-    border-radius: 42% 58% 55% 45% / 48% 52% 45% 55%;
-  }
-  50% {
-    border-radius: 56% 44% 45% 55% / 44% 56% 52% 48%;
-  }
-  100% {
-    border-radius: 46% 54% 58% 42% / 54% 46% 40% 60%;
-  }
-}
-
-.btn:active {
-  transform: translateY(0) scale(0.985);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
 }
 
 .btn .arr {
+  position: relative;
+  z-index: 2;
   font-size: 15px;
   line-height: 1;
+  display: inline-block;
   transition: transform 0.25s ease;
+  pointer-events: none;
 }
 
 .btn:hover .arr {
@@ -255,29 +247,17 @@ body {
   border-color: var(--ink);
 }
 
-.btn-primary:hover {
-  border-color: var(--accent);
-}
-
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink);
 }
 
-.btn-ghost:hover {
-  border-color: var(--accent);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn::before {
-    display: none;
-  }
-  .btn:hover {
-    background: var(--accent);
-    transform: none;
-  }
-}
+/*
+ * No prefers-reduced-motion override needed here.
+ * The spot repositions instantly (no transition on left/top) —
+ * only opacity fades (180ms), which is well within a11y norms.
+ */
 
 /* --- Focus visibility (accessibility) --- */
 
