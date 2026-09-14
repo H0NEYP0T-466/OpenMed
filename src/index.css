@@ -204,12 +204,11 @@ body {
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: 45px;
-  height: 45px;
+  width: 70px;
+  height: 70px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: var(--accent);
-  filter: blur(16px);
+  background: #ed6f5c;
   opacity: 0;
   transition: opacity 180ms ease;
   pointer-events: none;

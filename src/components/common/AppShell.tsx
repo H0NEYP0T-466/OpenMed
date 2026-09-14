@@ -27,13 +27,6 @@ export const AppShell: React.FC<AppShellProps> = ({ cta, children }) => {
 
   return (
     <div className="om-page">
-      <div className="om-rail left" aria-hidden="true">
-        <span>OpenMed — Anatomia Digitalis · MMXXVI</span>
-      </div>
-      <div className="om-rail right" aria-hidden="true">
-        <span>Terminologia Anatomica · TA2 · Lahore</span>
-      </div>
-
       <header className="masthead">
         <div className="om-menu-wrap">
           <button
@@ -61,7 +54,6 @@ export const AppShell: React.FC<AppShellProps> = ({ cta, children }) => {
         </div>
 
         <Link to="/" className="brand" aria-label="OpenMed — return to the front page">
-          <div className="brand-mark" aria-hidden="true">Ø</div>
           <span className="brand-word">
             OpenMed<span className="dot">.</span>
           </span>
