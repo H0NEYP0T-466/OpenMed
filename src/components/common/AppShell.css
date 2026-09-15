@@ -39,7 +39,7 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: 24px;
+  font-size: 34px;
   color: var(--ink);
   line-height: 1;
 }
@@ -50,7 +50,7 @@
   gap: 2px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 28px;
+  font-size: 40px;
   letter-spacing: -0.035em;
   color: var(--ink);
   line-height: 1.05;
