@@ -148,7 +148,7 @@ a.lp-pill {
 
 .lp-wordmark {
   position: absolute;
-  right: 40px;
+  right: 45px;
   top: -14px;
   z-index: 0;
   font-family: var(--font-display);
@@ -170,7 +170,21 @@ a.lp-pill {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding-top: 22px;
+  padding-top: 26px ;
+}
+
+/* Lead-in line beside "Begin reading" */
+.lp-foot-line {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-mute);
+  max-width: 58ch;
+}
+
+.lp-foot-line .serif {
+  font-style: italic;
+  color: var(--ink);
 }
 
 /* Responsive — page gutters track the workspace rhythm */

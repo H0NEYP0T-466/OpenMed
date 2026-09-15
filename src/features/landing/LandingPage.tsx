@@ -166,9 +166,14 @@ export const LandingPage: React.FC = () => (
         OpenMed<span className="dot">.</span>
       </div>
       <div className="lp-foot-inner">
+        <p className="lp-foot-line">
+          <em className="serif">How many times has AI actually helped a doctor?</em>{' '}
+          A verified ledger of the published answers: thirteen clinical disclosures, every
+          number linked to its source.
+        </p>
         <Link className="btn btn-ghost" to="/evidence">
           <span>Begin reading</span>
-          <span className="arr" aria-hidden="true">↗</span>
+          <span className="nav-star" aria-hidden="true">↗</span>
         </Link>
       </div>
     </footer>
