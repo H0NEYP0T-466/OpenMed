@@ -73,16 +73,12 @@ export const LandingPage: React.FC = () => (
     {/* Hero — the frontispiece fold */}
     <section className="lp-hero">
       <div className="lp-hero-type">
-        <div className="badge-row">
-          <span className="mono-badge">Anatomia Digitalis · MMXXVI</span>
-          <span className="veri-line">Multi-organ · Multi-modal · Public datasets</span>
-        </div>
         <h1 className="dossier-title">
           An AI hospital<span className="dot">.</span>
         </h1>
         <p className="lp-hero-sub serif">edited like a medical annual</p>
         <p className="dossier-lead">
-          OpenMed reads scans the way an editor reads copy — twelve organ departments
+          OpenMed reads scans the way an editor reads copy twelve organ departments
           classify, segment, and report on what the image says, then typeset the verdict
           as a signed dispatch. Every plate in this volume is interactive, every claim
           carries its benchmark, and every structure is named by Terminologia Anatomica.

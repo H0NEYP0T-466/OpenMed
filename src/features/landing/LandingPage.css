@@ -6,7 +6,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   max-width: 900px;
-  padding: 64px 64px 40px;
+  padding-top: 24px;
+  padding-bottom: 64px;
+  padding-left: 40px;
+  
 }
 
 .lp-hero-sub {
@@ -127,7 +130,8 @@
 /* Departments */
 .lp-departments {
   flex: 0 0 auto;
-  padding: 50px 64px 0;
+  padding-top: 50px;
+
 }
 
 a.lp-pill {
@@ -138,7 +142,7 @@ a.lp-pill {
 /* Colophon */
 .lp-foot {
   flex: 0 0 auto;
-  margin-top: 64px;
+  margin-top: 20px;
   position: relative;
   border-top: 1px solid var(--line);
   background: var(--paper-warm);
@@ -170,7 +174,7 @@ a.lp-pill {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding-top: 26px ;
+  padding-top: 27px;
 }
 
 /* Lead-in line beside "Begin reading" */
