@@ -1,0 +1,43 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables & Local Secrets
+.env
+.env.*
+!.env.example
+
+# Large Model Weights & Checkpoints (Never commit weights)
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.bin
+*.ckpt
+*.h5
+*.pkl
+weights/
+
+# Medical Volumes & Dataset Files
+*.nii
+*.nii.gz
+*.dcm
+data/
+storage/
+
+# Logs & Temporary Files
+*.log
+logs/
+tmp/
