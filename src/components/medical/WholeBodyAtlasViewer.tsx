@@ -131,7 +131,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
       dirty = true
     })
 
-    // Lighting — warm paper key over an ink ground
+    // Lighting - warm paper key over an ink ground
     scene.add(new THREE.AmbientLight(0xfff6e3, 0.55))
     scene.add(new THREE.HemisphereLight(0xfff8ee, 0x241f16, 0.85))
 
@@ -348,7 +348,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
     resizeObserver.observe(container)
 
     // ------------------------------------------------------------
-    // Anatomical naming — projected 2D pick targets + hover label
+    // Anatomical naming - projected 2D pick targets + hover label
     // (ported from ashemag/human-atlas scene.tsx)
     // ------------------------------------------------------------
     let targets: PickTarget[] = []
@@ -420,7 +420,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
       })
     }
 
-    // Bone hover chip (imperative — avoids 60 Hz React state churn)
+    // Bone hover chip (imperative - avoids 60 Hz React state churn)
     const tip = document.createElement('div')
     tip.className = 'part-tip'
     tip.hidden = true
@@ -509,7 +509,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
         }
       })
 
-      // When exploded, parts are flat cells on a board — use the projected targets
+      // When exploded, parts are flat cells on a board - use the projected targets
       if (found < 0 && amount > 0.45) {
         found = findTarget(
           e.clientX - rect.left,
@@ -680,7 +680,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
       {/* Plate caption */}
       <div className="plate-caption">
         <span className="p-num">
-          Plate <i>Nº {plateNo}</i> — Corpus Integrum
+          Plate <i>Nº {plateNo}</i> - Corpus Integrum
         </span>
         <span className="p-hair" aria-hidden="true" />
         <span className="p-term">Homo Sapiens · 2,234 parts</span>
@@ -689,14 +689,14 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
       {/* Coordinate / mesh stamp */}
       <div className="plate-coord">
         <span className="sep">·</span>15 physiological systems
-        <span className="sep">·</span>hover past 50% dissection to name structures — click to inspect
+        <span className="sep">·</span>hover past 50% dissection to name structures - click to inspect
       </div>
 
       {/* Loading note */}
       {isLoading && (
         <div className="plate-overlay">
           <div className="plate-note">
-            <span className="note-eyebrow">Off-press — assembling the macro plate</span>
+            <span className="note-eyebrow">Off-press - assembling the macro plate</span>
             <span className="note-title">
               Imposing BodyParts3D<span className="dot">.</span>
             </span>

@@ -1,4 +1,4 @@
-/* LandingPage — hero, six-movements pipeline, department index and
+/* LandingPage - hero, six-movements pipeline, department index and
    colophon. Reuses essay/pill classes. */
 
 .lp-hero {
@@ -191,7 +191,7 @@ a.lp-pill {
   color: var(--ink);
 }
 
-/* Responsive — page gutters track the workspace rhythm */
+/* Responsive - page gutters track the workspace rhythm */
 @media (max-width: 1279px) {
   .lp-hero, .lp-pipeline, .lp-departments, .lp-foot {
     padding-left: 32px;

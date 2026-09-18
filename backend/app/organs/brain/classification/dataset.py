@@ -17,33 +17,70 @@ class BrainTumorDataset(Dataset):
     """
     CLASS_NAMES = []
     TUMOR_TYPES = []
-    
+    @staticmethod
+    def locate_data_and_images(data_root):
+        """Intelligently discovers DATA.json and images base in any layout (nested, zipped, Kaggle)."""
+        json_path = None
+        data_dir = data_root
+
+        if os.path.isfile(data_root):
+            if data_root.endswith('.json'):
+                json_path = data_root
+                data_dir = os.path.dirname(data_root)
+            elif data_root.endswith('.zip'):
+                import zipfile
+                extract_target = os.path.join(os.path.dirname(data_root), "unzipped_dataset")
+                if not os.path.isdir(extract_target):
+                    logger.info(f"Extracting {data_root} to {extract_target}...")
+                    with zipfile.ZipFile(data_root, 'r') as z:
+                        z.extractall(extract_target)
+                data_dir = extract_target
+
+        if json_path is None:
+            candidates = [
+                os.path.join(data_dir, "DATA.json"),
+                os.path.join(data_dir, "archive", "DATA.json"),
+            ]
+            for c in candidates:
+                if os.path.isfile(c):
+                    json_path = c
+                    data_dir = os.path.dirname(c)
+                    break
+
+        if json_path is None and os.path.isdir(data_root):
+            for root, _, files in os.walk(data_root):
+                if "DATA.json" in files:
+                    json_path = os.path.join(root, "DATA.json")
+                    data_dir = root
+                    break
+
+        if json_path is None:
+            raise FileNotFoundError(f"Could not locate DATA.json inside '{data_root}'. Please verify the path.")
+
+        img_candidates = [
+            os.path.join(data_dir, "Images_", "Images_"),
+            os.path.join(data_dir, "Images_"),
+            os.path.join(os.path.dirname(data_dir), "Images_", "Images_"),
+            os.path.join(os.path.dirname(data_dir), "Images_"),
+            data_dir,
+        ]
+        images_base = data_dir
+        for c in img_candidates:
+            if os.path.isdir(c):
+                images_base = c
+                break
+
+        return json_path, images_base
+
     def __init__(self, data_root, transform=None, split_indices=None):
         """
         Args:
-            data_root (str): Path to the archive directory containing DATA.json and Images_/Images_
+            data_root (str): Path to dataset archive, DATA.json, or parent directory on Kaggle.
             transform (callable, optional): Optional transform to be applied on a sample.
             split_indices (list, optional): List of indices to subset the dataset (for train/val/test).
         """
-        if os.path.isfile(data_root):
-            self.json_path = data_root
-            self.data_root = os.path.dirname(data_root)
-        else:
-            self.json_path = os.path.join(data_root, "DATA.json")
-            self.data_root = data_root
-
-        # Resolve images base directory for nested archive structures (e.g. Images_/Images_)
-        candidates = [
-            os.path.join(self.data_root, "Images_", "Images_"),
-            os.path.join(self.data_root, "Images_"),
-            self.data_root,
-        ]
-        self.images_base = self.data_root
-        for cand in candidates:
-            if os.path.isdir(cand):
-                self.images_base = cand
-                break
-
+        self.json_path, self.images_base = self.locate_data_and_images(data_root)
+        self.data_root = os.path.dirname(self.json_path)
         self.transform = transform
         
         with open(self.json_path, 'r') as f:
@@ -110,6 +147,14 @@ class BrainTumorDataset(Dataset):
         }
             
         return image, label, meta_dict
+
+    @staticmethod
+    def collate_fn(batch):
+        """Custom collate function to handle variable-length metadata lists."""
+        images = torch.stack([item[0] for item in batch])
+        labels = torch.tensor([item[1] for item in batch], dtype=torch.long)
+        metas = [item[2] for item in batch]
+        return images, labels, metas
         
     @staticmethod
     def compute_class_weights(dataset_samples, num_classes):
@@ -136,10 +181,7 @@ class BrainTumorDataset(Dataset):
         Stratifies by primary location to prevent anatomy leakage, 
         falling back to class stratification.
         """
-        if os.path.isfile(data_root):
-            json_path = data_root
-        else:
-            json_path = os.path.join(data_root, "DATA.json")
+        json_path, _ = BrainTumorDataset.locate_data_and_images(data_root)
         with open(json_path, 'r') as f:
             raw_data = json.load(f)
             

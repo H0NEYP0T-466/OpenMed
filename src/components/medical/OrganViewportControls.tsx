@@ -22,7 +22,7 @@ interface OrganViewportControlsProps {
 }
 
 /**
- * Paper control rail — lives beside the plate, never on top of the model.
+ * Paper control rail - lives beside the plate, never on top of the model.
  */
 export const OrganViewportControls: React.FC<OrganViewportControlsProps> = ({
   settings,
@@ -49,10 +49,10 @@ export const OrganViewportControls: React.FC<OrganViewportControlsProps> = ({
 
   return (
     <>
-      {/* Pl. I — Shading */}
+      {/* Pl. I - Shading */}
       <div className="rail-group">
         <div className="rail-head">
-          <span className="rail-label">Pl. I — Shading</span>
+          <span className="rail-label">Pl. I - Shading</span>
         </div>
         <div className="rail-btns" role="group" aria-label="Shading modes">
           <button
@@ -97,10 +97,10 @@ export const OrganViewportControls: React.FC<OrganViewportControlsProps> = ({
         </div>
       </div>
 
-      {/* Pl. II — Annotation */}
+      {/* Pl. II - Annotation */}
       <div className="rail-group">
         <div className="rail-head">
-          <span className="rail-label">Pl. II — Annotation</span>
+          <span className="rail-label">Pl. II - Annotation</span>
         </div>
         <div className="rail-btns" role="group" aria-label="Annotation toggles">
           {hotspotsCount > 0 && (
@@ -137,10 +137,10 @@ export const OrganViewportControls: React.FC<OrganViewportControlsProps> = ({
         </div>
       </div>
 
-      {/* Pl. III — Planes */}
+      {/* Pl. III - Planes */}
       <div className="rail-group">
         <div className="rail-head">
-          <span className="rail-label">Pl. III — Planes</span>
+          <span className="rail-label">Pl. III - Planes</span>
         </div>
         <div className="rail-btns" role="group" aria-label="Camera planes">
           <button

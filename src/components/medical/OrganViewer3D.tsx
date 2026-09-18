@@ -64,7 +64,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     activeHotspotRef.current = activeHotspot
   }, [activeHotspot])
 
-  // Initialize Three.js scene once — warm museum lighting on an ink plate
+  // Initialize Three.js scene once - warm museum lighting on an ink plate
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -100,7 +100,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     controls.zoomSpeed = 0.9
     controlsRef.current = controls
 
-    // Studio lighting rig — warm paper key, muted olive-warm fill, coral rim
+    // Studio lighting rig - warm paper key, muted olive-warm fill, coral rim
     scene.add(new THREE.AmbientLight(0xfff6e3, 0.45))
     scene.add(new THREE.HemisphereLight(0xfff8ee, 0x241f16, 0.75))
 
@@ -388,7 +388,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       {/* WebGL canvas mount */}
       <div ref={containerRef} className="plate-canvas" />
 
-      {/* Corner brackets — mandatory plate annotation */}
+      {/* Corner brackets - mandatory plate annotation */}
       <span className="brk tl" aria-hidden="true" />
       <span className="brk tr" aria-hidden="true" />
       <span className="brk bl" aria-hidden="true" />
@@ -397,7 +397,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       {/* Plate caption */}
       <div className="plate-caption">
         <span className="p-num">
-          Plate <i>Nº {plateNo}</i> — {organ.name}
+          Plate <i>Nº {plateNo}</i> - {organ.name}
         </span>
         <span className="p-hair" aria-hidden="true" />
         <span className="p-term">{organ.anatomicalTerm}</span>
@@ -406,14 +406,14 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       {/* Coordinate / mesh stamp */}
       <div className="plate-coord">
         FIG. {plateNo} / OM-26<span className="sep">·</span>PBR glTF<span className="sep">·</span>
-        {organ.hotspots.length} landmarks<span className="sep">·</span>drag to orbit — scroll to zoom
+        {organ.hotspots.length} landmarks<span className="sep">·</span>drag to orbit - scroll to zoom
       </div>
 
       {/* Loading note */}
       {isLoading && (
         <div className="plate-overlay">
           <div className="plate-note">
-            <span className="note-eyebrow">Off-press — Plate Nº {plateNo}</span>
+            <span className="note-eyebrow">Off-press - Plate Nº {plateNo}</span>
             <span className="note-title">
               Setting the type: {organ.name}<span className="dot">.</span>
             </span>
@@ -434,7 +434,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       {loadError && !isLoading && (
         <div className="plate-overlay">
           <div className="plate-note">
-            <span className="note-eyebrow">Press halt — Plate Nº {plateNo}</span>
+            <span className="note-eyebrow">Press halt - Plate Nº {plateNo}</span>
             <span className="note-title">
               Plate offline<span className="dot">.</span>
             </span>

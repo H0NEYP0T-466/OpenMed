@@ -10,7 +10,7 @@ export interface TumorInfo {
 export const TUMOR_DATA: Record<string, TumorInfo> = {
   'Meningioma': {
     name: 'Meningioma',
-    description: 'A typically slow-growing, benign tumor that forms from the meninges—the membranous layers surrounding the brain and spinal cord.',
+    description: 'A typically slow-growing, benign tumor that forms from the meninges-the membranous layers surrounding the brain and spinal cord.',
     commonLocations: ['Parasagittal/falcine region', 'Convexity', 'Sphenoid wing', 'Olfactory groove', 'Posterior fossa'],
     mriCharacteristics: 'Usually isointense to gray matter on T1 and T2-weighted imaging. Shows strong, homogenous enhancement on T1C+ (contrast). Often exhibits a "dural tail" sign.',
     grading: 'WHO Grade 1 (80% of cases), Grade 2 (atypical, 15-20%), Grade 3 (anaplastic/malignant, 1-3%).',

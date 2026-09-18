@@ -28,29 +28,29 @@ export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
   return (
     <article className="organ-essay">
       <div className="dossier-grid">
-        {/* I — Observatio */}
-        <RomanSection index={0} of={sectionCount} title="Observatio — Physiology" className="sp7">
+        {/* I - Observatio */}
+        <RomanSection index={0} of={sectionCount} title="Observatio - Physiology" className="sp7">
           <p className="sec-copy">{profile?.physiology ?? organ.description}</p>
           {profile?.medicalNote && <p className="sec-copy note">{profile.medicalNote}</p>}
         </RomanSection>
 
-        {/* II — Constantia — daily fact as pull-quote */}
+        {/* II - Constantia - daily fact as pull-quote */}
         {profile?.dailyFact && (
-          <RomanSection index={1} of={sectionCount} title="Constantia — Physiological Fact" className="sp5">
+          <RomanSection index={1} of={sectionCount} title="Constantia - Physiological Fact" className="sp5">
             <figure className="pull-quote">
               <span className="pq-mark" aria-hidden="true">“</span>
               <p>{profile.dailyFact}</p>
-              <figcaption>Nº Dies — {profile.system}</figcaption>
+              <figcaption>Nº Dies - {profile.system}</figcaption>
             </figure>
           </RomanSection>
         )}
 
-        {/* III — Landmarks */}
+        {/* III - Landmarks */}
         {organ.hotspots.length > 0 && (
           <RomanSection
             index={2}
             of={sectionCount}
-            title={`Landmarks — ${organ.hotspots.length} Points`}
+            title={`Landmarks - ${organ.hotspots.length} Points`}
             className="sp12"
           >
             <p className="sec-hint">Select a point to locate it on the plate above.</p>
@@ -81,8 +81,8 @@ export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
           </RomanSection>
         )}
 
-        {/* IV — Data */}
-        <RomanSection index={3} of={sectionCount} title="Data — Benchmarks" className="sp5">
+        {/* IV - Data */}
+        <RomanSection index={3} of={sectionCount} title="Data - Benchmarks" className="sp5">
           <div className="data-row">
             <span className="k">Classification</span>
             <span className="v">{organ.classificationDataset}</span>
@@ -93,8 +93,8 @@ export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
           </div>
         </RomanSection>
 
-        {/* V — Targetes */}
-        <RomanSection index={4} of={sectionCount} title="Targetes — Diagnostic Tasks" className="sp7">
+        {/* V - Targetes */}
+        <RomanSection index={4} of={sectionCount} title="Targetes - Diagnostic Tasks" className="sp7">
           <div>
             {organ.clinicalTasks.map((task, i) => (
               <div key={task} className="target-row">
@@ -106,7 +106,7 @@ export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
           </div>
         </RomanSection>
 
-        {/* VI — Vasa & Pathologiae */}
+        {/* VI - Vasa & Pathologiae */}
         <RomanSection index={5} of={sectionCount} title="Vasa & Pathologiae" className="sp12">
           {profile?.bloodSupply && (
             <div className="data-row">
@@ -127,7 +127,7 @@ export const OrganInfoCard: React.FC<OrganInfoCardProps> = ({
       {/* Colophon footer */}
       <footer className="dossier-foot">
         <span>
-          Asset — {organ.modelFile.split('/').pop()} · {profile?.system ?? 'Homo Sapiens'}
+          Asset - {organ.modelFile.split('/').pop()} · {profile?.system ?? 'Homo Sapiens'}
         </span>
         <span className="fin">fin.</span>
       </footer>

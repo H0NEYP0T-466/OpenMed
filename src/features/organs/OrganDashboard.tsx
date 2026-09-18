@@ -93,7 +93,7 @@ export const OrganDashboard: React.FC = () => {
     setSearchParams(id === 'body' ? {} : { organ: id }, { replace: true })
   }
 
-  // Browser back/forward rewrites ?organ= — mirror it into state.
+  // Browser back/forward rewrites ?organ= - mirror it into state.
   useEffect(() => {
     const target = urlOrgan ?? 'body'
     setSelectedOrganId((prev) => (prev === target ? prev : target))
@@ -168,15 +168,15 @@ export const OrganDashboard: React.FC = () => {
       }
     >
 
-      {/* Specimen title block — read it, then see it */}
+      {/* Specimen title block - read it, then see it */}
       {isWholeBodyView ? (
         <EssayHead
           badge="3D Atlas · BodyParts3D 4.0"
           verified="Terminologia Anatomica concepts · CC BY 4.0"
           title="Corpus Integrum"
           serif="The Whole Figure"
-          latin={`Plate Nº ${plateNo} — 2,234 named structures · 15 physiological systems`}
-          lead="The centre page of the annual: one adult male reference body, segmented into every structure the anatomists of BodyParts3D chose to name — from the dura mater to the semitendinosus. Nothing here is a sculptor’s guess; each of the 2,234 meshes carries its own anatomical concept id, so naming, isolating and dissecting the figure stays truthful to the source atlas at every zoom."
+          latin={`Plate Nº ${plateNo} - 2,234 named structures · 15 physiological systems`}
+          lead="The centre page of the annual: one adult male reference body, segmented into every structure the anatomists of BodyParts3D chose to name - from the dura mater to the semitendinosus. Nothing here is a sculptor’s guess; each of the 2,234 meshes carries its own anatomical concept id, so naming, isolating and dissecting the figure stays truthful to the source atlas at every zoom."
         />
       ) : (
         <EssayHead
@@ -184,12 +184,12 @@ export const OrganDashboard: React.FC = () => {
           verified="Verified · Terminologia Anatomica TA2"
           title={currentOrgan.name}
           serif={currentOrgan.clinicalProfile?.poeticTitle}
-          latin={`Plate Nº ${plateNo} — ${currentOrgan.anatomicalTerm}`}
+          latin={`Plate Nº ${plateNo} - ${currentOrgan.anatomicalTerm}`}
           lead={currentOrgan.description}
         />
       )}
 
-      {/* Stage — the plate stays clear; all controls live in the rail */}
+      {/* Stage - the plate stays clear; all controls live in the rail */}
       <main className={`stage ${isWholeBodyView ? 'stage-atlas' : ''}`}>
         <section className="plate" ref={plateRef}>
           {isWholeBodyView ? (
@@ -263,7 +263,7 @@ export const OrganDashboard: React.FC = () => {
           )}
         </section>
 
-        {/* Controls rail — pushed off the model, onto paper */}
+        {/* Controls rail - pushed off the model, onto paper */}
         <aside className="controls-rail">
           {isWholeBodyView ? (
             <AtlasControlsRail
@@ -283,7 +283,7 @@ export const OrganDashboard: React.FC = () => {
         </aside>
       </main>
 
-      {/* The essay — below the plate, reached by scrolling */}
+      {/* The essay - below the plate, reached by scrolling */}
       <section className="dossier-flow">
         {isWholeBodyView ? (
           <AtlasDossier />
@@ -301,7 +301,7 @@ export const OrganDashboard: React.FC = () => {
         )}
       </section>
 
-      {/* Index of specimens — structured table of contents */}
+      {/* Index of specimens - structured table of contents */}
       <footer className="index-bar">
         <div className="index-word" aria-hidden="true">
           OpenMed<span className="dot">.</span>

@@ -10,7 +10,7 @@ interface HotspotCalloutProps {
 
 export const HotspotCallout: React.FC<HotspotCalloutProps> = ({ hotspot, onClose }) => {
   return (
-    <div className="callout" role="dialog" aria-label={`${hotspot.label} — anatomical landmark`}>
+    <div className="callout" role="dialog" aria-label={`${hotspot.label} - anatomical landmark`}>
       <div className="co-head">
         <span className="co-eyebrow">Anatomical Landmark</span>
         <button type="button" className="icon-btn" onClick={onClose} aria-label="Close landmark details">
@@ -39,7 +39,7 @@ export const HotspotCallout: React.FC<HotspotCalloutProps> = ({ hotspot, onClose
       )}
 
       <div className="co-foot">
-        <span>Fig. {hotspot.id} — OM-26</span>
+        <span>Fig. {hotspot.id} - OM-26</span>
         <span className="fin">fin.</span>
       </div>
     </div>

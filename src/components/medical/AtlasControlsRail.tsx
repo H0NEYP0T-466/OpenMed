@@ -26,10 +26,10 @@ export const AtlasControlsRail: React.FC<AtlasControlsRailProps> = ({
 
   return (
     <>
-      {/* Pl. I — Physiological systems */}
+      {/* Pl. I - Physiological systems */}
       <div className="rail-group">
         <div className="rail-head">
-          <span className="rail-label">Pl. I — Systems</span>
+          <span className="rail-label">Pl. I - Systems</span>
           <span className="rail-count">{state.visibleSystems.length}/15 · scroll</span>
         </div>
         <div className="rail-systems">
@@ -46,17 +46,17 @@ export const AtlasControlsRail: React.FC<AtlasControlsRailProps> = ({
               >
                 <span className="sys-swatch" style={{ backgroundColor: sys.color }} />
                 <span className="sys-name">{sys.name}</span>
-                <span className="sys-tick">{isVisible ? '✓' : '—'}</span>
+                <span className="sys-tick">{isVisible ? '✓' : '-'}</span>
               </button>
             )
           })}
         </div>
       </div>
 
-      {/* Pl. II — Dissection */}
+      {/* Pl. II - Dissection */}
       <div className="rail-group">
         <div className="rail-head">
-          <span className="rail-label">Pl. II — Dissection</span>
+          <span className="rail-label">Pl. II - Dissection</span>
           <span className="val-badge">{pct}%</span>
         </div>
         <input
@@ -76,14 +76,14 @@ export const AtlasControlsRail: React.FC<AtlasControlsRailProps> = ({
           <span>Inventory board</span>
         </div>
         <p className="rail-hint">
-          Past 50% the plate flattens into its inventory — hover any structure to read its name.
+          Past 50% the plate flattens into its inventory - hover any structure to read its name.
         </p>
       </div>
 
-      {/* Pl. III — View */}
+      {/* Pl. III - View */}
       <div className="rail-group">
         <div className="rail-head">
-          <span className="rail-label">Pl. III — View</span>
+          <span className="rail-label">Pl. III - View</span>
         </div>
         <div className="rail-btns">
           {VIEW_PRESETS.map((preset) => (

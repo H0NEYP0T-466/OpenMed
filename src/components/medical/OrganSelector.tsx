@@ -9,7 +9,7 @@ interface OrganSelectorProps {
 }
 
 /**
- * Index of specimens — a structured table-of-contents grid.
+ * Index of specimens - a structured table-of-contents grid.
  * Every entry visible at once; no horizontal scrolling.
  */
 export const OrganSelector: React.FC<OrganSelectorProps> = ({

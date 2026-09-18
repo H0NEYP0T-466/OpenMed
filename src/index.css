@@ -1,11 +1,11 @@
 /* ============================================================
-   OPENMED — "ANATOMIA DIGITALIS"
+   OPENMED - "ANATOMIA DIGITALIS"
    Atelier Zero editorial design system (token schema exact).
    Warm paper canvas · ink hierarchy · single coral accent.
    ============================================================ */
 
 :root {
-  /* --- Atelier Zero palette (DESIGN.md §2 — no invented hex) --- */
+  /* --- Atelier Zero palette (DESIGN.md §2 - no invented hex) --- */
   --paper: #efe7d2;
   --paper-warm: #ece4cf;
   --paper-dark: #ddd2b6;
@@ -131,7 +131,7 @@ body {
   background: var(--accent);
 }
 
-/* Roman section rule (DESIGN.md §6) — [Roman.] · [meta] · [page-of] */
+/* Roman section rule (DESIGN.md §6) - [Roman.] · [meta] · [page-of] */
 .sec-rule {
   border-top: 1px solid var(--line);
   padding-top: 10px;
@@ -169,7 +169,7 @@ body {
   white-space: nowrap;
 }
 
-/* --- Buttons (DESIGN.md §6) — transparent outline, cursor-follow color spot --- */
+/* --- Buttons (DESIGN.md §6) - transparent outline, cursor-follow color spot --- */
 
 .btn {
   position: relative;
@@ -196,7 +196,7 @@ body {
 
 /*
  * Small blurred coral spot that trails the cursor. Position never
- * transitions — only opacity does — so on leave the spot simply fades
+ * transitions - only opacity does - so on leave the spot simply fades
  * out where it last was instead of jerking back to center.
  */
 .btn::before {
@@ -254,7 +254,7 @@ body {
 
 /*
  * No prefers-reduced-motion override needed here.
- * The spot repositions instantly (no transition on left/top) —
+ * The spot repositions instantly (no transition on left/top) -
  * only opacity fades (180ms), which is well within a11y norms.
  */
 

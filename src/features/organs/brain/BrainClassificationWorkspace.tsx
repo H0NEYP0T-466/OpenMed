@@ -146,8 +146,8 @@ export const BrainClassificationWorkspace: React.FC = () => {
       </div>
 
       <div className="dossier-grid">
-        {/* VII — Scan Ingestion & Analysis */}
-        <RomanSection index={6} of={9} title="Ingestio — MRI Scan Acquisition" className="sp12">
+        {/* VII - Scan Ingestion & Analysis */}
+        <RomanSection index={6} of={9} title="Ingestio - MRI Scan Acquisition" className="sp12">
           {!apiReady && (
             <div className="error-message">
               FastAPI backend service is offline at <code>http://localhost:8016</code>. Run <code>python -m app.main</code> to enable live AI inference.
@@ -206,8 +206,8 @@ export const BrainClassificationWorkspace: React.FC = () => {
         {/* Diagnostic Results & Visual Attention Map */}
         {result && (
           <>
-            {/* VIII — Diagnostic Findings & Grad-CAM */}
-            <RomanSection index={7} of={9} title="Diagnosis — 39-Class Neuro-Oncology Finding" className="sp7">
+            {/* VIII - Diagnostic Findings & Grad-CAM */}
+            <RomanSection index={7} of={9} title="Diagnosis - 39-Class Neuro-Oncology Finding" className="sp7">
               <div className="diagnostic-readout-card">
                 <div>
                   <div className="diag-eyebrow">Automated Differential Finding</div>
@@ -256,7 +256,7 @@ export const BrainClassificationWorkspace: React.FC = () => {
               </div>
             </RomanSection>
 
-            <RomanSection index={7} of={9} title="Attentio — Grad-CAM Feature Map" className="sp5">
+            <RomanSection index={7} of={9} title="Attentio - Grad-CAM Feature Map" className="sp5">
               <div className="gradcam-dual-plate">
                 {previewUrl && (
                   <div className="scan-frame">
@@ -274,11 +274,11 @@ export const BrainClassificationWorkspace: React.FC = () => {
             </RomanSection>
 
             {/* Spatial Localization & Clinical Monograph */}
-            <RomanSection index={8} of={9} title="Locus 3D — Spatial Coordinate Localization" className="sp7">
+            <RomanSection index={8} of={9} title="Locus 3D - Spatial Coordinate Localization" className="sp7">
               <BrainRegionViewer locations={result.locations_3d} />
             </RomanSection>
 
-            <RomanSection index={8} of={9} title="Monograph — Clinical Guidance" className="sp5">
+            <RomanSection index={8} of={9} title="Monograph - Clinical Guidance" className="sp5">
               <div className="monograph-box">
                 {tumorInfo ? (
                   <>
@@ -313,7 +313,7 @@ export const BrainClassificationWorkspace: React.FC = () => {
         )}
 
         {/* Academic Model & Kaggle Training Ledger */}
-        <RomanSection index={8} of={9} title="Disciplina — Kaggle Training & Academic Benchmarks" className="sp12">
+        <RomanSection index={8} of={9} title="Disciplina - Kaggle Training & Academic Benchmarks" className="sp12">
           <div className="archival-ledger-card">
             <div className="ledger-stats-strip">
               <div className="ledger-stat">

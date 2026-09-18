@@ -1,5 +1,5 @@
 /**
- * Cursor-follow color spotlight on button hover — the canonical mechanic.
+ * Cursor-follow color spotlight on button hover - the canonical mechanic.
  *
  * A small blurred coral dot sits under the button label and is repositioned
  * on pointermove by writing --x / --y (px, relative to the button). Only

@@ -53,7 +53,7 @@ export const AppShell: React.FC<AppShellProps> = ({ cta, children }) => {
           )}
         </div>
 
-        <Link to="/" className="brand" aria-label="OpenMed — return to the front page">
+        <Link to="/" className="brand" aria-label="OpenMed - return to the front page">
           <span className="brand-word">
             OpenMed<span className="dot">.</span>
           </span>

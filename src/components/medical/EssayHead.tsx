@@ -12,7 +12,7 @@ interface EssayHeadProps {
 }
 
 /**
- * The specimen's title block — set between the masthead and the plate,
+ * The specimen's title block - set between the masthead and the plate,
  * so the reader knows whose body they are looking at before the WebGL.
  */
 export const EssayHead: React.FC<EssayHeadProps> = ({

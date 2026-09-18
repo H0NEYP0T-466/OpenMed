@@ -14,7 +14,7 @@ const MOVEMENTS = [
     roman: 'I',
     title: 'Paper Intake',
     term: 'Lectio',
-    copy: 'A photograph of the handwritten clinic file goes in; structured text comes out — OCR over paper is the front door of Pakistani healthcare.',
+    copy: 'A photograph of the handwritten clinic file goes in; structured text comes out - OCR over paper is the front door of Pakistani healthcare.',
     status: 'draft' as const,
   },
   {
@@ -28,7 +28,7 @@ const MOVEMENTS = [
     roman: 'III',
     title: 'Classification',
     term: 'Judicium',
-    copy: 'Twelve organ departments, each with a fine-tuned vision ensemble grading the pathology — tumour type, stage, severity.',
+    copy: 'Twelve organ departments, each with a fine-tuned vision ensemble grading the pathology - tumour type, stage, severity.',
     status: 'press' as const,
   },
   {
@@ -42,14 +42,14 @@ const MOVEMENTS = [
     roman: 'V',
     title: 'The Report',
     term: 'Scriptura',
-    copy: 'A fine-tuned medical language model sets findings, impression and recommendation as a signed dispatch — always marked “clinician review required”.',
+    copy: 'A fine-tuned medical language model sets findings, impression and recommendation as a signed dispatch - always marked “clinician review required”.',
     status: 'draft' as const,
   },
   {
     roman: 'VI',
     title: 'Consultation',
     term: 'Disputatio',
-    copy: 'A RAG assistant answers questions about the case, the report, and the literature behind it — with citations to every line.',
+    copy: 'A RAG assistant answers questions about the case, the report, and the literature behind it - with citations to every line.',
     status: 'draft' as const,
   },
 ]
@@ -70,7 +70,7 @@ export const LandingPage: React.FC = () => (
       </Link>
     }
   >
-    {/* Hero — the frontispiece fold */}
+    {/* Hero - the frontispiece fold */}
     <section className="lp-hero">
       <div className="lp-hero-type">
         <h1 className="dossier-title">
@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => (
           </a>
         </div>
         <p className="lp-edition mono">
-          This edition ships the atlas &amp; benchmark dossiers — the AI pipeline is in press.
+          This edition ships the atlas &amp; benchmark dossiers - the AI pipeline is in press.
         </p>
       </div>
 
@@ -125,7 +125,7 @@ export const LandingPage: React.FC = () => (
       </div>
     </section>
 
-    {/* Departments — index of specimens, same pills as the workspace */}
+    {/* Departments - index of specimens, same pills as the workspace */}
     <section className="lp-departments">
       <div className="index-head">
         <div className="sec-rule">

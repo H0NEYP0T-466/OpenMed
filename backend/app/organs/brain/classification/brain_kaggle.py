@@ -186,6 +186,7 @@ def main():
         shuffle=True,
         num_workers=args.num_workers,
         pin_memory=torch.cuda.is_available(),
+        collate_fn=BrainTumorDataset.collate_fn,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -193,6 +194,7 @@ def main():
         shuffle=False,
         num_workers=args.num_workers,
         pin_memory=torch.cuda.is_available(),
+        collate_fn=BrainTumorDataset.collate_fn,
     )
     test_loader = DataLoader(
         test_dataset,
@@ -200,6 +202,7 @@ def main():
         shuffle=False,
         num_workers=args.num_workers,
         pin_memory=torch.cuda.is_available(),
+        collate_fn=BrainTumorDataset.collate_fn,
     )
 
     # 2. Model, Loss, Optimizer, Scheduler Setup
