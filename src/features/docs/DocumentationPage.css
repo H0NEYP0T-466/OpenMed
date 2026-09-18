@@ -1,0 +1,288 @@
+/* ============================================================
+   OPENMED - ACADEMIC & ENGINEERING DOCUMENTATION
+   Atelier Zero editorial design system.
+   Bone paper surfaces · ink hairlines · warm typography.
+   ============================================================ */
+
+.doc-page-layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 24px 96px 24px;
+}
+
+/* --- Document Head --- */
+.doc-head-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 40px;
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--line);
+}
+
+.doc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.doc-eyebrow .meta-sep {
+  color: var(--line);
+}
+
+.doc-meta-tag {
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+}
+
+.doc-main-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(38px, 4.2vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.doc-main-title .serif {
+  display: block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(18px, 1.8vw, 25px);
+  letter-spacing: -0.01em;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+
+.doc-lead-copy {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 72ch;
+}
+
+.doc-quick-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.doc-nav-anchor {
+  padding: 6px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  background: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+.doc-nav-anchor:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* --- Section Layout --- */
+.doc-section-wrapper {
+  margin-bottom: 64px;
+}
+
+/* Info Blocks */
+.doc-info-block {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.doc-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.doc-block-icon {
+  color: var(--accent);
+}
+
+.doc-block-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.doc-block-copy {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+/* API Endpoints Grid */
+.api-endpoints-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.api-endpoint-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  background: var(--paper-warm);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.http-method {
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+}
+
+.http-method.post {
+  background: rgba(237, 111, 92, 0.15);
+  color: var(--accent);
+}
+
+.http-method.get {
+  background: rgba(110, 116, 72, 0.15);
+  color: var(--olive);
+}
+
+.endpoint-path {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.endpoint-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-mute);
+}
+
+/* MNI Axes Diagram */
+.mni-axes-diagram {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .mni-axes-diagram {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mni-axis-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  background: var(--paper-warm);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+
+.axis-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.axis-range {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.axis-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-mute);
+}
+
+/* Purging Stat Strip */
+.purging-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+@media (max-width: 680px) {
+  .purging-stat-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+.p-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px;
+  background: var(--paper-warm);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+
+.p-stat .v {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.p-stat .v.red {
+  color: var(--accent);
+}
+
+.p-stat .v.green {
+  color: var(--olive);
+}
+
+.p-stat .k {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}

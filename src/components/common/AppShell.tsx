@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Front Page', note: 'the annual, at a glance' },
   { to: '/app', label: 'The Atlas', note: '3D models · 13 plates' },
   { to: '/evidence', label: 'AI Helping Doctors', note: 'the verified tallies' },
+  { to: '/docs', label: 'Documentation', note: 'academic benchmarks · training · ledger' },
 ]
 
 /**

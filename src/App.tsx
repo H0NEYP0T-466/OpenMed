@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { LandingPage } from './features/landing/LandingPage'
 import { OrganDashboard } from './features/organs/OrganDashboard'
 import { EvidencePage } from './features/evidence/EvidencePage'
+import { DocumentationPage } from './features/docs/DocumentationPage'
 
 const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation()
@@ -18,6 +19,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/app" element={<OrganDashboard />} />
         <Route path="/evidence" element={<EvidencePage />} />
+        <Route path="/docs" element={<DocumentationPage />} />
+        <Route path="/documentation" element={<DocumentationPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
