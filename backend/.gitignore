@@ -41,3 +41,4 @@ storage/
 *.log
 logs/
 tmp/
+datasets/
