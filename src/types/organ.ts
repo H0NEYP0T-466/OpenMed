@@ -160,12 +160,17 @@ export const ORGANS_REGISTRY: Record<OrganId, OrganMetadata> = {
     name: 'Brain',
     anatomicalTerm: 'Encephalon / Cerebrum',
     icon: '🧠',
-    classificationDataset: 'OASIS-3 (Alzheimer & Neurodegenerative)',
-    segmentationDataset: 'BraTS 2020/2024 (Glioma & Sub-regions)',
+    classificationDataset: 'OpenMed-BT12K · 12,626 Curated Scans (39 Classes)',
+    segmentationDataset: 'BraTS 2024 + 12K Bounding Boxes & Histological Masks',
     modality: 'MRI',
     modelFile: '/models/organs/brain.glb',
     description: 'High-definition cortical topology and cerebellar hemispheres with photorealistic PBR gyri and sulci textures.',
-    clinicalTasks: ['Glioma Sub-region Segmentation (WT/TC/ET)', 'Dementia & Alzheimer Classification', 'Ventricular Volumetry'],
+    clinicalTasks: [
+      '39-Class Histological & Sequence Subtyping (T1, T1C+, T2)',
+      'Grad-CAM Convolutional Attention Heatmap Localization',
+      '3D Stereotactic MNI Spatial Coordinate Projection',
+      'Primary-Location Stratified Risk Scoring'
+    ],
     accentColor: '#c58696',
     cameraDistance: 1.8,
     clinicalProfile: {

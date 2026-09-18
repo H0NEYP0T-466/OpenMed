@@ -1,0 +1,49 @@
+OpenMed Brain Classification — Academic Evaluation Report
+Model: EfficientNetV2-B2 (tf_efficientnetv2_b2.in1k)
+Test Accuracy: 0.9699 | Test Loss: 0.1604
+
+                                             precision    recall  f1-score   support
+
+                             Astrocytoma T1     0.9455    0.9455    0.9455       110
+                           Astrocytoma T1C+     0.9741    0.9417    0.9576       120
+                             Astrocytoma T2     0.9412    0.9302    0.9357        86
+  Dysembryoplastic Neuroepithelial Tumor T1     1.0000    0.8333    0.9091        12
+Dysembryoplastic Neuroepithelial Tumor T1C+     1.0000    1.0000    1.0000        17
+  Dysembryoplastic Neuroepithelial Tumor T2     0.7857    1.0000    0.8800        11
+              Ependymoma - Subependymoma T1     0.9615    0.9434    0.9524        53
+            Ependymoma - Subependymoma T1C+     0.9853    0.9710    0.9781        69
+              Ependymoma - Subependymoma T2     1.0000    0.9318    0.9647        44
+                           Ganglioglioma T1     0.8571    1.0000    0.9231         6
+                         Ganglioglioma T1C+     1.0000    1.0000    1.0000         8
+                           Ganglioglioma T2     0.8750    0.7778    0.8235         9
+                               Germinoma T1     1.0000    1.0000    1.0000        12
+                             Germinoma T1C+     0.9375    1.0000    0.9677        15
+                               Germinoma T2     0.9167    0.9167    0.9167        12
+                            Glioblastoma T1     1.0000    0.9531    0.9760        64
+                          Glioblastoma T1C+     0.9767    0.9767    0.9767        86
+                            Glioblastoma T2     0.9778    0.9778    0.9778        45
+                      Hemangiopericytoma T1     0.9583    1.0000    0.9787        23
+                    Hemangiopericytoma T1C+     1.0000    1.0000    1.0000        51
+                      Hemangiopericytoma T2     1.0000    1.0000    1.0000        18
+                         Medulloblastoma T1     0.9167    0.9429    0.9296        35
+                       Medulloblastoma T1C+     0.9667    1.0000    0.9831        58
+                         Medulloblastoma T2     0.8864    0.9750    0.9286        40
+                              Meningioma T1     0.9714    0.9358    0.9533       109
+                            Meningioma T1C+     1.0000    0.9744    0.9870       156
+                              Meningioma T2     0.9872    0.9747    0.9809        79
+                             Neurocytoma T1     1.0000    1.0000    1.0000        24
+                           Neurocytoma T1C+     1.0000    1.0000    1.0000        27
+                             Neurocytoma T2     1.0000    1.0000    1.0000        17
+                                  Normal T1     0.9296    1.0000    0.9635        66
+                                Normal T1C+     0.9783    1.0000    0.9890        45
+                                  Normal T2     0.9714    1.0000    0.9855        68
+                       Oligodendroglioma T1     1.0000    1.0000    1.0000        44
+                     Oligodendroglioma T1C+     0.9762    1.0000    0.9880        41
+                       Oligodendroglioma T2     1.0000    1.0000    1.0000        28
+                              Schwannoma T1     0.9153    0.9818    0.9474        55
+                            Schwannoma T1C+     1.0000    0.9881    0.9940        84
+                              Schwannoma T2     0.9787    0.9787    0.9787        47
+
+                                   accuracy                         0.9699      1894
+                                  macro avg     0.9633    0.9705    0.9659      1894
+                               weighted avg     0.9709    0.9699    0.9700      1894

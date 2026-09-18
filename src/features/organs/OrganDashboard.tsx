@@ -287,17 +287,18 @@ export const OrganDashboard: React.FC = () => {
       <section className="dossier-flow">
         {isWholeBodyView ? (
           <AtlasDossier />
+        ) : selectedOrganId === 'brain' ? (
+          <BrainClassificationWorkspace
+            organ={currentOrgan}
+            activeHotspot={activeHotspot}
+            onSelectHotspot={handleSelectHotspot}
+          />
         ) : (
-          <>
-            <OrganInfoCard
-              organ={currentOrgan}
-              activeHotspot={activeHotspot}
-              onSelectHotspot={handleSelectHotspot}
-            />
-            {selectedOrganId === 'brain' && (
-              <BrainClassificationWorkspace />
-            )}
-          </>
+          <OrganInfoCard
+            organ={currentOrgan}
+            activeHotspot={activeHotspot}
+            onSelectHotspot={handleSelectHotspot}
+          />
         )}
       </section>
 

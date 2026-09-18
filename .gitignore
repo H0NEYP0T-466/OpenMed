@@ -1,12 +1,3 @@
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
 # Node dependencies & builds
 node_modules/
 dist/
@@ -38,7 +29,7 @@ env/
 env.bak/
 venv.bak/
 
-# ML Weights & Checkpoints (Never commit large weights)
+# ML Model Weights & Checkpoints (Heavy binary weights)
 *.pt
 *.pth
 *.onnx
@@ -51,9 +42,7 @@ checkpoints/*.pt
 !checkpoints/.gitkeep
 weights/
 
-# Training Outputs, Artifacts & Bundles
-artifacts/
-training_log.csv
+# Archives & ZIP files (Only the zip bundles are ignored, visuals and logs are pushed)
 brain_classification_results.zip
 *.zip
 *.tar
@@ -62,7 +51,7 @@ brain_classification_results.zip
 *.rar
 *.7z
 
-# 3D Models & Atlas Assets (Stored locally in public/models/ or downloaded via script)
+# 3D Large Binary Models (Stored locally or downloaded via script)
 public/models/
 *.glb
 *.gltf

@@ -1,6 +1,9 @@
 import React from 'react'
 
-const ROMANS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'] as const
+const ROMANS = [
+  'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII',
+  'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI'
+] as const
 
 interface RomanSectionProps {
   readonly index: number
@@ -25,6 +28,7 @@ export const RomanSection: React.FC<RomanSectionProps> = ({
     <div className="sec-rule">
       <span className="roman">{ROMANS[index] ?? index + 1}.</span>
       <span className="sec-title">{title}</span>
+      <span className="meta-separator">•</span>
       <span className="page-of">
         {String(index + 1).padStart(3, '0')} / {String(of).padStart(3, '0')}
       </span>

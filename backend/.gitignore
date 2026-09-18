@@ -19,7 +19,7 @@ venv.bak/
 .env.*
 !.env.example
 
-# Large Model Weights & Checkpoints (Never commit weights)
+# Large Model Weights & Checkpoints (Heavy binary weights)
 *.pt
 *.pth
 *.onnx
@@ -33,15 +33,13 @@ checkpoints/*.pth
 checkpoints/*.pt
 !checkpoints/.gitkeep
 
-# Training Outputs, Artifacts & Bundles
-artifacts/
-training_log.csv
+# Archives & ZIP files (Only the zip bundles are ignored, visuals and logs are tracked)
 brain_classification_results.zip
 *.zip
 *.tar
 *.tar.gz
 
-# Medical Datasets & Scans
+# Medical Datasets & Scans (Raw datasets)
 datasets/
 data/
 storage/
@@ -49,7 +47,5 @@ storage/
 *.nii.gz
 *.dcm
 
-# Logs & Temporary Files
-*.log
-logs/
+# Temporary Files
 tmp/
