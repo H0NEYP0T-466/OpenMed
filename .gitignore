@@ -53,6 +53,7 @@ brain_classification_results.zip
 
 # 3D Large Binary Models (Stored locally or downloaded via script)
 public/models/
+public/visuals/
 *.glb
 *.gltf
 
