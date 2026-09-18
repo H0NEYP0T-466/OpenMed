@@ -14,6 +14,7 @@ import { AtlasDossier } from '../../components/medical/AtlasDossier'
 import { EssayHead } from '../../components/medical/EssayHead'
 import { Maximize2, ExternalLink, X } from 'lucide-react'
 import { AppShell } from '../../components/common/AppShell'
+import { BrainClassificationWorkspace } from './brain/BrainClassificationWorkspace'
 import './OrganDashboard.css'
 
 const ORGAN_ORDER: readonly OrganId[] = Object.keys(ORGANS_REGISTRY) as OrganId[]
@@ -287,11 +288,16 @@ export const OrganDashboard: React.FC = () => {
         {isWholeBodyView ? (
           <AtlasDossier />
         ) : (
-          <OrganInfoCard
-            organ={currentOrgan}
-            activeHotspot={activeHotspot}
-            onSelectHotspot={handleSelectHotspot}
-          />
+          <>
+            <OrganInfoCard
+              organ={currentOrgan}
+              activeHotspot={activeHotspot}
+              onSelectHotspot={handleSelectHotspot}
+            />
+            {selectedOrganId === 'brain' && (
+              <BrainClassificationWorkspace />
+            )}
+          </>
         )}
       </section>
 

@@ -1,0 +1,1 @@
+"""OpenMed backend app package."""

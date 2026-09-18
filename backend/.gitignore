@@ -29,16 +29,27 @@ venv.bak/
 *.h5
 *.pkl
 weights/
+checkpoints/*.pth
+checkpoints/*.pt
+!checkpoints/.gitkeep
 
-# Medical Volumes & Dataset Files
+# Training Outputs, Artifacts & Bundles
+artifacts/
+training_log.csv
+brain_classification_results.zip
+*.zip
+*.tar
+*.tar.gz
+
+# Medical Datasets & Scans
+datasets/
+data/
+storage/
 *.nii
 *.nii.gz
 *.dcm
-data/
-storage/
 
 # Logs & Temporary Files
 *.log
 logs/
 tmp/
-datasets/

@@ -1,0 +1,648 @@
+/* ============================================================
+   OPENMED — BRAIN NEURO-ONCOLOGY CLASSIFICATION DOSSIER
+   Atelier Zero editorial design system.
+   Bone paper surfaces · ink hairlines · warm typography.
+   ============================================================ */
+
+.brain-classification-essay {
+  max-width: 1180px;
+  margin: 48px auto 0 auto;
+  padding-top: 48px;
+  border-top: 1px solid var(--line);
+}
+
+/* --- Specimen Presets Bar --- */
+.specimen-presets-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.specimen-lead-tag {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-right: 4px;
+}
+
+.specimen-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.specimen-chip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--paper-warm);
+}
+
+.specimen-chip.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.specimen-chip .seq-badge {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(21, 20, 15, 0.08);
+  color: inherit;
+}
+
+.specimen-chip.active .seq-badge {
+  background: rgba(239, 231, 210, 0.2);
+}
+
+/* --- Ingestion Inset Box --- */
+.scan-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 28px 20px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.scan-dropzone:hover {
+  border-color: var(--ink);
+  background: var(--paper-warm);
+}
+
+.scan-dropzone.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.dropzone-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropzone-icon {
+  color: var(--ink-faint);
+  margin-bottom: 2px;
+}
+
+.dropzone-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.dropzone-sub {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.scan-preview-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.scan-preview-img {
+  max-width: 220px;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+.scan-preview-caption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* --- Diagnostic Readout Card --- */
+.diagnostic-readout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.diag-eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.diag-headline {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(26px, 2.5vw, 34px);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.diag-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.diag-meta-strip span b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.confidence-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gauge-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.gauge-track {
+  height: 6px;
+  background: rgba(21, 20, 15, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.differential-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.diff-header {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.diff-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.diff-text {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.diff-track {
+  height: 3px;
+  background: rgba(21, 20, 15, 0.06);
+  border-radius: 1.5px;
+  overflow: hidden;
+}
+
+.diff-fill {
+  height: 100%;
+  transition: width 0.5s ease-out;
+}
+
+/* --- Grad-CAM Dual Plate --- */
+.gradcam-dual-plate {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--plate);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.scan-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--plate-line-soft);
+}
+
+.scan-frame img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+}
+
+.scan-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(21, 20, 15, 0.85);
+  color: var(--bone);
+  border: 1px solid rgba(247, 241, 222, 0.2);
+  padding: 2px 7px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 3px;
+}
+
+/* --- 3D Locus Viewport --- */
+.locus-viewport-box {
+  display: flex;
+  flex-direction: column;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.locus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.locus-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.locus-title .ico {
+  color: var(--accent);
+}
+
+.locus-switch {
+  display: flex;
+  gap: 2px;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  padding: 2px;
+}
+
+.locus-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.15s ease;
+}
+
+.locus-toggle-btn.active {
+  background: var(--bone);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(21, 20, 15, 0.1);
+}
+
+.locus-canvas-wrap {
+  position: relative;
+  background: radial-gradient(circle at center, #26221c 0%, #15140f 100%);
+  height: 300px;
+}
+
+.locus-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.locus-canvas:active {
+  cursor: grabbing;
+}
+
+.locus-hud-hint {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.45);
+  pointer-events: none;
+}
+
+.locus-svg-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  background: var(--bone);
+  padding: 10px;
+}
+
+.locus-svg {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+}
+
+.locus-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bone);
+}
+
+.locus-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.locus-data-row .k {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.locus-data-row .v {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  text-align: right;
+}
+
+.locus-data-row .v.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.locus-data-row .lobe-tag {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+
+.locus-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.locus-chip {
+  padding: 3px 9px;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.locus-chip.selected {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* --- Clinical Monograph Inset --- */
+.monograph-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.monograph-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.monograph-copy {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.monograph-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.monograph-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--paper);
+  border-radius: 6px;
+  border-left: 2px solid var(--accent);
+}
+
+.mono-cell-k {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.mono-cell-v {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+/* --- Academic Benchmarks Table & Ledger --- */
+.archival-ledger-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.ledger-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.ledger-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ledger-stat .num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.ledger-stat .lbl {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.ledger-prose {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.ledger-code-slab {
+  padding: 12px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+.artifact-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 20px;
+  margin-top: 6px;
+}
+
+.artifact-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.artifact-item .check-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 840px) {
+  .ledger-stats-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gradcam-dual-plate {
+    grid-template-columns: 1fr;
+  }
+  .monograph-grid {
+    grid-template-columns: 1fr;
+  }
+  .artifact-checklist {
+    grid-template-columns: 1fr;
+  }
+}

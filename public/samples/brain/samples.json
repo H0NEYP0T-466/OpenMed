@@ -1,0 +1,38 @@
+{
+  "Medulloblastoma T1": {
+    "class": "Medulloblastoma T1",
+    "path": "/samples/brain/Medulloblastoma_T1.jpg",
+    "tumor_type": "Medulloblastoma",
+    "location": [
+      "brainstem"
+    ],
+    "sequence": "T1"
+  },
+  "Astrocytoma T1": {
+    "class": "Astrocytoma T1",
+    "path": "/samples/brain/Astrocytoma_T1.jpg",
+    "tumor_type": "Astrocytoma",
+    "location": [],
+    "sequence": "T1"
+  },
+  "Glioblastoma T1C+": {
+    "class": "Glioblastoma T1C+",
+    "path": "/samples/brain/Glioblastoma_T1Cplus.jpg",
+    "tumor_type": "Glioblastoma",
+    "location": [
+      "occipital",
+      "ventricle"
+    ],
+    "sequence": "T1C+"
+  },
+  "Meningioma T1C+": {
+    "class": "Meningioma T1C+",
+    "path": "/samples/brain/Meningioma_T1Cplus.jpg",
+    "tumor_type": "Meningioma",
+    "location": [
+      "anterior cranial fossa",
+      "frontal"
+    ],
+    "sequence": "T1C+"
+  }
+}

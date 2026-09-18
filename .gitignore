@@ -1,5 +1,5 @@
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,15 +7,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node dependencies & builds
+node_modules/
+dist/
+dist-ssr/
 *.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
@@ -23,14 +24,19 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python & Virtual Environments
+# Python Bytecode, Caches & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .venv/
 venv/
 ENV/
 env/
+env.bak/
+venv.bak/
 
 # ML Weights & Checkpoints (Never commit large weights)
 *.pt
@@ -39,21 +45,38 @@ env/
 *.bin
 *.safetensors
 *.ckpt
+*.h5
+checkpoints/*.pth
+checkpoints/*.pt
+!checkpoints/.gitkeep
+weights/
+
+# Training Outputs, Artifacts & Bundles
+artifacts/
+training_log.csv
+brain_classification_results.zip
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
 
 # 3D Models & Atlas Assets (Stored locally in public/models/ or downloaded via script)
 public/models/
 *.glb
 *.gltf
 
-# Medical Data & Scans
+# Medical Datasets & Scans (Never commit raw datasets to git)
+datasets/
+backend/datasets/
+storage/
+data/
 *.nii
 *.nii.gz
 *.dcm
-storage/
-weights/
-data/
 
-# Environment variables
+# Environment variables & Local Secrets
 .env
 .env.*
 !.env.example
