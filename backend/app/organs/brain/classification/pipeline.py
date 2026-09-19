@@ -1,223 +1,265 @@
-"""
-Brain Classification Inference Pipeline.
+"""Brain classification inference pipeline.
 
-Handles single-image inference with optional Grad-CAM overlay.
-Loads the trained EfficientNetV2-B2 checkpoint and applies the
-correct timm preprocessing transforms at inference time.
+Single-image inference with optional Grad-CAM overlay. The label space bound to
+the checkpoint is re-verified at load time, so a head/name disagreement fails
+closed instead of silently relabelling predictions.
 """
 
+from __future__ import annotations
+
+import base64
+import logging
+import os
+from typing import Any, Optional, Union
+
+import cv2
+import numpy as np
 import torch
 import torch.nn.functional as F
 from PIL import Image
-import numpy as np
-import cv2
-import base64
-import io
-import logging
-from typing import Union, Optional
 
-from .model import create_model, GradCAM
-from .preprocessor import get_inference_transform
+from .label_space import (
+    CLASS_NAMES,
+    LabelSpace,
+    LabelSpaceError,
+    resolve_label_space,
+    split_class_name,
+)
+from .model import (
+    MODEL_TAG,
+    GradCAM,
+    checkpoint_class_count,
+    create_model,
+    overlay_cam_on_image,
+    resolve_gradcam_layer,
+)
+from .preprocessor import get_inference_transform, input_side_length
 
 logger = logging.getLogger(__name__)
 
-# ── Actual 42 classes from the dataset, sorted alphabetically ────────────
-# Must match the order produced by BrainTumorDataset.CLASS_NAMES
-CLASS_NAMES: list[str] = sorted([
-    "Astrocytoma T1", "Astrocytoma T1C+", "Astrocytoma T2",
-    "Dysembryoplastic Neuroepithelial Tumor T1",
-    "Dysembryoplastic Neuroepithelial Tumor T1C+",
-    "Dysembryoplastic Neuroepithelial Tumor T2",
-    "Ependymoma - Subependymoma T1",
-    "Ependymoma - Subependymoma T1C+",
-    "Ependymoma - Subependymoma T2",
-    "Ganglioglioma T1", "Ganglioglioma T1C+", "Ganglioglioma T2",
-    "Germinoma T1", "Germinoma T1C+", "Germinoma T2",
-    "Glioblastoma T1", "Glioblastoma T1C+", "Glioblastoma T2",
-    "Hemangiopericytoma T1", "Hemangiopericytoma T1C+", "Hemangiopericytoma T2",
-    "Medulloblastoma T1", "Medulloblastoma T1C+", "Medulloblastoma T2",
-    "Meningioma T1", "Meningioma T1C+", "Meningioma T2",
-    "Neurocytoma T1", "Neurocytoma T1C+", "Neurocytoma T2",
-    "Normal T1", "Normal T1C+", "Normal T2",
-    "Oligodendroglioma T1", "Oligodendroglioma T1C+", "Oligodendroglioma T2",
-    "Pituitary T1", "Pituitary T1C+", "Pituitary T2",
-    "Schwannoma T1", "Schwannoma T1C+", "Schwannoma T2",
-])
+MAX_IMAGE_SIDE = 8192
+MIN_IMAGE_SIDE = 8
 
-# Map from full class name → (tumor_type, sequence)
-_TUMOR_SEQUENCE_MAP: dict[str, tuple[str, str]] = {}
-for _cls in CLASS_NAMES:
-    # Sequences are always the last token: T1, T1C+, or T2
-    _parts = _cls.rsplit(" ", 1)
-    if len(_parts) == 2:
-        _TUMOR_SEQUENCE_MAP[_cls] = (_parts[0], _parts[1])
-    else:
-        _TUMOR_SEQUENCE_MAP[_cls] = (_cls, "Unknown")
+__all__ = [
+    "BrainClassificationPipeline",
+    "CLASS_NAMES",
+    "ModelUnavailableError",
+]
+
+
+class ModelUnavailableError(RuntimeError):
+    """No usable, label-consistent checkpoint could be prepared for inference."""
 
 
 class BrainClassificationPipeline:
-    """
-    End-to-end inference pipeline for the brain tumor classifier.
-
-    Usage::
-
-        pipe = BrainClassificationPipeline("checkpoints/brain_best_model.pth")
-        result = pipe.predict("scan.jpg")          # basic prediction
-        result = pipe.predict_with_gradcam("scan.jpg")  # + Grad-CAM overlay
-    """
+    """End-to-end inference for the brain tumour classifier."""
 
     def __init__(
         self,
         model_path: Optional[str] = None,
         device: Optional[str] = None,
+        allow_untrained_fallback: bool = False,
     ) -> None:
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-        self.num_classes = len(CLASS_NAMES)
-        self.class_names = CLASS_NAMES
+        self.model_path = model_path
+        self.model_tag = MODEL_TAG
+
+        state_dict = self._load_state_dict(model_path, allow_untrained_fallback)
+        detected = checkpoint_class_count(state_dict) if state_dict else None
+
+        try:
+            self.label_space: LabelSpace = resolve_label_space(model_path, detected)
+        except LabelSpaceError as exc:
+            raise ModelUnavailableError(str(exc)) from exc
+
+        self.num_classes = self.label_space.num_classes
+        self.class_names: tuple[str, ...] = self.label_space.class_names
+        self.model_tag = self.label_space.model_tag or MODEL_TAG
+
+        self.model = create_model(
+            num_classes=self.num_classes,
+            pretrained=state_dict is None,
+            model_tag=self.model_tag,
+        )
+        self.using_trained_weights = state_dict is not None
+
+        if state_dict is not None:
+            self._populate(state_dict)
+
+        self.model.to(self.device)
+        self.model.eval()
+
+        self.transform = get_inference_transform(self.model)
+        self.input_size = input_side_length(self.model)
+        self.target_layer = resolve_gradcam_layer(self.model)
 
         logger.info(
-            f"Initializing BrainClassificationPipeline  "
-            f"device={self.device}  classes={self.num_classes}"
+            "Brain pipeline ready  device=%s  classes=%d  label_source=%s  trained=%s  input=%d",
+            self.device,
+            self.num_classes,
+            self.label_space.source,
+            self.using_trained_weights,
+            self.input_size,
         )
 
-        # Build model (pretrained=False — we'll load our own weights)
-        self.model = create_model(
-            num_classes=self.num_classes, pretrained=(model_path is None)
-        )
-        self.model.to(self.device)
-
-        if model_path:
-            try:
-                state_dict = torch.load(
-                    model_path, map_location=self.device, weights_only=True
+    def _load_state_dict(
+        self, model_path: Optional[str], allow_untrained_fallback: bool
+    ) -> Optional[dict[str, Any]]:
+        if not model_path:
+            if allow_untrained_fallback:
+                logger.warning(
+                    "No checkpoint path given; untrained fallback explicitly allowed."
                 )
-                # Detect checkpoint class count if different
-                for k in ["classifier.weight", "head.fc.weight"]:
-                    if k in state_dict:
-                        ckpt_classes = state_dict[k].shape[0]
-                        if ckpt_classes != self.num_classes:
-                            self.num_classes = ckpt_classes
-                            self.model = create_model(num_classes=self.num_classes, pretrained=False)
-                            self.model.to(self.device)
-                        break
-                self.model.load_state_dict(state_dict)
-                logger.info(f"Loaded checkpoint  path={model_path}  classes={self.num_classes}")
-            except Exception as exc:
-                logger.error(f"Failed to load checkpoint: {exc}")
-        else:
-            logger.warning(
-                "No model_path provided — running with ImageNet-pretrained weights "
-                "(predictions will be nonsensical until a trained checkpoint is loaded)."
+                return None
+            raise ModelUnavailableError(
+                "No checkpoint path supplied. Refusing to serve random weights."
             )
 
-        self.model.eval()
-        self.transform = get_inference_transform(self.model)
+        if not os.path.isfile(model_path):
+            raise ModelUnavailableError(
+                f"Brain classifier checkpoint not found at {model_path}. "
+                "Train it with brain_kaggle.py and copy the .pth into place."
+            )
 
-    # ── helpers ───────────────────────────────────────────────────────────
+        try:
+            state = torch.load(model_path, map_location="cpu", weights_only=True)
+        except Exception as exc:  # noqa: BLE001 - surfaced as a serviceable error
+            raise ModelUnavailableError(
+                f"Could not read checkpoint {model_path}: {exc}"
+            ) from exc
+
+        if not isinstance(state, dict) or not state:
+            raise ModelUnavailableError(
+                f"Checkpoint {model_path} does not contain a state dict."
+            )
+        return state
+
+    def _populate(self, state_dict: dict[str, Any]) -> None:
+        try:
+            self.model.load_state_dict(state_dict, strict=True)
+        except RuntimeError as exc:
+            raise ModelUnavailableError(
+                f"Checkpoint is incompatible with a {self.num_classes}-class "
+                f"{self.model_tag} backbone: {exc}"
+            ) from exc
+
+        head_width = checkpoint_class_count(self.model.state_dict())
+        if head_width is not None and head_width != len(self.class_names):
+            raise ModelUnavailableError(
+                f"After loading, the head emits {head_width} logits but "
+                f"{len(self.class_names)} class names are bound."
+            )
 
     @staticmethod
     def _load_image(image_path_or_pil: Union[str, Image.Image]) -> Image.Image:
         if isinstance(image_path_or_pil, str):
-            return Image.open(image_path_or_pil).convert("RGB")
-        return image_path_or_pil.convert("RGB")
+            try:
+                image = Image.open(image_path_or_pil)
+            except Exception as exc:  # noqa: BLE001
+                raise ValueError(f"Unreadable image at {image_path_or_pil}: {exc}") from exc
+        elif isinstance(image_path_or_pil, Image.Image):
+            image = image_path_or_pil
+        else:
+            raise TypeError(
+                "Expected a filesystem path or PIL.Image, got "
+                f"{type(image_path_or_pil).__name__}."
+            )
 
-    def _parse_class(self, class_name: str) -> tuple[str, str]:
-        """Return (tumor_type, sequence) for a class name."""
-        return _TUMOR_SEQUENCE_MAP.get(class_name, (class_name, "Unknown"))
+        with image:
+            image = image.convert("RGB")
+            width, height = image.size
+            if min(width, height) < MIN_IMAGE_SIDE:
+                raise ValueError(
+                    f"Image is too small to classify ({width}x{height})."
+                )
+            if max(width, height) > MAX_IMAGE_SIDE:
+                raise ValueError(
+                    f"Image exceeds the {MAX_IMAGE_SIDE}px side limit ({width}x{height})."
+                )
+            return image.copy()
 
-    # ── public API ────────────────────────────────────────────────────────
-
-    def predict(self, image_path_or_pil: Union[str, Image.Image]) -> dict:
-        """
-        Run inference on a single image.
-
-        Returns
-        -------
-        dict with keys:
-            predicted_class, confidence, tumor_type, sequence,
-            top5  (list[{class, confidence}]),
-            probabilities  (list[float] of length num_classes)
-        """
-        image = self._load_image(image_path_or_pil)
+    def _forward_logits(self, image: Image.Image) -> torch.Tensor:
         tensor = self.transform(image).unsqueeze(0).to(self.device)
-
         with torch.no_grad():
-            logits = self.model(tensor)
-            probs = F.softmax(logits, dim=1)[0]
+            return self.model(tensor)
 
+    def _interpret(self, logits: torch.Tensor) -> dict[str, Any]:
+        probs = F.softmax(logits, dim=1)[0].detach().cpu()
         top_prob, top_idx = torch.max(probs, dim=0)
-        top5_probs, top5_idxs = torch.topk(probs, min(5, self.num_classes))
+        k = min(5, self.num_classes)
+        top5_probs, top5_idxs = torch.topk(probs, k)
 
-        pred_class = self.class_names[top_idx.item()]
-        tumor_type, sequence = self._parse_class(pred_class)
+        predicted_class = self.class_names[int(top_idx.item())]
+        tumor_type, sequence = split_class_name(predicted_class)
 
         return {
-            "predicted_class": pred_class,
-            "confidence": round(top_prob.item(), 4),
+            "predicted_class": predicted_class,
+            "confidence": round(float(top_prob.item()), 4),
             "tumor_type": tumor_type,
             "sequence": sequence,
             "top5": [
                 {
-                    "class": self.class_names[c.item()],
-                    "confidence": round(p.item(), 4),
+                    "class": self.class_names[int(idx.item())],
+                    "confidence": round(float(prob.item()), 4),
                 }
-                for c, p in zip(top5_idxs, top5_probs)
+                for idx, prob in zip(top5_idxs, top5_probs)
             ],
-            "probabilities": [round(p, 6) for p in probs.cpu().tolist()],
+            "probabilities": [round(float(value), 6) for value in probs.tolist()],
+            "model_trained": self.using_trained_weights,
+            "label_space_source": self.label_space.source,
         }
+
+    def predict(self, image_path_or_pil: Union[str, Image.Image]) -> dict[str, Any]:
+        image = self._load_image(image_path_or_pil)
+        return self._interpret(self._forward_logits(image))
 
     def predict_with_gradcam(
         self, image_path_or_pil: Union[str, Image.Image]
-    ) -> dict:
-        """
-        Run inference **and** generate a Grad-CAM overlay (base64-encoded JPEG).
-        """
+    ) -> dict[str, Any]:
+        """Inference plus a Grad-CAM overlay rendered at model input resolution."""
         image = self._load_image(image_path_or_pil)
+        tensor = self.transform(image).unsqueeze(0).to(self.device)
 
-        # Grad-CAM requires gradients
-        prev_grads = {}
-        for name, p in self.model.named_parameters():
-            prev_grads[name] = p.requires_grad
-            p.requires_grad = True
-
-        try:
-            # Last conv layer in timm EfficientNetV2 is `conv_head`
-            target_layer = self.model.conv_head
-            grad_cam = GradCAM(self.model, target_layer)
-
-            tensor = self.transform(image).unsqueeze(0).to(self.device)
-            tensor.requires_grad = True
-
-            # Forward + generate CAM
+        with GradCAM(self.model, self.target_layer) as grad_cam:
             logits = self.model(tensor)
-            probs = F.softmax(logits, dim=1)[0]
-            top_class = torch.argmax(probs).item()
-            cam = grad_cam.generate(tensor, top_class)
+            probs = F.softmax(logits, dim=1)
+            target_class = int(torch.argmax(probs[0]).item())
+            cam = grad_cam.generate(tensor, target_class)
 
-            # Overlay on original image
-            img_np = np.array(image.resize((256, 256)))
-            if cam.ndim == 2:
-                cam_resized = cv2.resize(cam, (img_np.shape[1], img_np.shape[0]))
-                heatmap = cv2.applyColorMap(
-                    np.uint8(255 * cam_resized), cv2.COLORMAP_JET
-                )
-                heatmap_rgb = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB).astype(
-                    np.float32
-                ) / 255.0
-                overlay = heatmap_rgb * 0.4 + img_np.astype(np.float32) / 255.0 * 0.6
-                overlay = np.clip(overlay * 255, 0, 255).astype(np.uint8)
-            else:
-                overlay = img_np
-
-            # Encode to base64 JPEG
-            overlay_bgr = cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR)
-            ok, buf = cv2.imencode(".jpg", overlay_bgr, [cv2.IMWRITE_JPEG_QUALITY, 90])
-            b64 = base64.b64encode(buf.tobytes()).decode("utf-8")
-        finally:
-            # Restore gradient state
-            for name, p in self.model.named_parameters():
-                p.requires_grad = prev_grads.get(name, False)
-
-        result = self.predict(image)
-        result["gradcam_base64"] = f"data:image/jpeg;base64,{b64}"
+        result = self._interpret(logits)
+        base = np.array(image.resize((self.input_size, self.input_size)))
+        overlay = overlay_cam_on_image(base, cam)
+        result["gradcam_base64"] = _encode_jpeg_data_url(overlay)
+        result["gradcam_grid"] = [int(cam.shape[0]), int(cam.shape[1])]
+        result["explainability"] = {
+            "method": "gradcam",
+            "layer": type(self.target_layer).__name__,
+            "interpretation": (
+                "Coarse activation map at model input resolution. Indicates "
+                "regions the classifier relied on; not a lesion segmentation."
+            ),
+        }
         return result
+
+    def model_info(self) -> dict[str, Any]:
+        return {
+            "model_name": "EfficientNetV2-B2",
+            "model_tag": self.model_tag,
+            "num_classes": self.num_classes,
+            "class_names": list(self.class_names),
+            "input_size": f"{self.input_size}x{self.input_size}",
+            "label_space_source": self.label_space.source,
+            "trained_weights_loaded": self.using_trained_weights,
+            "metrics": self.label_space.metrics,
+        }
+
+
+def _encode_jpeg_data_url(array_rgb: np.ndarray, quality: int = 90) -> str:
+    encoded, buffer = cv2.imencode(
+        ".jpg",
+        cv2.cvtColor(array_rgb, cv2.COLOR_RGB2BGR),
+        [cv2.IMWRITE_JPEG_QUALITY, quality],
+    )
+    if not encoded:
+        raise RuntimeError("JPEG encoding failed for the Grad-CAM overlay.")
+    return "data:image/jpeg;base64," + base64.b64encode(buffer.tobytes()).decode("ascii")

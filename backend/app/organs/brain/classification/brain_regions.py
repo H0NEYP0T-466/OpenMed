@@ -1,12 +1,14 @@
 """
-3D brain region mapping for classification → localization.
+3D brain region mapping for classification -> localisation hints.
 
-Maps the 38 anatomical locations from the brain tumor dataset to approximate
-3D coordinates in MNI-like space. Used by the API to tell the frontend where
-to highlight on the 3D brain model.
+Maps anatomical location tags to approximate centroids in MNI-like space so the
+frontend can highlight a region on the 3D brain model.
 
-Coordinates are approximate centroids in a normalized [-1, 1]³ brain space
-oriented as: X=right, Y=anterior, Z=superior.
+Registry entries are authored as normalised design units in [-1, 1]^3 with
+X=right, Y=anterior, Z=superior, and converted to millimetres at the API
+boundary via `MNI_SEMI_AXES_MM`, because the viewer labels its readout as
+stereotactic MNI coordinates. Coordinates are illustrative centroids for a
+typical brain, not measurements taken from the scanned patient.
 """
 
 from __future__ import annotations
@@ -14,9 +16,29 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+from .label_space import split_class_name
+
 logger = logging.getLogger(__name__)
 
-# ── Complete region registry (all 38 locations from the dataset) ──────────
+MNI_SEMI_AXES_MM: tuple[float, float, float] = (68.0, 70.0, 52.0)
+
+# Region ranks are ordered most-to-least typical for a given tumour type. The
+# weights below turn that ordering into a displayable prior; they are not
+# learned probabilities.
+TYPICALITY_WEIGHTS: tuple[float, ...] = (1.0, 0.72, 0.52, 0.38, 0.28)
+
+_MIN_REGION_PROBABILITY = 0.05
+
+
+def to_mni_mm(coordinates: list[float]) -> list[float]:
+    """Convert a normalised [-1, 1]^3 centroid to approximate MNI millimetres."""
+    return [
+        round(float(value) * axis, 1)
+        for value, axis in zip(coordinates, MNI_SEMI_AXES_MM)
+    ]
+
+
+# ── Region registry ───────────────────────────────────────────────────────
 
 BRAIN_REGIONS_3D: dict[str, dict] = {
     # Major lobes
@@ -364,7 +386,108 @@ BRAIN_REGIONS_3D: dict[str, dict] = {
         "lobe": "Meningeal",
         "description": "Outer brain surface beneath the calvarium — meningioma site.",
     },
+    # Skull base sub-compartments present in the dataset taxonomy
+    "clivus": {
+        "name": "clivus",
+        "display_name": "Clivus",
+        "coordinates_3d": [0.0, 0.28, -0.45],
+        "color": "#e8b930",
+        "lobe": "Skull Base",
+        "description": "Sloping midline bone from dorsum sellae to foramen magnum.",
+    },
+    "petroclival": {
+        "name": "petroclival",
+        "display_name": "Petroclival Junction",
+        "coordinates_3d": [0.38, -0.15, -0.42],
+        "color": "#d4a017",
+        "lobe": "Skull Base",
+        "description": "Union of petrous apex and clivus — meningioma hotspot.",
+    },
+    "planum sphenoidale": {
+        "name": "planum sphenoidale",
+        "display_name": "Planum Sphenoidale",
+        "coordinates_3d": [0.0, 0.45, -0.30],
+        "color": "#ffeaa7",
+        "lobe": "Skull Base",
+        "description": "Flat bone above the sphenoid sinus, below olfactory grooves.",
+    },
+    "paraclinoid": {
+        "name": "paraclinoid",
+        "display_name": "Paraclinoid Internal Carotid Artery",
+        "coordinates_3d": [0.24, 0.30, -0.24],
+        "color": "#e17055",
+        "lobe": "Skull Base",
+        "description": "Clinoid segment of the ICA — paraclinoid meningioma site.",
+    },
+    "intracanalicular": {
+        "name": "intracanalicular",
+        "display_name": "Internal Auditory Canal",
+        "coordinates_3d": [0.55, -0.28, -0.36],
+        "color": "#fd79a8",
+        "lobe": "Cranial Nerve",
+        "description": "Bony canal carrying CN VII/VIII — classic vestibular schwannoma.",
+    },
+    "vestibular": {
+        "name": "vestibular",
+        "display_name": "Vestibular Labyrinth",
+        "coordinates_3d": [0.60, -0.22, -0.32],
+        "color": "#fab1a0",
+        "lobe": "Petrous Bone",
+        "description": "Membranous labyrinth of the inner ear within the petrous bone.",
+    },
+    # White matter and parenchyma
+    "corona radiata": {
+        "name": "corona radiata",
+        "display_name": "Corona Radiata",
+        "coordinates_3d": [0.24, 0.05, 0.45],
+        "color": "#dfe6e9",
+        "lobe": "White Matter",
+        "description": "Radiating projection fibres above the internal capsule.",
+    },
+    "intraparenchymal": {
+        "name": "intraparenchymal",
+        "display_name": "Cerebral Parenchyma",
+        "coordinates_3d": [0.16, 0.0, 0.22],
+        "color": "#b2bec3",
+        "lobe": "Parenchyma",
+        "description": "Within the brain substance, exclusive of ventricles and meninges.",
+    },
+    # Spinal extension
+    "spinal": {
+        "name": "spinal",
+        "display_name": "Cervicomedullary / Spinal",
+        "coordinates_3d": [0.0, -0.32, -0.88],
+        "color": "#6c5ce7",
+        "lobe": "Spinal",
+        "description": "Lower brainstem and upper cervical cord continuation.",
+    },
 }
+
+
+# ── Synonyms used by the dataset for regions already registered ───────────
+
+LOCATION_ALIASES: dict[str, str] = {
+    "anterior fossa": "anterior cranial fossa",
+    "falcine": "falx",
+    "interhemispheric": "falx",
+    "infratentorial": "posterior fossa",
+    "petrous ridge": "petrous",
+    "pituitary fossa": "sella turcica",
+    "sellar-suprasellar region": "sellar-suprasellar",
+    "tentorium cerebelli": "tentorial",
+    "iv ventricle": "fourth ventricle",
+    "lateral ventricle": "ventricle",
+}
+
+
+def resolve_region(location: str) -> Optional[dict]:
+    """Look up a location tag, following synonym aliases."""
+    needle = location.lower().strip()
+    region = BRAIN_REGIONS_3D.get(needle)
+    if region is None:
+        region = BRAIN_REGIONS_3D.get(LOCATION_ALIASES.get(needle, ""))
+    return region
+
 
 
 # ── Tumor-type → typical location fallback ────────────────────────────────
@@ -387,42 +510,69 @@ _TUMOR_LOCATION_FALLBACK: dict[str, list[str]] = {
 }
 
 
+LOCALIZATION_BASIS = (
+    "Typical presentation sites for the predicted tumour type, weighted by the "
+    "classifier's confidence. This is a population prior, not a measurement of "
+    "where this patient's lesion sits."
+)
+
+
 def map_prediction_to_3d(
     predicted_class: str,
     locations: Optional[list[str]] = None,
+    model_confidence: float = 1.0,
 ) -> list[dict]:
-    """
-    Map a classification result + optional location metadata to 3D brain regions.
+    """Map a predicted class (and optional location tags) to 3D brain regions.
 
     Parameters
     ----------
-    predicted_class : str
+    predicted_class:
         Full class name, e.g. ``"Meningioma T1C+"``.
-    locations : list[str] | None
-        Anatomical location tags from the image metadata.  When absent the
-        function falls back to typical locations for the predicted tumor type.
+    locations:
+        Anatomical tags for the image. When absent, typical locations for the
+        predicted tumour type are used.
+    model_confidence:
+        Classifier softmax confidence for `predicted_class`, scaling each
+        region's prior so the readout degrades when the model is unsure.
 
     Returns
     -------
     list[dict]
-        Region dicts with an added ``probability`` key.
+        Region dicts with `coordinates_3d` in approximate MNI millimetres and a
+        `probability` that is a prior scaled by `model_confidence`.
     """
-    # Parse tumor type from class name
-    tumor_type = predicted_class.rsplit(" ", 1)[0] if " " in predicted_class else predicted_class
+    tumor_type, _ = split_class_name(predicted_class)
 
-    if not locations:
-        locations = _TUMOR_LOCATION_FALLBACK.get(tumor_type, ["supratentorial"])
+    supplied = [loc for loc in (locations or []) if loc]
+    if supplied:
+        chosen, source = supplied, "image_metadata"
+    else:
+        chosen, source = _TUMOR_LOCATION_FALLBACK.get(tumor_type, []), "tumour_type_prior"
+
+    confidence = min(max(float(model_confidence), 0.0), 1.0)
 
     mapped: list[dict] = []
-    for i, loc in enumerate(locations):
-        loc_lower = loc.lower().strip()
-        region = BRAIN_REGIONS_3D.get(loc_lower)
-        if region:
-            entry = dict(region)
-            # Assign decreasing probability — first location is most likely
-            entry["probability"] = round(max(0.90 - i * 0.12, 0.25), 2)
-            mapped.append(entry)
-        else:
-            logger.debug(f"Unknown brain region '{loc}' — skipping 3D mapping")
+    for rank, location in enumerate(chosen):
+        region = resolve_region(location)
+        if region is None:
+            logger.warning(
+                "Location tag %r is not in the brain region registry; skipping.",
+                location,
+            )
+            continue
+
+        weight = (
+            TYPICALITY_WEIGHTS[rank]
+            if rank < len(TYPICALITY_WEIGHTS)
+            else TYPICALITY_WEIGHTS[-1]
+        )
+        entry = dict(region)
+        entry["coordinates_3d"] = to_mni_mm(region["coordinates_3d"])
+        entry["probability"] = round(
+            max(confidence * weight, _MIN_REGION_PROBABILITY), 3
+        )
+        entry["rank"] = rank + 1
+        entry["basis"] = source
+        mapped.append(entry)
 
     return mapped
