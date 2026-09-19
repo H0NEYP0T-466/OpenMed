@@ -35,16 +35,26 @@ from torchvision import transforms, models
 from PIL import Image
 
 # ------------------------------------------------------------------------------
-# Default Paths
+# Default Paths (overridable via environment, derived from this file otherwise)
 # ------------------------------------------------------------------------------
-DEFAULT_ARCHIVE_ROOT = "/home/honeypot/Projects/FAST_API/OpenMed/backend/datasets/brain/archive"
+_BACKEND_ROOT = Path(__file__).resolve().parents[3]
+_WORKSPACE_ROOT = _BACKEND_ROOT.parents[1]
+
+DEFAULT_ARCHIVE_ROOT = os.getenv(
+    "OPENMED_BRAIN_DATASET",
+    str(_BACKEND_ROOT / "datasets" / "brain" / "archive"),
+)
 DEFAULT_DATA_JSON = f"{DEFAULT_ARCHIVE_ROOT}/DATA.json"
 DEFAULT_IMAGES_BASE = f"{DEFAULT_ARCHIVE_ROOT}/Images_/Images_"
 
-DEFAULT_BTSC_NOTUMOR = "/home/honeypot/Projects/FAST_API/BTSC-UNet-ViT/backend/dataset/Vit_Dataset/notumor"
-DEFAULT_BTSC_PITUITARY = "/home/honeypot/Projects/FAST_API/BTSC-UNet-ViT/backend/dataset/Vit_Dataset/pituitary"
+_BTSC_DATASET = _WORKSPACE_ROOT / "BTSC-UNet-ViT" / "backend" / "dataset" / "Vit_Dataset"
+DEFAULT_BTSC_NOTUMOR = os.getenv("BTSC_NOTUMOR_DIR", str(_BTSC_DATASET / "notumor"))
+DEFAULT_BTSC_PITUITARY = os.getenv("BTSC_PITUITARY_DIR", str(_BTSC_DATASET / "pituitary"))
 
-DEFAULT_OUTPUT_DIR = "/home/honeypot/Desktop/brain_dataset_augmented"
+DEFAULT_OUTPUT_DIR = os.getenv(
+    "OPENMED_BRAIN_EXPORT",
+    str(Path.home() / "Desktop" / "brain_dataset_augmented"),
+)
 
 SEQUENCE_MAP = {0: "T1", 1: "T1C+", 2: "T2"}
 REV_SEQUENCE_MAP = {v: k for k, v in SEQUENCE_MAP.items()}
@@ -706,9 +716,10 @@ def main():
         data_json_path=data_json_path,
         images_base=images_base,
         samples_per_sequence=1000,
-        epochs=3,
+        epochs=args.epochs,
         batch_size=32,
         device="cpu",
+        force_retrain=args.force_retrain,
     )
 
     # 6. Classify sequences
@@ -716,7 +727,7 @@ def main():
     classify_dataset_items(model, all_items, batch_size=64, device="cpu")
 
     # 7. Clean export to Desktop
-    export_dataset(all_items, args.output_dir)
+    export_dataset(all_items, args.output_dir, args.min_sequence_confidence)
 
 
 if __name__ == "__main__":
