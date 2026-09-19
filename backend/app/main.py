@@ -17,6 +17,7 @@ from typing import AsyncIterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.organs.brain.classification.router import checkpoint_path
 from app.organs.brain.classification.router import router as brain_router
 
 
@@ -58,32 +59,52 @@ logger = logging.getLogger("openmed")
 
 # ── FastAPI App ───────────────────────────────────────────────────────────
 
+DEFAULT_DEV_ORIGINS = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+)
+
+
+def _cors_origins() -> list[str]:
+    configured = os.getenv("OPENMED_CORS_ORIGINS", "").strip()
+    if not configured:
+        return list(DEFAULT_DEV_ORIGINS)
+    if configured == "*":
+        logger.warning("CORS opened to all origins; credentials will be disabled.")
+        return ["*"]
+    return [origin.strip() for origin in configured.split(",") if origin.strip()]
+
+
+@asynccontextmanager
+async def _lifespan(application: FastAPI) -> AsyncIterator[None]:
+    logger.info("=" * 62)
+    logger.info("  OpenMed FastAPI server")
+    logger.info("  classify     : POST /api/brain/classify")
+    logger.info("  model info   : GET  /api/brain/model-info")
+    logger.info("  health       : GET  /api/brain/health")
+    logger.info("  checkpoint   : %s", checkpoint_path())
+    logger.info("  cors origins : %s", ", ".join(_cors_origins()))
+    logger.info("=" * 62)
+    yield
+
+
 app = FastAPI(
     title="OpenMed API",
     description="AI Hospital — Brain Tumor Classification & more",
     version="0.1.0",
+    lifespan=_lifespan,
 )
 
+_origins = _cors_origins()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=_origins,
+    allow_credentials=_origins != ["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
 app.include_router(brain_router, prefix="/api/brain", tags=["Brain"])
-
-
-@app.on_event("startup")
-async def _startup() -> None:
-    logger.info("━" * 60)
-    logger.info("  OpenMed FastAPI Server  ·  starting up")
-    logger.info("━" * 60)
-    logger.info("  Brain classification : /api/brain/classify")
-    logger.info("  Brain model info     : /api/brain/model-info")
-    logger.info("  Brain health         : /api/brain/health")
-    logger.info("━" * 60)
 
 
 @app.get("/")
@@ -92,6 +113,11 @@ def read_root():
         "service": "OpenMed API",
         "status": "running",
         "organs": ["brain"],
+        "endpoints": [
+            "/api/brain/classify",
+            "/api/brain/model-info",
+            "/api/brain/health",
+        ],
     }
 
 
@@ -102,8 +128,8 @@ if __name__ == "__main__":
 
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0",
-        port=8016,
-        reload=True,
+        host=os.getenv("OPENMED_HOST", "0.0.0.0"),
+        port=int(os.getenv("OPENMED_PORT", "8016")),
+        reload=os.getenv("OPENMED_RELOAD", "1") == "1",
         log_level="info",
     )

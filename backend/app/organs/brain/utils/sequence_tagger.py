@@ -318,26 +318,62 @@ def collect_pure_unique_scans(
 
 
 # ------------------------------------------------------------------------------
-# Train Sequence Classifier on CPU
+# Sequence classifier construction and cache provenance
 # ------------------------------------------------------------------------------
+def _build_sequence_model(pretrained: bool, freeze_backbone: bool = False) -> nn.Module:
+    model = models.mobilenet_v3_small(
+        weights=models.MobileNet_V3_Small_Weights.DEFAULT if pretrained else None
+    )
+    if freeze_backbone:
+        for param in model.features[:-3].parameters():
+            param.requires_grad = False
+    in_features = model.classifier[3].in_features
+    model.classifier[3] = nn.Linear(in_features, len(SEQUENCE_MAP))
+    return model
+
+
+def _cache_matches(meta_path: str, requested: Dict[str, Any]) -> bool:
+    if not os.path.exists(meta_path):
+        return False
+    try:
+        with open(meta_path, "r") as handle:
+            recorded = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return False
+    return all(recorded.get(key) == value for key, value in requested.items())
+
+
 def train_sequence_classifier(
     data_json_path: str,
     images_base: str,
     samples_per_sequence: int = 1000,
-    epochs: int = 3,
+    epochs: int = 8,
     batch_size: int = 32,
     device: str = "cpu",
+    force_retrain: bool = False,
 ) -> nn.Module:
     checkpoint_path = os.path.join(os.path.dirname(__file__), "sequence_classifier_mobilenet.pth")
-    if os.path.exists(checkpoint_path):
-        print(f"\n[MODEL] Loading pre-trained sequence classifier from:\n        {checkpoint_path}")
-        model = models.mobilenet_v3_small(weights=None)
-        in_features = model.classifier[3].in_features
-        model.classifier[3] = nn.Linear(in_features, 3)
+    meta_path = f"{checkpoint_path}.meta.json"
+    requested = {
+        "data_json_path": os.path.abspath(data_json_path),
+        "samples_per_sequence": samples_per_sequence,
+        "epochs": epochs,
+        "batch_size": batch_size,
+    }
+
+    if os.path.exists(checkpoint_path) and not force_retrain and _cache_matches(meta_path, requested):
+        print(f"\n[MODEL] Reusing cached sequence classifier: {checkpoint_path}")
+        model = _build_sequence_model(pretrained=False)
         model.load_state_dict(torch.load(checkpoint_path, map_location=device, weights_only=True))
         model.to(device)
         model.eval()
         return model
+
+    if os.path.exists(checkpoint_path) and not force_retrain:
+        print(
+            "\n[MODEL] Cached sequence classifier was trained with a different "
+            "configuration; retraining. Pass --force_retrain to always rebuild."
+        )
 
     print(f"\n[TRAIN] Loading sequence training scans from:\n        {data_json_path}")
     with open(data_json_path, "r") as f:
@@ -389,12 +425,7 @@ def train_sequence_classifier(
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=2)
 
-    model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
-    for param in model.features[:-3].parameters():
-        param.requires_grad = False
-
-    in_features = model.classifier[3].in_features
-    model.classifier[3] = nn.Linear(in_features, 3)
+    model = _build_sequence_model(pretrained=True, freeze_backbone=True)
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
@@ -444,12 +475,53 @@ def train_sequence_classifier(
         )
 
     print(f"        Sequence classifier ready in {time.time()-start_t:.1f}s.")
+
+    accuracy, report = evaluate_sequence_model(model, val_loader, device)
+    print(
+        f"        Held-out sequence accuracy {accuracy:.3f} on {len(val_samples)} scans.\n"
+        f"{report}"
+    )
+    if accuracy < 0.90:
+        print(
+            "        [WARN] Sequence accuracy is below 0.90. Labels derived from this\n"
+            "        model become the classifier's ground truth, so its errors are\n"
+            "        baked in as contradictory supervision. Consider more epochs or\n"
+            "        manual review of low-confidence rows."
+        )
+
     try:
         torch.save(model.state_dict(), checkpoint_path)
+        with open(meta_path, "w") as handle:
+            json.dump({**requested, "val_accuracy": round(accuracy, 4)}, handle, indent=2)
         print(f"        Saved sequence classifier checkpoint: {checkpoint_path}")
     except Exception as e:
         print(f"        [WARN] Could not cache checkpoint: {e}")
     return model
+
+
+@torch.no_grad()
+def evaluate_sequence_model(
+    model: nn.Module, loader: DataLoader, device: str = "cpu"
+) -> Tuple[float, str]:
+    model.eval()
+    targets: List[int] = []
+    predictions: List[int] = []
+    for imgs, lbls in loader:
+        out = model(imgs.to(device))
+        predictions.extend(out.argmax(1).cpu().tolist())
+        targets.extend(lbls.cpu().tolist())
+
+    accuracy = sum(int(p == t) for p, t in zip(predictions, targets)) / max(len(targets), 1)
+    names = [SEQUENCE_MAP[i] for i in sorted(SEQUENCE_MAP)]
+    try:
+        from sklearn.metrics import classification_report
+
+        report = classification_report(
+            targets, predictions, target_names=names, digits=3, zero_division=0
+        )
+    except Exception:
+        report = ""
+    return float(accuracy), report
 
 
 # ------------------------------------------------------------------------------
@@ -487,8 +559,26 @@ def classify_dataset_items(
 # ------------------------------------------------------------------------------
 # Clean & Export Dataset to Disk
 # ------------------------------------------------------------------------------
-def export_dataset(items: List[Dict[str, Any]], output_dir: str):
+def export_dataset(
+    items: List[Dict[str, Any]],
+    output_dir: str,
+    min_sequence_confidence: float = 0.60,
+):
     print(f"\n[EXPORT] Cleaning destination and standardizing 512x512 RGB images to:\n         {output_dir}")
+
+    low_confidence = [
+        item for item in items
+        if float(item.get("confidence", 1.0)) < min_sequence_confidence
+    ]
+    accepted = [
+        item for item in items
+        if float(item.get("confidence", 1.0)) >= min_sequence_confidence
+    ]
+    if low_confidence:
+        print(
+            f"         Discarded {len(low_confidence):,d} scans whose inferred pulse "
+            f"sequence fell below confidence {min_sequence_confidence:.2f}."
+        )
 
     # Completely wipe prior files in output directory to prevent leftovers
     images_base_dir = os.path.join(output_dir, "Images_")
@@ -501,7 +591,7 @@ def export_dataset(items: List[Dict[str, Any]], output_dir: str):
     manifest_records: Dict[str, Any] = {}
     counts = Counter()
 
-    for item in items:
+    for item in accepted:
         tumor_type = item["tumor_type"]
         seq = item["sequence"]
         counts[f"{tumor_type} {seq}"] += 1
@@ -531,8 +621,9 @@ def export_dataset(items: List[Dict[str, Any]], output_dir: str):
             "sequence": seq,
             "width": 512,
             "height": 512,
-            "point": {"x": 256.0, "y": 256.0},
-            "location": ["sellar"] if tumor_type == "Pituitary" else ["ventricle", "frontal"],
+            "point": {},
+            "location": [],
+            "localization_annotated": False,
             "has_lesion": 1 if tumor_type == "Pituitary" else 0,
             "bbox_path": "",
             "mask_path": "",
@@ -562,6 +653,15 @@ def main():
     parser.add_argument("--output_dir", type=str, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--count_normal", type=int, default=2000)
     parser.add_argument("--count_pituitary", type=int, default=2000)
+    parser.add_argument("--epochs", type=int, default=8, help="Sequence classifier epochs")
+    parser.add_argument(
+        "--min_sequence_confidence", type=float, default=0.60,
+        help="Drop scans whose inferred sequence confidence is below this value",
+    )
+    parser.add_argument(
+        "--force_retrain", action="store_true",
+        help="Ignore any cached sequence classifier and rebuild it",
+    )
     args = parser.parse_args()
 
     print("=" * 72)

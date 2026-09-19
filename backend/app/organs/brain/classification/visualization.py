@@ -24,7 +24,10 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from .model import GradCAM, overlay_cam_on_image, resolve_gradcam_layer
+try:
+    from model import GradCAM, overlay_cam_on_image, resolve_gradcam_layer
+except ImportError:
+    from .model import GradCAM, overlay_cam_on_image, resolve_gradcam_layer
 
 logger = logging.getLogger(__name__)
 
