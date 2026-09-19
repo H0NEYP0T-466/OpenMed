@@ -21,7 +21,7 @@ from .preprocessor import get_inference_transform
 
 logger = logging.getLogger(__name__)
 
-# ── Actual 39 classes from the dataset, sorted alphabetically ────────────
+# ── Actual 42 classes from the dataset, sorted alphabetically ────────────
 # Must match the order produced by BrainTumorDataset.CLASS_NAMES
 CLASS_NAMES: list[str] = sorted([
     "Astrocytoma T1", "Astrocytoma T1C+", "Astrocytoma T2",
@@ -40,6 +40,7 @@ CLASS_NAMES: list[str] = sorted([
     "Neurocytoma T1", "Neurocytoma T1C+", "Neurocytoma T2",
     "Normal T1", "Normal T1C+", "Normal T2",
     "Oligodendroglioma T1", "Oligodendroglioma T1C+", "Oligodendroglioma T2",
+    "Pituitary T1", "Pituitary T1C+", "Pituitary T2",
     "Schwannoma T1", "Schwannoma T1C+", "Schwannoma T2",
 ])
 
@@ -90,8 +91,17 @@ class BrainClassificationPipeline:
                 state_dict = torch.load(
                     model_path, map_location=self.device, weights_only=True
                 )
+                # Detect checkpoint class count if different
+                for k in ["classifier.weight", "head.fc.weight"]:
+                    if k in state_dict:
+                        ckpt_classes = state_dict[k].shape[0]
+                        if ckpt_classes != self.num_classes:
+                            self.num_classes = ckpt_classes
+                            self.model = create_model(num_classes=self.num_classes, pretrained=False)
+                            self.model.to(self.device)
+                        break
                 self.model.load_state_dict(state_dict)
-                logger.info(f"Loaded checkpoint  path={model_path}")
+                logger.info(f"Loaded checkpoint  path={model_path}  classes={self.num_classes}")
             except Exception as exc:
                 logger.error(f"Failed to load checkpoint: {exc}")
         else:

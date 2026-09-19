@@ -4,7 +4,7 @@ import timm
 import cv2
 import numpy as np
 
-def create_model(num_classes=39, pretrained=True):
+def create_model(num_classes=42, pretrained=True):
     """Creates EfficientNetV2-B2 model from timm."""
     model = timm.create_model('tf_efficientnetv2_b2.in1k', pretrained=pretrained, num_classes=num_classes)
     return model

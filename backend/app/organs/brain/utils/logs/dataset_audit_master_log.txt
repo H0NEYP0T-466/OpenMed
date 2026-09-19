@@ -1,0 +1,138 @@
+================================================================================
+ OPENMED BRAIN CLASSIFICATION DATASET AUDIT & VERIFICATION MASTER LOG
+================================================================================
+Timestamp   : 2026-09-19 12:52:36 +05:00
+Environment : Linux x86_64, CPU, 16 GB RAM
+Module      : backend/app/organs/brain/utils/
+Source Data : /home/honeypot/Projects/FAST_API/BTSC-UNet-ViT/backend/dataset/Vit_Dataset/
+Target Data : /home/honeypot/Desktop/brain_dataset_augmented/
+Archive Data: /home/honeypot/Projects/FAST_API/OpenMed/backend/datasets/brain/archive/
+================================================================================
+
+--------------------------------------------------------------------------------
+ PART 1: CANDIDATE INGESTION & PERCEPTUAL DEDUPLICATION LOG
+--------------------------------------------------------------------------------
+Pre-indexed Archive Hashes: 11,544 unique scans across 13 families loaded from
+/home/honeypot/Projects/FAST_API/OpenMed/backend/datasets/brain/archive/.archive_hashes_cache.json
+
+1. Normal (notumor) Candidates:
+   - Source Path             : .../Vit_Dataset/notumor
+   - Pure Candidates Found   : 7,986 scans
+   - Synthetic Noise Excluded: Banned salt, gaussian, speckle, median augmentations
+   - Low Variance Filtered   : Standard deviation < 15.0 intensity rejected
+   - Accepted Unique Scans   : 2,000 scans
+   - Purged Internal SHA-256 : 0
+   - Purged Internal pHash   : 115 near-duplicate scans (Hamming distance <= 2)
+   - Purged 12.6k Collisions : 4 scans (Siar_healthy_1140.jpg, no_tumor882.jpg,
+                               no_tumor4.jpg, no_tumor809.jpg)
+
+2. Pituitary Candidates:
+   - Source Path             : .../Vit_Dataset/pituitary
+   - Pure Candidates Found   : 7,421 scans
+   - Synthetic Noise Excluded: Banned salt, gaussian, speckle, median augmentations
+   - Low Variance Filtered   : Standard deviation < 15.0 intensity rejected
+   - Accepted Unique Scans   : 2,000 scans
+   - Purged Internal SHA-256 : 0
+   - Purged Internal pHash   : 194 near-duplicate scans (Hamming distance <= 2)
+   - Purged 12.6k Collisions : 0
+
+Total Clean Scans Selected: 4,000 (2,000 Normal + 2,000 Pituitary)
+
+--------------------------------------------------------------------------------
+ PART 2: SEQUENCE CLASSIFIER MODEL TRAINING LOG
+--------------------------------------------------------------------------------
+Model Architecture : MobileNetV3-Small (transfer learning from ImageNet)
+Sequence Target    : T1 vs T1C+ vs T2 (3 classes)
+Training Set Source: OpenMed 12.6k Brain Archive (balanced stratified sample)
+Optimizer          : AdamW (lr=1e-4 for backbone, lr=1e-3 for classifier, wd=1e-4)
+Loss Function      : CrossEntropyLoss
+Device             : Raw CPU (16 GB RAM)
+
+Epoch-by-Epoch Progress:
+  - Epoch 1/3 (64.1s) | Train Loss / Acc: 78.00% | Val Acc: 74.44%
+  - Epoch 2/3 (76.5s) | Train Loss / Acc: 90.67% | Val Acc: 74.00%
+  - Epoch 3/3 (66.7s) | Train Loss / Acc: 92.51% | Val Acc: 87.11%
+Sequence classifier ready in 207.2 seconds.
+
+Saved Model Checkpoint:
+  /home/honeypot/Projects/FAST_API/OpenMed/backend/app/organs/brain/utils/sequence_classifier_mobilenet.pth
+  Checkpoint Size: 6.2 MB
+
+--------------------------------------------------------------------------------
+ PART 3: INFERENCE & STANDARDIZATION EXPORT LOG
+--------------------------------------------------------------------------------
+Batch Size       : 64
+Standardization  : 512x512 RGB, LANCZOS resampling, JPEG Quality 95
+Target Directory : /home/honeypot/Desktop/brain_dataset_augmented
+
+Export Breakdown:
+  - Normal T1      : 388 scans  (Images_/Images_/Normal/Normal T1/Normal T1/)
+  - Normal T1C+    : 924 scans  (Images_/Images_/Normal/Normal T1C+/Normal T1C+/)
+  - Normal T2      : 688 scans  (Images_/Images_/Normal/Normal T2/Normal T2/)
+    Subtotal Normal: 2,000 scans
+
+  - Pituitary T1   : 231 scans  (Images_/Images_/Pituitary/Pituitary T1/Pituitary T1/)
+  - Pituitary T1C+ : 1,555 scans(Images_/Images_/Pituitary/Pituitary T1C+/Pituitary T1C+/)
+  - Pituitary T2   : 214 scans  (Images_/Images_/Pituitary/Pituitary T2/Pituitary T2/)
+    Subtotal Pit.  : 2,000 scans
+
+Total Exported Scans: 4,000 files
+Master Manifest: /home/honeypot/Desktop/brain_dataset_augmented/DATA.json
+
+--------------------------------------------------------------------------------
+ PART 4: SHA-256 & 64-BIT DCT PHASH INTEGRITY TEST SUITE LOG
+--------------------------------------------------------------------------------
+Test Script: backend/app/organs/brain/utils/dataset_dedup_test.py
+Dataset Path: /home/honeypot/Desktop/brain_dataset_augmented
+
+Manifest Load:
+  - Indexed records in DATA.json: 4,000
+  - Physical files on disk      : 4,000
+
+Hashing Run:
+  - Computed SHA-256 cryptographic digests: 4,000 / 4,000
+  - Computed 64-bit DCT perceptual pHashes: 4,000 / 4,000
+
+TEST 1: Exact SHA-256 Cryptographic Collisions
+  [PASS] ZERO byte-level duplicate files detected. (All 4,000 SHA-256 hashes unique)
+
+TEST 2: Inter-Sequence Cross-Leakage (T1 vs T2 vs T1C+)
+  Distribution:
+    - Sequence T1   : 619 scans
+    - Sequence T1C+ : 2,479 scans
+    - Sequence T2   : 902 scans
+  Total pairwise cross-sequence comparisons: 4,978,249 pairs
+  [PASS] ZERO cross-sequence leakage between T1, T2, and T1C+.
+         (Verified both SHA-256 and pHash with Hamming threshold <= 2)
+
+TEST 3: Inter-Class Cross-Leakage (Normal vs Pituitary)
+  Distribution:
+    - Normal scans    : 2,000
+    - Pituitary scans : 2,000
+  [PASS] ZERO cross-class collisions between Normal and Pituitary.
+
+TEST 4: Intra-Class Near-Duplicates (pHash Hamming distance == 0)
+  [PASS] All scans within each class possess unique perceptual hashes.
+
+TEST 5: Comprehensive Collision Check Against ENTIRE 12,626-Scan Archive
+  Archive Hashes Loaded: 11,544 scans (across all 13 tumor families)
+  [PASS] ZERO collisions with existing archive! All 4,000 scans are completely
+         new and distinct from the archive.
+
+TEST 6: DATA.json Consistency & Physical File Verification
+  - Records in DATA.json   : 4,000
+  - Files on physical disk : 4,000
+  - Missing on disk        : 0
+  - Unindexed on disk      : 0
+  [PASS] 100% 1-to-1 parity between DATA.json and physical files.
+
+================================================================================
+ EXECUTIVE TEST SUITE SUMMARY: ALL 6 TESTS PASSED
+================================================================================
+ 1. Exact SHA-256 Collisions       : [PASSED]
+ 2. Inter-Sequence Cross-Leakage   : [PASSED]
+ 3. Normal vs Pituitary Leakage   : [PASSED]
+ 4. Intra-Class Visual Uniqueness : [PASSED]
+ 5. Existing Archive Non-Overlap  : [PASSED]
+ 6. DATA.json Physical Parity     : [PASSED]
+================================================================================

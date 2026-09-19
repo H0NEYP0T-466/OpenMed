@@ -158,7 +158,10 @@ class BrainTumorDataset(Dataset):
         
     @staticmethod
     def compute_class_weights(dataset_samples, num_classes):
-        """Computes inverse-frequency class weights for cross-entropy loss."""
+        """
+        Computes robust smoothed inverse-frequency class weights for cross-entropy loss.
+        Applies square-root dampening and clipping to prevent minority/majority class explosion.
+        """
         class_counts = Counter([sample['metadata']['class'] for sample in dataset_samples])
         class_names = BrainTumorDataset.CLASS_NAMES
         
@@ -168,10 +171,19 @@ class BrainTumorDataset(Dataset):
         for i, cls_name in enumerate(class_names):
             count = class_counts.get(cls_name, 0)
             if count > 0:
-                weights[i] = total_samples / (num_classes * count)
+                # Square-root smoothed inverse frequency
+                weights[i] = np.sqrt(total_samples / (num_classes * count))
             else:
-                weights[i] = 1.0 # fallback
+                weights[i] = 1.0  # fallback
                 
+        # Normalize weights so mean is 1.0
+        mean_w = np.mean(weights)
+        if mean_w > 0:
+            weights = weights / mean_w
+            
+        # Clip extreme weights to avoid gradient instability
+        weights = np.clip(weights, 0.2, 5.0)
+        
         return torch.tensor(weights, dtype=torch.float)
 
     @staticmethod

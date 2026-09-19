@@ -1,0 +1,56 @@
+========================================================================
+ OPENMED PURE DEDUPLICATED DATASET EXPANDER (CPU)
+========================================================================
+       Loading archive hashes from cache: /home/honeypot/Projects/FAST_API/OpenMed/backend/datasets/brain/archive/.archive_hashes_cache.json
+       Indexed 11,544 existing archive hashes.
+
+[INGEST] Selecting 2,000 pure unique scans for: Normal
+         Source directory: /home/honeypot/Projects/FAST_API/BTSC-UNet-ViT/backend/dataset/Vit_Dataset/notumor
+         Pure candidate files available: 7,986
+         Accepted 500 / 2,000 unique scans...
+         Accepted 1,000 / 2,000 unique scans...
+         Accepted 1,500 / 2,000 unique scans...
+         Accepted 2,000 / 2,000 unique scans...
+         Summary for Normal:
+           - Accepted Pure Scans   : 2,000
+           - Purged Internal SHA   : 0
+           - Purged Internal pHash : 115
+           - Purged 12.6k Collisions: 4
+
+[INGEST] Selecting 2,000 pure unique scans for: Pituitary
+         Source directory: /home/honeypot/Projects/FAST_API/BTSC-UNet-ViT/backend/dataset/Vit_Dataset/pituitary
+         Pure candidate files available: 7,421
+         Accepted 500 / 2,000 unique scans...
+         Accepted 1,000 / 2,000 unique scans...
+         Accepted 1,500 / 2,000 unique scans...
+         Accepted 2,000 / 2,000 unique scans...
+         Summary for Pituitary:
+           - Accepted Pure Scans   : 2,000
+           - Purged Internal SHA   : 0
+           - Purged Internal pHash : 194
+           - Purged 12.6k Collisions: 0
+
+[INFO] Total pure unique candidate scans gathered: 4,000
+
+[TRAIN] Loading sequence training scans from:
+        /home/honeypot/Projects/FAST_API/OpenMed/backend/datasets/brain/archive/DATA.json
+        Training MobileNetV3 on CPU (3 epochs)...
+        Epoch 1/3 (64.1s) | Train Acc: 78.00% | Val Acc: 74.44%
+        Epoch 2/3 (76.5s) | Train Acc: 90.67% | Val Acc: 74.00%
+        Epoch 3/3 (66.7s) | Train Acc: 92.51% | Val Acc: 87.11%
+        Sequence classifier ready in 207.2s.
+        Saved sequence classifier checkpoint: /home/honeypot/Projects/FAST_API/OpenMed/backend/app/organs/brain/utils/sequence_classifier_mobilenet.pth
+
+[CLASS] Classifying pulse sequences for all 4,000 scans...
+
+[EXPORT] Cleaning destination and standardizing 512x512 RGB images to:
+         /home/honeypot/Desktop/brain_dataset_augmented
+
+[DONE] Successfully exported 4,000 pure scans!
+       Master DATA.json created: /home/honeypot/Desktop/brain_dataset_augmented/DATA.json
+       - Normal T1         : 388 scans
+       - Normal T1C+       : 924 scans
+       - Normal T2         : 688 scans
+       - Pituitary T1      : 231 scans
+       - Pituitary T1C+    : 1,555 scans
+       - Pituitary T2      : 214 scans

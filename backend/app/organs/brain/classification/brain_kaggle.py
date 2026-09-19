@@ -167,18 +167,20 @@ def main():
     logger.info("Loading DATA.json and computing location-stratified splits...")
     train_idx, val_idx, test_idx = BrainTumorDataset.get_stratified_splits(args.data_root)
 
-    # Resolve native transforms via timm config
-    base_model = create_model(num_classes=39, pretrained=True)
+    # Inspect dataset manifest to dynamically catalogue exact classes
+    temp_dataset = BrainTumorDataset(args.data_root, transform=None, split_indices=train_idx)
+    class_names = temp_dataset.CLASS_NAMES
+    num_classes = len(class_names)
+    logger.info(f"Classes catalogued: {num_classes} (dynamically verified from DATA.json)")
+
+    # Resolve native transforms via timm config with the actual number of classes
+    base_model = create_model(num_classes=num_classes, pretrained=True)
     train_transform = get_train_transform(base_model)
     val_transform = get_val_transform(base_model)
 
     train_dataset = BrainTumorDataset(args.data_root, transform=train_transform, split_indices=train_idx)
     val_dataset = BrainTumorDataset(args.data_root, transform=val_transform, split_indices=val_idx)
     test_dataset = BrainTumorDataset(args.data_root, transform=val_transform, split_indices=test_idx)
-
-    class_names = train_dataset.CLASS_NAMES
-    num_classes = len(class_names)
-    logger.info(f"Classes catalogued: {num_classes}")
 
     train_loader = DataLoader(
         train_dataset,

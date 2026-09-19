@@ -111,5 +111,13 @@ export const TUMOR_DATA: Record<string, TumorInfo> = {
     mriCharacteristics: 'Typically appears as a cystic mass with an enhancing mural nodule. Calcification is seen in up to 50% of cases. Overlying cortical dysplasia is common.',
     grading: 'WHO Grade 1 (vast majority).',
     prognosis: 'Excellent long-term prognosis. Surgical resection is primarily aimed at seizure control.'
+  },
+  'Pituitary': {
+    name: 'Pituitary Adenoma / Neuroendocrine Tumor',
+    description: 'An epithelial neoplasm arising from anterior pituitary gland cells in the sella turcica, commonly causing endocrine syndromes or chiasmatic visual field deficits.',
+    commonLocations: ['Sella turcica', 'Suprasellar space', 'Cavernous sinus'],
+    mriCharacteristics: 'Microadenomas (<10mm) appear hypointense on early dynamic T1C+. Macroadenomas (>10mm) demonstrate sellar remodeling, classic snowman/figure-8 appearance with suprasellar expansion, and vivid contrast enhancement.',
+    grading: 'WHO Pituitary Neuroendocrine Tumor (PitNET); predominantly benign behavior.',
+    prognosis: 'Excellent following endoscopic transsphenoidal resection or medical management (dopamine agonists).'
   }
 };
