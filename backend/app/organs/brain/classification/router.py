@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import io
+import json
 import logging
 import os
 import time
@@ -67,7 +68,11 @@ def _dataset_summary() -> dict[str, Any]:
 
         with open(json_path) as handle:
             raw = json.load(handle)
-        rows = {k: v for k, v in raw.items() if not k.endswith(".png") or not k.endswith("_mask.png")}
+        rows = {
+            key: value
+            for key, value in raw.items()
+            if not key.endswith(BrainTumorDataset.MASK_SUFFIX)
+        }
         summary = {
             "samples": len(rows),
             "tumour_types": len({v["tumor_type"] for v in rows.values()}),
@@ -120,7 +125,7 @@ async def _get_pipeline() -> BrainClassificationPipeline:
 class Top5Prediction(BaseModel):
     model_config = {"populate_by_name": True}
 
-    class_name: str = Field(alias="class")
+    class_name: str = Field(alias="class", serialization_alias="class")
     confidence: float
 
 
