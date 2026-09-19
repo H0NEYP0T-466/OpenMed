@@ -1,25 +1,27 @@
 """
-Brain Classification — Kaggle / Standalone Training Entrypoint.
+Brain classification training entrypoint.
 
-Orchestrates data loading, stratified splitting (by brain location),
-class-weighted training with EfficientNetV2-B2, learning rate scheduling,
-early stopping, model checkpointing, evaluation, and comprehensive
-academic artifact generation (exported as brain_classification_results.zip).
+Runs the leak-free grouped split, trains EfficientNetV2-B2 with class-weighted
+cross entropy under a one-cycle schedule, then writes checkpoints, an auditable
+split manifest and evaluation artefacts.
 
 Usage:
-    python brain_kaggle.py --data_root /path/to/archive --batch_size 32 --epochs 50
-    python brain_kaggle.py --data_root /kaggle/input/brain-tumor-dataset --output_dir /kaggle/working
+    python brain_kaggle.py --data_root /path/to/archive --output_dir /kaggle/working
+    OPENMED_BRAIN_DATASET=/path/to/archive python brain_kaggle.py
 """
+
+from __future__ import annotations
 
 import argparse
 import csv
+import json
 import logging
 import os
+import random
 import sys
 import time
 import zipfile
 
-# Ensure local modules can be imported regardless of execution working directory
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 if _current_dir not in sys.path:
     sys.path.insert(0, _current_dir)
@@ -33,14 +35,28 @@ from tqdm import tqdm
 
 try:
     from dataset import BrainTumorDataset
+    from label_space import label_space_path_for, save_label_space
+    from model import (
+        MODEL_TAG,
+        create_model,
+        get_loss_function,
+        get_optimizer,
+        get_scheduler,
+    )
     from preprocessor import get_train_transform, get_val_transform
-    from model import create_model, get_loss_function, get_optimizer, get_scheduler
     import visualization
 except ImportError:
-    from app.organs.brain.classification.dataset import BrainTumorDataset
-    from app.organs.brain.classification.preprocessor import get_train_transform, get_val_transform
-    from app.organs.brain.classification.model import create_model, get_loss_function, get_optimizer, get_scheduler
-    from app.organs.brain.classification import visualization
+    from .dataset import BrainTumorDataset
+    from .label_space import label_space_path_for, save_label_space
+    from .model import (
+        MODEL_TAG,
+        create_model,
+        get_loss_function,
+        get_optimizer,
+        get_scheduler,
+    )
+    from .preprocessor import get_train_transform, get_val_transform
+    from . import visualization
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,99 +65,145 @@ logging.basicConfig(
 )
 logger = logging.getLogger("brain_kaggle")
 
+MONITOR = "val_loss"
 
-def train_one_epoch(model, dataloader, criterion, optimizer, scheduler, device, epoch):
+
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True, warn_only=True)
+
+
+def train_one_epoch(model, loader, criterion, optimizer, scheduler, device, epoch):
     model.train()
     running_loss = 0.0
     correct = 0
     total = 0
 
-    pbar = tqdm(dataloader, desc=f"Epoch {epoch:02d} [Train]", leave=False)
-    for inputs, labels, _ in pbar:
+    progress = tqdm(loader, desc=f"Epoch {epoch:02d} [train]", leave=False)
+    for inputs, labels, _ in progress:
         inputs, labels = inputs.to(device), labels.to(device)
 
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
-
-        # Gradient clipping for stable training
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-
         optimizer.step()
         if scheduler is not None:
             scheduler.step()
 
-        running_loss += loss.item() * inputs.size(0)
-        _, predicted = outputs.max(1)
-        total += labels.size(0)
-        correct += predicted.eq(labels).sum().item()
+        batch = inputs.size(0)
+        running_loss += float(loss.item()) * batch
+        correct += int(outputs.argmax(1).eq(labels).sum().item())
+        total += batch
+        progress.set_postfix(
+            loss=f"{loss.item():.4f}", acc=f"{correct / max(total, 1):.3f}"
+        )
 
-        pbar.set_postfix({"loss": f"{loss.item():.4f}", "acc": f"{(correct/total):.3f}"})
-
-    epoch_loss = running_loss / max(total, 1)
-    epoch_acc = correct / max(total, 1)
-    return epoch_loss, epoch_acc
+    return running_loss / max(total, 1), correct / max(total, 1)
 
 
-def validate(model, dataloader, criterion, device, epoch, return_preds=False):
+@torch.no_grad()
+def validate(model, loader, criterion, device, epoch, return_preds=False):
     model.eval()
     running_loss = 0.0
     correct = 0
     total = 0
+    predictions: list[np.ndarray] = []
+    targets: list[np.ndarray] = []
+    probabilities: list[np.ndarray] = []
 
-    all_preds = []
-    all_labels = []
-    all_probs = []
+    progress = tqdm(loader, desc=f"Epoch {epoch:02d} [val]  ", leave=False)
+    for inputs, labels, _ in progress:
+        inputs, labels = inputs.to(device), labels.to(device)
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
 
-    pbar = tqdm(dataloader, desc=f"Epoch {epoch:02d} [Val]  ", leave=False)
-    with torch.no_grad():
-        for inputs, labels, _ in pbar:
-            inputs, labels = inputs.to(device), labels.to(device)
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
+        batch = inputs.size(0)
+        running_loss += float(loss.item()) * batch
+        predicted = outputs.argmax(1)
+        correct += int(predicted.eq(labels).sum().item())
+        total += batch
 
-            probs = F.softmax(outputs, dim=1)
-
-            running_loss += loss.item() * inputs.size(0)
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
-
-            all_preds.extend(predicted.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
-            all_probs.extend(probs.cpu().numpy())
-
-            pbar.set_postfix({"loss": f"{loss.item():.4f}", "acc": f"{(correct/total):.3f}"})
+        if return_preds:
+            predictions.append(predicted.cpu().numpy())
+            targets.append(labels.cpu().numpy())
+            probabilities.append(F.softmax(outputs, dim=1).cpu().numpy())
+        progress.set_postfix(
+            loss=f"{loss.item():.4f}", acc=f"{correct / max(total, 1):.3f}"
+        )
 
     epoch_loss = running_loss / max(total, 1)
     epoch_acc = correct / max(total, 1)
+    if not return_preds:
+        return epoch_loss, epoch_acc
 
-    if return_preds:
-        return epoch_loss, epoch_acc, all_labels, all_preds, all_probs
-    return epoch_loss, epoch_acc
+    return (
+        epoch_loss,
+        epoch_acc,
+        np.concatenate(targets),
+        np.concatenate(predictions),
+        np.vstack(probabilities),
+    )
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Train OpenMed Brain Tumor Classification Model")
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Train the OpenMed brain tumour classifier")
     parser.add_argument(
         "--data_root",
-        type=str,
-        default="/home/honeypot/Projects/FAST_API/OpenMed/backend/datasets/brain/archive",
-        help="Path to brain dataset archive directory or DATA.json",
+        default=os.getenv("OPENMED_BRAIN_DATASET", "datasets/brain/archive"),
+        help="Dataset directory, DATA.json or archive zip (default: $OPENMED_BRAIN_DATASET)",
     )
+    parser.add_argument("--output_dir", default=os.getenv("OPENMED_BRAIN_OUTPUT", "."))
+    parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--weight_decay", type=float, default=1e-4)
+    parser.add_argument("--patience", type=int, default=10)
+    parser.add_argument("--num_workers", type=int, default=4)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
-        "--output_dir",
-        type=str,
-        default=".",
-        help="Output directory for checkpoints, logs, and results zip",
+        "--grad_accum_steps", type=int, default=1, help="Effective batch multiplier"
     )
-    parser.add_argument("--batch_size", type=int, default=32, help="Batch size (default: 32)")
-    parser.add_argument("--epochs", type=int, default=50, help="Max training epochs (default: 50)")
-    parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate (default: 1e-3)")
-    parser.add_argument("--patience", type=int, default=10, help="Early stopping patience (default: 10)")
-    parser.add_argument("--num_workers", type=int, default=4, help="DataLoader workers (default: 4)")
-    args = parser.parse_args()
+    return parser.parse_args(argv)
+
+
+def write_split_manifest(path: str, dataset_root: str, splits: dict[str, list[int]]) -> int:
+    """Record every sample with its split assignment so results stay auditable."""
+    json_path, _ = BrainTumorDataset.locate_data_and_images(dataset_root)
+    with open(json_path) as handle:
+        raw = json.load(handle)
+    keys = sorted(key for key in raw if not key.endswith(BrainTumorDataset.MASK_SUFFIX))
+
+    written = 0
+    with open(path, "w", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["relative_path", "class", "tumor_type", "sequence", "split"])
+        for name, indices in splits.items():
+            for index in indices:
+                key = keys[index]
+                meta = raw[key]
+                writer.writerow(
+                    [
+                        key,
+                        meta["class"],
+                        meta.get("tumor_type", ""),
+                        meta.get("sequence", ""),
+                        name,
+                    ]
+                )
+                written += 1
+    return written
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    set_seed(args.seed)
 
     os.makedirs(args.output_dir, exist_ok=True)
     checkpoints_dir = os.path.join(args.output_dir, "checkpoints")
@@ -150,208 +212,237 @@ def main():
     os.makedirs(artifacts_dir, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.info("━" * 60)
-    logger.info("  OpenMed Brain Classification — Kaggle Training")
-    logger.info("━" * 60)
-    logger.info(f"  Device           : {device}")
+    logger.info("=" * 68)
+    logger.info("  OpenMed Brain Classification - training run")
+    logger.info("=" * 68)
+    logger.info("  device=%s  seed=%d  batch=%d  epochs=%d  lr=%g",
+                device, args.seed, args.batch_size, args.epochs, args.lr)
     if torch.cuda.is_available():
-        logger.info(f"  GPU Name         : {torch.cuda.get_device_name(0)}")
-        logger.info(f"  GPU Memory       : {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
-    logger.info(f"  Dataset Path     : {args.data_root}")
-    logger.info(f"  Output Directory : {args.output_dir}")
-    logger.info(f"  Batch Size       : {args.batch_size}")
-    logger.info(f"  Max Epochs       : {args.epochs}")
-    logger.info("━" * 60)
+        logger.info("  gpu=%s (%.1f GB)", torch.cuda.get_device_name(0),
+                    torch.cuda.get_device_properties(0).total_memory / 1e9)
+    logger.info("  data_root=%s", args.data_root)
+    logger.info("  output_dir=%s", args.output_dir)
+    logger.info("=" * 68)
 
-    # 1. Dataset & Stratified Splits
-    logger.info("Loading DATA.json and computing location-stratified splits...")
-    train_idx, val_idx, test_idx = BrainTumorDataset.get_stratified_splits(args.data_root)
+    train_idx, val_idx, test_idx = BrainTumorDataset.get_stratified_splits(
+        args.data_root, seed=args.seed
+    )
+    manifest_path = os.path.join(artifacts_dir, "split_manifest.csv")
+    rows = write_split_manifest(
+        manifest_path, args.data_root, {"train": train_idx, "val": val_idx, "test": test_idx}
+    )
+    logger.info("Split manifest with %d rows written to %s", rows, manifest_path)
 
-    # Inspect dataset manifest to dynamically catalogue exact classes
-    temp_dataset = BrainTumorDataset(args.data_root, transform=None, split_indices=train_idx)
-    class_names = temp_dataset.CLASS_NAMES
+    probe = BrainTumorDataset(args.data_root, transform=None, split_indices=train_idx)
+    class_names = probe.class_names
     num_classes = len(class_names)
-    logger.info(f"Classes catalogued: {num_classes} (dynamically verified from DATA.json)")
 
-    # Resolve native transforms via timm config with the actual number of classes
-    base_model = create_model(num_classes=num_classes, pretrained=True)
-    train_transform = get_train_transform(base_model)
-    val_transform = get_val_transform(base_model)
+    base_model = create_model(num_classes=num_classes, pretrained=True, model_tag=MODEL_TAG)
+    train_dataset = BrainTumorDataset(args.data_root, transform=get_train_transform(base_model), split_indices=train_idx)
+    val_dataset = BrainTumorDataset(args.data_root, transform=get_val_transform(base_model), split_indices=val_idx)
+    test_dataset = BrainTumorDataset(args.data_root, transform=get_val_transform(base_model), split_indices=test_idx)
 
-    train_dataset = BrainTumorDataset(args.data_root, transform=train_transform, split_indices=train_idx)
-    val_dataset = BrainTumorDataset(args.data_root, transform=val_transform, split_indices=val_idx)
-    test_dataset = BrainTumorDataset(args.data_root, transform=val_transform, split_indices=test_idx)
-
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=args.num_workers,
-        pin_memory=torch.cuda.is_available(),
-        collate_fn=BrainTumorDataset.collate_fn,
-    )
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=args.batch_size,
-        shuffle=False,
-        num_workers=args.num_workers,
-        pin_memory=torch.cuda.is_available(),
-        collate_fn=BrainTumorDataset.collate_fn,
-    )
-    test_loader = DataLoader(
-        test_dataset,
-        batch_size=args.batch_size,
-        shuffle=False,
-        num_workers=args.num_workers,
-        pin_memory=torch.cuda.is_available(),
-        collate_fn=BrainTumorDataset.collate_fn,
-    )
-
-    # 2. Model, Loss, Optimizer, Scheduler Setup
-    model = base_model.to(device)
-    class_weights = BrainTumorDataset.compute_class_weights(train_dataset.samples, num_classes)
-    criterion = get_loss_function(class_weights, device)
-
-    optimizer = get_optimizer(model, lr=args.lr)
-    steps_per_epoch = len(train_loader)
-    scheduler = get_scheduler(optimizer, num_epochs=args.epochs, steps_per_epoch=steps_per_epoch)
-
-    history = {"train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []}
-
-    best_val_loss = float("inf")
-    best_val_acc = 0.0
-    patience_counter = 0
-
-    log_csv_path = os.path.join(args.output_dir, "training_log.csv")
-    csv_file = open(log_csv_path, "w", newline="")
-    csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(["epoch", "train_loss", "train_acc", "val_loss", "val_acc", "lr", "elapsed_time"])
-
-    best_model_path = os.path.join(checkpoints_dir, "brain_best_model.pth")
-
-    # 3. Training Loop
-    logger.info("Starting training loop with early stopping...")
-    start_total_time = time.time()
-
-    for epoch in range(1, args.epochs + 1):
-        ep_start = time.time()
-
-        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, scheduler, device, epoch)
-        val_loss, val_acc = validate(model, val_loader, criterion, device, epoch)
-
-        ep_time = time.time() - ep_start
-        current_lr = optimizer.param_groups[0]["lr"]
-
-        history["train_loss"].append(train_loss)
-        history["train_acc"].append(train_acc)
-        history["val_loss"].append(val_loss)
-        history["val_acc"].append(val_acc)
-
-        csv_writer.writerow([epoch, f"{train_loss:.4f}", f"{train_acc:.4f}", f"{val_loss:.4f}", f"{val_acc:.4f}", f"{current_lr:.6f}", f"{ep_time:.2f}"])
-        csv_file.flush()
-
-        logger.info(
-            f"Epoch {epoch:02d}/{args.epochs:02d} | "
-            f"Train Loss: {train_loss:.4f}  Acc: {train_acc:.4f} | "
-            f"Val Loss: {val_loss:.4f}  Acc: {val_acc:.4f} | "
-            f"Time: {ep_time:.1f}s"
+    def loader_for(dataset: BrainTumorDataset, shuffle: bool) -> DataLoader:
+        return DataLoader(
+            dataset,
+            batch_size=args.batch_size,
+            shuffle=shuffle,
+            num_workers=args.num_workers,
+            pin_memory=torch.cuda.is_available(),
+            drop_last=shuffle,
+            collate_fn=BrainTumorDataset.collate_fn,
+            persistent_workers=args.num_workers > 0,
         )
 
-        # Checkpointing (best model)
-        if val_loss < best_val_loss or val_acc > best_val_acc:
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
-            if val_acc > best_val_acc:
-                best_val_acc = val_acc
+    train_loader = loader_for(train_dataset, shuffle=True)
+    val_loader = loader_for(val_dataset, shuffle=False)
+    test_loader = loader_for(test_dataset, shuffle=False)
 
-            torch.save(model.state_dict(), best_model_path)
-            logger.info(f" ⭐ Best model checkpoint saved (Val Loss: {best_val_loss:.4f}, Val Acc: {best_val_acc:.4f})")
-            patience_counter = 0
-        else:
-            patience_counter += 1
+    model = base_model.to(device)
+    weights = BrainTumorDataset.compute_class_weights(train_dataset.samples, class_names)
+    criterion = get_loss_function(weights, device)
+    optimizer = get_optimizer(model, lr=args.lr, weight_decay=args.weight_decay)
+    scheduler = get_scheduler(
+        optimizer, num_epochs=args.epochs, steps_per_epoch=max(len(train_loader), 1)
+    )
 
-        if patience_counter >= args.patience:
-            logger.info(f"Early stopping triggered at epoch {epoch} (patience={args.patience})")
-            break
+    best_path = os.path.join(checkpoints_dir, "brain_best_model.pth")
+    best_acc_path = os.path.join(checkpoints_dir, "brain_best_acc.pth")
+    log_path = os.path.join(args.output_dir, "training_log.csv")
 
-    csv_file.close()
-    total_elapsed = time.time() - start_total_time
-    logger.info(f"Training finished in {total_elapsed/60:.2f} minutes.")
+    history: dict[str, list[float]] = {
+        "train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []
+    }
+    best_monitor = float("inf")
+    best_acc = 0.0
+    patience_counter = 0
+    started = time.time()
 
-    # 4. Evaluation on Test Set & Artifact Generation
-    logger.info("Evaluating best model on held-out test split...")
-    if os.path.exists(best_model_path):
-        model.load_state_dict(torch.load(best_model_path, map_location=device))
+    logger.info("Training with %s as the checkpoint monitor.", MONITOR)
+    with open(log_path, "w", newline="") as csv_handle:
+        writer = csv.writer(csv_handle)
+        writer.writerow(["epoch", "train_loss", "train_acc", "val_loss", "val_acc", "lr", "seconds"])
+
+        for epoch in range(1, args.epochs + 1):
+            epoch_start = time.time()
+            train_loss, train_acc = train_one_epoch(
+                model, train_loader, criterion, optimizer, scheduler, device, epoch
+            )
+            val_loss, val_acc = validate(model, val_loader, criterion, device, epoch)
+            elapsed = time.time() - epoch_start
+            current_lr = optimizer.param_groups[0]["lr"]
+
+            history["train_loss"].append(train_loss)
+            history["train_acc"].append(train_acc)
+            history["val_loss"].append(val_loss)
+            history["val_acc"].append(val_acc)
+            writer.writerow([
+                epoch, f"{train_loss:.4f}", f"{train_acc:.4f}",
+                f"{val_loss:.4f}", f"{val_acc:.4f}", f"{current_lr:.6f}", f"{elapsed:.2f}",
+            ])
+            csv_handle.flush()
+
+            markers = []
+            if val_loss < best_monitor:
+                best_monitor = val_loss
+                torch.save(model.state_dict(), best_path)
+                save_label_space(best_path, class_names, model_tag=MODEL_TAG)
+                markers.append(f"best {MONITOR}={val_loss:.4f}")
+            if val_acc > best_acc:
+                best_acc = val_acc
+                torch.save(model.state_dict(), best_acc_path)
+                markers.append(f"best val_acc={val_acc:.4f}")
+
+            logger.info(
+                "Epoch %02d/%02d | train %.4f / %.4f | val %.4f / %.4f | %.1fs %s",
+                epoch, args.epochs, train_loss, train_acc, val_loss, val_acc,
+                elapsed, ("| " + ", ".join(markers)) if markers else "",
+            )
+
+            if not markers:
+                patience_counter += 1
+                if patience_counter >= args.patience:
+                    logger.info("Early stopping at epoch %d (patience=%d)", epoch, args.patience)
+                    break
+            else:
+                patience_counter = 0
+
+    logger.info("Training finished in %.2f minutes.", (time.time() - started) / 60)
+
+    if not os.path.isfile(best_path):
+        logger.error("No checkpoint was ever saved; aborting evaluation.")
+        return 1
+
+    model.load_state_dict(torch.load(best_path, map_location=device, weights_only=True))
+    model.eval()
 
     test_loss, test_acc, y_true, y_pred, y_probs = validate(
         model, test_loader, criterion, device, 0, return_preds=True
     )
-    logger.info(f"Test Set Evaluation — Loss: {test_loss:.4f}, Accuracy: {test_acc:.4f}")
+    logger.info("Test (monitor checkpoint) loss=%.4f acc=%.4f", test_loss, test_acc)
 
-    logger.info("Generating comprehensive academic artifacts...")
+    report = classification_report(
+        y_true, y_pred, labels=range(num_classes),
+        target_names=list(class_names), digits=4, zero_division=0,
+    )
 
-    # 4.1 Training loss & accuracy curves
-    visualization.plot_training_curves(history, artifacts_dir)
+    mean_class_auc = None
+    try:
+        from sklearn.metrics import roc_auc_score
 
-    # 4.2 Normalized Confusion Matrix
-    visualization.plot_confusion_matrix(y_true, y_pred, class_names, artifacts_dir)
+        encoded = np.zeros((len(y_true), num_classes))
+        encoded[np.arange(len(y_true)), y_true] = 1.0
+        supported = encoded.sum(axis=0) > 0
+        if supported.sum() > 1:
+            mean_class_auc = float(
+                roc_auc_score(encoded[:, supported], y_probs[:, supported], average="macro")
+            )
+    except (ValueError, RuntimeError) as exc:
+        logger.warning("Macro AUC unavailable: %s", exc)
 
-    # 4.3 Class distribution plot across splits
-    train_labels = [s["metadata"]["class"] for s in train_dataset.samples]
-    val_labels = [s["metadata"]["class"] for s in val_dataset.samples]
-    test_labels = [s["metadata"]["class"] for s in test_dataset.samples]
+    written = []
+    written += visualization.plot_training_curves(history, artifacts_dir)
+    written += visualization.plot_confusion_matrix(y_true, y_pred, class_names, artifacts_dir)
+    written += visualization.plot_class_distribution(
+        [train_dataset.class_to_idx[s["metadata"]["class"]] for s in train_dataset.samples],
+        [val_dataset.class_to_idx[s["metadata"]["class"]] for s in val_dataset.samples],
+        [test_dataset.class_to_idx[s["metadata"]["class"]] for s in test_dataset.samples],
+        class_names,
+        artifacts_dir,
+    )
 
-    train_label_indices = [train_dataset.class_to_idx[l] for l in train_labels]
-    val_label_indices = [val_dataset.class_to_idx[l] for l in val_labels]
-    test_label_indices = [test_dataset.class_to_idx[l] for l in test_labels]
-    visualization.plot_class_distribution(train_label_indices, val_label_indices, test_label_indices, class_names, artifacts_dir)
-
-    # 4.4 Sample prediction grid (4x4)
     sample_images, sample_labels, _ = next(iter(test_loader))
-    sample_images = sample_images[:16]
-    sample_labels = sample_labels[:16]
+    take = min(16, len(sample_images))
     with torch.no_grad():
-        out = model(sample_images.to(device))
-        _, preds = out.max(1)
-        sample_preds = preds.cpu().numpy()
-    visualization.plot_sample_predictions(sample_images, sample_labels.numpy(), sample_preds, class_names, artifacts_dir)
+        sample_preds = model(sample_images[:take].to(device)).argmax(1).cpu().numpy()
+    written += visualization.plot_sample_predictions(
+        sample_images[:take], sample_labels.numpy()[:take], sample_preds, class_names, artifacts_dir
+    )
+    written += visualization.plot_gradcam_samples(
+        model, test_dataset, device, class_names, artifacts_dir, seed=args.seed
+    )
+    written += visualization.plot_roc_curves(y_true, y_probs, class_names, artifacts_dir)
+    written += visualization.plot_pr_curves(y_true, y_probs, class_names, artifacts_dir)
 
-    # 4.5 Grad-CAM Heatmap Visualization
-    visualization.plot_gradcam_samples(model, test_dataset, device, class_names, artifacts_dir)
+    metrics = {
+        "model_tag": MODEL_TAG,
+        "num_classes": num_classes,
+        "seed": args.seed,
+        "monitor": MONITOR,
+        "best_val_loss": round(best_monitor, 6),
+        "best_val_acc": round(best_acc, 6),
+        "test_loss": round(float(test_loss), 6),
+        "test_acc": round(float(test_acc), 6),
+        "macro_auc_ovr": round(mean_class_auc, 6) if mean_class_auc is not None else None,
+        "splits": {
+            "train": len(train_idx), "val": len(val_idx), "test": len(test_idx)
+        },
+        "grouping": "source-scan groups with byte-identical duplicates collapsed",
+    }
+    with open(os.path.join(artifacts_dir, "metrics.json"), "w") as handle:
+        json.dump(metrics, handle, indent=2)
 
-    # 4.6 & 4.7 ROC & Precision-Recall Curves
-    visualization.plot_roc_curves(y_true, np.array(y_probs), class_names, artifacts_dir)
-    visualization.plot_pr_curves(y_true, np.array(y_probs), class_names, artifacts_dir)
+    save_label_space(best_path, class_names, model_tag=MODEL_TAG, metrics=metrics)
+    label_file = label_space_path_for(best_path)
 
-    # 4.8 Detailed Classification Report
-    report = classification_report(y_true, y_pred, target_names=class_names, digits=4, zero_division=0)
-    report_path = os.path.join(artifacts_dir, "classification_report.txt")
-    with open(report_path, "w") as f:
-        f.write("OpenMed Brain Classification — Academic Evaluation Report\n")
-        f.write(f"Model: EfficientNetV2-B2 (tf_efficientnetv2_b2.in1k)\n")
-        f.write(f"Test Accuracy: {test_acc:.4f} | Test Loss: {test_loss:.4f}\n\n")
-        f.write(report)
+    report_path = visualization.write_evaluation_report(
+        os.path.join(artifacts_dir, "classification_report.txt"),
+        test_acc, test_loss, report,
+        provenance={
+            "Model": MODEL_TAG,
+            "Monitor": MONITOR,
+            "Seed": args.seed,
+            "Train/Val/Test": f"{len(train_idx)}/{len(val_idx)}/{len(test_idx)}",
+            "Macro AUC (OvR)": f"{mean_class_auc:.4f}" if mean_class_auc is not None else "n/a",
+        },
+    )
 
-    # 5. Export everything as .zip
     zip_path = os.path.join(args.output_dir, "brain_classification_results.zip")
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-        if os.path.exists(log_csv_path):
-            zipf.write(log_csv_path, "training_log.csv")
-        if os.path.exists(best_model_path):
-            zipf.write(best_model_path, "brain_best_model.pth")
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
+        for path, arcname in (
+            (log_path, "training_log.csv"),
+            (best_path, "brain_best_model.pth"),
+            (best_acc_path, "brain_best_acc.pth"),
+            (label_file, "brain_best_model.label_space.json"),
+        ):
+            if os.path.isfile(path):
+                archive.write(path, arcname)
         for root, _, files in os.walk(artifacts_dir):
-            for file in files:
-                full_p = os.path.join(root, file)
-                rel_p = os.path.relpath(full_p, args.output_dir)
-                zipf.write(full_p, rel_p)
+            for name in files:
+                full = os.path.join(root, name)
+                archive.write(full, os.path.relpath(full, args.output_dir))
 
-    logger.info("━" * 60)
-    logger.info(f"✅ Training and evaluation complete!")
-    logger.info(f"   Model checkpoint saved to : {best_model_path}")
-    logger.info(f"   Artifacts generated in    : {artifacts_dir}")
-    logger.info(f"   Bundle exported to        : {zip_path}")
-    logger.info("━" * 60)
+    logger.info("=" * 68)
+    logger.info("  Run complete")
+    logger.info("  checkpoint : %s", best_path)
+    logger.info("  label file : %s", label_file)
+    logger.info("  report     : %s", report_path)
+    logger.info("  artefacts  : %d figures in %s", len(written), artifacts_dir)
+    logger.info("  bundle     : %s", zip_path)
+    logger.info("  test acc   : %.4f (grouped, leak-free split)", test_acc)
+    logger.info("=" * 68)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

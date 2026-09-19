@@ -64,7 +64,6 @@ def _dataset_summary() -> dict[str, Any]:
         from .dataset import BrainTumorDataset
 
         json_path, _ = BrainTumorDataset.locate_data_and_images(data_root)
-        import json
 
         with open(json_path) as handle:
             raw = json.load(handle)
@@ -196,10 +195,9 @@ def _validate_upload(file: UploadFile, payload: bytes) -> Image.Image:
         )
 
     try:
+        with Image.open(io.BytesIO(payload)) as probe:
+            probe.verify()
         with Image.open(io.BytesIO(payload)) as image:
-            image.verify()
-        with Image.open(io.BytesIO(payload)) as image:
-            image.draft(None, None)
             return image.convert("RGB")
     except (UnidentifiedImageError, OSError, ValueError) as exc:
         raise HTTPException(

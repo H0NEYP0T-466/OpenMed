@@ -1,221 +1,367 @@
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
+"""Training artefact plotting: curves, matrices, distributions and Grad-CAM panels."""
+
+from __future__ import annotations
+
+import logging
 import os
-from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_recall_curve
+import random
+from collections import Counter
+from typing import Any, Optional, Sequence
+
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 import torch
-import cv2
+from sklearn.metrics import (
+    auc,
+    confusion_matrix,
+    precision_recall_curve,
+    roc_auc_score,
+    roc_curve,
+)
 
-def plot_training_curves(history, save_dir):
-    """Plots training/validation loss and accuracy."""
+from .model import GradCAM, overlay_cam_on_image, resolve_gradcam_layer
+
+logger = logging.getLogger(__name__)
+
+IMAGENET_MEAN = (0.485, 0.456, 0.406)
+IMAGENET_STD = (0.229, 0.224, 0.225)
+ARTIFACT_SEED = 42
+
+
+def _inverse_normalize(tensor: Any, mean: Sequence[float], std: Sequence[float]) -> np.ndarray:
+    array = tensor.detach().cpu().numpy().transpose(1, 2, 0) if hasattr(tensor, "numpy") else np.asarray(tensor)
+    array = array * np.asarray(std, dtype=np.float32) + np.asarray(mean, dtype=np.float32)
+    return np.clip(array, 0.0, 1.0)
+
+
+def _save(figure: Any, save_dir: str, filename: str) -> str:
     os.makedirs(save_dir, exist_ok=True)
-    
-    epochs = range(1, len(history['train_loss']) + 1)
-    
-    plt.figure(figsize=(10, 5))
-    plt.plot(epochs, history['train_loss'], label='Train Loss')
-    plt.plot(epochs, history['val_loss'], label='Val Loss')
-    plt.title('Training and Validation Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(save_dir, 'loss_curves.png'))
-    plt.close()
-    
-    plt.figure(figsize=(10, 5))
-    plt.plot(epochs, history['train_acc'], label='Train Acc')
-    plt.plot(epochs, history['val_acc'], label='Val Acc')
-    plt.title('Training and Validation Accuracy')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(save_dir, 'accuracy_curves.png'))
-    plt.close()
+    target = os.path.join(save_dir, filename)
+    figure.savefig(target, dpi=150, bbox_inches="tight")
+    plt.close(figure)
+    return target
 
-def plot_confusion_matrix(y_true, y_pred, class_names, save_dir):
-    """Plots normalized confusion matrix."""
-    cm = confusion_matrix(y_true, y_pred)
-    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    
-    plt.figure(figsize=(20, 16))
-    sns.heatmap(cm_normalized, annot=False, cmap='Blues', xticklabels=class_names, yticklabels=class_names)
-    plt.title('Normalized Confusion Matrix')
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.xticks(rotation=90)
-    plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
-    plt.close()
 
-def plot_class_distribution(train_labels, val_labels, test_labels, class_names, save_dir):
-    """Plots class distribution across splits."""
-    x = np.arange(len(class_names))
-    width = 0.25
-    
-    train_counts = [train_labels.count(i) for i in range(len(class_names))]
-    val_counts = [val_labels.count(i) for i in range(len(class_names))]
-    test_counts = [test_labels.count(i) for i in range(len(class_names))]
-    
-    fig, ax = plt.subplots(figsize=(20, 10))
-    ax.bar(x - width, train_counts, width, label='Train')
-    ax.bar(x, val_counts, width, label='Val')
-    ax.bar(x + width, test_counts, width, label='Test')
-    
-    ax.set_ylabel('Counts')
-    ax.set_title('Class Distribution by Split')
-    ax.set_xticks(x)
-    ax.set_xticklabels(class_names, rotation=90)
-    ax.legend()
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'class_distribution.png'))
-    plt.close()
+def plot_training_curves(history: dict[str, Sequence[float]], save_dir: str) -> list[str]:
+    """Plot loss and accuracy curves for train and validation."""
+    if not history.get("train_loss"):
+        logger.warning("No training history to plot.")
+        return []
 
-def plot_sample_predictions(images, true_labels, pred_labels, class_names, save_dir):
-    """Plots 4x4 grid of predictions."""
-    fig, axes = plt.subplots(4, 4, figsize=(16, 16))
-    
-    for i, ax in enumerate(axes.flat):
-        if i < len(images):
-            # Unnormalize if needed based on transforms, assuming standardization
-            img = images[i].numpy().transpose((1, 2, 0))
-            mean = np.array([0.485, 0.456, 0.406])
-            std = np.array([0.229, 0.224, 0.225])
-            img = std * img + mean
-            img = np.clip(img, 0, 1)
-            
-            ax.imshow(img)
-            true_cls = class_names[true_labels[i]]
-            pred_cls = class_names[pred_labels[i]]
-            
-            color = 'green' if true_labels[i] == pred_labels[i] else 'red'
-            ax.set_title(f"True: {true_cls}\nPred: {pred_cls}", color=color, fontsize=8)
-            ax.axis('off')
-            
-    plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'sample_predictions.png'))
-    plt.close()
+    epochs = range(1, len(history["train_loss"]) + 1)
+    written = []
 
-def plot_gradcam_samples(model, dataset, device, class_names, save_dir, num_samples=8):
-    """Plots Grad-CAM overlays."""
+    figure, axes = plt.subplots(1, 2, figsize=(14, 5))
+    axes[0].plot(epochs, history["train_loss"], label="Train loss")
+    axes[0].plot(epochs, history["val_loss"], label="Validation loss")
+    axes[0].set_title("Loss per epoch")
+    axes[0].set_xlabel("Epoch")
+    axes[0].set_ylabel("Loss")
+    axes[0].grid(True, alpha=0.3)
+    axes[0].legend()
+
+    axes[1].plot(epochs, history["train_acc"], label="Train accuracy")
+    axes[1].plot(epochs, history["val_acc"], label="Validation accuracy")
+    axes[1].set_title("Accuracy per epoch")
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylabel("Accuracy")
+    axes[1].set_ylim(0.0, 1.05)
+    axes[1].grid(True, alpha=0.3)
+    axes[1].legend()
+
+    figure.tight_layout()
+    written.append(_save(figure, save_dir, "loss_and_accuracy_curves.png"))
+    return written
+
+
+def plot_confusion_matrix(
+    y_true: Sequence[int],
+    y_pred: Sequence[int],
+    class_names: Sequence[str],
+    save_dir: str,
+) -> list[str]:
+    """Row-normalised confusion matrix over the classes actually present."""
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    present = np.intersect1d(np.unique(np.concatenate([y_true, y_pred])), np.arange(len(class_names)))
+    if present.size == 0:
+        logger.warning("Confusion matrix skipped: no predicted labels.")
+        return []
+
+    names = [class_names[i] for i in present]
+    matrix = confusion_matrix(y_true, y_pred, labels=present)
+    totals = matrix.sum(axis=1, keepdims=True)
+    normalised = np.divide(matrix, totals, out=np.zeros_like(matrix, dtype=float), where=totals > 0)
+
+    size = max(10.0, 0.42 * present.size)
+    figure, axes = plt.subplots(figsize=(size, size))
+    sns.heatmap(
+        normalised,
+        annot=present.size <= 12,
+        fmt=".2f",
+        cmap="Blues",
+        cbar=True,
+        xticklabels=names,
+        yticklabels=names,
+        ax=axes,
+        square=True,
+    )
+    axes.set_title("Row-normalised confusion matrix (recalled class shares)")
+    axes.set_ylabel("True label")
+    axes.set_xlabel("Predicted label")
+    plt.setp(axes.get_xticklabels(), rotation=90)
+    plt.setp(axes.get_yticklabels(), rotation=0)
+
+    return [_save(figure, save_dir, "confusion_matrix.png")]
+
+
+def plot_class_distribution(
+    train_labels: Sequence[int],
+    val_labels: Sequence[int],
+    test_labels: Sequence[int],
+    class_names: Sequence[str],
+    save_dir: str,
+) -> list[str]:
+    """Sample counts per class, split by assignment."""
+    train_counts = Counter(train_labels)
+    val_counts = Counter(val_labels)
+    test_counts = Counter(test_labels)
+
+    indices = np.arange(len(class_names))
+    width = 0.26
+    train = np.array([train_counts.get(i, 0) for i in indices], dtype=float)
+    val = np.array([val_counts.get(i, 0) for i in indices], dtype=float)
+    test = np.array([test_counts.get(i, 0) for i in indices], dtype=float)
+
+    figure, axes = plt.subplots(figsize=(max(14.0, 0.5 * len(class_names)), 8))
+    axes.bar(indices - width, train, width, label=f"Train (n={int(train.sum())})")
+    axes.bar(indices, val, width, label=f"Val (n={int(val.sum())})")
+    axes.bar(indices + width, test, width, label=f"Test (n={int(test.sum())})")
+
+    axes.set_yscale("log")
+    axes.set_ylabel("Samples (log scale)")
+    axes.set_title("Class distribution by split")
+    axes.set_xticks(indices)
+    axes.set_xticklabels(class_names, rotation=90)
+    axes.legend()
+    axes.grid(True, axis="y", alpha=0.3)
+
+    return [_save(figure, save_dir, "class_distribution.png")]
+
+
+def plot_sample_predictions(
+    images: Any,
+    true_labels: Sequence[int],
+    pred_labels: Sequence[int],
+    class_names: Sequence[str],
+    save_dir: str,
+    mean: Sequence[float] = IMAGENET_MEAN,
+    std: Sequence[float] = IMAGENET_STD,
+    grid: tuple[int, int] = (4, 4),
+) -> list[str]:
+    """Grid of predictions with true/predicted captions, red where wrong."""
+    rows, columns = grid
+    count = min(len(images), rows * columns)
+    if count == 0:
+        logger.warning("No samples available for the prediction grid.")
+        return []
+
+    figure, axes = plt.subplots(rows, columns, figsize=(4.0 * columns, 4.0 * rows))
+    for slot, axes_cell in enumerate(np.atleast_1d(axes).ravel()):
+        if slot >= count:
+            axes_cell.axis("off")
+            continue
+
+        picture = _inverse_normalize(images[slot], mean, std)
+        true_index, pred_index = int(true_labels[slot]), int(pred_labels[slot])
+        correct = true_index == pred_index
+
+        axes_cell.imshow(picture)
+        axes_cell.set_title(
+            f"True: {class_names[true_index]}\nPred: {class_names[pred_index]}",
+            color="green" if correct else "red",
+            fontsize=7,
+        )
+        axes_cell.axis("off")
+
+    figure.suptitle("Sample predictions", y=1.0)
+    figure.tight_layout()
+    return [_save(figure, save_dir, "sample_predictions.png")]
+
+
+def plot_gradcam_samples(
+    model: Any,
+    dataset: Any,
+    device: Any,
+    class_names: Sequence[str],
+    save_dir: str,
+    num_samples: int = 8,
+    mean: Sequence[float] = IMAGENET_MEAN,
+    std: Sequence[float] = IMAGENET_STD,
+    seed: int = ARTIFACT_SEED,
+) -> list[str]:
+    """Grad-CAM overlays for a reproducible sample of a dataset split."""
+    available = len(dataset)
+    if available == 0:
+        logger.warning("Grad-CAM skipped: empty dataset.")
+        return []
+
+    rng = random.Random(seed)
+    taken = rng.sample(range(available), min(num_samples, available))
+    rows, columns = 2, 4
+
+    figure, axes = plt.subplots(rows, columns, figsize=(4.0 * columns, 4.0 * rows))
+    flat = np.atleast_1d(axes).ravel()
+
     try:
-        from .model import GradCAM
-    except (ImportError, ValueError):
-        from model import GradCAM
-    
-    for param in model.parameters():
-        param.requires_grad = True
-        
-    target_layer = model.conv_head
-    fig, axes = plt.subplots(2, 4, figsize=(16, 8))
-    indices = np.random.choice(len(dataset), min(num_samples, len(dataset)), replace=False)
-    
-    with GradCAM(model, target_layer) as grad_cam:
-        for i, idx in enumerate(indices):
-            if i >= 8: break
-            
-            img_tensor, label, _ = dataset[idx]
-            img_input = img_tensor.unsqueeze(0).to(device)
-            img_input.requires_grad = True
-            
-            cam = grad_cam.generate(img_input, label)
-            
-            img_np = img_tensor.numpy().transpose((1, 2, 0))
-            mean = np.array([0.485, 0.456, 0.406])
-            std = np.array([0.229, 0.224, 0.225])
-            img_np = std * img_np + mean
-            img_np = np.clip(img_np, 0, 1)
-            
-            if len(cam.shape) == 2:
-                cam = cv2.resize(cam, (img_np.shape[1], img_np.shape[0]))
-                heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
-                heatmap = np.float32(heatmap) / 255
-                heatmap = heatmap[:, :, ::-1] # BGR to RGB
-                overlay = heatmap + np.float32(img_np)
-                max_val = np.max(overlay)
-                if max_val > 0:
-                    overlay = overlay / max_val
-            else:
-                overlay = img_np
-                
-            ax = axes[i // 4, i % 4]
-            ax.imshow(overlay)
-            ax.set_title(f"Class: {class_names[label]}", fontsize=9)
-            ax.axis('off')
-            
-    plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'gradcam_samples.png'))
-    plt.close()
-    
-    for param in model.parameters():
-        param.requires_grad = False
+        with GradCAM(model, resolve_gradcam_layer(model)) as grad_cam:
+            for slot, index in enumerate(taken):
+                image_tensor, label, _ = dataset[index]
+                tensor = image_tensor.unsqueeze(0).to(device)
+                cam = grad_cam.generate(tensor, int(label))
+                picture = _inverse_normalize(image_tensor, mean, std)
+                overlay = overlay_cam_on_image((picture * 255).astype(np.uint8), cam)
 
-def plot_roc_curves(y_true, y_scores, class_names, save_dir):
-    """Plots macro-average and per-class ROC curves."""
-    n_classes = len(class_names)
-    y_true_onehot = np.eye(n_classes)[y_true]
-    
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-    
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(y_true_onehot[:, i], y_scores[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-        
-    # Macro average
-    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
-    mean_tpr = np.zeros_like(all_fpr)
-    for i in range(n_classes):
-        mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
-    mean_tpr /= n_classes
-    
-    fpr["macro"] = all_fpr
-    tpr["macro"] = mean_tpr
-    roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
-    
-    plt.figure(figsize=(10, 8))
-    plt.plot(fpr["macro"], tpr["macro"],
-             label=f'macro-average ROC curve (area = {roc_auc["macro"]:0.2f})',
-             color='navy', linestyle=':', linewidth=4)
-             
-    plt.plot([0, 1], [0, 1], 'k--', lw=2)
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
-    plt.legend(loc="lower right")
-    plt.savefig(os.path.join(save_dir, 'roc_curves_macro.png'))
-    plt.close()
+                flat[slot].imshow(overlay)
+                flat[slot].set_title(class_names[int(label)], fontsize=8)
+                flat[slot].axis("off")
+    except RuntimeError as exc:
+        logger.error("Grad-CAM generation failed: %s", exc)
+        plt.close(figure)
+        return []
 
-def plot_pr_curves(y_true, y_scores, class_names, save_dir):
-    """Plots PR curves."""
+    for slot in range(len(taken), flat.size):
+        flat[slot].axis("off")
+
+    figure.suptitle("Grad-CAM attribution for the true class", y=1.0)
+    figure.tight_layout()
+    return [_save(figure, save_dir, "gradcam_samples.png")]
+
+
+def _one_hot(y_true: Sequence[int], n_classes: int) -> np.ndarray:
+    encoded = np.zeros((len(y_true), n_classes), dtype=float)
+    for row, column in enumerate(np.asarray(y_true, dtype=int)):
+        if 0 <= column < n_classes:
+            encoded[row, column] = 1.0
+    return encoded
+
+
+def plot_roc_curves(
+    y_true: Sequence[int],
+    y_scores: np.ndarray,
+    class_names: Sequence[str],
+    save_dir: str,
+    max_per_class: int = 8,
+) -> list[str]:
+    """Macro-averaged ROC with the highest-AUC classes highlighted."""
     n_classes = len(class_names)
-    y_true_onehot = np.eye(n_classes)[y_true]
-    
-    precision = dict()
-    recall = dict()
-    
-    plt.figure(figsize=(10, 8))
-    
-    for i in range(n_classes):
-        precision[i], recall[i], _ = precision_recall_curve(y_true_onehot[:, i], y_scores[:, i])
-        # plt.plot(recall[i], precision[i], lw=1, alpha=0.3) # Too cluttered
-        
-    # Compute micro-average PR curve
-    precision["micro"], recall["micro"], _ = precision_recall_curve(y_true_onehot.ravel(), y_scores.ravel())
-    
-    plt.plot(recall["micro"], precision["micro"], color='gold', lw=2,
-             label='micro-average Precision-recall curve')
-             
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Precision-Recall curve')
-    plt.legend(loc="lower left")
-    plt.savefig(os.path.join(save_dir, 'pr_curves_micro.png'))
-    plt.close()
+    encoded = _one_hot(y_true, n_classes)
+
+    per_class: dict[int, float] = {}
+    figure, axes = plt.subplots(figsize=(9, 8))
+
+    for index in range(n_classes):
+        if encoded[:, index].sum() == 0:
+            continue
+        try:
+            false_positive, true_positive, _ = roc_curve(encoded[:, index], y_scores[:, index])
+        except ValueError:
+            continue
+        score = auc(false_positive, true_positive)
+        per_class[index] = score
+        if len(per_class) <= max_per_class:
+            axes.plot(
+                false_positive,
+                true_positive,
+                lw=1,
+                alpha=0.55,
+                label=f"{class_names[index]} (AUC {score:.2f})",
+            )
+
+    try:
+        micro = roc_auc_score(encoded, y_scores, average="micro", multi_class="ovr")
+    except ValueError:
+        micro = None
+
+    if per_class:
+        axes.plot([0, 1], [0, 1], "k--", lw=1.2, label="Chance")
+        axes.set_xlim(0.0, 1.0)
+        axes.set_ylim(0.0, 1.02)
+        axes.set_xlabel("False positive rate")
+        axes.set_ylabel("True positive rate")
+        title = f"ROC - mean per-class AUC {np.mean(list(per_class.values())):.3f}"
+        if micro is not None:
+            title += f", micro AUC {micro:.3f}"
+        axes.set_title(title)
+        axes.legend(fontsize=7, loc="lower right")
+        return [_save(figure, save_dir, "roc_curves.png")]
+
+    plt.close(figure)
+    logger.warning("ROC curves skipped: no computable classes.")
+    return []
+
+
+def plot_pr_curves(
+    y_true: Sequence[int],
+    y_scores: np.ndarray,
+    class_names: Sequence[str],
+    save_dir: str,
+) -> list[str]:
+    """Per-class precision-recall curves for classes with support."""
+    n_classes = len(class_names)
+    encoded = _one_hot(y_true, n_classes)
+
+    figure, axes = plt.subplots(figsize=(9, 7))
+    plotted = 0
+    for index in range(n_classes):
+        support = encoded[:, index].sum()
+        if support == 0:
+            continue
+        precision, recall, _ = precision_recall_curve(encoded[:, index], y_scores[:, index])
+        area = auc(recall, precision)
+        axes.plot(recall, precision, lw=1, alpha=0.55, label=f"{class_names[index]} (AP {area:.2f})")
+        plotted += 1
+
+    if plotted == 0:
+        plt.close(figure)
+        logger.warning("PR curves skipped: no classes with support.")
+        return []
+
+    axes.set_xlabel("Recall")
+    axes.set_ylabel("Precision")
+    axes.set_ylim(0.0, 1.02)
+    axes.set_title(f"Precision-recall ({plotted} classes with support)")
+    axes.legend(fontsize=6, loc="lower left", ncol=2)
+    axes.grid(True, alpha=0.25)
+
+    return [_save(figure, save_dir, "pr_curves.png")]
+
+
+def write_evaluation_report(
+    path: str,
+    test_accuracy: float,
+    test_loss: float,
+    report_text: str,
+    provenance: Optional[dict[str, Any]] = None,
+) -> str:
+    """Write the classification report with the provenance needed to interpret it."""
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w") as handle:
+        handle.write("OpenMed Brain Classification - Evaluation Report\n")
+        handle.write("=" * 60 + "\n")
+        handle.write(f"Test accuracy: {test_accuracy:.4f}\n")
+        handle.write(f"Test loss    : {test_loss:.4f}\n")
+        for key, value in (provenance or {}).items():
+            handle.write(f"{key:<13}: {value}\n")
+        handle.write(
+            "\nProtocol: splits are grouped by source scan and byte-identical\n"
+            "duplicates are collapsed, so no image group appears in two splits.\n"
+        )
+        handle.write("\n" + report_text + "\n")
+    return path
