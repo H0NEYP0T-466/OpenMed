@@ -14,6 +14,7 @@ from typing import Any, Optional, Union
 
 import cv2
 import numpy as np
+import timm
 import torch
 import torch.nn.functional as F
 from PIL import Image
@@ -41,8 +42,8 @@ MAX_IMAGE_SIDE = 8192
 MIN_IMAGE_SIDE = 8
 
 __all__ = [
-    "BrainClassificationPipeline",
     "CLASS_NAMES",
+    "BrainClassificationPipeline",
     "ModelUnavailableError",
 ]
 
@@ -74,13 +75,21 @@ class BrainClassificationPipeline:
 
         self.num_classes = self.label_space.num_classes
         self.class_names: tuple[str, ...] = self.label_space.class_names
-        self.model_tag = self.label_space.model_tag or MODEL_TAG
+        self.declared_model_tag = self.label_space.model_tag or MODEL_TAG
+        self.model_tag = self._architecture_tag(self.declared_model_tag)
 
-        self.model = create_model(
-            num_classes=self.num_classes,
-            pretrained=state_dict is None,
-            model_tag=self.model_tag,
-        )
+        try:
+            self.model = create_model(
+                num_classes=self.num_classes,
+                pretrained=state_dict is None,
+                model_tag=self.model_tag,
+            )
+        except (RuntimeError, ValueError) as exc:
+            raise ModelUnavailableError(
+                f"Could not build backbone {self.model_tag!r} for "
+                f"{self.label_space.source}: {exc}"
+            ) from exc
+
         self.using_trained_weights = state_dict is not None
 
         if state_dict is not None:
@@ -101,6 +110,30 @@ class BrainClassificationPipeline:
             self.using_trained_weights,
             self.input_size,
         )
+
+    @staticmethod
+    def _architecture_tag(declared: str) -> str:
+        """Only build an architecture the label file names if timm actually knows it.
+
+        A stale or hand-edited sidecar should degrade to the project default with
+        a warning, not abort the service with an opaque registry error.
+        """
+        if declared == MODEL_TAG:
+            return declared
+        try:
+            known = timm.is_model(declared)
+        except Exception:  # noqa: BLE001 - registry lookup must never be fatal
+            known = False
+
+        if known:
+            return declared
+
+        logger.warning(
+            "Label file declares unknown architecture %r; falling back to %r.",
+            declared,
+            MODEL_TAG,
+        )
+        return MODEL_TAG
 
     def _load_state_dict(
         self, model_path: Optional[str], allow_untrained_fallback: bool
@@ -202,7 +235,7 @@ class BrainClassificationPipeline:
                     "class": self.class_names[int(idx.item())],
                     "confidence": round(float(prob.item()), 4),
                 }
-                for idx, prob in zip(top5_idxs, top5_probs)
+                for idx, prob in zip(top5_idxs, top5_probs, strict=True)
             ],
             "probabilities": [round(float(value), 6) for value in probs.tolist()],
             "model_trained": self.using_trained_weights,
@@ -221,10 +254,10 @@ class BrainClassificationPipeline:
         tensor = self.transform(image).unsqueeze(0).to(self.device)
 
         with GradCAM(self.model, self.target_layer) as grad_cam:
-            logits = self.model(tensor)
-            probs = F.softmax(logits, dim=1)
-            target_class = int(torch.argmax(probs[0]).item())
-            cam = grad_cam.generate(tensor, target_class)
+            cam = grad_cam.generate(tensor)
+            logits = grad_cam.logits
+            if logits is None:  # pragma: no cover - generate always sets it
+                raise RuntimeError("Grad-CAM produced no logits to interpret.")
 
         result = self._interpret(logits)
         base = np.array(image.resize((self.input_size, self.input_size)))
@@ -245,6 +278,8 @@ class BrainClassificationPipeline:
         return {
             "model_name": "EfficientNetV2-B2",
             "model_tag": self.model_tag,
+            "declared_model_tag": self.declared_model_tag,
+            "architecture_matches_declaration": self.model_tag == self.declared_model_tag,
             "num_classes": self.num_classes,
             "class_names": list(self.class_names),
             "input_size": f"{self.input_size}x{self.input_size}",

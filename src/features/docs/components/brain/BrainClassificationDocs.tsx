@@ -22,16 +22,26 @@ const ARTIFACTS: readonly ArtifactCard[] = [
     filename: 'class_distribution.png',
     format: 'PNG · Categorical Bar',
     title: 'Class & Split Balance Ledger',
-    desc: 'Sample counts across 70% train (8,838), 15% val (1,894), and 15% test (1,894) location-stratified splits.',
+    desc: 'Per-class sample counts for the 70/15/15 grouped split on a log axis, so the long tail of rare histologies stays legible next to the dominant classes.',
     category: '01 · Dataset',
     previewPath: '/visuals/brain/class_distribution.png',
+  },
+  {
+    id: 'split_manifest',
+    filename: 'split_manifest.csv',
+    format: 'CSV · Provenance',
+    title: 'Split Assignment Ledger',
+    desc: 'Every image with its class and assigned split, so any reported metric can be traced back and audited for source-scan isolation.',
+    category: '01 · Dataset',
+    previewPath: '/visuals/brain/split_manifest.csv',
+    isText: true,
   },
   {
     id: 'loss_curves',
     filename: 'loss_curves.png',
     format: 'PNG · Metric Plot',
     title: 'Training & Validation Loss',
-    desc: 'Per-epoch cross-entropy loss convergence across 50 epochs validating monotonic loss reduction.',
+    desc: 'Per-epoch class-weighted cross-entropy for both branches of the grouped split, under a one-cycle schedule stepped per minibatch.',
     category: '02 · Optimization',
     previewPath: '/visuals/brain/loss_curves.png',
   },
@@ -40,43 +50,43 @@ const ARTIFACTS: readonly ArtifactCard[] = [
     filename: 'accuracy_curves.png',
     format: 'PNG · Metric Plot',
     title: 'Top-1 Accuracy Trajectories',
-    desc: 'Per-epoch training vs. validation accuracy curves demonstrating steady ascent to 96.99% holdout test.',
+    desc: 'Training versus validation accuracy per epoch. The gap between the two is the honest over-fitting signal once leakage is removed.',
     category: '03 · Optimization',
     previewPath: '/visuals/brain/accuracy_curves.png',
   },
   {
     id: 'cm',
     filename: 'confusion_matrix.png',
-    format: 'PNG · 39×39 Matrix',
+    format: 'PNG · Row-Normalised Matrix',
     title: 'Normalized Confusion Matrix',
-    desc: 'Full 39-class normalized diagnostic confusion matrix with row-wise sensitivity and false-positive mapping.',
+    desc: 'Row-normalised matrix restricted to classes present in the evaluated split, avoiding all-zero rows that render as undefined cells.',
     category: '04 · Validation',
     previewPath: '/visuals/brain/confusion_matrix.png',
   },
   {
     id: 'roc',
-    filename: 'roc_curves_macro.png',
-    format: 'PNG · Multi-Class Curve',
-    title: 'Multi-Class ROC Frontiers',
-    desc: 'Macro-averaged and per-class AUC-ROC curves demonstrating high true-positive discrimination.',
+    filename: 'roc_curves.png',
+    format: 'PNG · Multi-Class Curves',
+    title: 'One-vs-Rest ROC Frontiers',
+    desc: 'Per-class ROC curves for the strongest classes with mean per-class and micro-averaged AUC reported in the figure title.',
     category: '05 · Performance',
-    previewPath: '/visuals/brain/roc_curves_macro.png',
+    previewPath: '/visuals/brain/roc_curves.png',
   },
   {
     id: 'pr',
-    filename: 'pr_curves_micro.png',
-    format: 'PNG · Precision Curve',
+    filename: 'pr_curves.png',
+    format: 'PNG · Precision Curves',
     title: 'Precision-Recall Frontiers',
-    desc: 'Micro-averaged precision-recall operating frontier reflecting robust clinical precision under class imbalance.',
+    desc: 'Per-class precision-recall curves with average precision annotated, which is more informative than ROC under class imbalance.',
     category: '06 · Performance',
-    previewPath: '/visuals/brain/pr_curves_micro.png',
+    previewPath: '/visuals/brain/pr_curves.png',
   },
   {
     id: 'grid',
     filename: 'sample_predictions.png',
     format: 'PNG · 4×4 Plate',
     title: 'Qualitative Validation Grid',
-    desc: '16-panel test batch with true vs. predicted labels, highlighting correct predictions and clinical edge cases.',
+    desc: 'Sixteen held-out test images with true and predicted labels, captioned in red wherever the differential is wrong.',
     category: '07 · Inference',
     previewPath: '/visuals/brain/sample_predictions.png',
   },
@@ -85,7 +95,7 @@ const ARTIFACTS: readonly ArtifactCard[] = [
     filename: 'gradcam_samples.png',
     format: 'PNG · Layer Heatmap',
     title: 'Grad-CAM Attention Overlays',
-    desc: 'Final convolutional layer (conv_head) activation heatmaps demonstrating anatomical focus on tumor pathology.',
+    desc: 'Activation maps for the final convolution stage on a fixed, seeded sample of the test split. Each panel is computed from its own image.',
     category: '08 · Explainability',
     previewPath: '/visuals/brain/gradcam_samples.png',
   },
@@ -94,9 +104,19 @@ const ARTIFACTS: readonly ArtifactCard[] = [
     filename: 'classification_report.txt & training_log.csv',
     format: 'TXT / CSV · Telemetry',
     title: 'Classification Report & Epoch Log',
-    desc: 'Exhaustive per-class precision, recall, F1-score report and per-epoch CSV recording loss, LR, and elapsed time.',
+    desc: 'Per-class precision, recall and F1 with the run provenance header — monitor, seed, split sizes and macro AUC — plus the per-epoch CSV.',
     category: '09 · Audit',
     previewPath: '/visuals/brain/classification_report.txt',
+    isText: true,
+  },
+  {
+    id: 'metrics',
+    filename: 'metrics.json',
+    format: 'JSON · Machine Readable',
+    title: 'Machine-Readable Run Metrics',
+    desc: 'Test accuracy, loss, macro one-vs-rest AUC, split sizes and the grouping rule, mirroring what the label file binds to the checkpoint.',
+    category: '09 · Audit',
+    previewPath: '/visuals/brain/metrics.json',
     isText: true,
   },
 ]
@@ -106,7 +126,7 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
 
   const handleCopyKaggleCmd = () => {
     const cmd =
-      'python brain_kaggle.py --data_root /kaggle/input/brain-tumor-dataset/archive --output_dir /kaggle/working --batch_size 32 --epochs 50'
+      'python brain_kaggle.py --data_root /kaggle/input/brain-tumor-dataset/archive --output_dir /kaggle/working --batch_size 32 --epochs 50 --seed 42'
     navigator.clipboard.writeText(cmd)
     setCopiedCmd(true)
     setTimeout(() => setCopiedCmd(false), 2200)
@@ -117,9 +137,9 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
       <div className="task-header-strip">
         <div className="task-tag-group">
           <span className="task-type-tag class">Task · Classification</span>
-          <span className="task-name-text">39-Class Histological &amp; Sequence Differential</span>
+          <span className="task-name-text">42-Class Histological &amp; Sequence Differential</span>
         </div>
-        <span className="task-model-pill">EfficientNetV2-B2 · 512×512 · AdamW</span>
+        <span className="task-model-pill">EfficientNetV2-B2 · 208×208 input · AdamW</span>
       </div>
 
       {/* Empirical Research Chronology */}
@@ -432,11 +452,11 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
             </div>
             <div className="spec-row">
               <span className="spec-k">Input Resolution</span>
-              <span className="spec-v">512 × 512 × 3 (RGB-normalized)</span>
+              <span className="spec-v">208 × 208 × 3, bicubic with crop_pct 0.89 (resolved from the timm model config)</span>
             </div>
             <div className="spec-row">
               <span className="spec-k">Loss Formulation</span>
-              <span className="spec-v">Weighted Cross-Entropy (w = N / (C · n_c))</span>
+              <span className="spec-v">Cross-Entropy, sqrt-smoothed inverse-frequency weights mean-normalised and clipped to [0.2, 5.0]</span>
             </div>
             <div className="spec-row">
               <span className="spec-k">Optimizer &amp; LR</span>
@@ -444,7 +464,15 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
             </div>
             <div className="spec-row">
               <span className="spec-k">Learning Rate Schedule</span>
-              <span className="spec-v">CosineAnnealingWarmRestarts (T_0 = 10, T_mult = 2)</span>
+              <span className="spec-v">OneCycleLR stepped per minibatch (pct_start = 0.3), max_lr = 1e-3</span>
+            </div>
+            <div className="spec-row">
+              <span className="spec-k">Split Protocol</span>
+              <span className="spec-v">Grouped stratified — images sharing a source scan or byte-identical content stay in one split</span>
+            </div>
+            <div className="spec-row">
+              <span className="spec-k">Checkpoint Monitor</span>
+              <span className="spec-v">val_loss, with best-val-accuracy weights retained separately</span>
             </div>
             <div className="spec-row">
               <span className="spec-k">Data Regularization</span>
@@ -483,12 +511,13 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
           </div>
           <pre className="terminal-body">
             <code>
-              <span className="t-comment"># Launch production multi-class training with location-stratified splits:</span>
+              <span className="t-comment"># Launch production multi-class training with grouped, leakage-free splits:</span>
               {'\n'}python brain_kaggle.py \
               {'\n'}  --data_root /kaggle/input/brain-tumor-dataset/archive \
               {'\n'}  --output_dir /kaggle/working \
               {'\n'}  --batch_size 32 \
-              {'\n'}  --epochs 50
+              {'\n'}  --epochs 50 \
+              {'\n'}  --seed 42
             </code>
           </pre>
         </div>

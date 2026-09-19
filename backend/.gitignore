@@ -49,3 +49,8 @@ storage/
 
 # Temporary Files
 tmp/
+
+# Archived old artifacts and models
+**/projec_dustbin/**
+projec_dustbin/
+

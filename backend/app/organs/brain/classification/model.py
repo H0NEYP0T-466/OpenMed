@@ -30,7 +30,7 @@ def head_weight_keys(model: nn.Module) -> tuple[str, ...]:
     return tuple(
         name
         for name, _ in model.named_parameters()
-        if name.endswith("classifier.weight") or name.endswith("head.fc.weight")
+        if name.endswith(("classifier.weight", "head.fc.weight"))
     )
 
 
@@ -113,6 +113,7 @@ class GradCAM:
         self.target_layer = target_layer
         self.activations: Optional[torch.Tensor] = None
         self.gradients: Optional[torch.Tensor] = None
+        self.logits: Optional[torch.Tensor] = None
         self._handles: list[Any] = []
         self._attach()
 
@@ -137,7 +138,7 @@ class GradCAM:
             handle.remove()
         self._handles.clear()
 
-    def __enter__(self) -> "GradCAM":
+    def __enter__(self) -> GradCAM:
         self._attach()
         return self
 
@@ -172,6 +173,7 @@ class GradCAM:
 
             self.model.zero_grad(set_to_none=True)
             logits[0, int(target_class)].backward()
+            self.logits = logits.detach()
 
             if self.activations is None or self.gradients is None:
                 raise RuntimeError(

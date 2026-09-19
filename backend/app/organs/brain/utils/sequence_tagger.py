@@ -13,26 +13,25 @@ Sequence Tagger & Pure Clean Dataset Generator for OpenMed Brain Classification
 6. Completely cleans the output directory and exports exactly 2,000 Normal and 2,000 Pituitary scans.
 """
 
-import os
-import sys
-import io
-import json
-import random
-import shutil
 import argparse
 import hashlib
+import io
+import json
+import os
+import random
+import shutil
 import time
+from collections import Counter
 from pathlib import Path
-from collections import Counter, defaultdict
-from typing import Dict, List, Tuple, Set, Any, Optional
+from typing import Any, Dict, List, Set, Tuple
 
 import numpy as np
 import scipy.fftpack
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, models
 from PIL import Image
+from torch.utils.data import DataLoader, Dataset
+from torchvision import models, transforms
 
 # ------------------------------------------------------------------------------
 # Default Paths (overridable via environment, derived from this file otherwise)
@@ -144,18 +143,18 @@ class SequenceDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, idx):
-        path, label = self.samples[idx]
-        try:
-            with Image.open(path) as img:
-                img = img.convert("RGB")
-                if self.transform:
-                    img = self.transform(img)
-                return img, label
-        except Exception:
-            blank = Image.new("RGB", (224, 224), (0, 0, 0))
-            if self.transform:
-                blank = self.transform(blank)
-            return blank, label
+        total = len(self.samples)
+        for offset in range(min(8, total)):
+            path, label = self.samples[(idx + offset) % total]
+            try:
+                with Image.open(path) as img:
+                    img = img.convert("RGB")
+                    return (self.transform(img) if self.transform else img), label
+            except Exception:
+                continue
+        raise RuntimeError(
+            f"No readable image reachable from index {idx} of {total} samples"
+        )
 
 
 class InferenceDataset(Dataset):
@@ -167,21 +166,22 @@ class InferenceDataset(Dataset):
         return len(self.items)
 
     def __getitem__(self, idx):
-        item = self.items[idx]
-        path = item["src_path"]
+        """Yield (tensor, idx, readable).
+
+        An unreadable scan must never be labelled from a placeholder image: a
+        blank frame would still receive a confident sequence tag that then ships
+        as ground truth, so it is flagged for exclusion instead.
+        """
+        path = self.items[idx]["src_path"]
         try:
             with Image.open(path) as img:
                 img = img.convert("RGB")
-                if self.transform:
-                    tensor = self.transform(img)
-                else:
-                    tensor = transforms.ToTensor()(img)
-                return tensor, idx
+                tensor = self.transform(img) if self.transform else transforms.ToTensor()(img)
+            return tensor, idx, 1
         except Exception:
             blank = Image.new("RGB", (224, 224), (0, 0, 0))
-            if self.transform:
-                blank = self.transform(blank)
-            return blank, idx
+            tensor = self.transform(blank) if self.transform else transforms.ToTensor()(blank)
+            return tensor, idx, 0
 
 
 # ------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ def load_archive_known_hashes(archive_root: str) -> Tuple[Set[str], List[int]]:
     cache_path = os.path.join(archive_root, ".archive_hashes_cache.json")
     if os.path.exists(cache_path):
         print(f"       Loading archive hashes from cache: {cache_path}")
-        with open(cache_path, "r") as f:
+        with open(cache_path) as f:
             data = json.load(f)
         return set(data["shas"]), data["phashes"]
 
@@ -203,7 +203,7 @@ def load_archive_known_hashes(archive_root: str) -> Tuple[Set[str], List[int]]:
     phashes: List[int] = []
 
     if os.path.exists(archive_json):
-        with open(archive_json, "r") as f:
+        with open(archive_json) as f:
             manifest = json.load(f)
 
         for rel_k in manifest.keys():
@@ -342,51 +342,30 @@ def _build_sequence_model(pretrained: bool, freeze_backbone: bool = False) -> nn
     return model
 
 
-def _cache_matches(meta_path: str, requested: Dict[str, Any]) -> bool:
+def _cache_matches(
+    meta_path: str, requested: Dict[str, Any], min_val_accuracy: float
+) -> bool:
+    """True only when the cached model matches config AND cleared the gate.
+
+    The gate has to apply to reused models too, otherwise one sub-threshold
+    classifier becomes a permanently trusted source of ground-truth labels.
+    """
     if not os.path.exists(meta_path):
         return False
     try:
-        with open(meta_path, "r") as handle:
+        with open(meta_path) as handle:
             recorded = json.load(handle)
     except (OSError, json.JSONDecodeError):
         return False
-    return all(recorded.get(key) == value for key, value in requested.items())
+    if not all(recorded.get(key) == value for key, value in requested.items()):
+        return False
+    return float(recorded.get("val_accuracy", 0.0)) >= min_val_accuracy
 
 
-def train_sequence_classifier(
-    data_json_path: str,
-    images_base: str,
-    samples_per_sequence: int = 1000,
-    epochs: int = 8,
-    batch_size: int = 32,
-    device: str = "cpu",
-    force_retrain: bool = False,
-) -> nn.Module:
-    checkpoint_path = os.path.join(os.path.dirname(__file__), "sequence_classifier_mobilenet.pth")
-    meta_path = f"{checkpoint_path}.meta.json"
-    requested = {
-        "data_json_path": os.path.abspath(data_json_path),
-        "samples_per_sequence": samples_per_sequence,
-        "epochs": epochs,
-        "batch_size": batch_size,
-    }
-
-    if os.path.exists(checkpoint_path) and not force_retrain and _cache_matches(meta_path, requested):
-        print(f"\n[MODEL] Reusing cached sequence classifier: {checkpoint_path}")
-        model = _build_sequence_model(pretrained=False)
-        model.load_state_dict(torch.load(checkpoint_path, map_location=device, weights_only=True))
-        model.to(device)
-        model.eval()
-        return model
-
-    if os.path.exists(checkpoint_path) and not force_retrain:
-        print(
-            "\n[MODEL] Cached sequence classifier was trained with a different "
-            "configuration; retraining. Pass --force_retrain to always rebuild."
-        )
-
-    print(f"\n[TRAIN] Loading sequence training scans from:\n        {data_json_path}")
-    with open(data_json_path, "r") as f:
+def _sequence_split(
+    data_json_path: str, images_base: str, samples_per_sequence: int
+) -> Tuple[List[Tuple[str, int]], List[Tuple[str, int]]]:
+    with open(data_json_path) as f:
         data = json.load(f)
 
     seq_buckets: Dict[str, List[str]] = {"T1": [], "T1C+": [], "T2": []}
@@ -402,42 +381,26 @@ def train_sequence_classifier(
     random.seed(42)
     train_samples: List[Tuple[str, int]] = []
     val_samples: List[Tuple[str, int]] = []
-
     for seq, paths in seq_buckets.items():
         random.shuffle(paths)
         chosen = paths[:samples_per_sequence]
         split_idx = int(len(chosen) * 0.85)
-        train_paths = chosen[:split_idx]
-        val_paths = chosen[split_idx:]
         seq_id = REV_SEQUENCE_MAP[seq]
-        train_samples.extend([(p, seq_id) for p in train_paths])
-        val_samples.extend([(p, seq_id) for p in val_paths])
+        train_samples.extend([(p, seq_id) for p in chosen[:split_idx]])
+        val_samples.extend([(p, seq_id) for p in chosen[split_idx:]])
 
     random.shuffle(train_samples)
     random.shuffle(val_samples)
+    return train_samples, val_samples
 
-    train_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(10),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
 
-    val_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-
-    train_ds = SequenceDataset(train_samples, transform=train_transform)
-    val_ds = SequenceDataset(val_samples, transform=val_transform)
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=2)
-
-    model = _build_sequence_model(pretrained=True, freeze_backbone=True)
-    model.to(device)
-
+def _fit_sequence_model(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    epochs: int,
+    device: str,
+) -> None:
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(
         [
@@ -447,7 +410,6 @@ def train_sequence_classifier(
         weight_decay=1e-4,
     )
 
-    print(f"        Training MobileNetV3 on CPU ({epochs} epochs)...")
     start_t = time.time()
     for epoch in range(1, epochs + 1):
         ep_start = time.time()
@@ -465,7 +427,6 @@ def train_sequence_classifier(
             correct += (preds == lbls).sum().item()
             total += lbls.size(0)
 
-        # Validation
         model.eval()
         v_loss, v_corr, v_tot = 0.0, 0, 0
         with torch.no_grad():
@@ -483,29 +444,101 @@ def train_sequence_classifier(
             f"        Epoch {epoch}/{epochs} ({ep_time:.1f}s) | "
             f"Train Acc: {(correct/total)*100:.2f}% | Val Acc: {(v_corr/v_tot)*100:.2f}%"
         )
+    print(f"        Training finished in {time.time()-start_t:.1f}s.")
 
-    print(f"        Sequence classifier ready in {time.time()-start_t:.1f}s.")
+
+def train_sequence_classifier(
+    data_json_path: str,
+    images_base: str,
+    samples_per_sequence: int = 1000,
+    epochs: int = 8,
+    batch_size: int = 32,
+    device: str = "cpu",
+    force_retrain: bool = False,
+    min_val_accuracy: float = 0.90,
+) -> nn.Module:
+    checkpoint_path = os.path.join(os.path.dirname(__file__), "sequence_classifier_mobilenet.pth")
+    meta_path = f"{checkpoint_path}.meta.json"
+    requested = {
+        "data_json_path": os.path.abspath(data_json_path),
+        "samples_per_sequence": samples_per_sequence,
+        "epochs": epochs,
+        "batch_size": batch_size,
+    }
+
+    reuse = (
+        os.path.exists(checkpoint_path)
+        and not force_retrain
+        and _cache_matches(meta_path, requested, min_val_accuracy)
+    )
+    if os.path.exists(checkpoint_path) and not force_retrain and not reuse:
+        print(
+            "\n[MODEL] Cached sequence classifier is stale, misconfigured, or below "
+            "the accuracy gate; retraining. Pass --force_retrain to always rebuild."
+        )
+
+    print(f"\n[SPLIT] Building held-out sequence evaluation from:\n        {data_json_path}")
+    train_samples, val_samples = _sequence_split(
+        data_json_path, images_base, samples_per_sequence
+    )
+
+    train_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(10),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    val_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    train_loader = DataLoader(
+        SequenceDataset(train_samples, transform=train_transform),
+        batch_size=batch_size, shuffle=True, num_workers=2,
+    )
+    val_loader = DataLoader(
+        SequenceDataset(val_samples, transform=val_transform),
+        batch_size=batch_size, shuffle=False, num_workers=2,
+    )
+
+    if reuse:
+        print(f"\n[MODEL] Reusing cached sequence classifier: {checkpoint_path}")
+        model = _build_sequence_model(pretrained=False)
+        model.load_state_dict(
+            torch.load(checkpoint_path, map_location=device, weights_only=True)
+        )
+        model.to(device)
+        model.eval()
+    else:
+        print(f"\n[TRAIN] Fitting MobileNetV3 sequence classifier on CPU ({epochs} epochs)...")
+        model = _build_sequence_model(pretrained=True, freeze_backbone=True)
+        model.to(device)
+        _fit_sequence_model(model, train_loader, val_loader, epochs, device)
 
     accuracy, report = evaluate_sequence_model(model, val_loader, device)
     print(
         f"        Held-out sequence accuracy {accuracy:.3f} on {len(val_samples)} scans.\n"
         f"{report}"
     )
-    if accuracy < 0.90:
-        print(
-            "        [WARN] Sequence accuracy is below 0.90. Labels derived from this\n"
-            "        model become the classifier's ground truth, so its errors are\n"
-            "        baked in as contradictory supervision. Consider more epochs or\n"
-            "        manual review of low-confidence rows."
+
+    if accuracy < min_val_accuracy:
+        raise RuntimeError(
+            f"Sequence classifier held-out accuracy {accuracy:.3f} is below the "
+            f"{min_val_accuracy:.2f} gate, so it must not label training data: its "
+            "errors would become contradictory ground truth downstream. Refusing to "
+            "export. Raise --epochs, unfreeze the backbone, or label these scans "
+            "manually. (A re-scan of the curated archive may also reveal that the "
+            "T1C+ majority class is being over-predicted.)"
         )
 
-    try:
-        torch.save(model.state_dict(), checkpoint_path)
-        with open(meta_path, "w") as handle:
-            json.dump({**requested, "val_accuracy": round(accuracy, 4)}, handle, indent=2)
-        print(f"        Saved sequence classifier checkpoint: {checkpoint_path}")
-    except Exception as e:
-        print(f"        [WARN] Could not cache checkpoint: {e}")
+    torch.save(model.state_dict(), checkpoint_path)
+    with open(meta_path, "w") as handle:
+        json.dump({**requested, "val_accuracy": round(accuracy, 4)}, handle, indent=2)
+    print(f"        Saved sequence classifier checkpoint: {checkpoint_path}")
     return model
 
 

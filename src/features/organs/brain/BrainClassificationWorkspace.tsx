@@ -10,8 +10,8 @@ import {
 } from 'lucide-react'
 import { RomanSection } from '../../../components/common/RomanSection'
 import { BrainRegionViewer } from './BrainRegionViewer'
-import { classifyBrainImage, getBrainHealth } from './brainApi'
-import type { BrainClassificationResult } from './brainTypes'
+import { classifyBrainImage, getBrainHealth, getBrainModelInfo } from './brainApi'
+import type { BrainClassificationResult, BrainModelInfo } from './brainTypes'
 import { TUMOR_DATA } from './tumorData'
 import type { OrganMetadata, Hotspot } from '../../../types/organ'
 import './BrainClassificationWorkspace.css'
@@ -84,12 +84,34 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const [result, setResult] = useState<BrainClassificationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [apiReady, setApiReady] = useState<boolean>(false)
+  const [modelInfo, setModelInfo] = useState<BrainModelInfo | null>(null)
+  const [serviceDetail, setServiceDetail] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    let cancelled = false
+
     getBrainHealth()
-      .then(() => setApiReady(true))
-      .catch(() => setApiReady(false))
+      .then((health) => {
+        if (cancelled) return
+        setApiReady(health.status === 'ok')
+        setServiceDetail(health.detail ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setApiReady(false)
+      })
+
+    getBrainModelInfo()
+      .then((info) => {
+        if (!cancelled) setModelInfo(info)
+      })
+      .catch(() => {
+        /* model copy falls back to static defaults below */
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +184,12 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
 
   const tumorInfo = result?.tumor_type ? TUMOR_DATA[result.tumor_type] : null
   const profile = organ?.clinicalProfile
+
+  const classCount = modelInfo?.num_classes ?? null
+  const classLabel = classCount === null ? 'multi-class' : `${classCount}-class`
+  const classCountLabel = classCount === null ? 'classes' : `${classCount} classes`
+  const inputLabel = modelInfo?.input_size ?? 'model-native'
+  const isSimulated = result?.simulated === true
 
   // Total sections count depends on whether inference results are loaded and view mode
   const totalSections =
@@ -428,7 +456,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                     <div className="film-action-bar">
                       <div className="film-meta-copy">
                         <span className="meta-title">{file?.name ?? 'Loaded Specimen'}</span>
-                        <span className="meta-sub">Input tensor resolved to 512×512 · Model ready for 39-class evaluation</span>
+                        <span className="meta-sub">Input tensor resolved to {inputLabel} · Model ready for {classLabel} evaluation</span>
                       </div>
 
                       <div className="film-actions">
@@ -443,7 +471,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                         >
                           <span>
                             <Sparkles size={15} />
-                            {isAnalyzing ? 'Evaluating 39 Classes…' : 'Run EfficientNetV2-B2 Differential'}
+                            {isAnalyzing ? `Evaluating ${classCountLabel}…` : 'Run EfficientNetV2-B2 Differential'}
                           </span>
                           <span className="arr" aria-hidden="true">↗</span>
                         </button>
@@ -452,6 +480,13 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 )}
               </div>
+
+              {!apiReady && serviceDetail && (
+                <div className="service-unavailable-banner" role="status">
+                  <span className="service-unavailable-title">Analysis service unavailable</span>
+                  <span className="service-unavailable-copy">{serviceDetail}</span>
+                </div>
+              )}
 
               {error && <div className="lightbox-error-banner">{error}</div>}
             </RomanSection>
@@ -463,13 +498,24 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                 <RomanSection
                   index={viewMode === 'all' ? 5 : 1}
                   of={totalSections}
-                  title="Diagnostica - 39-Class Histological Finding"
+                  title={`Diagnostica - ${classLabel} Histological Finding`}
                   className="sp7"
                 >
                   <div className="diagnostic-readout-card">
                     <div className="diag-header-block">
                       <span className="diag-eyebrow">Automated Differential Finding</span>
                       <h3 className="diag-headline">{result.predicted_class}</h3>
+                      {isSimulated && (
+                        <p className="simulated-result-flag" role="status">
+                          Simulated specimen preset. The analysis service was unreachable, so this
+                          differential was not computed from the uploaded image.
+                        </p>
+                      )}
+                      {result.model_trained === false && !isSimulated && (
+                        <p className="simulated-result-flag" role="status">
+                          Trained checkpoint not loaded — output is not clinically meaningful.
+                        </p>
+                      )}
                     </div>
 
                     <div className="diag-meta-strip">
@@ -501,7 +547,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                     </div>
 
                     <div className="differential-ranking">
-                      <span className="diff-header">Differential Ranking (Top 5 of 39 Classes)</span>
+                      <span className="diff-header">Differential Ranking (Top 5 of {classCount ?? result.top5.length})</span>
                       <div className="diff-rows-container">
                         {result.top5.map((pred, i) => (
                           <div key={pred.class} className="diff-row">
@@ -548,7 +594,11 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                           <div className="cam-glow-layer" />
                         </div>
                       )}
-                      <span className="scan-tag highlight">CAM (conv_head)</span>
+                      <span className="scan-tag highlight">
+                        {result.gradcam_base64
+                          ? `CAM (${result.explainability.layer})`
+                          : 'Illustrative overlay — no activation computed'}
+                      </span>
                     </div>
                   </div>
                 </RomanSection>
@@ -557,10 +607,14 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                 <RomanSection
                   index={viewMode === 'all' ? 7 : 3}
                   of={totalSections}
-                  title="Locus - Anatomical Localization & Stereotactic Centroid"
+                  title="Locus - Typical Presentation Sites & Approximate Centroid"
                   className="sp7"
                 >
-                  <BrainRegionViewer locations={result.locations_3d} />
+                  <BrainRegionViewer
+                    locations={result.locations_3d}
+                    basis={result.localization_basis}
+                    tumourType={result.tumor_type}
+                  />
                 </RomanSection>
 
                 {/* IX - Monograph */}
@@ -612,7 +666,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
         <div className="docs-callout-copy">
           <span className="docs-callout-eyebrow">Academic Benchmarks &amp; System Architecture</span>
           <p className="docs-callout-text">
-            Looking for Kaggle Tesla T4 training logs, convergence trajectories, 39-class confusion matrix, MNI stereotactic mapping, or FastAPI service specs?
+            Looking for grouped-split training logs, convergence trajectories, a {classLabel} confusion matrix, MNI stereotactic mapping, or FastAPI service specs?
           </p>
         </div>
         <Link to="/docs" className="docs-callout-btn">

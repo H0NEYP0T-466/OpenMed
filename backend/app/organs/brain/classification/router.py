@@ -23,8 +23,14 @@ from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
 from .brain_regions import LOCALIZATION_BASIS, map_prediction_to_3d
-from .label_space import CLASS_NAMES
-from .pipeline import BrainClassificationPipeline, ModelUnavailableError
+from .label_space import (
+    CLASS_NAMES,
+    LabelSpaceError,
+    label_space_path_for,
+    read_label_space,
+)
+from .model import MODEL_TAG
+from .pipeline import BrainClassificationPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +43,7 @@ ALLOWED_MAGIC = (b"\xff\xd8\xff", b"\x89PNG", b"RIFF")
 
 _pipeline: Optional[BrainClassificationPipeline] = None
 _pipeline_error: Optional[str] = None
+_pipeline_error_key: Optional[tuple[float, int]] = None
 _load_lock = asyncio.Lock()
 
 _dataset_summary_cache: Optional[dict[str, Any]] = None
@@ -84,33 +91,96 @@ def _dataset_summary() -> dict[str, Any]:
     return summary
 
 
+def _declared_label_space():
+    """Read the checkpoint's sidecar label file without loading any weights."""
+    path = checkpoint_path()
+    try:
+        return read_label_space(path)
+    except LabelSpaceError as exc:
+        logger.error("Unreadable label file: %s", exc)
+        return None
+
+
+def _checkpoint_identity(path: str) -> Optional[tuple[float, int]]:
+    try:
+        stat = os.stat(path)
+    except OSError:
+        return None
+    return (stat.st_mtime, stat.st_size)
+
+
+def preflight() -> tuple[bool, Optional[str], list[str]]:
+    """Validate the configured checkpoint cheaply, without loading the network.
+
+    Returns (usable, blocking_reason, warnings). Only structurally impossible
+    states block: the hard guarantee that head width and class names agree
+    belongs to `resolve_label_space`, which also accepts a correctly-paired
+    non-canonical model.
+    """
+    path = checkpoint_path()
+    warnings: list[str] = []
+
+    if not os.path.isfile(path):
+        return False, f"Brain classifier checkpoint not found at {path}.", warnings
+
+    if os.path.getsize(path) == 0:
+        return False, f"Brain classifier checkpoint at {path} is empty.", warnings
+
+    space = _declared_label_space()
+    if space is None:
+        warnings.append(
+            f"No label file beside {os.path.basename(path)}; class order is being "
+            "assumed from the canonical label space. Copy the .label_space.json "
+            "produced by training next to the checkpoint to verify it."
+        )
+    elif space.num_classes != len(CLASS_NAMES):
+        warnings.append(
+            f"{os.path.basename(label_space_path_for(path))} declares "
+            f"{space.num_classes} classes, differing from the {len(CLASS_NAMES)}-class "
+            "canonical brain label space. Serving binds names from the sidecar."
+        )
+
+    return True, None, warnings
+
+
 async def _get_pipeline() -> BrainClassificationPipeline:
     """Lazily build the singleton, failing closed with a recorded reason."""
-    global _pipeline, _pipeline_error
+    global _pipeline, _pipeline_error, _pipeline_error_key
 
     if _pipeline is not None:
         return _pipeline
-    if _pipeline_error is not None:
+
+    path = checkpoint_path()
+    identity = _checkpoint_identity(path)
+
+    if _pipeline_error is not None and _pipeline_error_key == identity:
         raise HTTPException(
             status_code=503,
             detail=f"Brain classifier unavailable: {_pipeline_error}",
         )
+    if _pipeline_error is not None and _pipeline_error_key != identity:
+        # The checkpoint was replaced or repaired since the failed attempt.
+        logger.info("Checkpoint changed since the last failure; retrying load.")
+        _pipeline_error = None
+        _pipeline_error_key = None
 
     async with _load_lock:
         if _pipeline is not None:
             return _pipeline
 
-        path = checkpoint_path()
         started = time.perf_counter()
         logger.info("Loading brain classification model from %s", path)
         try:
             _pipeline = await run_in_threadpool(
                 lambda: BrainClassificationPipeline(model_path=path)
             )
-        except ModelUnavailableError as exc:
-            _pipeline_error = str(exc)
-            logger.error("Brain model unavailable: %s", exc)
-            raise HTTPException(status_code=503, detail=f"{exc}") from exc
+        except Exception as exc:  # noqa: BLE001 - any load failure is fail-closed
+            _pipeline_error = str(exc) or type(exc).__name__
+            _pipeline_error_key = identity
+            logger.error("Brain model unavailable: %s", exc, exc_info=True)
+            raise HTTPException(
+                status_code=503, detail=f"Brain classifier unavailable: {_pipeline_error}"
+            ) from exc
 
         logger.info(
             "Brain model ready in %.2fs (classes=%d, trained=%s)",
@@ -161,12 +231,16 @@ class HealthResponse(BaseModel):
     status: Literal["ok", "unavailable"]
     model_loaded: bool
     trained_weights: bool
+    checkpoint_present: bool
     detail: Optional[str] = None
+    warnings: list[str] = Field(default_factory=list)
 
 
 class ModelInfoResponse(BaseModel):
     model_name: str
     model_tag: str
+    declared_model_tag: str
+    architecture_matches_declaration: bool
     num_classes: int
     class_names: list[str]
     input_size: str
@@ -251,20 +325,27 @@ async def get_model_info() -> ModelInfoResponse:
     if _pipeline is not None:
         info = _pipeline.model_info()
     else:
+        # Report what the checkpoint declares without loading weights, so the UI
+        # can show the real class count and metrics before the first inference.
+        declared = _declared_label_space()
         info = {
             "model_name": "EfficientNetV2-B2",
-            "model_tag": "tf_efficientnetv2_b2.in1k",
-            "num_classes": len(CLASS_NAMES),
-            "class_names": list(CLASS_NAMES),
-            "input_size": "pending first inference",
-            "label_space_source": "canonical",
+            "model_tag": (declared.model_tag if declared else "") or MODEL_TAG,
+            "declared_model_tag": (declared.model_tag if declared else "") or MODEL_TAG,
+            "architecture_matches_declaration": True,
+            "num_classes": declared.num_classes if declared else len(CLASS_NAMES),
+            "class_names": list(declared.class_names) if declared else list(CLASS_NAMES),
+            "input_size": "resolved on first inference",
+            "label_space_source": declared.source if declared else "canonical (unverified)",
             "trained_weights_loaded": False,
-            "metrics": {},
+            "metrics": declared.metrics if declared else {},
         }
 
     return ModelInfoResponse(
         model_name=info["model_name"],
         model_tag=info["model_tag"],
+        declared_model_tag=info["declared_model_tag"],
+        architecture_matches_declaration=info["architecture_matches_declaration"],
         num_classes=info["num_classes"],
         class_names=info["class_names"],
         input_size=info["input_size"],
@@ -278,16 +359,29 @@ async def get_model_info() -> ModelInfoResponse:
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
-    """Readiness probe reporting load state and any recorded failure reason."""
+    """Readiness probe reporting load state, and the reason when not ready."""
+    path = checkpoint_path()
+    present = os.path.isfile(path)
+
     if _pipeline is not None:
         return HealthResponse(
             status="ok",
             model_loaded=True,
             trained_weights=_pipeline.using_trained_weights,
+            checkpoint_present=True,
         )
+
+    usable, reason, warnings = preflight()
+    if _pipeline_error is not None:
+        usable, reason = False, _pipeline_error
+
     return HealthResponse(
-        status="unavailable",
+        status="ok" if usable else "unavailable",
         model_loaded=False,
         trained_weights=False,
-        detail=_pipeline_error or "Model has not been loaded yet.",
+        checkpoint_present=present,
+        detail=_pipeline_error
+        or reason
+        or "Checkpoint validated; the network loads on the first request.",
+        warnings=warnings,
     )

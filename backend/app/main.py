@@ -12,7 +12,7 @@ import logging
 import os
 import sys
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import AsyncIterator, ClassVar
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,13 +20,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.organs.brain.classification.router import checkpoint_path
 from app.organs.brain.classification.router import router as brain_router
 
-
 # ── Logging Setup ─────────────────────────────────────────────────────────
 
 class _ColorFormatter(logging.Formatter):
     """ANSI-coloured formatter — no external deps."""
 
-    _COLORS = {
+    _COLORS: ClassVar[dict[str, str]] = {
         "DEBUG": "\033[2;37m",       # dim white
         "INFO": "\033[92m",          # green
         "WARNING": "\033[93m",       # yellow

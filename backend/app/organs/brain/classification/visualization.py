@@ -15,7 +15,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import torch
 from sklearn.metrics import (
     auc,
     confusion_matrix,
@@ -59,26 +58,27 @@ def plot_training_curves(history: dict[str, Sequence[float]], save_dir: str) -> 
     epochs = range(1, len(history["train_loss"]) + 1)
     written = []
 
-    figure, axes = plt.subplots(1, 2, figsize=(14, 5))
-    axes[0].plot(epochs, history["train_loss"], label="Train loss")
-    axes[0].plot(epochs, history["val_loss"], label="Validation loss")
-    axes[0].set_title("Loss per epoch")
-    axes[0].set_xlabel("Epoch")
-    axes[0].set_ylabel("Loss")
-    axes[0].grid(True, alpha=0.3)
-    axes[0].legend()
+    figure, axes = plt.subplots(figsize=(10, 5))
+    axes.plot(epochs, history["train_loss"], label="Train loss")
+    axes.plot(epochs, history["val_loss"], label="Validation loss")
+    axes.set_title("Loss per epoch")
+    axes.set_xlabel("Epoch")
+    axes.set_ylabel("Loss")
+    axes.grid(True, alpha=0.3)
+    axes.legend()
+    written.append(_save(figure, save_dir, "loss_curves.png"))
 
-    axes[1].plot(epochs, history["train_acc"], label="Train accuracy")
-    axes[1].plot(epochs, history["val_acc"], label="Validation accuracy")
-    axes[1].set_title("Accuracy per epoch")
-    axes[1].set_xlabel("Epoch")
-    axes[1].set_ylabel("Accuracy")
-    axes[1].set_ylim(0.0, 1.05)
-    axes[1].grid(True, alpha=0.3)
-    axes[1].legend()
+    figure, axes = plt.subplots(figsize=(10, 5))
+    axes.plot(epochs, history["train_acc"], label="Train accuracy")
+    axes.plot(epochs, history["val_acc"], label="Validation accuracy")
+    axes.set_title("Accuracy per epoch")
+    axes.set_xlabel("Epoch")
+    axes.set_ylabel("Accuracy")
+    axes.set_ylim(0.0, 1.05)
+    axes.grid(True, alpha=0.3)
+    axes.legend()
+    written.append(_save(figure, save_dir, "accuracy_curves.png"))
 
-    figure.tight_layout()
-    written.append(_save(figure, save_dir, "loss_and_accuracy_curves.png"))
     return written
 
 

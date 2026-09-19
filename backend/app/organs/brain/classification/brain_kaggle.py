@@ -34,6 +34,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 try:
+    import visualization
     from dataset import BrainTumorDataset
     from label_space import label_space_path_for, save_label_space
     from model import (
@@ -44,8 +45,8 @@ try:
         get_scheduler,
     )
     from preprocessor import get_train_transform, get_val_transform
-    import visualization
 except ImportError:
+    from . import visualization
     from .dataset import BrainTumorDataset
     from .label_space import label_space_path_for, save_label_space
     from .model import (
@@ -56,7 +57,6 @@ except ImportError:
         get_scheduler,
     )
     from .preprocessor import get_train_transform, get_val_transform
-    from . import visualization
 
 logging.basicConfig(
     level=logging.INFO,
@@ -167,9 +167,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument(
-        "--grad_accum_steps", type=int, default=1, help="Effective batch multiplier"
-    )
     return parser.parse_args(argv)
 
 
@@ -303,14 +300,17 @@ def main(argv: list[str] | None = None) -> int:
             csv_handle.flush()
 
             markers = []
+            improved_monitor = False
             if val_loss < best_monitor:
                 best_monitor = val_loss
+                improved_monitor = True
                 torch.save(model.state_dict(), best_path)
                 save_label_space(best_path, class_names, model_tag=MODEL_TAG)
                 markers.append(f"best {MONITOR}={val_loss:.4f}")
             if val_acc > best_acc:
                 best_acc = val_acc
                 torch.save(model.state_dict(), best_acc_path)
+                save_label_space(best_acc_path, class_names, model_tag=MODEL_TAG)
                 markers.append(f"best val_acc={val_acc:.4f}")
 
             logger.info(
@@ -319,13 +319,16 @@ def main(argv: list[str] | None = None) -> int:
                 elapsed, ("| " + ", ".join(markers)) if markers else "",
             )
 
-            if not markers:
+            if improved_monitor:
+                patience_counter = 0
+            else:
                 patience_counter += 1
                 if patience_counter >= args.patience:
-                    logger.info("Early stopping at epoch %d (patience=%d)", epoch, args.patience)
+                    logger.info(
+                        "Early stopping at epoch %d (patience=%d on %s)",
+                        epoch, args.patience, MONITOR,
+                    )
                     break
-            else:
-                patience_counter = 0
 
     logger.info("Training finished in %.2f minutes.", (time.time() - started) / 60)
 

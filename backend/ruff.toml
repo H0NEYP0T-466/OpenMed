@@ -1,0 +1,37 @@
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = [
+    "E4", "E7", "E9", "F",   # pycodestyle errors + pyflakes
+    "I",                     # import order
+    "B",                     # bugbear
+    "SIM",                   # simplifiable
+    "C4",                    # comprehension
+    "PIE",                   # pet peeves
+    "RUF",                   # ruff-specific
+    "UP",                    # pyupgrade
+    "BLE",                   # blind except (documented where intentional)
+]
+ignore = [
+    # Legacy `typing.List/Dict/Optional` annotations in the research scripts.
+    "UP006", "UP007", "UP035", "UP045",
+    # `import torch.nn as nn` is the universal PyTorch convention.
+    "PLR0402",
+    # FastAPI declares dependencies as argument defaults.
+    "B008",
+    # Broad handlers here deliberately convert to a serviceable error; the
+    # per-site `noqa` markers stay valid once BLE001 is opted into elsewhere.
+    "RUF100",
+]
+
+[lint.per-file-ignores]
+# Standalone research/utility scripts keep their pragmatic style.
+"app/organs/brain/utils/*" = ["SIM", "C4", "E501", "BLE", "B007", "B905", "RUF059", "F841"]
+# The training entrypoint must extend sys.path before importing siblings so it
+# runs both as `python brain_kaggle.py` and as a package module.
+"app/organs/brain/classification/brain_kaggle.py" = ["E402"]
+"tests/*" = ["SIM", "B017", "B905"]
+
+[lint.isort]
+known-first-party = ["app"]

@@ -26,8 +26,9 @@ from torch.utils.data import Dataset
 logger = logging.getLogger(__name__)
 
 SIGNATURE_SIZE = 32
+CONTENT_SIZE = 64
 SERIES_CORRELATION_THRESHOLD = 0.90
-CACHE_FORMAT_VERSION = 1
+CACHE_FORMAT_VERSION = 2
 
 
 def _numeric_stem(relative_path: str) -> str:
@@ -45,13 +46,19 @@ def _sha256(path: str) -> str:
     return hasher.hexdigest()
 
 
+def _content_digest(array: np.ndarray) -> str:
+    return hashlib.sha256(np.ascontiguousarray(array).tobytes(order="C")).hexdigest()
+
+
+def _luminance_grid(path: str, size: int) -> np.ndarray:
+    with Image.open(path) as image:
+        gray = image.convert("L").resize((size, size), Image.Resampling.BILINEAR)
+    return np.asarray(gray, dtype=np.uint8)
+
+
 def _signature(path: str) -> list[float]:
     """Mean-removed, unit-normalised low-resolution luminance signature."""
-    with Image.open(path) as image:
-        gray = image.convert("L").resize(
-            (SIGNATURE_SIZE, SIGNATURE_SIZE), Image.Resampling.BILINEAR
-        )
-    array = np.asarray(gray, dtype=np.float32)
+    array = _luminance_grid(path, SIGNATURE_SIZE).astype(np.float32)
     array -= array.mean()
     norm = float(np.linalg.norm(array))
     if norm > 0:
@@ -59,13 +66,14 @@ def _signature(path: str) -> list[float]:
     return array.reshape(-1).tolist()
 
 
-def _probe_image(args: tuple[str, str]) -> tuple[str, str, list[float]]:
+def _probe_image(args: tuple[str, str]) -> tuple[str, str, list[float], str]:
     key, absolute = args
     try:
-        return key, _sha256(absolute), _signature(absolute)
+        content = _content_digest(_luminance_grid(absolute, CONTENT_SIZE))
+        return key, _sha256(absolute), _signature(absolute), content
     except Exception as exc:  # noqa: BLE001 - recorded and surfaced by caller
         logger.warning("Unreadable image during grouping probe: %s (%s)", key, exc)
-        return key, f"error:{exc}", []
+        return key, f"error:{exc}", [], ""
 
 
 class BrainTumorDataset(Dataset):
@@ -251,6 +259,18 @@ class BrainTumorDataset(Dataset):
         return torch.tensor(np.clip(weights, 0.2, 5.0), dtype=torch.float)
 
     @staticmethod
+    def build_group_ids(
+        json_path: str,
+        images_base: str,
+        keys: Sequence[str],
+        seed: int = 42,
+    ) -> list[str]:
+        """Group ids for `keys`, one group per source scan (see `build_case_groups`)."""
+        return build_case_groups(
+            json_path=json_path, images_base=images_base, keys=keys, seed=seed
+        )
+
+    @staticmethod
     def get_stratified_splits(
         data_root: str,
         test_size: float = 0.15,
@@ -282,7 +302,7 @@ class BrainTumorDataset(Dataset):
         assignment = _grouped_stratified_assign(group_ids, labels, targets, seed)
 
         buckets: dict[str, list[int]] = {"train": [], "val": [], "test": []}
-        for index, key in enumerate(keys):
+        for index in range(len(keys)):
             buckets[assignment[group_ids[index]]].append(index)
 
         _report_split_quality(keys, labels, group_ids, assignment, buckets)
@@ -317,7 +337,38 @@ def _cache_path_for(json_path: str) -> str:
     return os.path.join(os.path.dirname(json_path), ".case_group_cache.json")
 
 
-def _load_cache(json_path: str, keys: Sequence[str]) -> dict[str, dict[str, str]] | None:
+def _fingerprint(
+    json_path: str, images_base: str, keys: Sequence[str]
+) -> dict[str, Any]:
+    """Identity for the exact image set the cache was derived from.
+
+    Per-file size and mtime are hashed together rather than reduced to a max and
+    a sum, so a single replaced frame cannot hide inside an unchanged total.
+    Files that cannot be stat-ed are recorded explicitly instead of being
+    silently dropped from the digest.
+    """
+    hasher = hashlib.sha256()
+    unreadable = 0
+    for key in keys:
+        try:
+            stat = os.stat(os.path.join(images_base, key))
+        except OSError:
+            unreadable += 1
+            hasher.update(f"{key}|missing".encode())
+            continue
+        hasher.update(f"{key}|{stat.st_size}|{stat.st_mtime_ns}".encode())
+
+    return {
+        "manifest_mtime": os.path.getmtime(json_path),
+        "image_digest": hasher.hexdigest(),
+        "count": len(keys),
+        "unreadable": unreadable,
+    }
+
+
+def _load_cache(
+    json_path: str, keys: Sequence[str], fingerprint: dict[str, Any]
+) -> dict[str, dict[str, str]] | None:
     path = _cache_path_for(json_path)
     if not os.path.isfile(path):
         return None
@@ -330,7 +381,8 @@ def _load_cache(json_path: str, keys: Sequence[str]) -> dict[str, dict[str, str]
 
     if payload.get("format") != CACHE_FORMAT_VERSION:
         return None
-    if payload.get("manifest_mtime") != os.path.getmtime(json_path):
+    if payload.get("fingerprint") != fingerprint:
+        logger.info("Case-group cache is stale for this image set; recomputing.")
         return None
 
     records = payload.get("records", {})
@@ -351,9 +403,10 @@ def _probe_images(
     else:
         probed = [_probe_image(pair) for pair in pairs]
 
-    for key, digest, signature in probed:
+    for key, digest, signature, content in probed:
         results[key] = {
             "sha256": digest,
+            "content": content,
             "signature": base64_signature(signature),
         }
     return results
@@ -390,15 +443,15 @@ def build_case_groups(
     if workers is None:
         workers = min(8, os.cpu_count() or 1)
 
-    records = _load_cache(json_path, keys)
+    fingerprint = _fingerprint(json_path, images_base, keys)
+    records = _load_cache(json_path, keys, fingerprint)
     if records is None:
         logger.info("Computing image signatures for leakage-safe grouping...")
         records = _probe_images(images_base, keys, workers)
-        _write_cache(json_path, keys, records)
+        _write_cache(json_path, keys, records, fingerprint)
     else:
         logger.info("Reusing cached image signatures for grouping.")
 
-    digests = {key: records[key]["sha256"] for key in keys}
     signatures = {key: decode_signature(records[key]["signature"]) for key in keys}
 
     parent = {key: key for key in keys}
@@ -414,21 +467,39 @@ def build_case_groups(
         if root_a != root_b:
             parent[root_b] = root_a
 
-    by_digest: dict[str, list[str]] = defaultdict(list)
-    for key in keys:
-        digest = digests[key]
-        if digest and not digest.startswith("error:"):
-            by_digest[digest].append(key)
+    def union_by(field: str) -> list[list[str]]:
+        buckets: dict[str, list[str]] = defaultdict(list)
+        for key in keys:
+            value = records[key].get(field, "")
+            if value and not value.startswith("error:"):
+                buckets[value].append(key)
+        clusters = [members for members in buckets.values() if len(members) > 1]
+        for members in clusters:
+            for extra in members[1:]:
+                union(members[0], extra)
+        return clusters
 
-    duplicate_groups = [members for members in by_digest.values() if len(members) > 1]
-    for members in duplicate_groups:
-        for extra in members[1:]:
-            union(members[0], extra)
-    if duplicate_groups:
+    byte_clusters = union_by("sha256")
+    if byte_clusters:
         logger.warning(
             "Collapsed %d byte-identical duplicate clusters covering %d images.",
-            len(duplicate_groups),
-            sum(len(m) for m in duplicate_groups),
+            len(byte_clusters),
+            sum(len(m) for m in byte_clusters),
+        )
+
+    content_clusters = [
+        cluster
+        for cluster in union_by("content")
+        if cluster not in byte_clusters
+    ]
+    if content_clusters:
+        logger.warning(
+            "Collapsed %d further clusters (%d images) whose pixels are identical "
+            "at %dx%d despite differing bytes or filenames.",
+            len(content_clusters),
+            sum(len(m) for m in content_clusters),
+            CONTENT_SIZE,
+            CONTENT_SIZE,
         )
 
     by_stem: dict[str, list[str]] = defaultdict(list)
@@ -467,25 +538,38 @@ def build_case_groups(
 def _is_visual_series(
     members: Sequence[str], signatures: dict[str, np.ndarray]
 ) -> bool:
-    matrix = np.stack([signatures[key] for key in members])
-    if matrix.shape[0] < 2 or not np.any(matrix):
+    """True when consecutive frames of a named series are the same picture.
+
+    Adjacent pairs are the meaningful comparison: in a slice series the first and
+    last frames of a volume legitimately differ, so an all-pairs median would
+    reject exactly the long series this grouping exists to catch.
+    """
+    ordered = sorted(members, key=_numeric_suffix)
+    vectors = np.stack([signatures[key] for key in ordered])
+    if vectors.shape[0] < 2 or not np.any(vectors):
         return False
 
-    grams = matrix @ matrix.T
-    take_upper = np.triu_indices(matrix.shape[0], k=1)
-    pairwise = grams[take_upper]
-    if pairwise.size == 0:
-        return False
-    return float(np.median(pairwise)) >= SERIES_CORRELATION_THRESHOLD
+    adjacent = np.sum(vectors[1:] * vectors[:-1], axis=1)
+    return float(np.median(adjacent)) >= SERIES_CORRELATION_THRESHOLD
+
+
+def _numeric_suffix(relative_path: str) -> tuple[int, str]:
+    """Trailing integer of a filename, so frames sort in acquisition order."""
+    stem = os.path.splitext(os.path.basename(relative_path))[0]
+    trimmed = stem.rstrip("0123456789")
+    tail = stem[len(trimmed) :]
+    return (int(tail) if tail else 0, stem)
 
 
 def _write_cache(
-    json_path: str, keys: Sequence[str], records: dict[str, dict[str, str]]
+    json_path: str,
+    keys: Sequence[str],
+    records: dict[str, dict[str, str]],
+    fingerprint: dict[str, Any],
 ) -> None:
     payload = {
         "format": CACHE_FORMAT_VERSION,
-        "manifest_mtime": os.path.getmtime(json_path),
-        "count": len(keys),
+        "fingerprint": fingerprint,
         "records": {key: records[key] for key in keys},
     }
     try:
@@ -506,7 +590,7 @@ def _grouped_stratified_assign(
     group_sizes: Counter[str] = Counter()
     group_label: dict[str, str] = {}
 
-    for group, label in zip(group_ids, labels):
+    for group, label in zip(group_ids, labels, strict=True):
         group_sizes[group] += 1
         if group in group_label:
             continue
@@ -565,7 +649,7 @@ def report_label_conflicts(
     the two copies is mislabelled.
     """
     seen: dict[str, list[str]] = defaultdict(list)
-    for group, label in zip(group_ids, labels):
+    for group, label in zip(group_ids, labels, strict=True):
         if label not in seen[group]:
             seen[group].append(label)
     return {group: names for group, names in seen.items() if len(names) > 1}
@@ -578,17 +662,28 @@ def _report_split_quality(
     assignment: dict[str, str],
     buckets: dict[str, list[int]],
 ) -> None:
-    seen: dict[str, str] = {}
-    crossings = 0
-    for group, index in zip(group_ids, range(len(keys))):
-        split = assignment[group]
-        if group in seen and seen[group] != split:
-            crossings += 1
-        seen[group] = split
+    """Verify isolation from the realised per-image assignment, not the intent."""
+    split_of_index: dict[int, str] = {}
+    for name, indices in buckets.items():
+        for index in indices:
+            split_of_index[index] = name
+
+    missing = set(range(len(keys))) - set(split_of_index)
+    if missing:
+        raise RuntimeError(
+            f"{len(missing)} sample(s) were not assigned to any split."
+        )
+
+    splits_per_group: dict[str, set[str]] = defaultdict(set)
+    for index, group in enumerate(group_ids):
+        splits_per_group[group].add(split_of_index[index])
+
+    offending = {group: splits for group, splits in splits_per_group.items() if len(splits) > 1}
+    leaked_samples = sum(group_ids.count(group) for group in offending)
 
     per_class: dict[str, Counter[str]] = defaultdict(Counter)
     for index, label in enumerate(labels):
-        per_class[label][assignment[group_ids[index]]] += 1
+        per_class[label][split_of_index[index]] += 1
 
     stragglers = [
         label
@@ -601,8 +696,8 @@ def _report_split_quality(
         len(buckets["train"]),
         len(buckets["val"]),
         len(buckets["test"]),
-        len(set(group_ids)),
-        crossings,
+        len(splits_per_group),
+        len(offending),
     )
     if stragglers:
         logger.warning(
@@ -611,7 +706,9 @@ def _report_split_quality(
             len(stragglers),
             ", ".join(sorted(stragglers)[:5]),
         )
-    if crossings:
+    if offending:
+        examples = ", ".join(sorted(offending)[:3])
         raise RuntimeError(
-            "Grouped split failed isolation invariant; refusing to train on leaked data."
+            f"{len(offending)} source group(s) covering {leaked_samples} sample(s) "
+            f"span multiple splits; refusing to train on leaked data. Examples: {examples}"
         )

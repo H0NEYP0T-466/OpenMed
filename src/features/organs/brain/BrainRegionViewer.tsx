@@ -4,18 +4,29 @@ import type { BrainRegion3D } from './brainTypes'
 
 interface BrainRegionViewerProps {
   readonly locations: readonly BrainRegion3D[]
+  readonly basis?: string
+  readonly tumourType?: string
 }
 
-export const BrainRegionViewer: React.FC<BrainRegionViewerProps> = ({ locations }) => {
+export const BrainRegionViewer: React.FC<BrainRegionViewerProps> = ({
+  locations,
+  basis,
+  tumourType,
+}) => {
   const [selectedIdx, setSelectedIdx] = useState<number>(0)
 
   if (!locations || locations.length === 0) {
+    const normal = tumourType === 'Normal'
     return (
       <div className="locus-empty-card">
         <MapPin size={20} className="locus-empty-icon" />
-        <span className="locus-empty-title">Diffuse / Unlocalized Pathology</span>
+        <span className="locus-empty-title">
+          {normal ? 'No Lesion Flagged' : 'Diffuse / Unlocalised Pathology'}
+        </span>
         <span className="locus-empty-sub">
-          Lesion demonstrates infiltrative subcortical distribution without a single discrete focal centroid.
+          {normal
+            ? 'The classifier returned a no-tumour label, so no anatomical site is reported. Slice-level classification cannot exclude pathology.'
+            : 'No representative presentation site is registered for this finding, so no anatomical centroid is shown.'}
         </span>
       </div>
     )
@@ -60,16 +71,16 @@ export const BrainRegionViewer: React.FC<BrainRegionViewerProps> = ({ locations 
         </div>
 
         <div className="locus-likelihood-badge">
-          <span className="likelihood-label">Involvement Confidence</span>
+          <span className="likelihood-label">Typical-site Prior</span>
           <span className="likelihood-num">{Math.round(activeRegion.probability * 100)}%</span>
         </div>
       </div>
 
-      {/* Stereotactic MNI Coordinates Matrix */}
+      {/* Approximate MNI Centroid (population template) */}
       <div className="stereotactic-coords-box">
         <div className="coords-header">
           <Crosshair size={13} className="coords-icon" />
-          <span className="coords-title">Stereotactic MNI Coordinates (Centroid)</span>
+          <span className="coords-title">Approximate MNI Centroid (population template)</span>
         </div>
 
         <div className="coords-axes-grid">
@@ -110,6 +121,10 @@ export const BrainRegionViewer: React.FC<BrainRegionViewerProps> = ({ locations 
             'Lesion centroid localized in subcortical white matter. Surrounding eloquent cortex and white matter tracts require surgical navigation margin verification.'}
         </p>
       </div>
+
+      {basis && (
+        <p className="locus-basis-note">{basis}</p>
+      )}
     </div>
   )
 }

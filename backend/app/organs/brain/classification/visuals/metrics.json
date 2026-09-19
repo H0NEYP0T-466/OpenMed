@@ -1,0 +1,17 @@
+{
+  "model_tag": "tf_efficientnetv2_b2.in1k",
+  "num_classes": 42,
+  "seed": 42,
+  "monitor": "val_loss",
+  "best_val_loss": 0.813065,
+  "best_val_acc": 0.813667,
+  "test_loss": 1.463144,
+  "test_acc": 0.727087,
+  "macro_auc_ovr": 0.974088,
+  "splits": {
+    "train": 11665,
+    "val": 2517,
+    "test": 2444
+  },
+  "grouping": "source-scan groups with byte-identical duplicates collapsed"
+}

@@ -10,14 +10,12 @@ Computes SHA-256 cryptographic hashes and DCT-based pHash perceptual hashes acro
   5. JSON registry integrity (verifying DATA.json 1-to-1 sync with disk)
 """
 
-import os
-import sys
-import json
-import hashlib
 import argparse
-from pathlib import Path
+import hashlib
+import json
+import os
 from collections import defaultdict
-from typing import Dict, List, Tuple, Set, Any
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import scipy.fftpack
@@ -95,7 +93,7 @@ class DatasetDedupTester:
         if not os.path.exists(self.data_json_path):
             raise FileNotFoundError(f"DATA.json not found at: {self.data_json_path}")
 
-        with open(self.data_json_path, "r") as f:
+        with open(self.data_json_path) as f:
             self.records = json.load(f)
 
         print(f"       Indexed records in DATA.json: {len(self.records):,d}")
@@ -293,7 +291,7 @@ class DatasetDedupTester:
     # --------------------------------------------------------------------------
     def test_intraclass_near_duplicates(self) -> Tuple[bool, List[Dict[str, Any]]]:
         print("\n" + "=" * 72)
-        print(f" TEST 4: Intra-Class Near-Duplicates (pHash Hamming distance == 0)")
+        print(" TEST 4: Intra-Class Near-Duplicates (pHash Hamming distance == 0)")
         print("=" * 72)
 
         by_class: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
@@ -346,14 +344,14 @@ class DatasetDedupTester:
 
         if os.path.exists(cache_path):
             print(f"       Loading archive hashes from cache: {cache_path}")
-            with open(cache_path, "r") as f:
+            with open(cache_path) as f:
                 c_data = json.load(f)
                 archive_shas = set(c_data["shas"])
                 archive_phashes = c_data["phashes"]
         else:
             print("       Indexing entire 12,626 archive hashes (one-time setup)...")
             archive_images_base = os.path.join(self.archive_root, "Images_", "Images_")
-            with open(archive_json_path, "r") as f:
+            with open(archive_json_path) as f:
                 archive_data = json.load(f)
 
             for rel_k in archive_data.keys():
@@ -391,7 +389,7 @@ class DatasetDedupTester:
                         overlap.append({
                             "filename": rec["filename"],
                             "class": rec["class"],
-                            "reason": f"Near-identical pHash visual duplicate with existing archive (dist <= 1)",
+                            "reason": "Near-identical pHash visual duplicate with existing archive (dist <= 1)",
                         })
                         break
 

@@ -34,7 +34,7 @@ def to_mni_mm(coordinates: list[float]) -> list[float]:
     """Convert a normalised [-1, 1]^3 centroid to approximate MNI millimetres."""
     return [
         round(float(value) * axis, 1)
-        for value, axis in zip(coordinates, MNI_SEMI_AXES_MM)
+        for value, axis in zip(coordinates, MNI_SEMI_AXES_MM, strict=True)
     ]
 
 
@@ -208,7 +208,7 @@ BRAIN_REGIONS_3D: dict[str, dict] = {
     },
     "sellar-suprasellar": {
         "name": "sellar-suprasellar",
-        "display_name": "Sellar–Suprasellar",
+        "display_name": "Sellar-Suprasellar",
         "coordinates_3d": [0.0, 0.11, -0.20],
         "color": "#e8b930",
         "lobe": "Sellar",

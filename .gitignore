@@ -71,3 +71,8 @@ data/
 .env.*
 !.env.example
 .shots/
+
+# Archived old artifacts and models
+**/projec_dustbin/**
+projec_dustbin/
+
