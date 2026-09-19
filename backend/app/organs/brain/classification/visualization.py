@@ -111,42 +111,42 @@ def plot_gradcam_samples(model, dataset, device, class_names, save_dir, num_samp
         param.requires_grad = True
         
     target_layer = model.conv_head
-    grad_cam = GradCAM(model, target_layer)
-    
     fig, axes = plt.subplots(2, 4, figsize=(16, 8))
-    
     indices = np.random.choice(len(dataset), min(num_samples, len(dataset)), replace=False)
     
-    for i, idx in enumerate(indices):
-        if i >= 8: break
-        
-        img_tensor, label, _ = dataset[idx]
-        img_input = img_tensor.unsqueeze(0).to(device)
-        img_input.requires_grad = True
-        
-        cam = grad_cam.generate(img_input, label)
-        
-        img_np = img_tensor.numpy().transpose((1, 2, 0))
-        mean = np.array([0.485, 0.456, 0.406])
-        std = np.array([0.229, 0.224, 0.225])
-        img_np = std * img_np + mean
-        img_np = np.clip(img_np, 0, 1)
-        
-        if len(cam.shape) == 2:
-            cam = cv2.resize(cam, (img_np.shape[1], img_np.shape[0]))
-            heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
-            heatmap = np.float32(heatmap) / 255
-            heatmap = heatmap[:, :, ::-1] # BGR to RGB
-            overlay = heatmap + np.float32(img_np)
-            overlay = overlay / np.max(overlay)
-        else:
-            overlay = img_np
+    with GradCAM(model, target_layer) as grad_cam:
+        for i, idx in enumerate(indices):
+            if i >= 8: break
             
-        ax = axes[i // 4, i % 4]
-        ax.imshow(overlay)
-        ax.set_title(f"Class: {class_names[label]}")
-        ax.axis('off')
-        
+            img_tensor, label, _ = dataset[idx]
+            img_input = img_tensor.unsqueeze(0).to(device)
+            img_input.requires_grad = True
+            
+            cam = grad_cam.generate(img_input, label)
+            
+            img_np = img_tensor.numpy().transpose((1, 2, 0))
+            mean = np.array([0.485, 0.456, 0.406])
+            std = np.array([0.229, 0.224, 0.225])
+            img_np = std * img_np + mean
+            img_np = np.clip(img_np, 0, 1)
+            
+            if len(cam.shape) == 2:
+                cam = cv2.resize(cam, (img_np.shape[1], img_np.shape[0]))
+                heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
+                heatmap = np.float32(heatmap) / 255
+                heatmap = heatmap[:, :, ::-1] # BGR to RGB
+                overlay = heatmap + np.float32(img_np)
+                max_val = np.max(overlay)
+                if max_val > 0:
+                    overlay = overlay / max_val
+            else:
+                overlay = img_np
+                
+            ax = axes[i // 4, i % 4]
+            ax.imshow(overlay)
+            ax.set_title(f"Class: {class_names[label]}", fontsize=9)
+            ax.axis('off')
+            
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, 'gradcam_samples.png'))
     plt.close()
