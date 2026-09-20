@@ -3,7 +3,7 @@ node_modules/
 dist/
 dist-ssr/
 *.local
-
+For_Agents/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

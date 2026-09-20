@@ -218,16 +218,26 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def write_split_manifest(path: str, dataset_root: str, splits: dict[str, list[int]]) -> int:
-    """Record every sample with its split assignment so results stay auditable."""
-    json_path, _ = BrainTumorDataset.locate_data_and_images(dataset_root)
+    """Record every sample with its split and source-group assignment.
+
+    The `group_id` column makes the manifest self-auditable: a reviewer can
+    verify split isolation from this file alone, without re-deriving groups
+    under whatever grouping code exists later.
+    """
+    json_path, images_base = BrainTumorDataset.locate_data_and_images(dataset_root)
     with open(json_path) as handle:
         raw = json.load(handle)
     keys = sorted(key for key in raw if not key.endswith(BrainTumorDataset.MASK_SUFFIX))
+    group_of = dict(
+        zip(keys, BrainTumorDataset.build_group_ids(json_path, images_base, keys), strict=True)
+    )
 
     written = 0
     with open(path, "w", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["relative_path", "class", "tumor_type", "sequence", "split"])
+        writer.writerow(
+            ["relative_path", "class", "tumor_type", "sequence", "split", "group_id"]
+        )
         for name, indices in splits.items():
             for index in indices:
                 key = keys[index]
@@ -239,6 +249,7 @@ def write_split_manifest(path: str, dataset_root: str, splits: dict[str, list[in
                         meta.get("tumor_type", ""),
                         meta.get("sequence", ""),
                         name,
+                        group_of[key],
                     ]
                 )
                 written += 1
