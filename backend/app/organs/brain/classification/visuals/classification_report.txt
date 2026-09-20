@@ -1,62 +1,30 @@
 OpenMed Brain Classification - Evaluation Report
 ============================================================
-Test accuracy: 0.7271
-Test loss    : 1.4631
+Test accuracy: 0.9287
+Test loss    : 0.2841
 Model        : tf_efficientnetv2_b2.in1k
 Monitor      : val_loss
 Seed         : 42
-Train/Val/Test: 11665/2517/2444
-Macro AUC (OvR): 0.9741
+Train/Val/Test: 7809/1623/1696
+Macro AUC (OvR): 0.9913
+Regularisation: drop_path=0.15, mixup=0.1, cutmix=0.2, randaugment=rand-m5-mstd0.5-inc1, ema=0.999, label_smoothing=0.1
 
 Protocol: splits are grouped by source scan and byte-identical
 duplicates are collapsed, so no image group appears in two splits.
 
-                                             precision    recall  f1-score   support
+                                          precision    recall  f1-score   support
 
-                             Astrocytoma T1     0.9437    0.6091    0.7403       110
-                           Astrocytoma T1C+     0.8532    0.7949    0.8230       117
-                             Astrocytoma T2     0.7273    0.6588    0.6914        85
-  Dysembryoplastic Neuroepithelial Tumor T1     0.7273    0.8889    0.8000         9
-Dysembryoplastic Neuroepithelial Tumor T1C+     0.5000    0.6471    0.5641        17
-  Dysembryoplastic Neuroepithelial Tumor T2     0.5556    0.4545    0.5000        11
-              Ependymoma - Subependymoma T1     0.8400    0.9767    0.9032        43
-            Ependymoma - Subependymoma T1C+     0.7761    0.7536    0.7647        69
-              Ependymoma - Subependymoma T2     0.9643    0.6279    0.7606        43
-                           Ganglioglioma T1     0.0000    0.0000    0.0000         6
-                         Ganglioglioma T1C+     0.2667    0.5714    0.3636         7
-                           Ganglioglioma T2     0.8182    1.0000    0.9000         9
-                               Germinoma T1     0.0000    0.0000    0.0000        12
-                             Germinoma T1C+     0.7333    0.7333    0.7333        15
-                               Germinoma T2     0.8750    0.5833    0.7000        12
-                            Glioblastoma T1     0.1600    0.0930    0.1176        86
-                          Glioblastoma T1C+     0.4388    0.6719    0.5309        64
-                            Glioblastoma T2     0.6667    0.7111    0.6882        45
-                      Hemangiopericytoma T1     0.1429    0.1053    0.1212        19
-                    Hemangiopericytoma T1C+     0.9032    0.4746    0.6222        59
-                      Hemangiopericytoma T2     0.7143    0.8333    0.7692        18
-                         Medulloblastoma T1     0.8462    0.9706    0.9041        34
-                       Medulloblastoma T1C+     0.9783    0.9574    0.9677        47
-                         Medulloblastoma T2     0.8750    0.8974    0.8861        39
-                              Meningioma T1     0.4839    0.7353    0.5837       102
-                            Meningioma T1C+     0.6519    0.5789    0.6132       152
-                              Meningioma T2     0.7901    0.7711    0.7805        83
-                             Neurocytoma T1     0.9286    0.8125    0.8667        16
-                           Neurocytoma T1C+     0.6389    1.0000    0.7797        23
-                             Neurocytoma T2     0.8235    0.8235    0.8235        17
-                                  Normal T1     0.8624    0.7581    0.8069       124
-                                Normal T1C+     0.7248    0.8634    0.7880       183
-                                  Normal T2     0.8081    0.8081    0.8081       172
-                       Oligodendroglioma T1     0.5692    0.8409    0.6789        44
-                     Oligodendroglioma T1C+     0.8000    0.5714    0.6667        42
-                       Oligodendroglioma T2     0.6364    0.7778    0.7000        27
-                               Pituitary T1     0.5682    0.7353    0.6410        34
-                             Pituitary T1C+     0.9333    0.8412    0.8849       233
-                               Pituitary T2     0.4634    0.5938    0.5205        32
-                              Schwannoma T1     0.6711    0.9444    0.7846        54
-                            Schwannoma T1C+     0.8267    0.7381    0.7799        84
-                              Schwannoma T2     0.8039    0.8913    0.8454        46
+                        Germ Cell Tumors     0.7955    0.8140    0.8046        43
+                                 Gliomas     0.9658    0.9216    0.9431       306
+                         Medulloblastoma     0.8174    0.8704    0.8430       108
+                   Meningothelial Tumors     0.9881    0.9121    0.9486       273
+ Mesenchymal (Non-Meningothelial Tumors)     0.8900    0.9368    0.9128        95
+Mixed Neuronal and Neuronal-Glial Tumors     0.8182    0.9065    0.8601       139
+                                  Normal     0.9842    0.9483    0.9659       329
+                               Pituitary     0.9551    1.0000    0.9770       255
+                              Schwannoma     0.8581    0.8986    0.8779       148
 
-                                   accuracy                         0.7271      2444
-                                  macro avg     0.6736    0.6928    0.6715      2444
-                               weighted avg     0.7382    0.7271    0.7228      2444
+                                accuracy                         0.9287      1696
+                               macro avg     0.8969    0.9120    0.9037      1696
+                            weighted avg     0.9318    0.9287    0.9294      1696
 

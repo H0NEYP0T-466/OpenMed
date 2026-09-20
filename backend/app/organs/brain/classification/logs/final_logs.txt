@@ -1,0 +1,105 @@
+[09:32:23] [INFO] [brain_kaggle] ====================================================================
+[09:32:23] [INFO] [brain_kaggle]   OpenMed Brain Classification - training run
+[09:32:23] [INFO] [brain_kaggle] ====================================================================
+[09:32:23] [INFO] [brain_kaggle]   device=cuda  seed=42  batch=32  epochs=75  lr=0.0005
+[09:32:23] [INFO] [brain_kaggle]   gpu=Tesla T4 (15.6 GB)
+[09:32:23] [INFO] [brain_kaggle]   data_root=/kaggle/input/datasets/h0neyp0t/brain-fyp
+[09:32:23] [INFO] [brain_kaggle]   output_dir=/kaggle/working
+[09:32:23] [INFO] [brain_kaggle] ====================================================================
+[09:32:45] [INFO] [dataset] Computing image signatures for leakage-safe grouping...
+[09:33:28] [INFO] [dataset] Grouping resolved 11128 images into 8104 source groups (230 verified series, 18 shared-prefix stems rejected, 12 independent-class stems kept unmerged).
+[09:33:28] [INFO] [dataset] Splits created: Train=7809, Val=1623, Test=1696 | groups=8104 | cross-split leaks=0
+[09:33:31] [INFO] [dataset] Reusing cached image signatures for grouping.
+[09:33:31] [INFO] [dataset] Grouping resolved 11128 images into 8104 source groups (230 verified series, 18 shared-prefix stems rejected, 12 independent-class stems kept unmerged).
+[09:33:31] [INFO] [brain_kaggle] Split manifest with 11128 rows written to /kaggle/working/artifacts/split_manifest.csv
+[09:33:32] [INFO] [dataset] Loaded dataset with 7809 samples. (9 classes, folder layout)
+[09:33:32] [INFO] [timm.models._builder] Loading pretrained weights from Hugging Face hub (timm/tf_efficientnetv2_b2.in1k)
+[09:33:32] [INFO] [httpx] HTTP Request: HEAD https://huggingface.co/timm/tf_efficientnetv2_b2.in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[09:33:32] [WARNING] [huggingface_hub.utils._http] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[09:33:32] [INFO] [httpx] HTTP Request: GET https://huggingface.co/api/models/timm/tf_efficientnetv2_b2.in1k/xet-read-token/b8fba01d75a7934f019a9250378cf041afa5cd20 "HTTP/1.1 200 OK"
+model.safetensors: 100%|███████████████████| 40.8M/40.8M [00:01<00:00, 32.9MB/s]
+[09:33:33] [INFO] [timm.models._hub] [timm/tf_efficientnetv2_b2.in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+[09:33:33] [INFO] [timm.models._builder] Missing keys (classifier.weight, classifier.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+[09:33:33] [INFO] [preprocessor] Resolved train transform config: {'input_size': (3, 208, 208), 'interpolation': 'bicubic', 'mean': (0.485, 0.456, 0.406), 'std': (0.229, 0.224, 0.225), 'crop_pct': 0.89, 'crop_mode': 'center', 'auto_augment': 'rand-m5-mstd0.5-inc1'}
+[09:33:33] [INFO] [preprocessor] Resolved minority train transform config: {'input_size': (3, 208, 208), 'interpolation': 'bicubic', 'mean': (0.485, 0.456, 0.406), 'std': (0.229, 0.224, 0.225), 'crop_pct': 0.89, 'crop_mode': 'center', 'auto_augment': 'rand-m7-mstd0.5-inc1', 'scale': (0.7, 1.0), 'hflip': 0.5, 'vflip': 0.2}
+[09:33:34] [INFO] [dataset] Loaded dataset with 7809 samples. (9 classes, folder layout)
+[09:33:34] [INFO] [preprocessor] Resolved val transform config: {'input_size': (3, 208, 208), 'interpolation': 'bicubic', 'mean': (0.485, 0.456, 0.406), 'std': (0.229, 0.224, 0.225), 'crop_pct': 0.89, 'crop_mode': 'center'}
+[09:33:34] [INFO] [dataset] Loaded dataset with 1623 samples. (9 classes, folder layout)
+[09:33:34] [INFO] [preprocessor] Resolved val transform config: {'input_size': (3, 208, 208), 'interpolation': 'bicubic', 'mean': (0.485, 0.456, 0.406), 'std': (0.229, 0.224, 0.225), 'crop_pct': 0.89, 'crop_mode': 'center'}
+[09:33:34] [INFO] [dataset] Loaded dataset with 1696 samples. (9 classes, folder layout)
+[09:33:35] [INFO] [brain_kaggle] Regularisation: drop_path=0.15 mixup=0.10 cutmix=0.20 auto_augment=rand-m5-mstd0.5-inc1 ema_decay=0.999 label_smoothing=0.1
+[09:33:35] [INFO] [brain_kaggle] Training with val_loss as the checkpoint monitor.
+[09:34:39] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:34:39] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:34:39] [INFO] [brain_kaggle] Epoch 01/75 | train 2.1645 / 0.3102 | val 1.4648 / 0.4886 | 63.8s | best val_loss=1.4648 (raw), best val_acc=0.4886
+[09:35:42] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:35:42] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:35:42] [INFO] [brain_kaggle] Epoch 02/75 | train 1.5869 / 0.5067 | val 1.0049 / 0.6556 | 63.4s | best val_loss=1.0049 (raw), best val_acc=0.6556
+[09:36:46] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:36:46] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:36:46] [INFO] [brain_kaggle] Epoch 03/75 | train 1.3530 / 0.5900 | val 0.7670 / 0.7270 | 63.4s | best val_loss=0.7670 (raw), best val_acc=0.7270
+[09:37:49] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:37:49] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:37:49] [INFO] [brain_kaggle] Epoch 04/75 | train 1.1936 / 0.6493 | val 0.7162 / 0.7554 | 62.5s | best val_loss=0.7162 (raw), best val_acc=0.7554
+[09:38:51] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:38:51] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:38:51] [INFO] [brain_kaggle] Epoch 05/75 | train 1.0528 / 0.7181 | val 0.6374 / 0.8028 | 62.3s | best val_loss=0.6374 (raw), best val_acc=0.8028
+[09:39:54] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:39:54] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:39:54] [INFO] [brain_kaggle] Epoch 06/75 | train 0.9796 / 0.7423 | val 0.4656 / 0.8577 | 62.8s | best val_loss=0.4656 (raw), best val_acc=0.8577
+[09:40:57] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:40:57] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:40:57] [INFO] [brain_kaggle] Epoch 07/75 | train 0.9311 / 0.7528 | val 0.4515 / 0.8743 | 62.8s | best val_loss=0.4515 (raw), best val_acc=0.8743
+[09:42:00] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:42:00] [INFO] [brain_kaggle] Epoch 08/75 | train 0.9079 / 0.7702 | val 0.4469 / 0.8657 | 62.8s | best val_loss=0.4469 (raw)
+[09:43:03] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:43:03] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:43:03] [INFO] [brain_kaggle] Epoch 09/75 | train 0.8866 / 0.7864 | val 0.3814 / 0.8922 | 62.5s | best val_loss=0.3814 (raw), best val_acc=0.8922
+[09:44:06] [INFO] [brain_kaggle] Epoch 10/75 | train 0.8542 / 0.7996 | val 0.4067 / 0.8879 | 62.6s 
+[09:45:08] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:45:08] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:45:08] [INFO] [brain_kaggle] Epoch 11/75 | train 0.8434 / 0.7985 | val 0.3600 / 0.8953 | 62.3s | best val_loss=0.3600 (ema), best val_acc=0.8953
+[09:46:12] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:46:12] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:46:12] [INFO] [brain_kaggle] Epoch 12/75 | train 0.8604 / 0.7679 | val 0.3066 / 0.9217 | 63.4s | best val_loss=0.3066 (ema), best val_acc=0.9217
+[09:47:14] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:47:14] [INFO] [brain_kaggle] Epoch 13/75 | train 0.8463 / 0.7952 | val 0.2702 / 0.9144 | 62.4s | best val_loss=0.2702 (ema)
+[09:48:17] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:48:17] [INFO] [brain_kaggle] Epoch 14/75 | train 0.8429 / 0.7810 | val 0.2517 / 0.9193 | 62.8s | best val_loss=0.2517 (ema)
+[09:49:20] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:49:20] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:49:20] [INFO] [brain_kaggle] Epoch 15/75 | train 0.8053 / 0.7942 | val 0.2381 / 0.9267 | 62.6s | best val_loss=0.2381 (ema), best val_acc=0.9267
+[09:50:22] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[09:50:23] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:50:23] [INFO] [brain_kaggle] Epoch 16/75 | train 0.7875 / 0.8139 | val 0.2295 / 0.9341 | 62.3s | best val_loss=0.2295 (ema), best val_acc=0.9341
+[09:51:25] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[09:51:25] [INFO] [brain_kaggle] Epoch 17/75 | train 0.8283 / 0.8019 | val 0.2314 / 0.9372 | 62.5s | best val_acc=0.9372
+[09:52:28] [INFO] [brain_kaggle] Epoch 18/75 | train 0.7850 / 0.8356 | val 0.2344 / 0.9359 | 62.4s 
+[09:53:31] [INFO] [brain_kaggle] Epoch 19/75 | train 0.7671 / 0.8261 | val 0.2461 / 0.9298 | 63.0s 
+[09:54:33] [INFO] [brain_kaggle] Epoch 20/75 | train 0.7583 / 0.8619 | val 0.2446 / 0.9304 | 62.5s 
+[09:55:36] [INFO] [brain_kaggle] Epoch 21/75 | train 0.7665 / 0.8274 | val 0.2387 / 0.9304 | 62.7s 
+[09:56:38] [INFO] [brain_kaggle] Epoch 22/75 | train 0.7664 / 0.8289 | val 0.2412 / 0.9335 | 62.4s 
+[09:57:41] [INFO] [brain_kaggle] Epoch 23/75 | train 0.7500 / 0.8258 | val 0.2417 / 0.9353 | 62.9s 
+[09:58:44] [INFO] [brain_kaggle] Epoch 24/75 | train 0.7048 / 0.8480 | val 0.2442 / 0.9335 | 62.8s 
+[09:59:47] [INFO] [brain_kaggle] Epoch 25/75 | train 0.7658 / 0.8178 | val 0.2518 / 0.9254 | 62.8s 
+[10:00:50] [INFO] [brain_kaggle] Epoch 26/75 | train 0.7649 / 0.8178 | val 0.2497 / 0.9335 | 62.8s 
+[10:01:52] [INFO] [brain_kaggle] Epoch 27/75 | train 0.7289 / 0.8231 | val 0.2500 / 0.9304 | 62.6s 
+[10:02:55] [INFO] [brain_kaggle] Epoch 28/75 | train 0.7102 / 0.8537 | val 0.2477 / 0.9310 | 62.6s 
+[10:04:01] [INFO] [brain_kaggle] Epoch 29/75 | train 0.7001 / 0.8609 | val 0.2451 / 0.9335 | 65.8s 
+[10:05:07] [INFO] [brain_kaggle] Epoch 30/75 | train 0.7116 / 0.8367 | val 0.2470 / 0.9328 | 66.3s 
+[10:06:10] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_acc.label_space.json
+[10:06:10] [INFO] [brain_kaggle] Epoch 31/75 | train 0.7444 / 0.8313 | val 0.2461 / 0.9390 | 62.9s | best val_acc=0.9390
+[10:06:10] [INFO] [brain_kaggle] Early stopping at epoch 31 (patience=15 on val_loss)
+[10:06:10] [INFO] [brain_kaggle] Training finished in 32.59 minutes.
+[10:06:16] [INFO] [brain_kaggle] Test (monitor checkpoint) loss=0.2841 acc=0.9287
+[10:06:23] [INFO] [label_space] Label space written to /kaggle/working/checkpoints/brain_best_model.label_space.json
+[10:06:27] [INFO] [brain_kaggle] ====================================================================
+[10:06:27] [INFO] [brain_kaggle]   Run complete
+[10:06:27] [INFO] [brain_kaggle]   checkpoint : /kaggle/working/checkpoints/brain_best_model.pth
+[10:06:27] [INFO] [brain_kaggle]   label file : /kaggle/working/checkpoints/brain_best_model.label_space.json
+[10:06:27] [INFO] [brain_kaggle]   report     : /kaggle/working/artifacts/classification_report.txt
+[10:06:27] [INFO] [brain_kaggle]   artefacts  : 8 figures in /kaggle/working/artifacts
+[10:06:27] [INFO] [brain_kaggle]   bundle     : /kaggle/working/brain_classification_results.zip
+[10:06:27] [INFO] [brain_kaggle]   test acc   : 0.9287 (grouped, leak-free split)
+[10:06:27] [INFO] [brain_kaggle] ====================================================================

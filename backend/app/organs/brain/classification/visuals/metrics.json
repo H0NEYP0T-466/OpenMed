@@ -1,17 +1,26 @@
 {
   "model_tag": "tf_efficientnetv2_b2.in1k",
-  "num_classes": 42,
+  "num_classes": 9,
   "seed": 42,
   "monitor": "val_loss",
-  "best_val_loss": 0.813065,
-  "best_val_acc": 0.813667,
-  "test_loss": 1.463144,
-  "test_acc": 0.727087,
-  "macro_auc_ovr": 0.974088,
+  "best_val_loss": 0.22946,
+  "best_val_acc": 0.939002,
+  "test_loss": 0.284084,
+  "test_acc": 0.928656,
+  "macro_auc_ovr": 0.991268,
   "splits": {
-    "train": 11665,
-    "val": 2517,
-    "test": 2444
+    "train": 7809,
+    "val": 1623,
+    "test": 1696
   },
-  "grouping": "source-scan groups with byte-identical duplicates collapsed"
+  "grouping": "source-scan groups with byte-identical duplicates collapsed",
+  "regularization": {
+    "drop_path": 0.15,
+    "mixup_alpha": 0.1,
+    "cutmix_alpha": 0.2,
+    "auto_augment": "rand-m5-mstd0.5-inc1",
+    "ema_decay": 0.999,
+    "label_smoothing": 0.1,
+    "weight_decay_exempt": "norm+bias"
+  }
 }
