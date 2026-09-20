@@ -1,16 +1,15 @@
 # Brain Organ — OpenMed
 
-FastAPI service for 42-class brain MRI classification (14 tumour types × 3 pulse
-sequences) on an EfficientNetV2-B2 backbone, with Grad-CAM attribution and
+FastAPI service for 9-class brain MRI classification on an EfficientNetV2-B2 backbone, with Grad-CAM attribution and
 typical-site mapping onto the frontend's 3D atlas.
 
 ```
 brain/
 ├── classification/
-│   ├── dataset.py          Manifest discovery, grouped leak-free splitting
-│   ├── preprocessor.py     timm-derived transforms (train ≡ inference)
+│   ├── dataset.py          Dataset discovery, grouped leak-free splitting
+│   ├── preprocessor.py     timm-derived transforms (class-aware minority augmentation)
 │   ├── model.py            Backbone factory, optim/schedulers, Grad-CAM, overlay
-│   ├── label_space.py      Canonical class list + checkpoint/label binding
+│   ├── label_space.py      Canonical 9-class list + checkpoint/label binding
 │   ├── pipeline.py         Single-image inference, fail-closed checkpoint loading
 │   ├── brain_regions.py    Location registry, MNI conversion, presentation priors
 │   ├── visualization.py    Training artefacts
@@ -18,8 +17,7 @@ brain/
 │   ├── brain_kaggle.py     Training entrypoint
 │   └── checkpoints/        Model weights (git-ignored)
 ├── utils/
-│   ├── sequence_tagger.py  Derives T1/T1C+/T2 labels for unlabeled external scans
-│   └── dataset_dedup_test.py  Standalone SHA/pHash integrity checker
+│   └── dataset_integrity_report.py  Comprehensive SHA-256/pHash integrity auditor
 └── segmentation/           Reserved
 ```
 
@@ -81,14 +79,14 @@ Both come from `resolve_model_data_config(model)`; the resolved input is
 cd backend
 python -m app.organs.brain.classification.brain_kaggle \
   --data_root "$OPENMED_BRAIN_DATASET" --output_dir /kaggle/working \
-  --epochs 100 --patience 10 --seed 42
+  --epochs 75 --patience 15 --seed 42
 ```
 
-The default recipe targets the overfitting observed on the first honest run
-(train 97% vs val 81%): stochastic depth (`--drop_path 0.2`), MixUp 0.2 /
-CutMix 1.0 with class-weighted soft-target loss and label smoothing 0.1
-(`--mixup_alpha`, `--cutmix_alpha`), RandAugment M9 (`--auto_augment`), EMA
-weights (`--ema_decay 0.999`), and AdamW with norm/bias exempt from decay.
+The calibrated recipe targets overfitting while preventing underfitting:
+stochastic depth (`--drop_path 0.15`), gentle MixUp 0.1 / CutMix 0.2 with `mixup_prob 0.3`,
+class-weighted soft-target cross entropy, label smoothing 0.05, calibrated RandAugment
+(`--auto_augment rand-m5-mstd0.5-inc1`), stronger minority class augmentation
+(`--minority_augment rand-m7-mstd0.5-inc1`), and AdamW with norm/bias exempt from decay.
 Each epoch validates raw and EMA weights and checkpoints whichever wins.
 Pass empty/zero values to disable any of them.
 

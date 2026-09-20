@@ -18,6 +18,7 @@ import hashlib
 import json
 import logging
 import os
+import tempfile
 import zipfile
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
@@ -90,8 +91,42 @@ def discover_dataset(data_root: str) -> DatasetView:
             manifest_path=json_path,
         )
 
-    images_root = os.path.join(data_root, "Images_")
-    base = images_root if os.path.isdir(images_root) else data_root
+    canonical_set = {
+        "Germ Cell Tumors",
+        "Gliomas",
+        "Medulloblastoma",
+        "Meningothelial Tumors",
+        "Mesenchymal (Non-Meningothelial Tumors)",
+        "Mixed Neuronal and Neuronal-Glial Tumors",
+        "Normal",
+        "Pituitary",
+        "Schwannoma",
+    }
+    base = None
+    for candidate in (
+        os.path.join(data_root, "archive", "Images_"),
+        os.path.join(data_root, "Images_"),
+        os.path.join(data_root, "archive"),
+        data_root,
+    ):
+        if os.path.isdir(candidate):
+            try:
+                subdirs = {d for d in os.listdir(candidate) if os.path.isdir(os.path.join(candidate, d))}
+                if len(subdirs & canonical_set) >= 2:
+                    base = candidate
+                    break
+            except OSError:
+                continue
+
+    if base is None and os.path.isdir(data_root):
+        for root, dirs, _ in os.walk(data_root):
+            if len(set(dirs) & canonical_set) >= 2:
+                base = root
+                break
+
+    if base is None:
+        base = data_root
+
     if not os.path.isdir(base):
         raise FileNotFoundError(
             f"No DATA.json and no image folders found under '{data_root}'."
@@ -128,12 +163,16 @@ def discover_dataset(data_root: str) -> DatasetView:
     if not keys:
         raise FileNotFoundError(f"No class folders with images found under '{base}'.")
     keys.sort()
+    cache_target = data_root if os.path.isdir(data_root) else base
+    if not os.access(cache_target, os.W_OK):
+        cache_target = os.environ.get("OPENMED_CACHE_DIR", tempfile.gettempdir())
+
     return DatasetView(
         keys=keys,
         labels=labels,
         metadata=metadata,
         images_base=base,
-        cache_dir=data_root if os.path.isdir(data_root) else base,
+        cache_dir=cache_target,
         manifest_path=None,
     )
 
@@ -498,7 +537,11 @@ def _load_cache(
 ) -> dict[str, dict[str, str]] | None:
     path = _cache_path_for(cache_dir)
     if not os.path.isfile(path):
-        return None
+        fallback = os.path.join(tempfile.gettempdir(), ".case_group_cache.json")
+        if os.path.isfile(fallback):
+            path = fallback
+        else:
+            return None
     try:
         with open(path) as handle:
             payload = json.load(handle)
@@ -714,11 +757,22 @@ def _write_cache(
         "fingerprint": fingerprint,
         "records": {key: records[key] for key in keys},
     }
+    written = False
     try:
         with open(_cache_path_for(cache_dir), "w") as handle:
             json.dump(payload, handle)
-    except OSError as exc:
-        logger.warning("Could not persist case-group cache: %s", exc)
+        written = True
+    except OSError:
+        pass
+
+    if not written:
+        fallback = os.path.join(tempfile.gettempdir(), ".case_group_cache.json")
+        try:
+            with open(fallback, "w") as handle:
+                json.dump(payload, handle)
+            logger.info("Persisted case-group cache to temporary directory: %s", fallback)
+        except OSError as exc:
+            logger.warning("Could not persist case-group cache: %s", exc)
 
 
 def _grouped_stratified_assign(
