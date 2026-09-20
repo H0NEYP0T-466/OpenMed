@@ -49,7 +49,6 @@ try:
     )
     from preprocessor import (
         build_class_aware_transforms,
-        get_train_transform,
         get_val_transform,
     )
 except ImportError:
@@ -66,7 +65,6 @@ except ImportError:
     )
     from .preprocessor import (
         build_class_aware_transforms,
-        get_train_transform,
         get_val_transform,
     )
 

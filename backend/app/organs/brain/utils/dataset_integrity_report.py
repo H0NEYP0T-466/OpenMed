@@ -30,7 +30,7 @@ import hashlib
 import os
 import sys
 import time
-from collections import Counter, defaultdict
+from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 
@@ -286,7 +286,7 @@ def main(argv: list[str] | None = None) -> int:
         emit(f"     [{g[0].cls}] " + fmt_cluster({r.relative for r in g}))
     emit(f"   same image in two classes     : {len(across)} cluster(s)")
     for g in across[:10]:
-        emit(f"     " + fmt_cluster({f'{r.relative} ({r.cls})' for r in g}))
+        emit("     " + fmt_cluster({f'{r.relative} ({r.cls})' for r in g}))
     emit(f"   [{'PASS' if not dup_clusters else 'FAIL'}] exact-duplicate verdict")
 
     # ---- 3. perceptual near-duplicates (pHash) ----

@@ -21,7 +21,7 @@ import os
 import zipfile
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
