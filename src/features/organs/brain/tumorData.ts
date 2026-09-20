@@ -119,5 +119,46 @@ export const TUMOR_DATA: Record<string, TumorInfo> = {
     mriCharacteristics: 'Microadenomas (<10mm) appear hypointense on early dynamic T1C+. Macroadenomas (>10mm) demonstrate sellar remodeling, classic snowman/figure-8 appearance with suprasellar expansion, and vivid contrast enhancement.',
     grading: 'WHO Pituitary Neuroendocrine Tumor (PitNET); predominantly benign behavior.',
     prognosis: 'Excellent following endoscopic transsphenoidal resection or medical management (dopamine agonists).'
+  },
+  'Gliomas': {
+    name: 'Glioma Spectrum (Astrocytoma, Glioblastoma, Oligodendroglioma, Ependymoma)',
+    description: 'A broad family of primary intra-axial central nervous system neoplasms arising from glial support cells (astrocytes, oligodendrocytes, ependymal cells).',
+    commonLocations: ['Frontal lobe', 'Temporal lobe', 'Parietal lobe', 'Corpus callosum', 'Ventricular system'],
+    mriCharacteristics: 'Ranges from non-enhancing T2/FLAIR hyperintense infiltrative lesions (low-grade) to necrotic ring-enhancing masses with extensive vasogenic edema (high-grade glioblastoma).',
+    grading: 'WHO Grades 1 through 4 (Grade 4: Glioblastoma).',
+    prognosis: 'Varies by molecular status (IDH mutation, 1p/19q codeletion) and WHO grade.'
+  },
+  'Meningothelial Tumors': {
+    name: 'Meningothelial Tumors (Meningioma)',
+    description: 'Extra-axial neoplasms arising from arachnoid cap cells of the meninges, attaching to the dura mater.',
+    commonLocations: ['Parasagittal / falx', 'Convexity', 'Sphenoid wing', 'Olfactory groove', 'Tentorium'],
+    mriCharacteristics: 'Well-circumscribed, extra-axial mass with broad dural base, homogenous contrast enhancement, and frequent dural tail sign on T1C+.',
+    grading: 'WHO Grade 1 (benign, ~80%), Grade 2 (atypical, ~15%), Grade 3 (anaplastic, ~2%).',
+    prognosis: 'Generally excellent for Grade 1 following surgical resection.'
+  },
+  'Mesenchymal (Non-Meningothelial Tumors)': {
+    name: 'Mesenchymal Tumors (Solitary Fibrous Tumor / Hemangiopericytoma)',
+    description: 'Rare vascular, non-meningothelial dural-based mesenchymal neoplasms with aggressive local growth and propensity for systemic metastasis.',
+    commonLocations: ['Meninges / dural sinuses', 'Tentorium', 'Convexity'],
+    mriCharacteristics: 'Lobulated dural-based mass with serpentine internal flow voids, prominent T2 hyperintensity, and vivid heterogeneous enhancement.',
+    grading: 'WHO Grades 1-3.',
+    prognosis: 'Requires complete surgical resection; lifelong surveillance needed for delayed recurrence and extracranial metastases.'
+  },
+  'Mixed Neuronal and Neuronal-Glial Tumors': {
+    name: 'Mixed Neuronal and Neuronal-Glial Tumors',
+    description: 'Neoplasms composed of differentiated neuronal elements and supporting glial cells (including Ganglioglioma, Central Neurocytoma, and DNET).',
+    commonLocations: ['Ventricular system (Neurocytoma)', 'Temporal lobe (Ganglioglioma / DNET)', 'Frontal cortex'],
+    mriCharacteristics: 'Frequently intraventricular (neurocytoma near Foramen of Monro) or cortical/subcortical multicystic ("bubbly") lesions associated with refractory epilepsy.',
+    grading: 'Predominantly WHO Grade 1 to Grade 2.',
+    prognosis: 'Favorable to excellent following complete resection with high seizure-control rates.'
+  },
+  'Germ Cell Tumors': {
+    name: 'Germ Cell Tumors (Germinoma)',
+    description: 'Midline neuroectodermal tumors arising from primordial germ cells misplaced during embryonic migration.',
+    commonLocations: ['Pineal region', 'Suprasellar region', 'Third ventricle'],
+    mriCharacteristics: 'Solid, circumscribed midline mass that is isointense to gray matter on T1/T2 with marked, uniform contrast enhancement and low ADC values.',
+    grading: 'Malignant, WHO recognized CNS germ cell tumor.',
+    prognosis: 'Exceptionally radiosensitive and chemosensitive; 5-year survival >90%.'
   }
 };
+

@@ -1,0 +1,84 @@
+==============================================================================
+DATA INTEGRITY REPORT - flattened brain classification dataset
+==============================================================================
+Root      : /home/honeypot/Desktop/archive/Images_
+Scanned   : 11128 files, 9 classes, 32.9s, workers=4
+Methods   : SHA-256 exact | 64-bit DCT pHash (Hamming<=2) | 32x32 signature series (corr>=0.9)
+
+Class counts:
+     233  Germ Cell Tumors [patient slices]
+   2,039  Gliomas [independent]
+     803  Medulloblastoma [patient slices]
+   1,820  Meningothelial Tumors [independent]
+     539  Mesenchymal (Non-Meningothelial Tumors) [patient slices]
+     787  Mixed Neuronal and Neuronal-Glial Tumors [patient slices]
+   2,192  Normal [independent]
+   1,704  Pituitary [independent]
+   1,011  Schwannoma [patient slices]
+  11,128  TOTAL decodable
+
+1. CORRUPT / UNDECODABLE FILES
+   [PASS] all files decode
+
+2. EXACT DUPLICATES (SHA-256 over file bytes)
+   same image twice in one class : 0 cluster(s), 0 file(s)
+   same image in two classes     : 0 cluster(s)
+   [PASS] exact-duplicate verdict
+
+3. NEAR-DUPLICATES (pHash Hamming <= 2, re-encode proof)
+   near-dup pairs                : 2969
+   same class                    : 635 cluster(s)
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 006.jpg; Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 007.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 011.jpg; Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 012.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Germinoma pineal , frontal 004.jpg; Germ Cell Tumors/T1 - Germinoma pineal , frontal 005.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Periventricular CNS germinoma ventricle 001.jpg; Germ Cell Tumors/T1 - Periventricular CNS germinoma ventricle 002.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Pineal germinoma pineal 006.jpg; Germ Cell Tumors/T1 - Pineal germinoma pineal 007.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Pineal germinoma pineal 012.jpg; Germ Cell Tumors/T1C+ - Pineal germinoma pineal 021.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1 - Pineal germinoma pineal 014.jpg; Germ Cell Tumors/T1C+ - Pineal germinoma pineal 019.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1C+ - Periventricular CNS germinoma ventricle 004.jpg; Germ Cell Tumors/T1C+ - Periventricular CNS germinoma ventricle 005.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1C+ - Periventricular CNS germinoma ventricle 006.jpg; Germ Cell Tumors/T1C+ - Periventricular CNS germinoma ventricle 007.jpg
+     [Germ Cell Tumors] Germ Cell Tumors/T1C+ - Pineal germinoma 002.jpg; Germ Cell Tumors/T1C+ - Pineal germinoma 003.jpg
+   CROSS-CLASS (label conflict)  : 6 cluster(s)
+     Germ Cell Tumors/T1 - Bifocal germinoma pineal 003.jpg (Germ Cell Tumors); Germ Cell Tumors/T1C+ - Bifocal germinoma pineal 012.jpg (Germ Cell Tumors); Germ Cell Tumors/T1C+ - Bifocal germinoma pineal 014.jpg (Germ Cell Tumors); Mixed Neuronal and Neuronal-Glial Tumors/T1C+ - Extraventricular neurocytoma frontal 017.jpg (Mixed Neuronal and Neuronal-Glial Tumors)
+     Gliomas/enh_Tr-glTr_0000.jpg (Gliomas); Mixed Neuronal and Neuronal-Glial Tumors/T1 - Atypical presentation of dysembryoplastic neuroepithelial tumor (DNET) occipital 001.jpg (Mixed Neuronal and Neuronal-Glial Tumors)
+     Gliomas/enh_Tr-gl_0135.jpg (Gliomas); Gliomas/enh_Tr-gl_0136.jpg (Gliomas); Gliomas/enh_Tr-gl_0137.jpg (Gliomas); Gliomas/enh_Tr-gl_0138.jpg (Gliomas) (+4 more)
+     Meningothelial Tumors/enh_Tr-me_0018.jpg (Meningothelial Tumors); Mixed Neuronal and Neuronal-Glial Tumors/T1C+ - Dysembryoplastic neuroepithelial tumor (DNET) parietal 008.jpg (Mixed Neuronal and Neuronal-Glial Tumors)
+     Meningothelial Tumors/enh_Tr-me_0349.jpg (Meningothelial Tumors); Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 097.jpg (Mesenchymal (Non-Meningothelial Tumors)); Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 098.jpg (Mesenchymal (Non-Meningothelial Tumors)); Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 099.jpg (Mesenchymal (Non-Meningothelial Tumors))
+     Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 089.jpg (Mesenchymal (Non-Meningothelial Tumors)); Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 090.jpg (Mesenchymal (Non-Meningothelial Tumors)); Normal/Siar_healthy_411.jpg (Normal)
+   [FAIL] cross-class verdict
+
+4. SUBJECT GROUPING (patient-slice classes)
+  Germ Cell Tumors:
+    files=233  verified series=26  files inside series=222  singleton files=11
+    series size: min=2 median=6 max=33
+    => distinct subjects ~37 (GroupKFold units)
+  Medulloblastoma:
+    files=803  verified series=36  files inside series=803  singleton files=0
+    series size: min=5 median=13 max=98
+    => distinct subjects ~36 (GroupKFold units)
+  Mesenchymal (Non-Meningothelial Tumors):
+    files=539  verified series=30  files inside series=536  singleton files=3
+    series size: min=3 median=13 max=73
+    => distinct subjects ~33 (GroupKFold units)
+  Mixed Neuronal and Neuronal-Glial Tumors:
+    files=787  verified series=63  files inside series=753  singleton files=34
+    series size: min=2 median=6 max=84
+    => distinct subjects ~97 (GroupKFold units)
+  Schwannoma:
+    files=1,011  verified series=75  files inside series=940  singleton files=71
+    series size: min=2 median=7 max=80
+    => distinct subjects ~146 (GroupKFold units)
+
+5. INDEPENDENCE CHECK (classes declared one-file-one-subject)
+  [WARN] Gliomas: 1 series + 81 near-dup clusters found - NOT fully independent; group them too
+  [WARN] Meningothelial Tumors: 1 series + 79 near-dup clusters found - NOT fully independent; group them too
+  [WARN] Normal: 0 series + 95 near-dup clusters found - NOT fully independent; group them too
+  [WARN] Pituitary: 1 series + 83 near-dup clusters found - NOT fully independent; group them too
+
+==============================================================================
+VERDICT
+  [ACTION REQUIRED] 6 near-dup cross-class cluster(s)
+  Remove or relabel the listed files before training.
+  Note: 0 exact + 635 near-dup clusters exist INSIDE single classes - the splitter must collapse them into one group (already handled by dataset.py grouping).
+  Split policy: GroupKFold on subjects for the 5 patient-slice classes; per-image stratified for the 4 independent classes.
+==============================================================================

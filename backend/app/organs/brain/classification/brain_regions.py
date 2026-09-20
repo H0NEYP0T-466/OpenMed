@@ -493,21 +493,29 @@ def resolve_region(location: str) -> Optional[dict]:
 # ── Tumor-type → typical location fallback ────────────────────────────────
 
 _TUMOR_LOCATION_FALLBACK: dict[str, list[str]] = {
+    # 9 Canonical Flattened Classes
+    "Gliomas": ["frontal", "temporal", "parietal", "corpus callosum", "ventricle"],
+    "Meningothelial Tumors": ["falx", "convexity", "sphenoid wing", "parafalcine"],
+    "Mesenchymal (Non-Meningothelial Tumors)": ["falx", "tentorial", "convexity"],
+    "Mixed Neuronal and Neuronal-Glial Tumors": ["temporal", "frontal", "ventricle"],
+    "Germ Cell Tumors": ["pineal", "suprasellar", "basal ganglia"],
+    "Pituitary": ["sellar", "sella turcica", "suprasellar"],
+    "Schwannoma": ["cerebellopontine angle", "trigeminal"],
+    "Medulloblastoma": ["posterior fossa", "cerebellum", "fourth ventricle"],
+    "Normal": [],
+    # Legacy / Subtype mappings
     "Meningioma": ["falx", "convexity", "sphenoid wing", "parafalcine"],
     "Astrocytoma": ["frontal", "temporal", "insular", "parietal"],
     "Glioblastoma": ["frontal", "temporal", "parietal", "corpus callosum"],
-    "Schwannoma": ["cerebellopontine angle", "trigeminal"],
-    "Normal": [],
     "Ependymoma - Subependymoma": ["ventricle", "fourth ventricle", "posterior fossa"],
-    "Medulloblastoma": ["posterior fossa", "cerebellum", "fourth ventricle"],
     "Oligodendroglioma": ["frontal", "parietal", "centrum semiovale"],
-    "Pituitary": ["sellar", "sella turcica", "suprasellar"],
     "Hemangiopericytoma": ["falx", "tentorial", "convexity"],
     "Neurocytoma": ["ventricle", "intraventricular"],
     "Dysembryoplastic Neuroepithelial Tumor": ["temporal", "frontal"],
     "Germinoma": ["pineal", "suprasellar", "basal ganglia"],
     "Ganglioglioma": ["temporal", "frontal"],
 }
+
 
 
 LOCALIZATION_BASIS = (

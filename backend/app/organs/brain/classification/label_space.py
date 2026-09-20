@@ -1,4 +1,4 @@
-"""Canonical label space for the 42-class brain tumour classifier.
+"""Canonical label space for the 9-class brain tumour classifier.
 
 A checkpoint and the name list used to interpret its logits must agree exactly.
 The label space is therefore persisted next to the weights at training time and
@@ -18,25 +18,17 @@ logger = logging.getLogger(__name__)
 MRI_SEQUENCES = ("T1", "T1C+", "T2")
 
 CLASS_NAMES: tuple[str, ...] = (
-    "Astrocytoma T1", "Astrocytoma T1C+", "Astrocytoma T2",
-    "Dysembryoplastic Neuroepithelial Tumor T1",
-    "Dysembryoplastic Neuroepithelial Tumor T1C+",
-    "Dysembryoplastic Neuroepithelial Tumor T2",
-    "Ependymoma - Subependymoma T1",
-    "Ependymoma - Subependymoma T1C+",
-    "Ependymoma - Subependymoma T2",
-    "Ganglioglioma T1", "Ganglioglioma T1C+", "Ganglioglioma T2",
-    "Germinoma T1", "Germinoma T1C+", "Germinoma T2",
-    "Glioblastoma T1", "Glioblastoma T1C+", "Glioblastoma T2",
-    "Hemangiopericytoma T1", "Hemangiopericytoma T1C+", "Hemangiopericytoma T2",
-    "Medulloblastoma T1", "Medulloblastoma T1C+", "Medulloblastoma T2",
-    "Meningioma T1", "Meningioma T1C+", "Meningioma T2",
-    "Neurocytoma T1", "Neurocytoma T1C+", "Neurocytoma T2",
-    "Normal T1", "Normal T1C+", "Normal T2",
-    "Oligodendroglioma T1", "Oligodendroglioma T1C+", "Oligodendroglioma T2",
-    "Pituitary T1", "Pituitary T1C+", "Pituitary T2",
-    "Schwannoma T1", "Schwannoma T1C+", "Schwannoma T2",
+    "Germ Cell Tumors",
+    "Gliomas",
+    "Medulloblastoma",
+    "Meningothelial Tumors",
+    "Mesenchymal (Non-Meningothelial Tumors)",
+    "Mixed Neuronal and Neuronal-Glial Tumors",
+    "Normal",
+    "Pituitary",
+    "Schwannoma",
 )
+
 
 LABEL_SPACE_FILENAME = "label_space.json"
 
@@ -154,5 +146,5 @@ def resolve_label_space(
         f"{detected_classes} logits, which does not match the {len(names)} names "
         "in the brain label space. Refusing to guess the mapping: copy "
         f"'{LABEL_SPACE_FILENAME}' next to the checkpoint, or retrain on the "
-        "current 42-class dataset."
+        f"current {len(names)}-class dataset."
     )

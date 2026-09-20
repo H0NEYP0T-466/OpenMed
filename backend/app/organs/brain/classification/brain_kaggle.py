@@ -37,7 +37,7 @@ from tqdm import tqdm
 
 try:
     import visualization
-    from dataset import BrainTumorDataset
+    from dataset import BrainTumorDataset, discover_dataset
     from label_space import label_space_path_for, save_label_space
     from model import (
         MODEL_TAG,
@@ -47,10 +47,14 @@ try:
         get_scheduler,
         weighted_soft_target_cross_entropy,
     )
-    from preprocessor import get_train_transform, get_val_transform
+    from preprocessor import (
+        build_class_aware_transforms,
+        get_train_transform,
+        get_val_transform,
+    )
 except ImportError:
     from . import visualization
-    from .dataset import BrainTumorDataset
+    from .dataset import BrainTumorDataset, discover_dataset
     from .label_space import label_space_path_for, save_label_space
     from .model import (
         MODEL_TAG,
@@ -60,7 +64,11 @@ except ImportError:
         get_scheduler,
         weighted_soft_target_cross_entropy,
     )
-    from .preprocessor import get_train_transform, get_val_transform
+    from .preprocessor import (
+        build_class_aware_transforms,
+        get_train_transform,
+        get_val_transform,
+    )
 
 logging.basicConfig(
     level=logging.INFO,
@@ -190,25 +198,29 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--output_dir", default=os.getenv("OPENMED_BRAIN_OUTPUT", "."))
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--epochs", type=int, default=75)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
-    parser.add_argument("--patience", type=int, default=10)
+    parser.add_argument("--patience", type=int, default=15)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
-        "--drop_path", type=float, default=0.1,
+        "--drop_path", type=float, default=0.15,
         help="Stochastic depth rate (primary EfficientNet regulariser)",
     )
-    parser.add_argument("--mixup_alpha", type=float, default=0.0)
-    parser.add_argument("--cutmix_alpha", type=float, default=0.0)
+    parser.add_argument("--mixup_alpha", type=float, default=0.1)
+    parser.add_argument("--cutmix_alpha", type=float, default=0.2)
     parser.add_argument(
-        "--mixup_prob", type=float, default=1.0,
-        help="Probability that a batch is mixed; lower (e.g. 0.5) to soften",
+        "--mixup_prob", type=float, default=0.3,
+        help="Probability that a batch is mixed; 0.3 for gentle regularization",
     )
     parser.add_argument(
-        "--auto_augment", default="",
-        help="timm RandAugment spec; pass '' to disable",
+        "--auto_augment", default="rand-m5-mstd0.5-inc1",
+        help="timm RandAugment spec for standard classes; pass '' to disable",
+    )
+    parser.add_argument(
+        "--minority_augment", default="rand-m7-mstd0.5-inc1",
+        help="Stronger RandAugment spec for minority/lower-sample classes",
     )
     parser.add_argument(
         "--ema_decay", type=float, default=0.999,
@@ -228,13 +240,17 @@ def write_split_manifest(path: str, dataset_root: str, splits: dict[str, list[in
     verify split isolation from this file alone, without re-deriving groups
     under whatever grouping code exists later.
     """
-    json_path, images_base = BrainTumorDataset.locate_data_and_images(dataset_root)
-    with open(json_path) as handle:
-        raw = json.load(handle)
-    keys = sorted(key for key in raw if not key.endswith(BrainTumorDataset.MASK_SUFFIX))
-    group_of = dict(
-        zip(keys, BrainTumorDataset.build_group_ids(json_path, images_base, keys), strict=True)
+    view = discover_dataset(dataset_root)
+    keys = view.keys
+    labels = [view.labels[key] for key in keys]
+    group_ids = BrainTumorDataset.build_group_ids(
+        view.manifest_path,
+        view.images_base,
+        keys,
+        labels=labels,
+        cache_dir=view.cache_dir,
     )
+    group_of = dict(zip(keys, group_ids, strict=True))
 
     written = 0
     with open(path, "w", newline="") as handle:
@@ -245,12 +261,12 @@ def write_split_manifest(path: str, dataset_root: str, splits: dict[str, list[in
         for name, indices in splits.items():
             for index in indices:
                 key = keys[index]
-                meta = raw[key]
+                meta = view.metadata[key]
                 writer.writerow(
                     [
                         key,
-                        meta["class"],
-                        meta.get("tumor_type", ""),
+                        meta.get("class", view.labels[key]),
+                        meta.get("tumor_type", view.labels[key]),
                         meta.get("sequence", ""),
                         name,
                         group_of[key],
@@ -258,6 +274,7 @@ def write_split_manifest(path: str, dataset_root: str, splits: dict[str, list[in
                 )
                 written += 1
     return written
+
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -302,9 +319,23 @@ def main(argv: list[str] | None = None) -> int:
         model_tag=MODEL_TAG,
         drop_path_rate=args.drop_path,
     )
+    MINORITY_CLASSES = (
+        "Germ Cell Tumors",
+        "Mesenchymal (Non-Meningothelial Tumors)",
+        "Mixed Neuronal and Neuronal-Glial Tumors",
+        "Medulloblastoma",
+    )
+    default_transform, minority_transforms = build_class_aware_transforms(
+        base_model,
+        class_names=class_names,
+        minority_classes=MINORITY_CLASSES,
+        base_augment=args.auto_augment or None,
+        minority_augment=args.minority_augment,
+    )
     train_dataset = BrainTumorDataset(
         args.data_root,
-        transform=get_train_transform(base_model, auto_augment=args.auto_augment or None),
+        transform=default_transform,
+        transforms_by_class=minority_transforms,
         split_indices=train_idx,
     )
     val_dataset = BrainTumorDataset(args.data_root, transform=get_val_transform(base_model), split_indices=val_idx)

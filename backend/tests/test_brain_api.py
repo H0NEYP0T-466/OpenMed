@@ -93,7 +93,7 @@ def test_legacy_head_width_is_refused_not_misread(
     )
     assert response.status_code == 503
     detail = response.json()["detail"]
-    assert "39 logits" in detail and "42 names" in detail
+    assert "39 logits" in detail and f"{len(CLASS_NAMES)} names" in detail
 
 
 def test_model_info_reports_declared_label_space_before_loading(
@@ -104,7 +104,7 @@ def test_model_info_reports_declared_label_space_before_loading(
     info = client.get("/api/brain/model-info").json()
     assert info["num_classes"] == len(CLASS_NAMES)
     assert info["class_names"] == list(CLASS_NAMES)
-    assert "42-class" in info["task"]
+    assert f"{len(CLASS_NAMES)}-class" in info["task"]
     assert info["label_space_source"].startswith("sidecar:")
     assert info["metrics"]["test_acc"] == 0.42
     assert info["trained_weights_loaded"] is False

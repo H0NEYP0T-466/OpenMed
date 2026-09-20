@@ -1,0 +1,441 @@
+================================================================================
+OPENMED BRAIN CLASSIFICATION — AUDIT & EXPERIMENT LOG
+================================================================================
+Compiled       : 2026-09-20
+Workspace      : /home/honeypot/Projects/FAST_API/OpenMed/backend
+Model          : tf_efficientnetv2_b2.in1k (EfficientNetV2-B2), 208x208, 42 classes
+Dataset        : datasets/brain/archive (DATA.json + Images_/Images_)
+
+PROVENANCE: every number in this file was measured by an actual command run in
+this workspace during the audit/repair cycle (Sept 19-20, 2026). Output was
+captured at the time; section [REF] points at the on-disk artifact that still
+contains it.
+
+NOTE ON pHash: pHash (64-bit DCT, Hamming threshold) was used by the AUTHOR in
+the ingestion tests for the 4,000 added scans (2026-09-19, section 2b) and in
+the earlier 4-class project. The audit performed in this session used as its
+equivalents:
+  (a) SHA-256 of full file bytes            -> exact duplicates
+  (b) 32x32 mean-removed luminance signature, adjacent-pair Pearson
+      correlation, threshold 0.90           -> near-duplicate scan series
+  (c) 64x64 pixel content digest (SHA-256 of decoded pixels)
+                                            -> identical pixels after re-encode
+Their results are in sections 2 and 4.
+
+--------------------------------------------------------------------------------
+SECTION 1 — DATASET AUDIT (DATA.json)
+--------------------------------------------------------------------------------
+Total samples (excluding *_mask.png)   : 16,626
+Classes                                : 42 = 13 tumour types x 3 sequences (T1,
+                                         T1C+, T2) + Normal x 3
+Original rows                          : 12,626
+Rows added from BTSC-UNet-ViT project  : 4,000 (2,000 Normal + 2,000 Pituitary)
+
+Pulse-sequence distribution (measured from DATA.json 'sequence' field):
+  pre-existing 12,626 : T1 32.3% | T1C+ 41.1% | T2 26.6%
+  added btsc   4,000  : T1 15.5% | T1C+ 62.0% | T2 22.5%   <- T1C+ over-skew,
+                                                             tagged by the weak
+                                                             MobileNetV3 tagger
+
+Contradictory supervision (identical pixels, conflicting class labels):
+  under grouping v1 : 16 samples
+  under grouping v2 : 7 groups covering 79 samples (confirmed independently on
+                      the Kaggle run, see section 9). All observed examples are
+                      same-tumour-type / different-sequence conflicts, e.g.:
+                        T2 - Medulloblastoma ventricle, posterior fossa 009.jpg
+                             -> ['Medulloblastoma T1C+', 'Medulloblastoma T2']
+                        T1 - Diffuse low grade astrocytoma frontal 005.jpg
+                             -> ['Astrocytoma T1', 'Astrocytoma T1C+']
+                      => suspected double-exported scans with inconsistent
+                         sequence tags in DATA.json. DATA repair item, 0.5% of
+                         data.
+
+--------------------------------------------------------------------------------
+SECTION 2 — DUPLICATE / LEAKAGE AUDIT  (the "pHash-equivalent" tests)
+--------------------------------------------------------------------------------
+(a) SHA-256 over all 16,626 files:
+    1,046 byte-identical images found stored under different names/folders.
+    Example pair (exact same bytes):
+      train-side : T1 - Medulloblastoma 004.jpg
+      other-side : T1 - Medulloblastoma ventricle , supratentorial 020.jpg
+
+(b) 32x32 luminance-signature series test (adjacent-pair median correlation,
+    threshold 0.90, frames ordered by trailing index):
+    852 named series verified as same-scan frame sequences.
+    28 shared-prefix stems REJECTED as false series (all-pairs median would
+    have accepted them; adjacent-pair median correctly rejects them).
+
+(c) Blast-radius measurement BEFORE choosing a rule:
+    a fuzzy global pass (32x32 signatures, pairwise corr > 0.98) would have
+    merged ~28,178 image pairs -> catastrophic over-grouping. REJECTED.
+    Adopted instead: exact content digest (64x64 decoded pixels), which
+    cannot over-merge.
+
+(d) Final grouping (v2, union-find over: series rule + SHA-256 clusters +
+    content-digest clusters):
+    16,626 images -> 5,016 source groups
+    922 byte-identical duplicate clusters covering 2,004 images collapsed
+
+--------------------------------------------------------------------------------
+SECTION 2b — AUTHOR'S pHASH INGESTION TEST SUITE (4,000 added scans)
+--------------------------------------------------------------------------------
+When     : 2026-09-19 12:52-12:54 PKT
+Script   : backend/app/organs/brain/utils/dataset_dedup_test.py
+Hashes   : SHA-256 (exact) + 64-bit DCT pHash (perceptual, Hamming threshold)
+[REF] logs/dataset_audit_master_log.txt, logs/deduplication_and_integrity_tests.log.txt
+
+Ingestion funnel (from BTSC-UNet-ViT Vit_Dataset into this dataset):
+  Normal    : 7,986 candidates -> 2,000 accepted
+              (115 pHash near-duplicates purged at Hamming<=2;
+               4 archive collisions purged; synthetic-noise + low-variance
+               filters applied)
+  Pituitary : 7,421 candidates -> 2,000 accepted
+              (194 pHash near-duplicates purged; 0 archive collisions)
+  Export standardisation: 512x512 RGB, LANCZOS, JPEG quality 95
+
+Sequence tagger used to label these scans (MobileNetV3-Small, 3 epochs, CPU):
+  train acc 92.51% | **held-out val acc 87.11%**
+  => ~13% sequence-label error baked into the 4,000 rows. This is BELOW the
+     90% quality gate now enforced by sequence_tagger.py - i.e. the current
+     code would refuse to label with that model. This number explains the
+     T1C+ skew and the weak Pituitary T1/T2 classes (see sections 1 and 9).
+
+All 6 tests PASSED:
+  1. Exact SHA-256 collisions (within 4,000)          : zero
+  2. Cross-sequence leakage T1/T1C+/T2                : zero
+     (4,978,249 pairwise comparisons; SHA-256 AND pHash Hamming<=2)
+     sequence mix measured: T1 619 | T1C+ 2,479 | T2 902
+     (matches DATA.json skew: 15.5% / 62.0% / 22.6%)
+  3. Normal vs Pituitary collisions                   : zero
+  4. Intra-class pHash uniqueness (Hamming 0)         : all unique
+  5. Collisions vs 12,626-scan archive (11,544 hashes): zero
+  6. DATA.json <-> physical files                     : 1-to-1 parity
+
+Cross-reference with this session's audit: sections 2/4 cover the WHOLE
+16,626-image dataset (where 922 duplicate clusters / 1,046 identical pairs
+live in the ORIGINAL 12,626 archive, not in the added 4,000 - the two audits
+agree: the added scans were clean on arrival).
+
+--------------------------------------------------------------------------------
+SECTION 3 — ORIGINAL 39-CLASS CHECKPOINT DEFECT (critical bug)
+--------------------------------------------------------------------------------
+Defect: shipped checkpoint head shape (39, 1408) vs 42-name class list in
+pipeline.py. Logits indices 36-38 were interpreted with the wrong class names
+(label offset), e.g. every tested Schwannoma scan was reported as "Pituitary".
+
+Verification after retrain (42-class checkpoint + label_space sidecar):
+  head out_features = 42 | sidecar classes = 42 | canonical = 42 (MATCH)
+  live inference on test images:
+    TRUE=Schwannoma T1      PRED=Schwannoma T1      conf=0.870
+    TRUE=Schwannoma T1      PRED=Schwannoma T1      conf=0.999
+    TRUE=Schwannoma T1      PRED=Schwannoma T1      conf=0.999
+    TRUE=Meningioma T1C+    PRED=Meningioma T1C+    conf=1.000
+    TRUE=Meningioma T1C+    PRED=Meningioma T1C+    conf=1.000
+  label-space source: sidecar:.../brain_best_model.label_space.json
+
+Fail-closed chain: resolve_label_space() raises on any mismatch ->
+pipeline.ModelUnavailableError -> router HTTP 503. Covered by unit tests.
+
+--------------------------------------------------------------------------------
+SECTION 4 — SPLITTER VERIFICATION (grouped, leak-free)
+--------------------------------------------------------------------------------
+Invariant: no source group may appear in two splits.
+  Real-data check (fresh split, current code):
+    images: 16,626 | groups: 5,016 | cross-split groups: 0  -> PASS
+  Determinism across machines:
+    local fresh split  : Train=11730, Val=2418, Test=2478
+    Kaggle run 2 split : Train=11730, Val=2418, Test=2478  (identical, seed 42)
+
+Classes confined to a single split by their group structure (honest property
+of grouped splitting, not a bug):
+  Hemangiopericytoma T1C+, Neurocytoma T1, Neurocytoma T1C+
+
+Manifest note: split_manifest.csv gained a 'group_id' column AFTER the 2026-09-19
+run; manifests from that run cannot be audited by re-deriving groups under
+newer grouping code (doing so once produced 414 false "crossings"). Audit
+old runs via the run-time guard line (cross-split leaks=0) instead.
+
+--------------------------------------------------------------------------------
+SECTION 5 — GRAD-CAM CORRECTNESS
+--------------------------------------------------------------------------------
+Before fix (hooks removed after first call):
+  two consecutive generate() calls on different inputs returned IDENTICAL
+  maps (max abs diff = 0.000) -> all 8 explanation panels were the same image.
+After fix:
+  smoke-test artifact gradcam_samples.png: 8 panels distinct, pairwise
+  correlations 0.108 - 0.642 (1.000 would indicate the old bug).
+Regression test: test_gradcam_reuse_produces_fresh_maps.
+
+--------------------------------------------------------------------------------
+SECTION 6 — CLASS WEIGHTS (train split only; no val/test statistics used)
+--------------------------------------------------------------------------------
+Formula: sqrt-smoothed inverse frequency, mean-normalised (mean = 1.00),
+clipped to [0.2, 5.0] (clips never engaged). MixUp/CutMix batches keep the
+weighting via weighted_soft_target_cross_entropy (unit-tested to reduce
+exactly to nn.CrossEntropyLoss(weight=...) on one-hot targets).
+
+  class                                   train-n   weight
+  Pituitary T1C+  (most common)             1,555    0.37
+  Normal T1C+                               1,224    0.42
+  Normal T2                                 1,145    0.44
+  Meningioma T1C+                           1,042    0.46
+  ...
+  Dysembryoplastic Neuroepithelial Tumor T2    72    1.74
+  Ganglioglioma T2                            60    1.90
+  Ganglioglioma T1C+                          52    2.05
+  Ganglioglioma T1  (rarest)                  42    2.28
+  effective spread: 0.37 .. 2.28  (~6.2x relative boost, rare over common)
+
+--------------------------------------------------------------------------------
+SECTION 7 — RUN 1: BASELINE (leak-free grouped split, no extra regularisation)
+--------------------------------------------------------------------------------
+Where   : Kaggle Tesla T4, author retrain, artifacts stamped 2026-09-19 17:07 PKT
+Command : brain_kaggle.py, batch 32, epochs 50, seed 42 (patience not reached;
+          ran all 50 epochs)
+Splits  : Train=11,665  Val=2,517  Test=2,444   (groups=5,016, leaks=0)
+[REF] visuals/training_log.csv, visuals/metrics.json, visuals/classification_report.txt
+
+Final headline (metrics.json):
+  best_val_loss : 0.813065   (epoch 29)
+  best_val_acc  : 0.813667   (epoch 43)
+  test_loss     : 1.463144
+  test_acc      : 0.727087
+  macro_auc_ovr : 0.974088
+  monitor       : val_loss  -> shipped checkpoint = epoch-29 weights
+  grouping      : "source-scan groups with byte-identical duplicates collapsed"
+
+Overfit signature (train vs val):
+  epoch 29: train 0.2806/0.9008 | val 0.8131/0.8017   <- val-loss bottom
+  epoch 50: train 0.0786/0.9715 | val 0.9122/0.8081
+  => train acc ends ~16 pts above val; val loss creeps up after ep29.
+
+Full epoch log (epoch, train_loss, train_acc, val_loss, val_acc, lr, seconds):
+epoch,train_loss,train_acc,val_loss,val_acc,lr,seconds
+1,3.1189,0.2048,2.1817,0.3909,0.000050,77.14
+2,1.9255,0.4678,1.5268,0.5447,0.000082,81.13
+3,1.3695,0.5997,1.2514,0.6134,0.000132,80.97
+4,1.0527,0.6833,1.1190,0.6528,0.000199,80.72
+5,0.8975,0.7208,1.1412,0.6591,0.000280,80.88
+6,0.8304,0.7386,1.0964,0.6742,0.000372,80.82
+7,0.8155,0.7454,1.1710,0.6822,0.000470,80.42
+8,0.8188,0.7412,1.4628,0.6377,0.000570,80.42
+9,0.8118,0.7439,1.2131,0.6845,0.000668,80.44
+10,0.8347,0.7417,1.3896,0.6563,0.000760,80.59
+11,0.7921,0.7479,1.1618,0.6830,0.000841,80.53
+12,0.7741,0.7523,1.1617,0.7187,0.000908,80.61
+13,0.7381,0.7627,1.1720,0.6802,0.000959,80.74
+14,0.7169,0.7746,1.2821,0.6845,0.000990,80.94
+15,0.6633,0.7873,1.1636,0.7247,0.001000,80.86
+16,0.6266,0.7923,1.1761,0.7036,0.000998,80.70
+17,0.5827,0.8098,1.2181,0.7120,0.000992,80.71
+18,0.5406,0.8160,0.9997,0.7394,0.000982,80.73
+19,0.5196,0.8262,1.0607,0.7386,0.000968,80.59
+20,0.4903,0.8306,1.1544,0.7215,0.000950,80.66
+21,0.4658,0.8395,1.0564,0.7608,0.000929,80.35
+22,0.4198,0.8522,1.0066,0.7616,0.000904,80.42
+23,0.4084,0.8612,1.0340,0.7628,0.000876,80.50
+24,0.3840,0.8710,1.1140,0.7588,0.000845,80.84
+25,0.3680,0.8711,1.0098,0.7839,0.000812,81.28
+26,0.3472,0.8809,0.9068,0.7767,0.000775,81.12
+27,0.3350,0.8832,1.1219,0.7584,0.000737,81.41
+28,0.3074,0.8882,0.8821,0.8033,0.000696,81.22
+29,0.2806,0.9008,0.8131,0.8017,0.000654,81.46
+30,0.2521,0.9111,0.9039,0.7954,0.000611,81.33
+31,0.2455,0.9134,0.8442,0.8006,0.000567,80.15
+32,0.2187,0.9217,0.8664,0.7902,0.000522,80.51
+33,0.2041,0.9274,0.8990,0.7926,0.000477,80.13
+34,0.2015,0.9262,0.9593,0.7954,0.000433,80.23
+35,0.1822,0.9342,0.8741,0.8105,0.000389,80.15
+36,0.1863,0.9371,0.8162,0.8105,0.000345,80.19
+37,0.1521,0.9439,0.8374,0.8021,0.000303,80.31
+38,0.1406,0.9469,0.9306,0.8109,0.000263,80.61
+39,0.1212,0.9535,0.8928,0.8093,0.000224,81.61
+40,0.1126,0.9567,0.9449,0.8065,0.000188,81.25
+41,0.1022,0.9620,0.9415,0.7990,0.000154,80.61
+42,0.1032,0.9654,0.9356,0.7994,0.000123,80.52
+43,0.0954,0.9645,0.9264,0.8137,0.000095,80.31
+44,0.0844,0.9675,0.9267,0.8037,0.000071,80.32
+45,0.0858,0.9691,0.9554,0.7994,0.000049,80.11
+46,0.0868,0.9694,0.9213,0.8033,0.000032,80.36
+47,0.0826,0.9709,0.9291,0.8053,0.000018,80.68
+48,0.0720,0.9731,0.9437,0.8065,0.000008,80.67
+49,0.0721,0.9744,0.9008,0.8097,0.000002,80.50
+50,0.0786,0.9715,0.9122,0.8081,0.000000,80.58
+
+Full per-class evaluation (verbatim from visuals/classification_report.txt):
+                                             precision    recall  f1-score   support
+
+                             Astrocytoma T1     0.9437    0.6091    0.7403       110
+                           Astrocytoma T1C+     0.8532    0.7949    0.8230       117
+                             Astrocytoma T2     0.7273    0.6588    0.6914        85
+  Dysembryoplastic Neuroepithelial Tumor T1     0.7273    0.8889    0.8000         9
+Dysembryoplastic Neuroepithelial Tumor T1C+     0.5000    0.6471    0.5641        17
+  Dysembryoplastic Neuroepithelial Tumor T2     0.5556    0.4545    0.5000        11
+              Ependymoma - Subependymoma T1     0.8400    0.9767    0.9032        43
+            Ependymoma - Subependymoma T1C+     0.7761    0.7536    0.7647        69
+              Ependymoma - Subependymoma T2     0.9643    0.6279    0.7606        43
+                           Ganglioglioma T1     0.0000    0.0000    0.0000         6
+                         Ganglioglioma T1C+     0.2667    0.5714    0.3636         7
+                           Ganglioglioma T2     0.8182    1.0000    0.9000         9
+                               Germinoma T1     0.0000    0.0000    0.0000        12
+                             Germinoma T1C+     0.7333    0.7333    0.7333        15
+                               Germinoma T2     0.8750    0.5833    0.7000        12
+                            Glioblastoma T1     0.1600    0.0930    0.1176        86
+                          Glioblastoma T1C+     0.4388    0.6719    0.5309        64
+                            Glioblastoma T2     0.6667    0.7111    0.6882        45
+                      Hemangiopericytoma T1     0.1429    0.1053    0.1212        19
+                    Hemangiopericytoma T1C+     0.9032    0.4746    0.6222        59
+                      Hemangiopericytoma T2     0.7143    0.8333    0.7692        18
+                         Medulloblastoma T1     0.8462    0.9706    0.9041        34
+                       Medulloblastoma T1C+     0.9783    0.9574    0.9677        47
+                         Medulloblastoma T2     0.8750    0.8974    0.8861        39
+                              Meningioma T1     0.4839    0.7353    0.5837       102
+                            Meningioma T1C+     0.6519    0.5789    0.6132       152
+                              Meningioma T2     0.7901    0.7711    0.7805        83
+                             Neurocytoma T1     0.9286    0.8125    0.8667        16
+                           Neurocytoma T1C+     0.6389    1.0000    0.7797        23
+                             Neurocytoma T2     0.8235    0.8235    0.8235        17
+                                  Normal T1     0.8624    0.7581    0.8069       124
+                                Normal T1C+     0.7248    0.8634    0.7880       183
+                                  Normal T2     0.8081    0.8081    0.8081       172
+                       Oligodendroglioma T1     0.5692    0.8409    0.6789        44
+                     Oligodendroglioma T1C+     0.8000    0.5714    0.6667        42
+                       Oligodendroglioma T2     0.6364    0.7778    0.7000        27
+                               Pituitary T1     0.5682    0.7353    0.6410        34
+                             Pituitary T1C+     0.9333    0.8412    0.8849       233
+                               Pituitary T2     0.4634    0.5938    0.5205        32
+                              Schwannoma T1     0.6711    0.9444    0.7846        54
+                            Schwannoma T1C+     0.8267    0.7381    0.7799        84
+                              Schwannoma T2     0.8039    0.8913    0.8454        46
+
+                                   accuracy                         0.7271      2444
+                                  macro avg     0.6736    0.6928    0.6715      2444
+                               weighted avg     0.7382    0.7271    0.7228      2444
+
+--------------------------------------------------------------------------------
+SECTION 8 — POST-HOC EVALUATION OF RUN 1 (evaluated on ITS OWN split_manifest.csv)
+--------------------------------------------------------------------------------
+Method: full inference over the run's 2,444 manifest test rows, checkpoint =
+brain_best_model.pth (epoch-29 val-loss monitor weights).
+  top-1 (42-way)               : 0.727   (sanity MATCH with report 0.7271)
+  top-3                        : 0.884
+  top-5                        : 0.948
+  tumour-type top-1 (14-way,
+  sequences collapsed)         : 0.782
+
+INVALID MEASUREMENT, DISCARDED — recorded as a caution:
+  an earlier attempt re-derived the split fresh instead of reading the run's
+  manifest (grouping rules had changed since) -> test count 2,478 vs the run's
+  2,444 and an inflated "0.908 top-1". Any evaluation MUST use the run's own
+  split manifest; never a re-derived split.
+
+--------------------------------------------------------------------------------
+SECTION 9 — PER-CLASS ERROR-ABSORPTION ANALYSIS (are the ADDED classes harmful?)
+--------------------------------------------------------------------------------
+Question: did merging Pituitary/Normal from the old project cause the accuracy
+drop? Answer, from Run 1's own per-class report:
+
+  new class          prec    rec     f1   test n
+  Normal T1         0.862  0.758  0.807     124
+  Normal T1C+       0.725  0.863  0.788     183
+  Normal T2         0.808  0.808  0.808     172
+  Pituitary T1      0.568  0.735  0.641      34
+  Pituitary T1C+    0.933  0.841  0.885     233
+  Pituitary T2      0.463  0.594  0.520      32
+
+  mean F1, added classes (Pituitary+Normal)   : 0.742
+  mean F1, original 39 classes                : 0.663
+  new-class predictions that are wrong        : 148 / 778  = 19.0%
+  old-39-class predictions that are wrong     : 483 / 1649 = 29.3%
+
+  => The ADDED classes outperform the original ones and absorb FEWER errors
+     than the old classes generate. The drop from "97%" is attributable to the
+     leak-free evaluation protocol and the 42-way problem difficulty, NOT to
+     the merged data. Worst classes are old, tiny classes:
+       Ganglioglioma T1 F1=0.00 (n=6), Germinoma T1 F1=0.00 (n=12),
+       Glioblastoma T1 F1=0.12 (n=86), Hemangiopericytoma T1 F1=0.12 (n=19),
+       Ganglioglioma T1C+ F1=0.36 (n=7).
+
+--------------------------------------------------------------------------------
+SECTION 10 — RUN 2: REGULARISED (Kaggle, 2026-09-20 05:20:39 - 06:11:08, 47.93 min)
+--------------------------------------------------------------------------------
+Config : epochs 100 (scheduled), batch 32, lr 1e-3, seed 42, Tesla T4
+Recipe : drop_path=0.20  mixup_alpha=0.20  cutmix_alpha=1.00  mixup_prob=1.0
+         auto_augment=rand-m9-mstd0.5-inc1  ema_decay=0.999  label_smoothing=0.1
+         pct_start=0.2  patience=10 (monitor val_loss)
+Data   : grouping v2 -> 16,626 images, 5,016 groups (852 series, 28 stems
+         rejected), 922 duplicate clusters / 2,004 images collapsed,
+         7 groups / 79 samples with conflicting labels (see section 1),
+         splits Train=11,730 Val=2,418 Test=2,478, cross-split leaks=0
+Note   : cache persist failed on /kaggle/input (read-only) - harmless, 90 s
+         recompute per run.
+
+Epoch summary (selected; EMA = best variant flagged):
+  ep 01: train 3.6731/0.0727 | val 3.1223/0.1849 | best val_loss 3.1223 (ema)
+  ep 05: train 2.6233/0.3085 | val 1.8613/0.4251 | best val_loss 1.8613 (ema)
+  ep 10: train 2.3439/0.3826 | val 1.6468/0.4847 | best val_loss 1.6468 (ema)
+  ep 13: train 2.3131/0.3675 | val 1.5803/0.5120 | best val_loss 1.5803 (ema)
+  ep 14: train 2.2695/0.3992 | val 1.5677/0.5261 | best val_loss 1.5677 (ema)
+  ep 20: train 2.2414/0.4214 | val 1.5610/0.5434 | best val_loss 1.5610 (ema)
+  ep 28: train 2.0510/0.4200 | val 1.5944/0.5459 | best val_acc 0.5459
+  ep 29: train 2.0676/0.4458 | val 1.5761/0.5513 | best val_acc 0.5513
+  ep 30: train 2.0729/0.4482 | val 1.5720/0.5546 | best val_acc 0.5546
+  EARLY STOPPING at epoch 30 (patience=10 on val_loss; last loss improvement ep20)
+
+  best_val_loss : 1.5610 (epoch 20, EMA weights)
+  best_val_acc  : 0.5546 (epoch 30)
+  test_loss     : 1.5410
+  test_acc      : 0.5521   <- WORSE than Run 1 (0.7271)
+
+DIAGNOSIS (from the log itself):
+  val ACCURACY was still improving when the run stopped
+  (0.5447 ep16 -> 0.5513 ep29 -> 0.5546 ep30). Patience=10 fired during the
+  high-LR phase of the 100-epoch one-cycle schedule; the accuracy payoff of a
+  one-cycle schedule arrives in the LR-anneal tail, and heavy regularisation
+  (mixup on every batch + RandAugment + DropPath) intentionally slows
+  convergence. The shipped checkpoint (epoch 20, mid-warmup) is half-trained.
+  CONCLUSION: premature stop, not a verdict on the recipe.
+
+CORRECTIVE CHANGES SHIPPED AFTER RUN 2:
+  new flag --mixup_prob (default 1.0; recommend 0.5 to soften stacking)
+  recommended patience for long one-cycle schedules: off (--patience 100) or
+  25 - never 10. Run 3 command (not yet executed at time of writing):
+    python brain_kaggle.py \
+      --data_root /kaggle/input/datasets/h0neyp0t/openmed-brain \
+      --output_dir /kaggle/working \
+      --batch_size 32 --epochs 100 --patience 100 --mixup_prob 0.5 --seed 42
+  Decision rule: beat Run 1 baseline (test 0.7271 top-1); if a FULL run still
+  plateaus below ~0.75 val acc, next knob is --auto_augment
+  rand-m7-mstd0.5-inc1.
+
+--------------------------------------------------------------------------------
+SECTION 11 — QUALITY GATES (final state at time of writing)
+--------------------------------------------------------------------------------
+pytest   : 40 passed (includes regression tests: split-isolation guard fires,
+           Grad-CAM freshness, label-space width refusal + sidecar preference,
+           soft-target loss == weighted CE on one-hot, rare-class upweighting)
+ruff     : all checks passed (config: backend/ruff.toml; B905 zip-strict fixed)
+frontend : npm run build OK; lint 3 pre-existing warnings in untouched files
+kaggle_training_scripts.zip : deleted (author clones the repo instead)
+
+--------------------------------------------------------------------------------
+SECTION 12 — OPEN ITEMS
+--------------------------------------------------------------------------------
+1. DATA.json repair: 79 samples in 7 groups carry identical pixels with
+   conflicting sequence labels (section 1) - fix the manifest, not the code.
+2. 3 classes confined to a single split (Hemangiopericytoma T1C+,
+   Neurocytoma T1, Neurocytoma T1C+) - inherent to grouped splitting.
+3. Information-starved rare classes (test support 6-19): data collection, not
+   hyperparameters.
+4. T1C+ skew (62%) in the 4,000 BTSC rows: cause identified - the sequence
+   tagger that labelled them scored 87.11% val accuracy (section 2b), below
+   the 90% gate now enforced. Rerun sequence_tagger (it will retrain or
+   refuse) if regenerating; existing rows keep their labels until then.
+5. Run 3 (regularised, full schedule) pending; comparison bar = Run 1 baseline
+   (test 0.7271 / top-3 0.884 / top-5 0.948 / 14-way 0.782 / AUC 0.9741).
+6. OOD/"unknown" detection: post-hoc energy/maxlogit scoring proposed (no
+   retrain); rigorous option = leave-one-tumour-type-out run.
+
+================================================================================
+END OF LOG
+================================================================================

@@ -126,7 +126,7 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
 
   const handleCopyKaggleCmd = () => {
     const cmd =
-      'python brain_kaggle.py --data_root /kaggle/input/brain-tumor-dataset/archive --output_dir /kaggle/working --batch_size 32 --epochs 100 --patience 10 --seed 42'
+      'python brain_kaggle.py --data_root /kaggle/input/datasets/h0neyp0t/openmed-brain --output_dir /kaggle/working --batch_size 32 --epochs 75 --patience 15 --seed 42'
     navigator.clipboard.writeText(cmd)
     setCopiedCmd(true)
     setTimeout(() => setCopiedCmd(false), 2200)
@@ -137,7 +137,7 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
       <div className="task-header-strip">
         <div className="task-tag-group">
           <span className="task-type-tag class">Task · Classification</span>
-          <span className="task-name-text">42-Class Histological &amp; Sequence Differential</span>
+          <span className="task-name-text">9-Class Histological Differential (Flattened Modalities)</span>
         </div>
         <span className="task-model-pill">EfficientNetV2-B2 · 208×208 input · AdamW</span>
       </div>
@@ -339,37 +339,37 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
             <div className="roadmap-steps-grid">
               <div className="roadmap-step-card">
                 <span className="step-idx">Step 01</span>
-                <h5 className="step-title">MRI Sequence Auditing</h5>
+                <h5 className="step-title">Modality Flattening &amp; Class Harmonization</h5>
                 <p className="step-desc">
-                  Audit BTSC "No Tumor" and "Pituitary" images to map each scan to its exact pulse sequence:
-                  <strong> T1-weighted, T1 contrast-enhanced (T1C+), or T2-weighted</strong>.
+                  Collapse pulse sequence sub-modalities into <strong>9 unified histological &amp; diagnostic classes</strong>,
+                  merging multi-angle variations into robust diagnostic disease entities.
                 </p>
               </div>
 
               <div className="roadmap-step-card">
                 <span className="step-idx">Step 02</span>
-                <h5 className="step-title">Anatomical &amp; Patient-Level Partitioning</h5>
+                <h5 className="step-title">Deduplication &amp; Patient-Grouped Isolation</h5>
                 <p className="step-desc">
-                  Merge multi-angle normal scans into sequence-specific <code>Normal</code> buckets while strictly isolating patient IDs
-                  to prevent inter-slice leakage across train/val/test splits.
+                  Run SHA-256 and content hash deduplication across all 11,128 images with zero duplicate tolerance,
+                  applying GroupKFold patient-level grouping to prevent inter-slice leakage.
                 </p>
               </div>
 
               <div className="roadmap-step-card">
                 <span className="step-idx">Step 03</span>
-                <h5 className="step-title">Taxonomy Expansion (14 WHO Families)</h5>
+                <h5 className="step-title">Class Imbalance &amp; Minority Augmentation</h5>
                 <p className="step-desc">
-                  Introduce Pituitary adenomas as the 14th histological family mapped stereotactically to the Sellar/Suprasellar MNI region,
-                  expanding the classification space to 41–42 classes.
+                  Apply class-aware augmentation (RandAugment m7, scale jitter, affine flips) for rare classes
+                  alongside inverse-frequency loss weights to eliminate bias towards majority classes.
                 </p>
               </div>
 
               <div className="roadmap-step-card">
                 <span className="step-idx">Step 04</span>
-                <h5 className="step-title">Angle-Invariant Retraining</h5>
+                <h5 className="step-title">Calibrated Regularization &amp; 75-Epoch Training</h5>
                 <p className="step-desc">
-                  Launch a clean 50-epoch run on Tesla T4 with expanded affine rotation (±15°), contrast jitter, and class-weighted
-                  Cross-Entropy loss to permanently eliminate slice-angle bias.
+                  Train EfficientNetV2-B2 for 75 epochs (early stopping patience 15) with balanced regularizers
+                  (drop path 0.15, moderate mixup/cutmix, cosine annealing) to prevent overfitting.
                 </p>
               </div>
             </div>
@@ -513,10 +513,11 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
             <code>
               <span className="t-comment"># Launch production multi-class training with grouped, leakage-free splits:</span>
               {'\n'}python brain_kaggle.py \
-              {'\n'}  --data_root /kaggle/input/brain-tumor-dataset/archive \
+              {'\n'}  --data_root /kaggle/input/datasets/h0neyp0t/openmed-brain \
               {'\n'}  --output_dir /kaggle/working \
               {'\n'}  --batch_size 32 \
-              {'\n'}  --epochs 100 \
+              {'\n'}  --epochs 75 \
+              {'\n'}  --patience 15 \
               {'\n'}  --seed 42
             </code>
           </pre>

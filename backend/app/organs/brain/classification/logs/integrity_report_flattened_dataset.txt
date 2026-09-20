@@ -1,0 +1,94 @@
+==============================================================================
+DATA INTEGRITY REPORT - flattened brain classification dataset
+==============================================================================
+Root      : /home/honeypot/Desktop/archive
+Scanned   : 11623 files, 9 classes, 41.5s, workers=4
+Methods   : SHA-256 exact | 64-bit DCT pHash (Hamming<=2) | 32x32 signature series (corr>=0.9)
+
+Class counts:
+     261  Germ Cell Tumors [patient slices]
+   2,039  Gliomas [independent]
+     882  Medulloblastoma [patient slices]
+   1,820  Meningothelial Tumors [independent]
+     613  Mesenchymal (Non-Meningothelial Tumors) [patient slices]
+     876  Mixed Neuronal and Neuronal-Glial Tumors [patient slices]
+   2,192  Normal [independent]
+   1,704  Pituitary [independent]
+   1,236  Schwannoma [patient slices]
+  11,623  TOTAL decodable
+
+1. CORRUPT / UNDECODABLE FILES
+   [PASS] all files decode
+
+2. EXACT DUPLICATES (SHA-256 over file bytes)
+   same image twice in one class : 434 cluster(s), 929 file(s)
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma pineal 008.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma pineal 012.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 001.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 010.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 002.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 009.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 003.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 008.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 002.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 009.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 003.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 007.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 008.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 004.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 005.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Parinaud syndrome - pineal germinoma pineal 002.jpg; Images_/Germ Cell Tumors/T1 - Parinaud syndrome - pineal germinoma pineal 003.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Parinaud syndrome - pineal germinoma pineal 004.jpg; Images_/Germ Cell Tumors/T1 - Parinaud syndrome - pineal germinoma pineal 005.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Periventricular CNS germinoma ventricle 003.jpg; Images_/Germ Cell Tumors/T1 - Periventricular CNS germinoma ventricle 004.jpg
+   same image in two classes     : 0 cluster(s)
+   [FAIL] exact-duplicate verdict
+
+3. NEAR-DUPLICATES (pHash Hamming <= 2, re-encode proof)
+   near-dup pairs                : 4489
+   same class                    : 908 cluster(s)
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma pineal 008.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma pineal 012.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 001.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 010.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 002.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 009.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 003.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 008.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 006.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 007.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 011.jpg; Images_/Germ Cell Tumors/T1 - Bifocal germinoma suprasellar , ventricle 012.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Germinoma pineal , frontal 004.jpg; Images_/Germ Cell Tumors/T1 - Germinoma pineal , frontal 005.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 002.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 009.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 003.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 007.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 008.jpg
+     [Germ Cell Tumors] Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 004.jpg; Images_/Germ Cell Tumors/T1 - Intracranial multifocal germinoma 005.jpg
+   CROSS-CLASS (label conflict)  : 6 cluster(s)
+     Images_/Germ Cell Tumors/T1 - Bifocal germinoma pineal 003.jpg (Germ Cell Tumors); Images_/Germ Cell Tumors/T1C+ - Bifocal germinoma pineal 012.jpg (Germ Cell Tumors); Images_/Germ Cell Tumors/T1C+ - Bifocal germinoma pineal 014.jpg (Germ Cell Tumors); Images_/Mixed Neuronal and Neuronal-Glial Tumors/T1C+ - Extraventricular neurocytoma frontal 017.jpg (Mixed Neuronal and Neuronal-Glial Tumors)
+     Images_/Gliomas/enh_Tr-glTr_0000.jpg (Gliomas); Images_/Mixed Neuronal and Neuronal-Glial Tumors/T1 - Atypical presentation of dysembryoplastic neuroepithelial tumor (DNET) occipital 001.jpg (Mixed Neuronal and Neuronal-Glial Tumors)
+     Images_/Gliomas/enh_Tr-gl_0135.jpg (Gliomas); Images_/Gliomas/enh_Tr-gl_0136.jpg (Gliomas); Images_/Gliomas/enh_Tr-gl_0137.jpg (Gliomas); Images_/Gliomas/enh_Tr-gl_0138.jpg (Gliomas) (+4 more)
+     Images_/Meningothelial Tumors/enh_Tr-me_0018.jpg (Meningothelial Tumors); Images_/Mixed Neuronal and Neuronal-Glial Tumors/T1C+ - Dysembryoplastic neuroepithelial tumor (DNET) parietal 008.jpg (Mixed Neuronal and Neuronal-Glial Tumors)
+     Images_/Meningothelial Tumors/enh_Tr-me_0349.jpg (Meningothelial Tumors); Images_/Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 097.jpg (Mesenchymal (Non-Meningothelial Tumors)); Images_/Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 098.jpg (Mesenchymal (Non-Meningothelial Tumors)); Images_/Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 099.jpg (Mesenchymal (Non-Meningothelial Tumors))
+     Images_/Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 089.jpg (Mesenchymal (Non-Meningothelial Tumors)); Images_/Mesenchymal (Non-Meningothelial Tumors)/T1 - Solitary fibrous tumor (hemangiopericytoma) falx 090.jpg (Mesenchymal (Non-Meningothelial Tumors)); Images_/Normal/Siar_healthy_411.jpg (Normal)
+   [FAIL] cross-class verdict
+
+4. SUBJECT GROUPING (patient-slice classes)
+  Germ Cell Tumors:
+    files=261  verified series=30  files inside series=257  singleton files=4
+    series size: min=2 median=6 max=35
+    => distinct subjects ~34 (GroupKFold units)
+  Medulloblastoma:
+    files=882  verified series=36  files inside series=882  singleton files=0
+    series size: min=5 median=15 max=101
+    => distinct subjects ~36 (GroupKFold units)
+  Mesenchymal (Non-Meningothelial Tumors):
+    files=613  verified series=31  files inside series=613  singleton files=0
+    series size: min=3 median=15 max=108
+    => distinct subjects ~31 (GroupKFold units)
+  Mixed Neuronal and Neuronal-Glial Tumors:
+    files=876  verified series=75  files inside series=864  singleton files=12
+    series size: min=2 median=5 max=90
+    => distinct subjects ~87 (GroupKFold units)
+  Schwannoma:
+    files=1,236  verified series=81  files inside series=1,183  singleton files=53
+    series size: min=2 median=9 max=139
+    => distinct subjects ~134 (GroupKFold units)
+
+5. INDEPENDENCE CHECK (classes declared one-file-one-subject)
+  [WARN] Gliomas: 1 series + 81 near-dup clusters found - NOT fully independent; group them too
+  [WARN] Meningothelial Tumors: 1 series + 79 near-dup clusters found - NOT fully independent; group them too
+  [WARN] Normal: 0 series + 95 near-dup clusters found - NOT fully independent; group them too
+  [WARN] Pituitary: 1 series + 83 near-dup clusters found - NOT fully independent; group them too
+
+==============================================================================
+VERDICT
+  [ACTION REQUIRED] 6 near-dup cross-class cluster(s)
+  Remove or relabel the listed files before training.
+  Note: 434 exact + 908 near-dup clusters exist INSIDE single classes - the splitter must collapse them into one group (already handled by dataset.py grouping).
+  Split policy: GroupKFold on subjects for the 5 patient-slice classes; per-image stratified for the 4 independent classes.
+==============================================================================

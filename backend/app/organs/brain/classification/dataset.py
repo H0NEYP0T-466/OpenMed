@@ -1,9 +1,14 @@
-"""Brain tumour classification dataset, manifest discovery and leakage-free splitting.
+"""Brain tumour classification dataset, discovery and leakage-free splitting.
 
-Splitting is group-aware: images verified to originate from the same source
-scan are forced into a single split, and byte-identical duplicates are
-collapsed into the same group regardless of filename. See
-`app/organs/brain/README.md` for the measurement behind the grouping rule.
+Supports two layouts:
+  - manifest mode: DATA.json + Images_/ tree (the 42-class archive)
+  - folder mode  : Images_/<class>/<files> with no manifest (flattened
+    WHO-family dataset) - class label comes from the folder name.
+
+Splitting is group-aware. Classes in `INDEPENDENT_CLASSES` hold one study per
+file, so every file is its own group; all other classes hold patient slices,
+so visually verified series are forced into a single split, and byte-identical
+duplicates are collapsed everywhere. See `app/organs/brain/README.md`.
 """
 
 from __future__ import annotations
@@ -16,7 +21,8 @@ import os
 import zipfile
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
-from typing import Any, Iterable, Sequence
+from dataclasses import dataclass, field
+from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
 import torch
@@ -28,7 +34,108 @@ logger = logging.getLogger(__name__)
 SIGNATURE_SIZE = 32
 CONTENT_SIZE = 64
 SERIES_CORRELATION_THRESHOLD = 0.90
-CACHE_FORMAT_VERSION = 2
+CACHE_FORMAT_VERSION = 3
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+
+# Classes whose files are independent studies (one image = one subject); no
+# slice-series grouping applies. Everything else is patient-slice based and
+# gets GroupKFold-style whole-group splitting.
+INDEPENDENT_CLASSES = frozenset({
+    "Normal",
+    "Pituitary",
+    "Gliomas",
+    "Meningothelial Tumors",
+})
+
+
+@dataclass(frozen=True)
+class DatasetView:
+    """Unified view over manifest and folder dataset layouts."""
+
+    keys: list[str]                        # relative paths under images_base, sorted
+    labels: dict[str, str]                 # key -> class name
+    metadata: dict[str, dict[str, Any]]    # key -> per-sample metadata
+    images_base: str
+    cache_dir: str
+    manifest_path: str | None = None       # DATA.json when present
+
+
+def discover_dataset(data_root: str) -> DatasetView:
+    """Discover a dataset in manifest or folder layout.
+
+    Manifest mode is tried first so existing DATA.json archives keep their
+    rich metadata; folder mode labels images by their immediate class folder.
+    """
+    try:
+        json_path, images_base = BrainTumorDataset.locate_data_and_images(data_root)
+    except FileNotFoundError:
+        json_path = None
+
+    if json_path is not None:
+        with open(json_path) as handle:
+            raw_data = json.load(handle)
+        keys = sorted(
+            path
+            for path in raw_data
+            if not path.endswith(BrainTumorDataset.MASK_SUFFIX)
+        )
+        metadata = {key: dict(raw_data[key]) for key in keys}
+        labels = {key: metadata[key]["class"] for key in keys}
+        return DatasetView(
+            keys=keys,
+            labels=labels,
+            metadata=metadata,
+            images_base=images_base,
+            cache_dir=os.path.dirname(json_path),
+            manifest_path=json_path,
+        )
+
+    images_root = os.path.join(data_root, "Images_")
+    base = images_root if os.path.isdir(images_root) else data_root
+    if not os.path.isdir(base):
+        raise FileNotFoundError(
+            f"No DATA.json and no image folders found under '{data_root}'."
+        )
+
+    keys: list[str] = []
+    labels: dict[str, str] = {}
+    metadata: dict[str, dict[str, Any]] = {}
+    for dirpath, _, filenames in os.walk(base):
+        for name in sorted(filenames):
+            if os.path.splitext(name)[1].lower() not in IMAGE_EXTENSIONS:
+                continue
+            if name.endswith(BrainTumorDataset.MASK_SUFFIX):
+                continue
+            full = os.path.join(dirpath, name)
+            key = os.path.relpath(full, base)
+            parts = key.split(os.sep)
+            if len(parts) < 2:
+                logger.warning("Skipping image outside a class folder: %s", key)
+                continue
+            cls = parts[0]
+            keys.append(key)
+            labels[key] = cls
+            metadata[key] = {
+                "class": cls,
+                "tumor_type": cls,
+                "filename": name,
+                "sequence": "",
+                "location": [],
+                "point": [],
+                "has_lesion": 0 if cls == "Normal" else 1,
+                "relative_path": key,
+            }
+    if not keys:
+        raise FileNotFoundError(f"No class folders with images found under '{base}'.")
+    keys.sort()
+    return DatasetView(
+        keys=keys,
+        labels=labels,
+        metadata=metadata,
+        images_base=base,
+        cache_dir=data_root if os.path.isdir(data_root) else base,
+        manifest_path=None,
+    )
 
 
 def _numeric_stem(relative_path: str) -> str:
@@ -86,55 +193,43 @@ class BrainTumorDataset(Dataset):
         data_root: str,
         transform: Any | None = None,
         split_indices: Sequence[int] | None = None,
+        transforms_by_class: Mapping[str, Any] | None = None,
     ) -> None:
-        self.json_path, self.images_base = self.locate_data_and_images(data_root)
-        self.data_root = os.path.dirname(self.json_path)
+        self.view = discover_dataset(data_root)
+        self.json_path = self.view.manifest_path or ""
+        self.images_base = self.view.images_base
+        self.data_root = self.view.cache_dir
         self.transform = transform
+        self.transforms_by_class: dict[str, Any] = dict(transforms_by_class or {})
 
-        with open(self.json_path) as handle:
-            raw_data = json.load(handle)
-
-        self.class_names: list[str] = sorted(
-            {
-                metadata["class"]
-                for path, metadata in raw_data.items()
-                if not path.endswith(self.MASK_SUFFIX)
-            }
-        )
+        self.class_names: list[str] = sorted(set(self.view.labels.values()))
         self.tumor_types: list[str] = sorted(
             {
-                metadata["tumor_type"]
-                for path, metadata in raw_data.items()
-                if not path.endswith(self.MASK_SUFFIX)
+                meta.get("tumor_type", meta["class"])
+                for meta in self.view.metadata.values()
             }
         )
         self.class_to_idx: dict[str, int] = {
             name: idx for idx, name in enumerate(self.class_names)
         }
 
-        records = [
-            (path, metadata)
-            for path, metadata in raw_data.items()
-            if not path.endswith(self.MASK_SUFFIX)
-        ]
-        records.sort(key=lambda item: item[0])
-
         self.samples: list[dict[str, Any]] = [
             {
-                "path": os.path.join(self.images_base, path),
-                "relative_path": path,
-                "metadata": metadata,
+                "path": os.path.join(self.images_base, key),
+                "relative_path": key,
+                "metadata": self.view.metadata[key],
             }
-            for path, metadata in records
+            for key in self.view.keys
         ]
 
         if split_indices is not None:
             self.samples = [self.samples[i] for i in split_indices]
 
         logger.info(
-            "Loaded dataset with %d samples. (%d classes)",
+            "Loaded dataset with %d samples. (%d classes%s)",
             len(self.samples),
             len(self.class_names),
+            "" if self.view.manifest_path else ", folder layout",
         )
 
     def __len__(self) -> int:
@@ -153,8 +248,11 @@ class BrainTumorDataset(Dataset):
                 continue
 
             label = self.class_to_idx[sample["metadata"]["class"]]
-            if self.transform is not None:
-                image = self.transform(image)
+            transform = self.transforms_by_class.get(
+                sample["metadata"]["class"], self.transform
+            )
+            if transform is not None:
+                image = transform(image)
 
             metadata = sample["metadata"]
             meta_dict = {
@@ -240,8 +338,14 @@ class BrainTumorDataset(Dataset):
     def compute_class_weights(
         dataset_samples: Sequence[dict[str, Any]],
         class_names: Sequence[str],
+        smoothing: float = 1.0,
     ) -> torch.Tensor:
-        """Square-root smoothed inverse-frequency weights, mean-normalised and clipped."""
+        """Inverse-frequency class weights, mean-normalised and clipped.
+
+        `smoothing=1.0` is full 'balanced' weighting (sklearn convention):
+        a class with 8x fewer samples gets an 8x larger loss weight.
+        Lower values soften it (0.5 = square-root smoothing).
+        """
         counts = Counter(sample["metadata"]["class"] for sample in dataset_samples)
         num_classes = len(class_names)
         total = len(dataset_samples) or 1
@@ -250,24 +354,50 @@ class BrainTumorDataset(Dataset):
         for idx, name in enumerate(class_names):
             count = counts.get(name, 0)
             if count > 0:
-                weights[idx] = np.sqrt(total / (num_classes * count))
+                weights[idx] = (total / (num_classes * count)) ** smoothing
 
         mean_weight = float(np.mean(weights))
         if mean_weight > 0:
             weights /= mean_weight
 
-        return torch.tensor(np.clip(weights, 0.2, 5.0), dtype=torch.float)
+        return torch.tensor(np.clip(weights, 0.2, 8.0), dtype=torch.float)
+
+    @staticmethod
+    def sample_weights(
+        dataset_samples: Sequence[dict[str, Any]],
+        class_names: Sequence[str],
+        class_weights: torch.Tensor,
+        smoothing: float = 0.5,
+    ) -> list[float]:
+        """Per-sample oversampling weights for WeightedRandomSampler.
+
+        smoothing=1.0 fully balances sampling (rare images repeat ~8x per
+        epoch, which invites memorisation); 0.5 is the sqrt compromise.
+        """
+        index_of = {name: idx for idx, name in enumerate(class_names)}
+        values = class_weights.tolist()
+        return [
+            values[index_of[sample["metadata"]["class"]]] ** smoothing
+            for sample in dataset_samples
+        ]
 
     @staticmethod
     def build_group_ids(
-        json_path: str,
+        json_path: str | None,
         images_base: str,
         keys: Sequence[str],
         seed: int = 42,
+        labels: Sequence[str] | None = None,
+        cache_dir: str | None = None,
     ) -> list[str]:
-        """Group ids for `keys`, one group per source scan (see `build_case_groups`)."""
+        """Group ids for `keys`, one group per source subject (see `build_case_groups`)."""
         return build_case_groups(
-            json_path=json_path, images_base=images_base, keys=keys, seed=seed
+            json_path=json_path,
+            images_base=images_base,
+            keys=keys,
+            seed=seed,
+            labels=labels,
+            cache_dir=cache_dir,
         )
 
     @staticmethod
@@ -277,21 +407,18 @@ class BrainTumorDataset(Dataset):
         val_size: float = 0.15,
         seed: int = 42,
     ) -> tuple[list[int], list[int], list[int]]:
-        """Return leak-free train/val/test indices grouped by source scan."""
-        json_path, images_base = BrainTumorDataset.locate_data_and_images(data_root)
-        with open(json_path) as handle:
-            raw_data = json.load(handle)
-
-        keys = sorted(
-            path for path in raw_data if not path.endswith(BrainTumorDataset.MASK_SUFFIX)
-        )
-        labels = [raw_data[key]["class"] for key in keys]
+        """Return leak-free train/val/test indices grouped by source subject."""
+        view = discover_dataset(data_root)
+        keys = view.keys
+        labels = [view.labels[key] for key in keys]
 
         group_ids = build_case_groups(
-            json_path=json_path,
-            images_base=images_base,
+            json_path=view.manifest_path,
+            images_base=view.images_base,
             keys=keys,
             seed=seed,
+            labels=labels,
+            cache_dir=view.cache_dir,
         )
 
         targets = {
@@ -333,12 +460,12 @@ def _safe_extract_zip(archive_path: str) -> str:
     return destination
 
 
-def _cache_path_for(json_path: str) -> str:
-    return os.path.join(os.path.dirname(json_path), ".case_group_cache.json")
+def _cache_path_for(cache_dir: str) -> str:
+    return os.path.join(cache_dir, ".case_group_cache.json")
 
 
 def _fingerprint(
-    json_path: str, images_base: str, keys: Sequence[str]
+    json_path: str | None, images_base: str, keys: Sequence[str]
 ) -> dict[str, Any]:
     """Identity for the exact image set the cache was derived from.
 
@@ -359,7 +486,7 @@ def _fingerprint(
         hasher.update(f"{key}|{stat.st_size}|{stat.st_mtime_ns}".encode())
 
     return {
-        "manifest_mtime": os.path.getmtime(json_path),
+        "manifest_mtime": os.path.getmtime(json_path) if json_path else 0.0,
         "image_digest": hasher.hexdigest(),
         "count": len(keys),
         "unreadable": unreadable,
@@ -367,9 +494,9 @@ def _fingerprint(
 
 
 def _load_cache(
-    json_path: str, keys: Sequence[str], fingerprint: dict[str, Any]
+    cache_dir: str, keys: Sequence[str], fingerprint: dict[str, Any]
 ) -> dict[str, dict[str, str]] | None:
-    path = _cache_path_for(json_path)
+    path = _cache_path_for(cache_dir)
     if not os.path.isfile(path):
         return None
     try:
@@ -427,28 +554,35 @@ def decode_signature(encoded: str) -> np.ndarray:
 
 
 def build_case_groups(
-    json_path: str,
+    json_path: str | None,
     images_base: str,
     keys: Sequence[str],
     seed: int = 42,
     workers: int | None = None,
+    labels: Sequence[str] | None = None,
+    cache_dir: str | None = None,
 ) -> list[str]:
     """Map every image to a group id such that one group never spans two splits.
 
-    Two images share a group when they are byte-identical, or when they share a
-    numeric filename stem *and* are measurably the same picture. The correlation
-    test is what separates true slice series from unrelated scans that merely
-    share a naming prefix.
+    Two images share a group when they are byte-identical, when their pixels
+    are identical at 64x64, or when they share a numeric filename stem *within
+    one class* and are measurably the same picture. Classes listed in
+    `INDEPENDENT_CLASSES` hold one study per file and are never series-merged.
+    The correlation test is what separates true slice series from unrelated
+    scans that merely share a naming prefix.
     """
     if workers is None:
         workers = min(8, os.cpu_count() or 1)
+    anchor_dir = cache_dir or (
+        os.path.dirname(json_path) if json_path else images_base
+    )
 
     fingerprint = _fingerprint(json_path, images_base, keys)
-    records = _load_cache(json_path, keys, fingerprint)
+    records = _load_cache(anchor_dir, keys, fingerprint)
     if records is None:
         logger.info("Computing image signatures for leakage-safe grouping...")
         records = _probe_images(images_base, keys, workers)
-        _write_cache(json_path, keys, records, fingerprint)
+        _write_cache(anchor_dir, keys, records, fingerprint)
     else:
         logger.info("Reusing cached image signatures for grouping.")
 
@@ -502,14 +636,20 @@ def build_case_groups(
             CONTENT_SIZE,
         )
 
-    by_stem: dict[str, list[str]] = defaultdict(list)
+    class_of = dict(zip(keys, labels, strict=True)) if labels is not None else {}
+    by_stem: dict[tuple[str, str], list[str]] = defaultdict(list)
     for key in keys:
-        by_stem[_numeric_stem(key)].append(key)
+        by_stem[(class_of.get(key, ""), _numeric_stem(key))].append(key)
 
     verified_series = 0
     rejected_stems = 0
-    for stem, members in by_stem.items():
+    independent_stems = 0
+    for (cls, _stem), members in by_stem.items():
         if len(members) < 2:
+            continue
+        if cls in INDEPENDENT_CLASSES:
+            # One file per subject by dataset design: never series-merge these.
+            independent_stems += 1
             continue
         if _is_visual_series(members, signatures):
             verified_series += 1
@@ -519,17 +659,19 @@ def build_case_groups(
             rejected_stems += 1
             logger.debug(
                 "Stem %r groups %d unrelated images; kept as independent samples.",
-                stem,
+                _stem,
                 len(members),
             )
 
     logger.info(
         "Grouping resolved %d images into %d source groups "
-        "(%d verified series, %d shared-prefix stems rejected).",
+        "(%d verified series, %d shared-prefix stems rejected, "
+        "%d independent-class stems kept unmerged).",
         len(keys),
         len({find(key) for key in keys}),
         verified_series,
         rejected_stems,
+        independent_stems,
     )
 
     return [find(key) for key in keys]
@@ -562,7 +704,7 @@ def _numeric_suffix(relative_path: str) -> tuple[int, str]:
 
 
 def _write_cache(
-    json_path: str,
+    cache_dir: str,
     keys: Sequence[str],
     records: dict[str, dict[str, str]],
     fingerprint: dict[str, Any],
@@ -573,7 +715,7 @@ def _write_cache(
         "records": {key: records[key] for key in keys},
     }
     try:
-        with open(_cache_path_for(json_path), "w") as handle:
+        with open(_cache_path_for(cache_dir), "w") as handle:
             json.dump(payload, handle)
     except OSError as exc:
         logger.warning("Could not persist case-group cache: %s", exc)
