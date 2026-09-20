@@ -32,6 +32,9 @@ weights/
 checkpoints/*.pth
 checkpoints/*.pt
 !checkpoints/.gitkeep
+# Tiny label-space sidecars stay tracked: a clone can then verify class order
+# and report a precise "weights missing" reason instead of guessing.
+!checkpoints/*.label_space.json
 
 # Archives & ZIP files (Only the zip bundles are ignored, visuals and logs are tracked)
 brain_classification_results.zip

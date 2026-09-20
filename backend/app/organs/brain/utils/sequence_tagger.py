@@ -586,17 +586,30 @@ def classify_dataset_items(
     ds = InferenceDataset(items, transform=transform)
     loader = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=2)
 
+    unreadable = 0
     with torch.no_grad():
-        for imgs, indices in loader:
+        for imgs, indices, readable in loader:
             imgs = imgs.to(device)
             logits = model(imgs)
             probs = torch.softmax(logits, dim=1)
             confidences, preds = torch.max(probs, dim=1)
 
-            for idx_tensor, pred, conf in zip(indices, preds.cpu().tolist(), confidences.cpu().tolist()):
+            readable_flags = readable.tolist()
+            for idx_tensor, pred, conf, ok in zip(
+                indices, preds.cpu().tolist(), confidences.cpu().tolist(), readable_flags
+            ):
+                if not int(ok):
+                    unreadable += 1
+                    continue
                 idx = int(idx_tensor)
                 items[idx]["sequence"] = SEQUENCE_MAP[pred]
                 items[idx]["confidence"] = float(conf)
+
+    if unreadable:
+        print(
+            f"       [WARN] {unreadable:,d} scan(s) could not be decoded and were left "
+            "unlabelled; they are excluded from export rather than guessed."
+        )
 
 
 # ------------------------------------------------------------------------------
@@ -609,14 +622,21 @@ def export_dataset(
 ):
     print(f"\n[EXPORT] Cleaning destination and standardizing 512x512 RGB images to:\n         {output_dir}")
 
+    unlabelled = [item for item in items if not item.get("sequence")]
     low_confidence = [
         item for item in items
-        if float(item.get("confidence", 1.0)) < min_sequence_confidence
+        if item.get("sequence")
+        and float(item.get("confidence", 1.0)) < min_sequence_confidence
     ]
     accepted = [
         item for item in items
-        if float(item.get("confidence", 1.0)) >= min_sequence_confidence
+        if item.get("sequence")
+        and float(item.get("confidence", 1.0)) >= min_sequence_confidence
     ]
+    if unlabelled:
+        print(
+            f"         Skipped {len(unlabelled):,d} scans that received no sequence label."
+        )
     if low_confidence:
         print(
             f"         Discarded {len(low_confidence):,d} scans whose inferred pulse "
@@ -705,6 +725,10 @@ def main():
         "--force_retrain", action="store_true",
         help="Ignore any cached sequence classifier and rebuild it",
     )
+    parser.add_argument(
+        "--min_sequence_accuracy", type=float, default=0.90,
+        help="Refuse to label data with a sequence classifier below this held-out accuracy",
+    )
     args = parser.parse_args()
 
     print("=" * 72)
@@ -753,6 +777,7 @@ def main():
         batch_size=32,
         device="cpu",
         force_retrain=args.force_retrain,
+        min_val_accuracy=args.min_sequence_accuracy,
     )
 
     # 6. Classify sequences

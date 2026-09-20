@@ -80,8 +80,17 @@ Both come from `resolve_model_data_config(model)`; the resolved input is
 ```bash
 cd backend
 python -m app.organs.brain.classification.brain_kaggle \
-  --data_root "$OPENMED_BRAIN_DATASET" --output_dir /kaggle/working --epochs 50 --seed 42
+  --data_root "$OPENMED_BRAIN_DATASET" --output_dir /kaggle/working \
+  --epochs 100 --patience 10 --seed 42
 ```
+
+The default recipe targets the overfitting observed on the first honest run
+(train 97% vs val 81%): stochastic depth (`--drop_path 0.2`), MixUp 0.2 /
+CutMix 1.0 with class-weighted soft-target loss and label smoothing 0.1
+(`--mixup_alpha`, `--cutmix_alpha`), RandAugment M9 (`--auto_augment`), EMA
+weights (`--ema_decay 0.999`), and AdamW with norm/bias exempt from decay.
+Each epoch validates raw and EMA weights and checkpoints whichever wins.
+Pass empty/zero values to disable any of them.
 
 Produces `checkpoints/brain_best_model.pth` (best `val_loss`) plus
 `brain_best_acc.pth`, a `split_manifest.csv` recording every assignment, and

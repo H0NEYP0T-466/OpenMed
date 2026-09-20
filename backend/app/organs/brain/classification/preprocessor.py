@@ -7,7 +7,7 @@ preprocessing cannot drift away from what the network was trained on.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from timm.data import create_transform, resolve_model_data_config
 
@@ -18,8 +18,12 @@ def data_config(model: Any) -> dict[str, Any]:
     return dict(resolve_model_data_config(model))
 
 
-def get_train_transform(model: Any) -> Any:
+def get_train_transform(model: Any, auto_augment: Optional[str] = None) -> Any:
     config = data_config(model)
+    if auto_augment:
+        # RandAugment (the EfficientNet recipe) on top of the model's own
+        # random-resized-crop/flip stack; inference keeps the clean transform.
+        config["auto_augment"] = auto_augment
     logger.info("Resolved train transform config: %s", config)
     return create_transform(**config, is_training=True)
 

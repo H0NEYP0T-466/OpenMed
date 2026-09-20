@@ -9,6 +9,7 @@ import numpy as np
 import timm
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 MODEL_TAG = "tf_efficientnetv2_b2.in1k"
 GRADCAM_LAYER_CANDIDATES = ("conv_head", "bn2", "stem")
@@ -18,11 +19,24 @@ def create_model(
     num_classes: int,
     pretrained: bool = True,
     model_tag: str = MODEL_TAG,
+    drop_path_rate: float = 0.0,
+    drop_rate: Optional[float] = None,
 ) -> nn.Module:
-    """Build a timm classification backbone with a head sized for `num_classes`."""
+    """Build a timm classification backbone with a head sized for `num_classes`.
+
+    `drop_path_rate` enables stochastic depth, the primary regulariser for
+    EfficientNet backbones; it is identity in eval mode, so serving is
+    unaffected. `drop_rate` overrides the classifier-head dropout probability
+    when the architecture default is not wanted.
+    """
     if num_classes < 1:
         raise ValueError(f"num_classes must be positive, got {num_classes}")
-    return timm.create_model(model_tag, pretrained=pretrained, num_classes=num_classes)
+    kwargs: dict[str, Any] = {"drop_path_rate": drop_path_rate}
+    if drop_rate is not None:
+        kwargs["drop_rate"] = drop_rate
+    return timm.create_model(
+        model_tag, pretrained=pretrained, num_classes=num_classes, **kwargs
+    )
 
 
 def head_weight_keys(model: nn.Module) -> tuple[str, ...]:
@@ -69,12 +83,49 @@ def get_loss_function(
     return nn.CrossEntropyLoss(weight=class_weights.to(device))
 
 
+def weighted_soft_target_cross_entropy(
+    logits: torch.Tensor,
+    soft_targets: torch.Tensor,
+    class_weights: torch.Tensor,
+) -> torch.Tensor:
+    """Cross entropy against mixture targets (MixUp/CutMix), still class-weighted.
+
+    Each sample's loss is the target-distribution expectation of the per-class
+    weighted NLL, so the rare-class up-weighting survives label mixing instead
+    of being washed out by soft targets. The weighted mean matches
+    `nn.CrossEntropyLoss(weight=..., reduction="mean")`, which normalises by
+    the sum of sample weights rather than the batch size, so train and val
+    losses stay on the same scale.
+    """
+    log_probs = F.log_softmax(logits, dim=1)
+    per_sample = -(soft_targets * log_probs).sum(dim=1)
+    weights = soft_targets @ class_weights.to(logits.device)
+    total_weight = weights.sum()
+    if float(total_weight) > 0:
+        return (per_sample * weights).sum() / total_weight
+    return per_sample.mean()
+
+
 def get_optimizer(
     model: nn.Module,
     lr: float = 1e-3,
     weight_decay: float = 1e-4,
 ) -> torch.optim.AdamW:
-    return torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    """AdamW with the conventional exemption of norm and bias terms from decay."""
+    decay: list[nn.Parameter] = []
+    no_decay: list[nn.Parameter] = []
+    for name, param in model.named_parameters():
+        if not param.requires_grad:
+            continue
+        if param.ndim <= 1 or name.endswith(".bias"):
+            no_decay.append(param)
+        else:
+            decay.append(param)
+    groups = [
+        {"params": decay, "weight_decay": weight_decay},
+        {"params": no_decay, "weight_decay": 0.0},
+    ]
+    return torch.optim.AdamW(groups, lr=lr)
 
 
 def get_scheduler(

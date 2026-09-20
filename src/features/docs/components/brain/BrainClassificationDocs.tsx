@@ -41,7 +41,7 @@ const ARTIFACTS: readonly ArtifactCard[] = [
     filename: 'loss_curves.png',
     format: 'PNG · Metric Plot',
     title: 'Training & Validation Loss',
-    desc: 'Per-epoch class-weighted cross-entropy for both branches of the grouped split, under a one-cycle schedule stepped per minibatch.',
+    desc: 'Class-weighted soft-target cross-entropy over MixUp/CutMix batches, RandAugment inputs, stochastic depth and EMA weights, under a one-cycle schedule stepped per minibatch.',
     category: '02 · Optimization',
     previewPath: '/visuals/brain/loss_curves.png',
   },
@@ -126,7 +126,7 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
 
   const handleCopyKaggleCmd = () => {
     const cmd =
-      'python brain_kaggle.py --data_root /kaggle/input/brain-tumor-dataset/archive --output_dir /kaggle/working --batch_size 32 --epochs 50 --seed 42'
+      'python brain_kaggle.py --data_root /kaggle/input/brain-tumor-dataset/archive --output_dir /kaggle/working --batch_size 32 --epochs 100 --patience 10 --seed 42'
     navigator.clipboard.writeText(cmd)
     setCopiedCmd(true)
     setTimeout(() => setCopiedCmd(false), 2200)
@@ -456,11 +456,11 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
             </div>
             <div className="spec-row">
               <span className="spec-k">Loss Formulation</span>
-              <span className="spec-v">Cross-Entropy, sqrt-smoothed inverse-frequency weights mean-normalised and clipped to [0.2, 5.0]</span>
+              <span className="spec-v">Class-weighted soft-target CE over MixUp (α 0.2) / CutMix (α 1.0) batches with label smoothing 0.1; sqrt-smoothed inverse-frequency weights mean-normalised and clipped to [0.2, 5.0]</span>
             </div>
             <div className="spec-row">
               <span className="spec-k">Optimizer &amp; LR</span>
-              <span className="spec-v">AdamW (lr = 1e-3, weight_decay = 1e-4)</span>
+              <span className="spec-v">AdamW (lr = 1e-3, weight_decay = 1e-4, norm/bias exempt) · DropPath 0.2 · EMA 0.999 · RandAugment M9</span>
             </div>
             <div className="spec-row">
               <span className="spec-k">Learning Rate Schedule</span>
@@ -516,7 +516,7 @@ export const BrainClassificationDocs: React.FC<BrainClassificationDocsProps> = (
               {'\n'}  --data_root /kaggle/input/brain-tumor-dataset/archive \
               {'\n'}  --output_dir /kaggle/working \
               {'\n'}  --batch_size 32 \
-              {'\n'}  --epochs 50 \
+              {'\n'}  --epochs 100 \
               {'\n'}  --seed 42
             </code>
           </pre>

@@ -30,6 +30,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from sklearn.metrics import classification_report
+from timm.data import Mixup
+from timm.utils import ModelEmaV2
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -43,6 +45,7 @@ try:
         get_loss_function,
         get_optimizer,
         get_scheduler,
+        weighted_soft_target_cross_entropy,
     )
     from preprocessor import get_train_transform, get_val_transform
 except ImportError:
@@ -55,6 +58,7 @@ except ImportError:
         get_loss_function,
         get_optimizer,
         get_scheduler,
+        weighted_soft_target_cross_entropy,
     )
     from .preprocessor import get_train_transform, get_val_transform
 
@@ -78,7 +82,23 @@ def set_seed(seed: int) -> None:
     torch.use_deterministic_algorithms(True, warn_only=True)
 
 
-def train_one_epoch(model, loader, criterion, optimizer, scheduler, device, epoch):
+def train_one_epoch(
+    model,
+    loader,
+    criterion,
+    optimizer,
+    scheduler,
+    device,
+    epoch,
+    mixup_fn=None,
+    class_weights=None,
+    ema=None,
+):
+    """One training pass; MixUp/CutMix batches optimise the weighted soft-target loss.
+
+    Accuracy is logged against the original hard labels so the curve stays
+    comparable across runs even though the optimisation target is a mixture.
+    """
     model.train()
     running_loss = 0.0
     correct = 0
@@ -86,20 +106,29 @@ def train_one_epoch(model, loader, criterion, optimizer, scheduler, device, epoc
 
     progress = tqdm(loader, desc=f"Epoch {epoch:02d} [train]", leave=False)
     for inputs, labels, _ in progress:
-        inputs, labels = inputs.to(device), labels.to(device)
+        inputs, hard_labels = inputs.to(device), labels.to(device)
 
         optimizer.zero_grad(set_to_none=True)
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
+        if mixup_fn is not None and inputs.size(0) > 1:
+            inputs, soft_targets = mixup_fn(inputs, hard_labels)
+            outputs = model(inputs)
+            loss = weighted_soft_target_cross_entropy(
+                outputs, soft_targets, class_weights
+            )
+        else:
+            outputs = model(inputs)
+            loss = criterion(outputs, hard_labels)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
         if scheduler is not None:
             scheduler.step()
+        if ema is not None:
+            ema.update(model)
 
         batch = inputs.size(0)
         running_loss += float(loss.item()) * batch
-        correct += int(outputs.argmax(1).eq(labels).sum().item())
+        correct += int(outputs.argmax(1).eq(hard_labels).sum().item())
         total += batch
         progress.set_postfix(
             loss=f"{loss.item():.4f}", acc=f"{correct / max(total, 1):.3f}"
@@ -109,7 +138,7 @@ def train_one_epoch(model, loader, criterion, optimizer, scheduler, device, epoc
 
 
 @torch.no_grad()
-def validate(model, loader, criterion, device, epoch, return_preds=False):
+def validate(model, loader, criterion, device, epoch, return_preds=False, tag="val"):
     model.eval()
     running_loss = 0.0
     correct = 0
@@ -118,7 +147,7 @@ def validate(model, loader, criterion, device, epoch, return_preds=False):
     targets: list[np.ndarray] = []
     probabilities: list[np.ndarray] = []
 
-    progress = tqdm(loader, desc=f"Epoch {epoch:02d} [val]  ", leave=False)
+    progress = tqdm(loader, desc=f"Epoch {epoch:02d} [{tag}    ]", leave=False)
     for inputs, labels, _ in progress:
         inputs, labels = inputs.to(device), labels.to(device)
         outputs = model(inputs)
@@ -167,6 +196,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--drop_path", type=float, default=0.2,
+        help="Stochastic depth rate (primary EfficientNet regulariser)",
+    )
+    parser.add_argument("--mixup_alpha", type=float, default=0.2)
+    parser.add_argument("--cutmix_alpha", type=float, default=1.0)
+    parser.add_argument(
+        "--auto_augment", default="rand-m9-mstd0.5-inc1",
+        help="timm RandAugment spec; pass '' to disable",
+    )
+    parser.add_argument(
+        "--ema_decay", type=float, default=0.999,
+        help="Exponential-moving-average decay for eval weights; 0 disables",
+    )
+    parser.add_argument(
+        "--pct_start", type=float, default=0.2,
+        help="One-cycle warmup share of total steps",
+    )
     return parser.parse_args(argv)
 
 
@@ -234,8 +281,17 @@ def main(argv: list[str] | None = None) -> int:
     class_names = probe.class_names
     num_classes = len(class_names)
 
-    base_model = create_model(num_classes=num_classes, pretrained=True, model_tag=MODEL_TAG)
-    train_dataset = BrainTumorDataset(args.data_root, transform=get_train_transform(base_model), split_indices=train_idx)
+    base_model = create_model(
+        num_classes=num_classes,
+        pretrained=True,
+        model_tag=MODEL_TAG,
+        drop_path_rate=args.drop_path,
+    )
+    train_dataset = BrainTumorDataset(
+        args.data_root,
+        transform=get_train_transform(base_model, auto_augment=args.auto_augment or None),
+        split_indices=train_idx,
+    )
     val_dataset = BrainTumorDataset(args.data_root, transform=get_val_transform(base_model), split_indices=val_idx)
     test_dataset = BrainTumorDataset(args.data_root, transform=get_val_transform(base_model), split_indices=test_idx)
 
@@ -256,11 +312,32 @@ def main(argv: list[str] | None = None) -> int:
     test_loader = loader_for(test_dataset, shuffle=False)
 
     model = base_model.to(device)
+    ema = ModelEmaV2(model, decay=args.ema_decay) if args.ema_decay > 0 else None
     weights = BrainTumorDataset.compute_class_weights(train_dataset.samples, class_names)
     criterion = get_loss_function(weights, device)
+    class_weight_tensor = weights.to(device)
+    mixup_fn = None
+    if args.mixup_alpha > 0 or args.cutmix_alpha > 0:
+        mixup_fn = Mixup(
+            mixup_alpha=args.mixup_alpha,
+            cutmix_alpha=args.cutmix_alpha,
+            prob=1.0,
+            switch_prob=0.5,
+            label_smoothing=0.1,
+            num_classes=num_classes,
+        )
     optimizer = get_optimizer(model, lr=args.lr, weight_decay=args.weight_decay)
     scheduler = get_scheduler(
-        optimizer, num_epochs=args.epochs, steps_per_epoch=max(len(train_loader), 1)
+        optimizer,
+        num_epochs=args.epochs,
+        steps_per_epoch=max(len(train_loader), 1),
+        pct_start=args.pct_start,
+    )
+    logger.info(
+        "Regularisation: drop_path=%.2f mixup=%.2f cutmix=%.2f auto_augment=%s "
+        "ema_decay=%s label_smoothing=0.1",
+        args.drop_path, args.mixup_alpha, args.cutmix_alpha,
+        args.auto_augment or "off", args.ema_decay or "off",
     )
 
     best_path = os.path.join(checkpoints_dir, "brain_best_model.pth")
@@ -278,14 +355,33 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("Training with %s as the checkpoint monitor.", MONITOR)
     with open(log_path, "w", newline="") as csv_handle:
         writer = csv.writer(csv_handle)
-        writer.writerow(["epoch", "train_loss", "train_acc", "val_loss", "val_acc", "lr", "seconds"])
+        writer.writerow([
+            "epoch", "train_loss", "train_acc", "val_loss", "val_acc",
+            "val_loss_ema", "val_acc_ema", "lr", "seconds",
+        ])
 
         for epoch in range(1, args.epochs + 1):
             epoch_start = time.time()
             train_loss, train_acc = train_one_epoch(
-                model, train_loader, criterion, optimizer, scheduler, device, epoch
+                model, train_loader, criterion, optimizer, scheduler, device, epoch,
+                mixup_fn=mixup_fn, class_weights=class_weight_tensor, ema=ema,
             )
-            val_loss, val_acc = validate(model, val_loader, criterion, device, epoch)
+            raw_loss, raw_acc = validate(model, val_loader, criterion, device, epoch)
+            ema_loss = ema_acc = None
+            monitor_state = acc_state = model.state_dict()
+            val_loss, val_acc = raw_loss, raw_acc
+            if ema is not None:
+                ema_loss, ema_acc = validate(
+                    ema.module, val_loader, criterion, device, epoch, tag="val-ema"
+                )
+                # The EMA weights usually generalise better; whichever variant
+                # wins per metric is the one that gets checkpointed.
+                if ema_loss < raw_loss:
+                    val_loss = ema_loss
+                    monitor_state = ema.module.state_dict()
+                if ema_acc > raw_acc:
+                    val_acc = ema_acc
+                    acc_state = ema.module.state_dict()
             elapsed = time.time() - epoch_start
             current_lr = optimizer.param_groups[0]["lr"]
 
@@ -295,7 +391,10 @@ def main(argv: list[str] | None = None) -> int:
             history["val_acc"].append(val_acc)
             writer.writerow([
                 epoch, f"{train_loss:.4f}", f"{train_acc:.4f}",
-                f"{val_loss:.4f}", f"{val_acc:.4f}", f"{current_lr:.6f}", f"{elapsed:.2f}",
+                f"{val_loss:.4f}", f"{val_acc:.4f}",
+                f"{ema_loss:.4f}" if ema_loss is not None else "",
+                f"{ema_acc:.4f}" if ema_acc is not None else "",
+                f"{current_lr:.6f}", f"{elapsed:.2f}",
             ])
             csv_handle.flush()
 
@@ -304,12 +403,13 @@ def main(argv: list[str] | None = None) -> int:
             if val_loss < best_monitor:
                 best_monitor = val_loss
                 improved_monitor = True
-                torch.save(model.state_dict(), best_path)
+                torch.save(monitor_state, best_path)
                 save_label_space(best_path, class_names, model_tag=MODEL_TAG)
-                markers.append(f"best {MONITOR}={val_loss:.4f}")
+                source = "ema" if monitor_state is not model.state_dict() else "raw"
+                markers.append(f"best {MONITOR}={val_loss:.4f} ({source})")
             if val_acc > best_acc:
                 best_acc = val_acc
-                torch.save(model.state_dict(), best_acc_path)
+                torch.save(acc_state, best_acc_path)
                 save_label_space(best_acc_path, class_names, model_tag=MODEL_TAG)
                 markers.append(f"best val_acc={val_acc:.4f}")
 
@@ -401,6 +501,15 @@ def main(argv: list[str] | None = None) -> int:
             "train": len(train_idx), "val": len(val_idx), "test": len(test_idx)
         },
         "grouping": "source-scan groups with byte-identical duplicates collapsed",
+        "regularization": {
+            "drop_path": args.drop_path,
+            "mixup_alpha": args.mixup_alpha,
+            "cutmix_alpha": args.cutmix_alpha,
+            "auto_augment": args.auto_augment or None,
+            "ema_decay": args.ema_decay or None,
+            "label_smoothing": 0.1 if mixup_fn is not None else 0.0,
+            "weight_decay_exempt": "norm+bias",
+        },
     }
     with open(os.path.join(artifacts_dir, "metrics.json"), "w") as handle:
         json.dump(metrics, handle, indent=2)
@@ -417,6 +526,11 @@ def main(argv: list[str] | None = None) -> int:
             "Seed": args.seed,
             "Train/Val/Test": f"{len(train_idx)}/{len(val_idx)}/{len(test_idx)}",
             "Macro AUC (OvR)": f"{mean_class_auc:.4f}" if mean_class_auc is not None else "n/a",
+            "Regularisation": (
+                f"drop_path={args.drop_path}, mixup={args.mixup_alpha}, "
+                f"cutmix={args.cutmix_alpha}, randaugment={args.auto_augment or 'off'}, "
+                f"ema={args.ema_decay or 'off'}, label_smoothing={0.1 if mixup_fn else 0.0}"
+            ),
         },
     )
 

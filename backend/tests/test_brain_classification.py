@@ -308,6 +308,47 @@ def test_label_space_refuses_width_mismatch() -> None:
         resolve_label_space(None, 39)
 
 
+def test_weighted_soft_target_loss_matches_weighted_ce_for_one_hot() -> None:
+    """The MixUp/CutMix objective must reduce to weighted CE on un-mixed targets."""
+    torch = pytest.importorskip("torch")
+    from app.organs.brain.classification.model import weighted_soft_target_cross_entropy
+
+    generator = torch.Generator().manual_seed(0)
+    logits = torch.randn(8, 6, generator=generator)
+    hard = torch.randint(0, 6, (8,), generator=generator)
+    soft = torch.nn.functional.one_hot(hard, 6).float()
+    weights = torch.rand(6, generator=generator) + 0.5
+
+    expected = torch.nn.functional.cross_entropy(logits, hard, weight=weights)
+    actual = weighted_soft_target_cross_entropy(logits, soft, weights)
+    assert torch.allclose(actual, expected, atol=1e-5)
+
+
+def test_soft_target_loss_upweights_rare_class_errors() -> None:
+    """Mixing must not wash out the class weighting.
+
+    With equal weighting, one rare-class error averages against three easy
+    common-class wins. Up-weighting the rare class must pull the aggregate
+    loss toward that error (normalised weighted mean, PyTorch convention).
+    """
+    torch = pytest.importorskip("torch")
+    from app.organs.brain.classification.model import weighted_soft_target_cross_entropy
+
+    logits = torch.tensor([
+        [3.0, -3.0],  # predicts class 0: rows 1-3 correct, row 4 (rare) wrong
+        [3.0, -3.0],
+        [3.0, -3.0],
+        [3.0, -3.0],
+    ])
+    soft = torch.nn.functional.one_hot(torch.tensor([0, 0, 0, 1]), 2).float()
+    weights = torch.tensor([1.0, 5.0])  # per-class: common=1, rare=5
+
+    log_probs = torch.nn.functional.log_softmax(logits, dim=1)
+    unweighted = (-(soft * log_probs).sum(1)).mean()
+    weighted = weighted_soft_target_cross_entropy(logits, soft, weights)
+    assert weighted > unweighted
+
+
 def test_label_space_accepts_matching_width() -> None:
     space = resolve_label_space(None, len(CLASS_NAMES))
     assert space.num_classes == len(CLASS_NAMES)
