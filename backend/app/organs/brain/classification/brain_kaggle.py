@@ -197,13 +197,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
-        "--drop_path", type=float, default=0.2,
+        "--drop_path", type=float, default=0.1,
         help="Stochastic depth rate (primary EfficientNet regulariser)",
     )
-    parser.add_argument("--mixup_alpha", type=float, default=0.2)
-    parser.add_argument("--cutmix_alpha", type=float, default=1.0)
+    parser.add_argument("--mixup_alpha", type=float, default=0.0)
+    parser.add_argument("--cutmix_alpha", type=float, default=0.0)
     parser.add_argument(
-        "--auto_augment", default="rand-m9-mstd0.5-inc1",
+        "--mixup_prob", type=float, default=1.0,
+        help="Probability that a batch is mixed; lower (e.g. 0.5) to soften",
+    )
+    parser.add_argument(
+        "--auto_augment", default="",
         help="timm RandAugment spec; pass '' to disable",
     )
     parser.add_argument(
@@ -332,7 +336,7 @@ def main(argv: list[str] | None = None) -> int:
         mixup_fn = Mixup(
             mixup_alpha=args.mixup_alpha,
             cutmix_alpha=args.cutmix_alpha,
-            prob=1.0,
+            prob=args.mixup_prob,
             switch_prob=0.5,
             label_smoothing=0.1,
             num_classes=num_classes,
@@ -416,7 +420,7 @@ def main(argv: list[str] | None = None) -> int:
                 improved_monitor = True
                 torch.save(monitor_state, best_path)
                 save_label_space(best_path, class_names, model_tag=MODEL_TAG)
-                source = "ema" if monitor_state is not model.state_dict() else "raw"
+                source = "raw" if (ema is None or val_loss == raw_loss) else "ema"
                 markers.append(f"best {MONITOR}={val_loss:.4f} ({source})")
             if val_acc > best_acc:
                 best_acc = val_acc
