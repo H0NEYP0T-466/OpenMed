@@ -6,7 +6,7 @@ every segmentation call NameError'd.  These tests exercise that exact path.
 
 ``verify_checkpoint`` / ``prepare_model`` are tested against a synthetic
 random-weights checkpoint so the weight-preparation flow is proven without a
-network download.  The 80 MB size gate is patched away for the synthetic file.
+network download.  The minimum-size gate is patched away for the synthetic file.
 """
 
 from __future__ import annotations
@@ -125,12 +125,12 @@ def test_heatmap_to_mask_prompt_shape(hot_cam: np.ndarray) -> None:
 def test_verify_checkpoint_reports_ready_strict(synthetic_checkpoint: str) -> None:
     from app.organs.brain.segmentation.model import build_medsam_lite
 
-    # Patch the 80 MB gate so the small synthetic file passes shape checks.
+    # Patch the min-size gate so the small synthetic file passes shape checks.
     prepare_weights.EXPECTED_MIN_BYTES = 0
     try:
         report = prepare_weights.verify_checkpoint(Path(synthetic_checkpoint), device="cpu")
     finally:
-        prepare_weights.EXPECTED_MIN_BYTES = 80_000_000
+        prepare_weights.EXPECTED_MIN_BYTES = 30_000_000
 
     assert report["parameters"] == sum(
         p.numel() for p in build_medsam_lite().parameters()
@@ -148,7 +148,7 @@ def test_verify_checkpoint_rejects_garbage(tmp_path) -> None:
         with pytest.raises(RuntimeError):
             prepare_weights.verify_checkpoint(garbage, device="cpu")
     finally:
-        prepare_weights.EXPECTED_MIN_BYTES = 80_000_000
+        prepare_weights.EXPECTED_MIN_BYTES = 30_000_000
 
 
 def test_prepare_model_no_download_when_present(
@@ -225,5 +225,45 @@ def test_pipeline_segment_with_heatmap_end_to_end(
     assert res["box_mask_base64"].startswith("data:image/png;base64,")
     assert res["mask_prompt_mask_base64"].startswith("data:image/png;base64,")
     assert isinstance(res["iou_box"], float) and isinstance(res["iou_mask"], float)
+
+    pipe.unload()
+
+
+class _FakeMedSAM:
+    """Mimics the released LiteMedSAM weights: box prompts segment, dense mask
+    prompts return an all-negative logit map (hence an empty binarised mask).
+    This is exactly the behaviour the real checkpoint exhibits, so the pipeline
+    must fall back to the box result instead of rendering a black mask."""
+
+    def __call__(self, image, boxes=None, masks=None, points=None):
+        low = torch.zeros(image.shape[0], 1, 256, 256)
+        iou = torch.full((image.shape[0], 1), 0.72)
+        if masks is not None:
+            low.fill_(-2.0)   # all-negative → empty after `> 0`
+            iou.fill_(0.32)
+        elif boxes is not None:
+            low[:, :, 100:160, 100:160] = 2.0
+        return low, iou
+
+
+def test_mask_prompt_falls_back_to_box_when_empty(
+    sample_image: Image.Image, hot_cam,
+) -> None:
+    """If the dense mask prompt yields an empty mask (LiteMedSAM is box-only),
+    the pipeline reuses the box result so the UI never shows a black mask."""
+    pipe = BrainSegmentationPipeline()
+    pipe.model = _FakeMedSAM()   # type: ignore[assignment]
+    pipe.device = "cpu"
+    pipe._loaded = True
+
+    res = pipe.segment_with_heatmap(sample_image, hot_cam)
+
+    assert res["mask_prompt_used"] is True
+    assert res["mask_prompt_fallback"] is True
+    assert res["mask_prompt_mask_base64"] == res["box_mask_base64"]
+    assert res["mask_prompt_overlay_base64"] == res["box_overlay_base64"]
+    assert res["iou_mask"] == res["iou_box"]
+    # The note explains why the box result is shown in the mask-prompt slot.
+    assert "box" in res["mask_prompt_note"].lower()
 
     pipe.unload()

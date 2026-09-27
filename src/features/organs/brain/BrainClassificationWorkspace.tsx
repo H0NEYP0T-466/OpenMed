@@ -10,8 +10,8 @@ import {
 } from 'lucide-react'
 import { RomanSection } from '../../../components/common/RomanSection'
 import { BrainRegionViewer } from './BrainRegionViewer'
-import { classifyBrainImage, getBrainHealth, getBrainModelInfo } from './brainApi'
-import type { BrainClassificationResult, BrainModelInfo } from './brainTypes'
+import { analyzeBrainImage, getBrainHealth, getBrainModelInfo } from './brainApi'
+import type { BrainModelInfo, BrainSegmentationResult } from './brainTypes'
 import { TUMOR_DATA } from './tumorData'
 import type { OrganMetadata, Hotspot } from '../../../types/organ'
 import './BrainClassificationWorkspace.css'
@@ -81,7 +81,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [result, setResult] = useState<BrainClassificationResult | null>(null)
+  const [result, setResult] = useState<BrainSegmentationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [apiReady, setApiReady] = useState<boolean>(false)
   const [modelInfo, setModelInfo] = useState<BrainModelInfo | null>(null)
@@ -172,7 +172,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
     setIsAnalyzing(true)
     setError(null)
     try {
-      const res = await classifyBrainImage(file)
+      const res = await analyzeBrainImage(file)
       setResult(res)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Inference failed.'
@@ -194,10 +194,10 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   // Total sections count depends on whether inference results are loaded and view mode
   const totalSections =
     viewMode === 'all'
-      ? (result ? 9 : 5)
+      ? (result ? 10 : 5)
       : viewMode === 'anatomical'
         ? 4
-        : (result ? 5 : 1)
+        : (result ? 6 : 1)
 
   return (
     <article className="organ-essay brain-master-dossier">
@@ -603,9 +603,96 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 </RomanSection>
 
-                {/* VIII - Locus Anatomical Site */}
+                {/* VIII - Segmentio / LiteMedSAM */}
                 <RomanSection
                   index={viewMode === 'all' ? 7 : 3}
+                  of={totalSections}
+                  title="Segmentio - LiteMedSAM Promptable Segmentation"
+                  className="sp12"
+                >
+                  {result.segmentation_performed ? (
+                    <>
+                      <p className="sec-hint">
+                        Model: LiteMedSAM (TinyViT-256) · Input: 256×256 ·
+                        Prompted by the Grad-CAM heatmap above — a bounding box
+                        and the dense activation map are run separately.
+                      </p>
+
+                      <div className="seg-metadata-strip">
+                        <span className="seg-meta-chip">
+                          <span className="k">Box prompt IoU</span>
+                          <span className="v">{result.iou_box?.toFixed(3) ?? '—'}</span>
+                        </span>
+                        <span className="seg-meta-chip">
+                          <span className="k">Mask prompt IoU</span>
+                          <span className="v">{result.iou_mask?.toFixed(3) ?? '—'}</span>
+                        </span>
+                        <span className="seg-meta-chip">
+                          <span className="k">Box coords (256²)</span>
+                          <span className="v">
+                            {result.box_coords
+                              ? result.box_coords.map((c) => c.toFixed(0)).join(', ')
+                              : '—'}
+                          </span>
+                        </span>
+                        <span className="seg-meta-chip">
+                          <span className="k">Segment step</span>
+                          <span className="v">{result.total_ms?.toFixed(0)} ms</span>
+                        </span>
+                      </div>
+
+                      <div className="gradcam-dual-plate">
+                        {previewUrl && (
+                          <div className="scan-frame">
+                            <img src={previewUrl} alt="Source MRI Scan" />
+                            <span className="scan-tag">Source MRI</span>
+                          </div>
+                        )}
+                        <div className="scan-frame">
+                          {result.box_mask_base64 ? (
+                            <img src={result.box_mask_base64} alt="Box-prompt segmentation mask" />
+                          ) : (
+                            <div className="seg-empty-plate">No box mask produced</div>
+                          )}
+                          <span className="scan-tag highlight">Box prompt · mask</span>
+                        </div>
+                        <div className="scan-frame">
+                          {result.box_overlay_base64 ? (
+                            <img src={result.box_overlay_base64} alt="Segmentation overlay on MRI" />
+                          ) : (
+                            <div className="seg-empty-plate">No box overlay produced</div>
+                          )}
+                          <span className="scan-tag highlight">Box prompt · overlay</span>
+                        </div>
+                        <div className="scan-frame">
+                          {result.mask_prompt_mask_base64 ? (
+                            <img src={result.mask_prompt_mask_base64} alt="Mask-prompt segmentation mask" />
+                          ) : (
+                            <div className="seg-empty-plate">No mask-prompt mask</div>
+                          )}
+                          <span className="scan-tag">Mask prompt · mask</span>
+                        </div>
+                        <div className="scan-frame">
+                          {result.mask_prompt_overlay_base64 ? (
+                            <img src={result.mask_prompt_overlay_base64} alt="Mask-prompt overlay on MRI" />
+                          ) : (
+                            <div className="seg-empty-plate">No mask-prompt overlay</div>
+                          )}
+                          <span className="scan-tag">Mask prompt · overlay</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="seg-skipped-banner" role="status">
+                      {result.segmentation_skipped_reason ??
+                        'Segmentation was not performed on this scan.'}
+                    </div>
+                  )}
+                </RomanSection>
+
+                {/* IX - Locus Anatomical Site */}
+                <RomanSection
+                  index={viewMode === 'all' ? 8 : 4}
                   of={totalSections}
                   title="Locus - Typical Presentation Sites & Approximate Centroid"
                   className="sp7"
@@ -617,9 +704,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   />
                 </RomanSection>
 
-                {/* IX - Monograph */}
+                {/* X - Monograph */}
                 <RomanSection
-                  index={viewMode === 'all' ? 8 : 4}
+                  index={viewMode === 'all' ? 9 : 5}
                   of={totalSections}
                   title="Monograph - Clinical Tumor Dossier"
                   className="sp5"

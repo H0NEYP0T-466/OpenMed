@@ -1,8 +1,8 @@
 import type {
-  BrainClassificationResult,
   BrainHealthStatus,
   BrainModelInfo,
   BrainRegion3D,
+  BrainSegmentationResult,
   Top5Prediction,
 } from './brainTypes'
 
@@ -153,7 +153,7 @@ const LOCALIZATION_BASIS =
   "classifier's confidence. This is a population prior, not a measurement of " +
   "where this patient's lesion sits."
 
-function buildPreset(spec: PresetSpec): BrainClassificationResult {
+function buildPreset(spec: PresetSpec): BrainSegmentationResult {
   const top5: Top5Prediction[] = spec.differential.map(([name, confidence]) => ({
     class: name,
     confidence,
@@ -184,10 +184,15 @@ function buildPreset(spec: PresetSpec): BrainClassificationResult {
     label_space_source: 'preset',
     inference_ms: 0,
     simulated: true,
+    // Presets are rendered when the backend is unreachable, so no real
+    // segmentation can be produced. Show the "skipped" state instead.
+    segmentation_performed: false,
+    segmentation_skipped_reason:
+      'The analysis service is offline — segmentation was not run on this specimen preset.',
   }
 }
 
-const SIMULATED_PRESETS: Readonly<Record<string, BrainClassificationResult>> = Object.fromEntries(
+const SIMULATED_PRESETS: Readonly<Record<string, BrainSegmentationResult>> = Object.fromEntries(
   PRESET_SPECS.map((spec) => [spec.key, buildPreset(spec)]),
 )
 
@@ -197,7 +202,7 @@ function isNetworkFailure(error: unknown): boolean {
   return /fetch|network|load/i.test(message)
 }
 
-function matchPreset(fileName: string): BrainClassificationResult | null {
+function matchPreset(fileName: string): BrainSegmentationResult | null {
   const lowered = fileName.toLowerCase()
   for (const [key, preset] of Object.entries(SIMULATED_PRESETS)) {
     if (lowered.includes(key)) return preset
@@ -205,15 +210,23 @@ function matchPreset(fileName: string): BrainClassificationResult | null {
   return null
 }
 
-export const classifyBrainImage = async (
+/**
+ * Classify an MRI scan *and* segment any detected tumour in one round trip.
+ *
+ * POST /api/brain/segment runs the full pipeline: EfficientNetV2-B2
+ * classification with Grad-CAM, and if the prediction is any tumour type
+ * (not "Normal"), LiteMedSAM segmentation using the Grad-CAM heatmap as both
+ * a bounding-box prompt and a dense mask prompt.
+ */
+export const analyzeBrainImage = async (
   file: File,
-): Promise<BrainClassificationResult> => {
+): Promise<BrainSegmentationResult> => {
   const formData = new FormData()
   formData.append('file', file)
 
   let response: Response
   try {
-    response = await fetch(`${API_BASE_URL}/classify`, { method: 'POST', body: formData })
+    response = await fetch(`${API_BASE_URL}/segment`, { method: 'POST', body: formData })
   } catch (error) {
     if (isNetworkFailure(error)) {
       const preset = matchPreset(file.name)
@@ -232,11 +245,11 @@ export const classifyBrainImage = async (
     const message =
       detail && typeof detail.detail === 'string'
         ? detail.detail
-        : `Classification failed (HTTP ${response.status}).`
+        : `Analysis failed (HTTP ${response.status}).`
     throw new Error(message)
   }
 
-  return (await response.json()) as BrainClassificationResult
+  return (await response.json()) as BrainSegmentationResult
 }
 
 export const getBrainModelInfo = async (): Promise<BrainModelInfo> => {
@@ -256,5 +269,5 @@ export const getBrainHealth = async (): Promise<BrainHealthStatus> => {
 }
 
 export const isSimulatedResult = (
-  result: BrainClassificationResult | null,
+  result: BrainSegmentationResult | null,
 ): boolean => result?.simulated === true

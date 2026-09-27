@@ -1941,3 +1941,50 @@
   }
 }
 
+
+/* ── Segmentio (LiteMedSAM) ───────────────────────────────────────────── */
+.seg-metadata-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.seg-meta-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--ink-mute, #b2bec3);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+}
+
+.seg-meta-chip .k {
+  font-weight: 600;
+  color: var(--ink-mute, #b2bec3);
+}
+
+.seg-meta-chip .v {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.seg-empty-plate {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  color: var(--ink-mute, #b2bec3);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.seg-skipped-banner {
+  padding: 1rem 1.25rem;
+  border: 1px dashed var(--ink-mute, #b2bec3);
+  border-radius: 0.5rem;
+  color: var(--ink-mute, #b2bec3);
+  font-size: 0.9rem;
+}

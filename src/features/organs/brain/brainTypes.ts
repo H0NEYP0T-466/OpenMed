@@ -36,7 +36,8 @@ export interface BrainClassificationResult {
   readonly tumor_type: string
   readonly sequence: string
   readonly top5: readonly Top5Prediction[]
-  readonly probabilities: readonly number[]
+  /** Not returned by the /segment endpoint; kept for /classify compatibility. */
+  readonly probabilities?: readonly number[]
   readonly gradcam_base64: string
   readonly gradcam_grid: readonly [number, number]
   readonly explainability: Explainability
@@ -47,6 +48,37 @@ export interface BrainClassificationResult {
   readonly inference_ms: number
   /** Present only when the backend was unreachable and a preset was simulated. */
   readonly simulated?: boolean
+}
+
+/**
+ * Response from POST /api/brain/segment.
+ *
+ * A superset of {@link BrainClassificationResult}: every classification field
+ * is present, plus the LiteMedSAM segmentation result. When the classifier
+ * predicts "Normal", ``segmentation_performed`` is ``false`` and no mask is
+ * produced — the pipeline only segments when a tumour is detected.
+ */
+export interface BrainSegmentationResult extends BrainClassificationResult {
+  readonly segmentation_performed: boolean
+  /** Why segmentation did not run (e.g. classified as Normal). */
+  readonly segmentation_skipped_reason?: string
+
+  /** Box-prompt segmentation (bounding box derived from the Grad-CAM heatmap). */
+  readonly box_prompt_used?: boolean
+  readonly box_mask_base64?: string
+  readonly box_overlay_base64?: string
+  readonly box_coords?: number[]
+  readonly iou_box?: number
+
+  /** Dense mask-prompt segmentation (full Grad-CAM heatmap as the prompt). */
+  readonly mask_prompt_used?: boolean
+  readonly mask_prompt_mask_base64?: string
+  readonly mask_prompt_overlay_base64?: string
+  readonly iou_mask?: number
+
+  readonly segmentation_input_size?: string
+  readonly original_size?: string
+  readonly total_ms?: number
 }
 
 export interface DatasetSummary {

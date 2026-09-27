@@ -198,10 +198,29 @@ class BrainSegmentationPipeline:
                     input_tensor, masks=mask_prompt,
                 )
             mask_dense = postprocess_mask(low_res_masks_m, prep.original_hw, prep.resized_hw)
-            result["mask_prompt_mask_base64"] = _encode_mask_png(mask_dense)
-            result["mask_prompt_overlay_base64"] = _encode_overlay(pil_image, mask_dense)
-            result["iou_mask"] = round(float(iou_pred_m.squeeze().cpu().item()), 4)
-            result["mask_prompt_used"] = True
+
+            if mask_dense.max() > 0:
+                result["mask_prompt_mask_base64"] = _encode_mask_png(mask_dense)
+                result["mask_prompt_overlay_base64"] = _encode_overlay(pil_image, mask_dense)
+                result["iou_mask"] = round(float(iou_pred_m.squeeze().cpu().item()), 4)
+                result["mask_prompt_used"] = True
+            elif "box_mask_base64" in result:
+                # LiteMedSAM weights are trained for box prompting only: a
+                # dense mask prompt yields an all-negative logit map, so the
+                # `> 0` binarisation above produces an empty mask. Fall back
+                # to the box result so the UI never renders a black mask.
+                result["mask_prompt_mask_base64"] = result["box_mask_base64"]
+                result["mask_prompt_overlay_base64"] = result["box_overlay_base64"]
+                result["iou_mask"] = result["iou_box"]
+                result["mask_prompt_used"] = True
+                result["mask_prompt_fallback"] = True
+                result["mask_prompt_note"] = (
+                    "LiteMedSAM weights support box prompting only; the dense "
+                    "mask prompt produced an empty prediction, so the "
+                    "box-prompt result is shown."
+                )
+            else:
+                result["mask_prompt_used"] = False
         else:
             result["mask_prompt_used"] = False
 
