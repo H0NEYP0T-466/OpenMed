@@ -63,7 +63,7 @@
     transparent 72%
   );
   pointer-events: none;
-  filter: blur(10px);
+  /* No blur filter: the gradient is already soft and the layer pulses. */
   animation: orbAuraPulse 3.4s ease-in-out infinite alternate;
 }
 
@@ -82,7 +82,7 @@
   position: relative;
   z-index: 2;
   display: block;
-  filter: drop-shadow(0 0 14px rgba(237, 111, 92, 0.4));
+  /* No drop-shadow: this canvas repaints every frame. */
 }
 
 /* Optional unboxed mono label */

@@ -16,6 +16,7 @@ For_Agents/
 *.sw?
 
 brag-output-2026-09-27-112042/
+public/samples
 
 
 # Python Bytecode, Caches & Virtual Environments

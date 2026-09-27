@@ -15,8 +15,19 @@ import { MODE_FRAMES, resolvePreset, type OrbFrame } from 'thinking-orbs/engine'
 import './DiagnosticThinkingHUD.css'
 
 export interface DiagnosticThinkingHUDProps {
-  classCountLabel?: string
+  /**
+   * Drives the overlay in and out. The component stays mounted so the exit
+   * transition can play — it renders nothing once fully closed, and the orb
+   * animation stops as soon as it starts closing.
+   */
+  readonly isVisible: boolean
+  readonly classCountLabel?: string
 }
+
+/** Must match the opacity transition on `.diagnostic-hud-fullscreen-backdrop`. */
+const FADE_MS = 320
+
+type OrbPhase = 'connecting' | 'transition' | 'solving'
 
 // Coral accent palette
 const CORAL_R = 237
@@ -93,6 +104,7 @@ function drawOrbFrame(
 }
 
 export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
+  isVisible,
   classCountLabel = '4 classes',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -100,7 +112,14 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
   const startTimeRef = useRef<number>(0)
 
   const [elapsedSec, setElapsedSec] = useState<number>(0)
-  const [activePhase, setActivePhase] = useState<'connecting' | 'transition' | 'solving'>('connecting')
+  const [activePhase, setActivePhase] = useState<OrbPhase>('connecting')
+  const [stage, setStage] = useState<'open' | 'closing' | 'hidden'>(
+    isVisible ? 'open' : 'hidden',
+  )
+
+  // Mirrors of state the render loop reads, so it can skip redundant updates.
+  const phaseRef = useRef<OrbPhase>('connecting')
+  const openedRef = useRef(isVisible)
 
   // Rendered orb diameter in CSS px. The engine's preset table only ships
   // 64 / 32 / 20 tuning entries, but the geometry functions take a free
@@ -109,7 +128,33 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
   // upscaling a 64px bitmap.
   const size = 176
 
+  // Open / close lifecycle. The overlay fades out instead of vanishing.
+  //
+  // Holding a node on screen for an exit transition is the one thing that
+  // cannot be derived at render time — "stay mounted for another 320ms after
+  // the prop flips" is inherently post-render state. Hence the setState here.
   useEffect(() => {
+    if (isVisible) {
+      openedRef.current = true
+      // eslint-disable-next-line react/set-state-in-effect
+      setStage('open')
+      return
+    }
+    if (!openedRef.current) return
+
+    setStage('closing')
+    const timer = window.setTimeout(() => {
+      openedRef.current = false
+      setStage('hidden')
+    }, FADE_MS)
+    return () => window.clearTimeout(timer)
+  }, [isVisible])
+
+  // Orb animation. Only runs while open — it stops the instant the overlay
+  // begins closing, so the fade-out costs nothing.
+  useEffect(() => {
+    if (stage !== 'open') return
+
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -128,24 +173,37 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
     startTimeRef.current = performance.now()
     let isRunning = true
 
+    // The canvas redraws every frame, but React must NOT re-render every
+    // frame. The timer only shows tenths, so state is pushed at 10 Hz, and
+    // the phase only when it actually changes. Re-rendering this whole card
+    // at 60 fps was what made the animation stutter.
+    let lastTick = -1
+
     const render = (now: number) => {
       if (!isRunning) return
 
       const elapsed = (now - startTimeRef.current) / 1000
-      setElapsedSec(elapsed)
+
+      const tick = Math.floor(elapsed * 10)
+      if (tick !== lastTick) {
+        lastTick = tick
+        setElapsedSec(tick / 10)
+      }
+
       const cycleTime = elapsed % CYCLE_TOTAL
 
       let weightConnecting = 1
       let weightSolving = 0
       let scaleConnecting = 1
       let scaleSolving = 0.92
+      let phase: OrbPhase = 'connecting'
 
       if (cycleTime < DURATION_CONNECTING) {
         weightConnecting = 1
         weightSolving = 0
         scaleConnecting = 1
         scaleSolving = 0.92
-        setActivePhase('connecting')
+        phase = 'connecting'
       } else if (cycleTime < DURATION_CONNECTING + DURATION_TRANSITION) {
         const p = (cycleTime - DURATION_CONNECTING) / DURATION_TRANSITION
         const ease = p * p * (3 - 2 * p)
@@ -153,13 +211,13 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
         weightSolving = ease
         scaleConnecting = 1 + 0.08 * ease
         scaleSolving = 0.92 + 0.08 * ease
-        setActivePhase('transition')
+        phase = 'transition'
       } else if (cycleTime < DURATION_CONNECTING + DURATION_TRANSITION + DURATION_SOLVING) {
         weightConnecting = 0
         weightSolving = 1
         scaleConnecting = 0.92
         scaleSolving = 1
-        setActivePhase('solving')
+        phase = 'solving'
       } else {
         const p =
           (cycleTime - (DURATION_CONNECTING + DURATION_TRANSITION + DURATION_SOLVING)) /
@@ -169,7 +227,13 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
         weightConnecting = ease
         scaleSolving = 1 + 0.08 * ease
         scaleConnecting = 0.92 + 0.08 * ease
-        setActivePhase('transition')
+        phase = 'transition'
+      }
+
+      // Only touch React state when the phase actually flips.
+      if (phase !== phaseRef.current) {
+        phaseRef.current = phase
+        setActivePhase(phase)
       }
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -196,7 +260,7 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
         cancelAnimationFrame(animFrameRef.current)
       }
     }
-  }, [size])
+  }, [stage, size])
 
   // Formatting elapsed time mm:ss.d
   const mins = Math.floor(elapsedSec / 60)
@@ -214,9 +278,12 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
     phaseSubtitle = 'Tracing the tumour boundary'
   }
 
+  if (stage === 'hidden') return null
+  if (typeof document === 'undefined') return null
+
   const modalContent = (
     <div
-      className="diagnostic-hud-fullscreen-backdrop"
+      className={`diagnostic-hud-fullscreen-backdrop ${stage === 'open' ? 'is-open' : 'is-closing'}`}
       role="dialog"
       aria-modal="true"
       aria-label="Analyzing scan"
@@ -279,6 +346,5 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
     </div>
   )
 
-  if (typeof document === 'undefined') return null
   return createPortal(modalContent, document.body)
 }

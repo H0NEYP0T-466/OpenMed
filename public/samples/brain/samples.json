@@ -1,38 +1,79 @@
 {
-  "Medulloblastoma T1": {
-    "class": "Medulloblastoma T1",
-    "path": "/samples/brain/Medulloblastoma_T1.jpg",
-    "tumor_type": "Medulloblastoma",
+  "Germ Cell Tumors": {
+    "class": "Germ Cell Tumors",
+    "path": "/samples/brain/GermCellTumors.jpg",
+    "tumor_type": "Germ Cell Tumors",
     "location": [
-      "brainstem"
-    ],
-    "sequence": "T1"
+      "pineal",
+      "ventricle"
+    ]
   },
-  "Astrocytoma T1": {
-    "class": "Astrocytoma T1",
-    "path": "/samples/brain/Astrocytoma_T1.jpg",
-    "tumor_type": "Astrocytoma",
-    "location": [],
-    "sequence": "T1"
-  },
-  "Glioblastoma T1C+": {
-    "class": "Glioblastoma T1C+",
-    "path": "/samples/brain/Glioblastoma_T1Cplus.jpg",
-    "tumor_type": "Glioblastoma",
+  "Gliomas": {
+    "class": "Gliomas",
+    "path": "/samples/brain/Gliomas.jpg",
+    "tumor_type": "Gliomas",
     "location": [
       "occipital",
       "ventricle"
-    ],
-    "sequence": "T1C+"
+    ]
   },
-  "Meningioma T1C+": {
-    "class": "Meningioma T1C+",
-    "path": "/samples/brain/Meningioma_T1Cplus.jpg",
-    "tumor_type": "Meningioma",
+  "Medulloblastoma": {
+    "class": "Medulloblastoma",
+    "path": "/samples/brain/Medulloblastoma.jpg",
+    "tumor_type": "Medulloblastoma",
+    "location": [
+      "posterior fossa",
+      "ventricle"
+    ]
+  },
+  "Meningothelial Tumors": {
+    "class": "Meningothelial Tumors",
+    "path": "/samples/brain/MeningothelialTumors.jpg",
+    "tumor_type": "Meningothelial Tumors",
     "location": [
       "anterior cranial fossa",
       "frontal"
-    ],
-    "sequence": "T1C+"
+    ]
+  },
+  "Mesenchymal (Non-Meningothelial Tumors)": {
+    "class": "Mesenchymal (Non-Meningothelial Tumors)",
+    "path": "/samples/brain/Mesenchymal.jpg",
+    "tumor_type": "Mesenchymal (Non-Meningothelial Tumors)",
+    "location": [
+      "parafalcine",
+      "falx"
+    ]
+  },
+  "Mixed Neuronal and Neuronal-Glial Tumors": {
+    "class": "Mixed Neuronal and Neuronal-Glial Tumors",
+    "path": "/samples/brain/MixedNeuronal.jpg",
+    "tumor_type": "Mixed Neuronal and Neuronal-Glial Tumors",
+    "location": [
+      "intraventricular",
+      "ventricle"
+    ]
+  },
+  "Normal": {
+    "class": "Normal",
+    "path": "/samples/brain/Normal.jpg",
+    "tumor_type": "Normal",
+    "location": []
+  },
+  "Pituitary": {
+    "class": "Pituitary",
+    "path": "/samples/brain/Pituitary.jpg",
+    "tumor_type": "Pituitary",
+    "location": [
+      "pituitary fossa",
+      "sella"
+    ]
+  },
+  "Schwannoma": {
+    "class": "Schwannoma",
+    "path": "/samples/brain/Schwannoma.jpg",
+    "tumor_type": "Schwannoma",
+    "location": [
+      "cerebellopontine angle"
+    ]
   }
 }

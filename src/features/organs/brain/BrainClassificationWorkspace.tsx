@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   UploadCloud,
   Sparkles,
-  Activity,
   Brain as BrainIcon,
-  ShieldCheck,
   ArrowUpRight,
 } from 'lucide-react'
 import { RomanSection } from '../../../components/common/RomanSection'
@@ -27,43 +25,79 @@ interface SpecimenPreset {
   readonly plate: string
   readonly name: string
   readonly path: string
-  readonly seq: string
   readonly subtitle: string
   readonly site: string
 }
 
+/**
+ * One specimen per class in the classifier's 9-class label space, so every
+ * class can be exercised from the cassette rack. Each plate is a real MRI
+ * pulled from backend/datasets/brain/<class>/ — the subtitle and site come
+ * from that series' own clinical filename, not from invented values.
+ */
 const SPECIMEN_PRESETS: readonly SpecimenPreset[] = [
   {
     plate: 'Pl. A',
-    name: 'Meningioma',
-    path: '/samples/brain/Meningioma_T1Cplus.jpg',
-    seq: 'T1C+',
-    subtitle: 'Extra-axial Dural Mass',
-    site: 'Anterior Fossa / Frontal',
+    name: 'Germ Cell Tumors',
+    path: '/samples/brain/GermCellTumors.jpg',
+    subtitle: 'Pineal Germinoma',
+    site: 'Pineal Region / Ventricle',
   },
   {
     plate: 'Pl. B',
-    name: 'Glioblastoma',
-    path: '/samples/brain/Glioblastoma_T1Cplus.jpg',
-    seq: 'T1C+',
-    subtitle: 'High-Grade Infiltrative Glioma',
+    name: 'Gliomas',
+    path: '/samples/brain/Gliomas.jpg',
+    subtitle: 'Cystic Glioblastoma',
     site: 'Occipital / Ventricle',
   },
   {
     plate: 'Pl. C',
-    name: 'Astrocytoma',
-    path: '/samples/brain/Astrocytoma_T1.jpg',
-    seq: 'T1',
-    subtitle: 'Diffuse Astrocytic Neoplasm',
-    site: 'Temporal White Matter',
+    name: 'Medulloblastoma',
+    path: '/samples/brain/Medulloblastoma.jpg',
+    subtitle: 'Desmoplastic Medulloblastoma',
+    site: 'Posterior Fossa / Cerebellum',
   },
   {
     plate: 'Pl. D',
-    name: 'Medulloblastoma',
-    path: '/samples/brain/Medulloblastoma_T1.jpg',
-    seq: 'T1',
-    subtitle: 'Posterior Fossa Embryonal',
-    site: 'Cerebellar Vermis / Brainstem',
+    name: 'Meningothelial Tumors',
+    path: '/samples/brain/MeningothelialTumors.jpg',
+    subtitle: 'Angiomatous Meningioma',
+    site: 'Anterior Cranial Fossa / Frontal',
+  },
+  {
+    plate: 'Pl. E',
+    name: 'Mesenchymal (Non-Meningothelial)',
+    path: '/samples/brain/Mesenchymal.jpg',
+    subtitle: 'Dural Solitary Fibrous Tumor',
+    site: 'Parafalcine / Falx',
+  },
+  {
+    plate: 'Pl. F',
+    name: 'Mixed Neuronal & Neuronal-Glial',
+    path: '/samples/brain/MixedNeuronal.jpg',
+    subtitle: 'Central Neurocytoma',
+    site: 'Intraventricular / Ventricle',
+  },
+  {
+    plate: 'Pl. G',
+    name: 'Normal',
+    path: '/samples/brain/Normal.jpg',
+    subtitle: 'No Tumour Detected',
+    site: 'Whole Brain',
+  },
+  {
+    plate: 'Pl. H',
+    name: 'Pituitary',
+    path: '/samples/brain/Pituitary.jpg',
+    subtitle: 'Pituitary Tumour',
+    site: 'Sellar Region',
+  },
+  {
+    plate: 'Pl. I',
+    name: 'Schwannoma',
+    path: '/samples/brain/Schwannoma.jpg',
+    subtitle: 'Acoustic Schwannoma',
+    site: 'Cerebellopontine Angle',
   },
 ]
 
@@ -157,7 +191,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
     try {
       const resp = await fetch(preset.path)
       const blob = await resp.blob()
-      const sampleFile = new File([blob], `${preset.name}_${preset.seq}.jpg`, {
+      const sampleFile = new File([blob], `${preset.name}.jpg`, {
         type: 'image/jpeg',
       })
       setFile(sampleFile)
@@ -190,14 +224,13 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const classLabel = classCount === null ? 'multi-class' : `${classCount}-class`
   const classCountLabel = classCount === null ? 'classes' : `${classCount} classes`
   const inputLabel = modelInfo?.input_size ?? 'model-native'
-  const isSimulated = result?.simulated === true
 
   // Total sections count depends on whether inference results are loaded and view mode
   const totalSections =
     viewMode === 'all'
-      ? (result ? 10 : 5)
+      ? (result ? 9 : 4)
       : viewMode === 'anatomical'
-        ? 4
+        ? 3
         : (result ? 6 : 1)
 
   return (
@@ -297,80 +330,31 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                 </div>
               </RomanSection>
             )}
-
-            {/* IV - Vasa & Pathologiae */}
-            <RomanSection
-              index={3}
-              of={totalSections}
-              title="Vasa & Pathologiae - Cerebrovascular Circulation & Differential Spectrum"
-              className="sp12"
-            >
-              <div className="vasa-layout-grid">
-                <div className="vasa-card">
-                  <div className="vasa-card-head">
-                    <Activity size={15} className="vasa-icon" />
-                    <span className="vasa-card-title">Cerebrovascular Perfusion (Circle of Willis)</span>
-                  </div>
-                  <p className="vasa-card-copy">{profile.bloodSupply}</p>
-                  <div className="vasa-meta-tags">
-                    <span className="vasa-tag">Internal Carotid Arterial Axis</span>
-                    <span className="vasa-tag">Vertebrobasilar Perfusion Territory</span>
-                    <span className="vasa-tag">Blood-Brain Barrier (BBB) Dynamics</span>
-                  </div>
-                </div>
-
-                <div className="vasa-card">
-                  <div className="vasa-card-head">
-                    <ShieldCheck size={15} className="vasa-icon" />
-                    <span className="vasa-card-title">Differential Pathology Spectrum</span>
-                  </div>
-                  <div className="pathology-matrix">
-                    {profile.commonConditions.map((cond) => (
-                      <div key={cond} className="pathology-pill">
-                        <span className="pathology-bullet" />
-                        <span className="pathology-label">{cond}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </RomanSection>
           </>
         )}
 
         {/* =========================================================
-            PART B: DIAGNOSTIC SUITE & RADIOLOGICAL INGESTION (V - VII)
+            PART B: DIAGNOSTIC SUITE & RADIOLOGICAL INGESTION (IV - IX)
             ========================================================= */}
         {(viewMode === 'all' || viewMode === 'diagnostic') && (
           <>
-            {/* V - Scan Ingestion & Specimen Lightbox */}
+            {/* IV - Scan Ingestion & Specimen Lightbox */}
             <RomanSection
-              index={viewMode === 'all' ? 4 : 0}
+              index={viewMode === 'all' ? 3 : 0}
               of={totalSections}
               title="Ingestio - MRI Scan Acquisition & Specimen Cassettes"
               className="sp12"
             >
               {/* Telemetry Header */}
               <div className="ingest-telemetry-strip">
-                <div className="ingest-spec-group">
-                  <span className="ingest-label">Modality:</span>
-                  <span className="ingest-val">Cranial MRI (Axial)</span>
-                  <span className="ingest-sep">•</span>
-                  <span className="ingest-label">Matrix:</span>
-                  <span className="ingest-val">512 × 512 px</span>
-                  <span className="ingest-sep">•</span>
-                  <span className="ingest-label">Sequences:</span>
-                  <span className="ingest-val">T1, T1C+, T2</span>
-                </div>
-
                 <div className="ingest-status-badge">
                   {apiReady ? (
                     <span className="status-pill online">
                       <span className="status-dot" /> Live Neural Engine (Port 8016)
                     </span>
                   ) : (
-                    <span className="status-pill offline" title="FastAPI server offline. Running on verified local specimen cache.">
-                      <span className="status-dot" /> Demonstration Archive (Local Cache)
+                    <span className="status-pill offline" title="FastAPI server offline. Start it to analyse scans.">
+                      <span className="status-dot" /> Analysis Engine Offline
                     </span>
                   )}
                 </div>
@@ -394,7 +378,6 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       >
                         <div className="cassette-thumbnail-box">
                           <img src={preset.path} alt={preset.name} className="cassette-thumbnail" loading="lazy" decoding="async" />
-                          <span className="cassette-seq-badge">{preset.seq}</span>
                         </div>
                         <div className="cassette-info">
                           <div className="cassette-meta">
@@ -438,7 +421,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                     </div>
                     <span className="prompt-headline">Drop Brain MRI Scan or Browse File</span>
                     <span className="prompt-meta">
-                      Accepts 512×512 Axial T1, T1C+, or T2 DICOM / JPEG series • Or select a Specimen Cassette above
+                      Accepts 512×512 axial DICOM / JPEG scans • Or select a Specimen Cassette above
                     </span>
                     <span className="prompt-btn">Browse Local Drive</span>
                   </div>
@@ -447,16 +430,18 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                     <div className="film-viewport">
                       <img src={previewUrl} alt="Mounted MRI Scan" className="film-image" loading="lazy" decoding="async" />
                       <div className="film-overlay-hud">
-                        <span className="hud-tag top-left">AXIAL T1/T2</span>
+                        <span className="hud-tag top-left">AXIAL</span>
                         <span className="hud-tag top-right">FOV 240mm</span>
                         <span className="hud-tag btm-left">{file?.name ?? 'Specimen Scan'}</span>
                         <span className="hud-tag btm-right">{file ? `${(file.size / 1024).toFixed(1)} KB` : '512×512'}</span>
                       </div>
 
-                      {/* Diagnostic Thinking HUD Overlay during Inference */}
-                      {isAnalyzing && (
-                        <DiagnosticThinkingHUD classCountLabel={classCountLabel} />
-                      )}
+                      {/* Thinking overlay. Kept mounted so it can fade out
+                          instead of disappearing the instant inference ends. */}
+                      <DiagnosticThinkingHUD
+                        isVisible={isAnalyzing}
+                        classCountLabel={classCountLabel}
+                      />
                     </div>
 
                     <div className="film-action-bar">
@@ -509,9 +494,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
             {/* Diagnostic Inference Results (When Evaluated) */}
             {result && (
               <>
-                {/* VI - Diagnostic Finding */}
+                {/* V - Diagnostic Finding */}
                 <RomanSection
-                  index={viewMode === 'all' ? 5 : 1}
+                  index={viewMode === 'all' ? 4 : 1}
                   of={totalSections}
                   title={`Diagnostica - ${classLabel} Histological Finding`}
                   className="sp7"
@@ -520,14 +505,8 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                     <div className="diag-header-block">
                       <span className="diag-eyebrow">Automated Differential Finding</span>
                       <h3 className="diag-headline">{result.predicted_class}</h3>
-                      {isSimulated && (
-                        <p className="simulated-result-flag" role="status">
-                          Simulated specimen preset. The analysis service was unreachable, so this
-                          differential was not computed from the uploaded image.
-                        </p>
-                      )}
-                      {result.model_trained === false && !isSimulated && (
-                        <p className="simulated-result-flag" role="status">
+                      {result.model_trained === false && (
+                        <p className="model-warning-flag" role="status">
                           Trained checkpoint not loaded — output is not clinically meaningful.
                         </p>
                       )}
@@ -537,10 +516,6 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       <div className="meta-chip">
                         <span className="k">Histological Family</span>
                         <span className="v">{result.tumor_type}</span>
-                      </div>
-                      <div className="meta-chip">
-                        <span className="k">MRI Sequence</span>
-                        <span className="v">{result.sequence}</span>
                       </div>
                       <div className="meta-chip">
                         <span className="k">Backbone</span>
@@ -586,9 +561,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 </RomanSection>
 
-                {/* VII - Attentio / Grad-CAM */}
+                {/* VI - Attentio / Grad-CAM */}
                 <RomanSection
-                  index={viewMode === 'all' ? 6 : 2}
+                  index={viewMode === 'all' ? 5 : 2}
                   of={totalSections}
                   title="Attentio - Grad-CAM Feature Activation"
                   className="sp5"
@@ -604,25 +579,20 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       {result.gradcam_base64 ? (
                         <img src={result.gradcam_base64} alt="Grad-CAM Activation" loading="lazy" decoding="async" />
                       ) : (
-                        <div className="simulated-cam-plate">
-                          {previewUrl && (
-                            <img src={previewUrl} alt="Base" className="underlay-img" loading="lazy" decoding="async" />
-                          )}
-                          <div className="cam-glow-layer" />
-                        </div>
+                        <div className="seg-empty-plate">No activation map produced</div>
                       )}
                       <span className="scan-tag highlight">
                         {result.gradcam_base64
                           ? `CAM (${result.explainability.layer})`
-                          : 'Illustrative overlay — no activation computed'}
+                          : 'No activation computed'}
                       </span>
                     </div>
                   </div>
                 </RomanSection>
 
-                {/* VIII - Segmentio / LiteMedSAM */}
+                {/* VII - Segmentio / LiteMedSAM */}
                 <RomanSection
-                  index={viewMode === 'all' ? 7 : 3}
+                  index={viewMode === 'all' ? 6 : 3}
                   of={totalSections}
                   title="Segmentio - LiteMedSAM Promptable Segmentation"
                   className="sp12"
@@ -699,9 +669,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   )}
                 </RomanSection>
 
-                {/* IX - Locus Anatomical Site */}
+                {/* VIII - Locus Anatomical Site */}
                 <RomanSection
-                  index={viewMode === 'all' ? 8 : 4}
+                  index={viewMode === 'all' ? 7 : 4}
                   of={totalSections}
                   title="Locus - Typical Presentation Sites & Approximate Centroid"
                   className="sp7"
@@ -713,9 +683,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   />
                 </RomanSection>
 
-                {/* X - Monograph */}
+                {/* IX - Monograph */}
                 <RomanSection
-                  index={viewMode === 'all' ? 9 : 5}
+                  index={viewMode === 'all' ? 8 : 5}
                   of={totalSections}
                   title="Monograph - Clinical Tumor Dossier"
                   className="sp5"

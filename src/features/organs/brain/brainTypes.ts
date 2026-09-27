@@ -46,8 +46,6 @@ export interface BrainClassificationResult {
   readonly model_trained: boolean
   readonly label_space_source: string
   readonly inference_ms: number
-  /** Present only when the backend was unreachable and a preset was simulated. */
-  readonly simulated?: boolean
 }
 
 /**

@@ -14,7 +14,7 @@
   pointer-events: none;
 }
 
-/* Subtle glow filter on dark backgrounds */
-.thinking-orb-dark .thinking-orb-canvas {
-  filter: drop-shadow(0 0 12px rgba(237, 111, 92, 0.18));
-}
+/* NOTE: deliberately no drop-shadow glow on the canvas. It repaints every
+   frame, and a per-frame filter is a per-frame blur pass — the main reason
+   these orb animations stuttered. Use a static glow layer behind the canvas
+   if a halo is needed. */
