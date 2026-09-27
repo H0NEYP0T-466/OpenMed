@@ -1,0 +1,252 @@
+/**
+ * DiagnosticThinkingHUD.css — thinking overlay with a fullscreen unclickable
+ * backdrop blur.
+ */
+
+.diagnostic-hud-fullscreen-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Unclickable background blur */
+  backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  background: rgba(15, 14, 11, 0.72);
+  pointer-events: all;
+  cursor: wait;
+  user-select: none;
+  animation: hudBackdropFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hudBackdropFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(14px) saturate(125%);
+    -webkit-backdrop-filter: blur(14px) saturate(125%);
+  }
+}
+
+/* Big prominent card container */
+.diagnostic-hud-big-card {
+  position: relative;
+  width: 580px;
+  max-width: 92vw;
+  background: #15140f;
+  border: 1px solid rgba(247, 241, 222, 0.16);
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(237, 111, 92, 0.22);
+  padding: 32px 36px 28px;
+  display: flex;
+  flex-direction: column;
+  color: var(--bone);
+  animation: hudCardScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hudCardScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Card Header — status on the left, elapsed time on the right */
+.hud-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(247, 241, 222, 0.08);
+}
+
+.hud-card-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(237, 111, 92, 0.85);
+  animation: statusDotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes statusDotPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.82); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+.status-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(239, 231, 210, 0.88);
+}
+
+.hud-card-timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(237, 111, 92, 0.1);
+  border: 1px solid rgba(237, 111, 92, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.timer-pulse-icon {
+  color: var(--accent);
+  animation: timerBlink 1.4s ease-in-out infinite;
+}
+
+@keyframes timerBlink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.timer-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+/* Center Orb Stage */
+.hud-orb-center-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 28px 0 18px;
+  min-height: 212px;
+}
+
+.hud-orb-ambient-glow {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(237, 111, 92, 0.26) 0%,
+    rgba(237, 111, 92, 0.06) 45%,
+    transparent 70%
+  );
+  filter: blur(8px);
+  pointer-events: none;
+  animation: orbAuraPulse 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes orbAuraPulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+.hud-orb-canvas {
+  position: relative;
+  z-index: 2;
+  display: block;
+  filter: drop-shadow(0 0 16px rgba(237, 111, 92, 0.45));
+}
+
+/* Phase Metadata */
+.hud-phase-meta {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hud-phase-title {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.hud-phase-sub {
+  font-size: 12.5px;
+  color: rgba(239, 231, 210, 0.65);
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.45;
+}
+
+/* Multi-stage Progress Tracker */
+.hud-stage-tracker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(21, 20, 15, 0.6);
+  border: 1px solid rgba(247, 241, 222, 0.08);
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 22px;
+}
+
+.tracker-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.4;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.tracker-step.active {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+
+.step-label {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.tracker-divider {
+  flex: 1;
+  height: 1px;
+  background: rgba(247, 241, 222, 0.1);
+  margin: 0 12px;
+}
+
+/* Footer Metadata */
+.hud-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(247, 241, 222, 0.08);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: rgba(239, 231, 210, 0.55);
+}
+
+.hud-card-footer strong {
+  color: rgba(239, 231, 210, 0.9);
+}

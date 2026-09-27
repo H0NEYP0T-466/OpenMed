@@ -106,37 +106,6 @@ def resize_box_to_medsam(
     return torch.tensor(scaled, dtype=torch.float32).reshape(1, 1, 4)
 
 
-def heatmap_to_mask_prompt(
-    cam: np.ndarray,
-    target_size: int = MEDSAM_INPUT_SIZE,
-    threshold: float = 0.5,
-) -> torch.Tensor:
-    """Convert a Grad-CAM heatmap into a dense mask prompt for MedSAM.
-
-    The heatmap is resized to 256×256, thresholded, and returned as a
-    ``(1, 1, 256, 256)`` float tensor suitable for
-    ``prompt_encoder(masks=...)``.
-
-    Parameters
-    ----------
-    cam : 2D numpy array, normalised [0, 1] (from GradCAM.generate)
-    target_size : spatial side (256)
-    threshold : activation threshold — regions above this become the prompt
-
-    Returns
-    -------
-    mask_prompt : (1, 1, 256, 256) float32 tensor
-    """
-    cam = np.asarray(cam, dtype=np.float32)
-    if cam.ndim != 2:
-        raise ValueError(f"Expected a 2D heatmap, got shape {cam.shape}")
-
-    resized = cv2.resize(cam, (target_size, target_size), interpolation=cv2.INTER_LINEAR)
-    # Binarise at threshold, then keep soft values above it
-    mask = np.where(resized >= threshold, resized, 0.0).astype(np.float32)
-    return torch.from_numpy(mask).unsqueeze(0).unsqueeze(0)  # (1, 1, H, W)
-
-
 def heatmap_to_box_prompt(
     cam: np.ndarray,
     resized_hw: tuple[int, int],

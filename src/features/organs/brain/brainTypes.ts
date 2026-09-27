@@ -70,12 +70,6 @@ export interface BrainSegmentationResult extends BrainClassificationResult {
   readonly box_coords?: number[]
   readonly iou_box?: number
 
-  /** Dense mask-prompt segmentation (full Grad-CAM heatmap as the prompt). */
-  readonly mask_prompt_used?: boolean
-  readonly mask_prompt_mask_base64?: string
-  readonly mask_prompt_overlay_base64?: string
-  readonly iou_mask?: number
-
   readonly segmentation_input_size?: string
   readonly original_size?: string
   readonly total_ms?: number

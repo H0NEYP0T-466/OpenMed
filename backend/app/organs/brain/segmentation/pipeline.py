@@ -4,9 +4,9 @@ Wraps LiteMedSAM into a self-contained inference pipeline that:
 
 1. Loads the ``lite_medsam.pth`` checkpoint on first use.
 2. Accepts a PIL image and optional Grad-CAM heatmap.
-3. Converts the heatmap into *both* a bounding-box prompt and a dense
-   mask prompt, runs segmentation with each, and returns both results.
-4. Produces binary masks, overlay images, and base64-encoded outputs
+3. Converts the heatmap into a bounding-box prompt and runs segmentation
+   with the box (the released LiteMedSAM weights prompt via boxes only).
+4. Produces a binary mask, an overlay image, and base64-encoded outputs
    ready for the API response.
 
 The pipeline is designed for lazy loading and explicit unloading so that
@@ -28,9 +28,7 @@ from PIL import Image
 from .model import MedSAM_Lite, build_medsam_lite
 from .preprocessor import (
     MEDSAM_INPUT_SIZE,
-    PreprocessResult,
     heatmap_to_box_prompt,
-    heatmap_to_mask_prompt,
     postprocess_mask,
     preprocess_image,
 )
@@ -50,12 +48,10 @@ class SegmentationUnavailableError(RuntimeError):
 class BrainSegmentationPipeline:
     """End-to-end inference for brain tumour segmentation with LiteMedSAM.
 
-    Supports two prompt modes:
-    - **box prompt**: a bounding box extracted from the Grad-CAM heatmap
-    - **mask prompt**: the full Grad-CAM heatmap as a dense mask
-
-    Both are run by default when a heatmap is provided, so the frontend
-    can display and compare both segmentation results.
+    Prompt mode:
+    - **box prompt**: a bounding box extracted from the Grad-CAM heatmap.
+      The released LiteMedSAM weights segment from boxes, which is why this
+      is the only prompt mode the pipeline runs.
     """
 
     def __init__(
@@ -127,23 +123,24 @@ class BrainSegmentationPipeline:
         cam_threshold: float = 0.5,
         box_margin_px: int = 10,
     ) -> dict[str, Any]:
-        """Run segmentation using a Grad-CAM heatmap as prompt.
+        """Segment a tumour using the Grad-CAM heatmap as a prompt.
 
-        Produces two segmentation results:
-        - ``box_prompt``: bounding box extracted from the heatmap
-        - ``mask_prompt``: the full heatmap used as a dense mask prompt
+        The released LiteMedSAM weights prompt via a bounding box only (they
+        were never trained on dense masks), so the heatmap is converted into a
+        single box prompt and run once.  The segmentation result is returned
+        downscaled to keep the response payload small for the browser.
 
         Parameters
         ----------
         image : path or PIL Image (the original uploaded image)
         cam_heatmap : 2D normalised [0, 1] array from the classifier's Grad-CAM
-        cam_threshold : threshold for deriving box / binary mask from heatmap
+        cam_threshold : threshold for deriving the box from the heatmap
         box_margin_px : padding around the box prompt
 
         Returns
         -------
-        dict with keys: box_mask_base64, mask_prompt_mask_base64, overlay_base64,
-                        mask_prompt_overlay_base64, iou_box, iou_mask, etc.
+        dict with keys: box_mask_base64, box_overlay_base64, iou_box,
+                        box_coords, input_size, original_size.
         """
         if not self._loaded or self.model is None:
             raise SegmentationUnavailableError("Segmentation model is not loaded.")
@@ -173,8 +170,10 @@ class BrainSegmentationPipeline:
                     input_tensor, boxes=box_tensor,
                 )
             mask_box = postprocess_mask(low_res_masks, prep.original_hw, prep.resized_hw)
-            result["box_mask_base64"] = _encode_mask_png(mask_box)
-            result["box_overlay_base64"] = _encode_overlay(pil_image, mask_box)
+            result["box_mask_base64"] = _encode_mask_png(mask_box, max_side=SEG_MAX_SIDE)
+            result["box_overlay_base64"] = _encode_overlay(
+                pil_image, mask_box, max_side=SEG_MAX_SIDE,
+            )
             result["iou_box"] = round(float(iou_pred.squeeze().cpu().item()), 4)
             result["box_coords"] = box_tensor.squeeze().cpu().tolist()
             result["box_prompt_used"] = True
@@ -183,46 +182,6 @@ class BrainSegmentationPipeline:
             result["box_prompt_note"] = (
                 "No region in the heatmap exceeded the activation threshold."
             )
-
-        # ── Mask prompt segmentation ──────────────────────────────────
-        mask_prompt = heatmap_to_mask_prompt(
-            cam_heatmap,
-            target_size=MEDSAM_INPUT_SIZE,
-            threshold=cam_threshold,
-        ).to(self.device)
-
-        has_activation = mask_prompt.sum().item() > 0
-        if has_activation:
-            with torch.no_grad():
-                low_res_masks_m, iou_pred_m = self.model(
-                    input_tensor, masks=mask_prompt,
-                )
-            mask_dense = postprocess_mask(low_res_masks_m, prep.original_hw, prep.resized_hw)
-
-            if mask_dense.max() > 0:
-                result["mask_prompt_mask_base64"] = _encode_mask_png(mask_dense)
-                result["mask_prompt_overlay_base64"] = _encode_overlay(pil_image, mask_dense)
-                result["iou_mask"] = round(float(iou_pred_m.squeeze().cpu().item()), 4)
-                result["mask_prompt_used"] = True
-            elif "box_mask_base64" in result:
-                # LiteMedSAM weights are trained for box prompting only: a
-                # dense mask prompt yields an all-negative logit map, so the
-                # `> 0` binarisation above produces an empty mask. Fall back
-                # to the box result so the UI never renders a black mask.
-                result["mask_prompt_mask_base64"] = result["box_mask_base64"]
-                result["mask_prompt_overlay_base64"] = result["box_overlay_base64"]
-                result["iou_mask"] = result["iou_box"]
-                result["mask_prompt_used"] = True
-                result["mask_prompt_fallback"] = True
-                result["mask_prompt_note"] = (
-                    "LiteMedSAM weights support box prompting only; the dense "
-                    "mask prompt produced an empty prediction, so the "
-                    "box-prompt result is shown."
-                )
-            else:
-                result["mask_prompt_used"] = False
-        else:
-            result["mask_prompt_used"] = False
 
         return result
 
@@ -259,8 +218,8 @@ class BrainSegmentationPipeline:
 
         return {
             "segmentation_performed": True,
-            "box_mask_base64": _encode_mask_png(mask),
-            "box_overlay_base64": _encode_overlay(pil_image, mask),
+            "box_mask_base64": _encode_mask_png(mask, max_side=SEG_MAX_SIDE),
+            "box_overlay_base64": _encode_overlay(pil_image, mask, max_side=SEG_MAX_SIDE),
             "iou_box": round(float(iou_pred.squeeze().cpu().item()), 4),
             "box_coords": scaled_box,
             "input_size": f"{MEDSAM_INPUT_SIZE}x{MEDSAM_INPUT_SIZE}",
@@ -280,7 +239,9 @@ class BrainSegmentationPipeline:
             "model_name": "LiteMedSAM",
             "architecture": "TinyViT-256 + SAM PromptEncoder + MaskDecoder",
             "input_size": f"{MEDSAM_INPUT_SIZE}x{MEDSAM_INPUT_SIZE}",
-            "prompt_types": ["bounding_box", "dense_mask", "points"],
+            # The architecture accepts dense masks and points, but the released
+            # lite_medsam.pth weights were only trained to segment from boxes.
+            "prompt_types": ["bounding_box"],
             "loaded": self._loaded,
             "device": str(self.device) if self._loaded else None,
         }
@@ -288,9 +249,29 @@ class BrainSegmentationPipeline:
 
 # ── Encoding helpers ──────────────────────────────────────────────────────
 
+# Rendered output is downscaled to this side before encoding.  The browser
+# only ever shows these tiles at ~half page width, so a 512×512 PNG/JPEG was
+# pure overhead (and the main cause of the laggy scroll from big base64 data
+# URLs).  384 keeps the tumour crisp while cutting the payload ~2×; 256 is
+# lighter still if you want max smoothness.
+SEG_MAX_SIDE = 384
 
-def _encode_mask_png(mask: np.ndarray) -> str:
-    """Encode a binary mask as a base64 data-URL PNG."""
+
+def _downscale(img: np.ndarray, max_side: int) -> np.ndarray:
+    """Shrink an image so its longest side is at most ``max_side``."""
+    h, w = img.shape[:2]
+    longest = max(h, w)
+    if longest <= max_side:
+        return img
+    scale = max_side / longest
+    new_size = (max(1, round(w * scale)), max(1, round(h * scale)))
+    interp = cv2.INTER_NEAREST if img.ndim == 2 else cv2.INTER_AREA
+    return cv2.resize(img, new_size, interpolation=interp)
+
+
+def _encode_mask_png(mask: np.ndarray, max_side: int = SEG_MAX_SIDE) -> str:
+    """Encode a binary mask as a base64 data-URL PNG, downscaled to fit."""
+    mask = _downscale(mask, max_side)
     success, buffer = cv2.imencode(".png", mask)
     if not success:
         raise RuntimeError("PNG encoding failed for the segmentation mask.")
@@ -302,11 +283,14 @@ def _encode_overlay(
     mask: np.ndarray,
     color: tuple[int, int, int] = (237, 111, 92),  # coral accent
     alpha: float = 0.45,
-    quality: int = 90,
+    quality: int = 85,
+    max_side: int = SEG_MAX_SIDE,
 ) -> str:
     """Blend a coloured segmentation mask onto the original image.
 
-    Uses the OpenMed coral accent colour by default.
+    Uses the OpenMed coral accent colour by default.  The blended raster is
+    downscaled to ``max_side`` and JPEG-compressed at ``quality`` so the
+    returned data URL stays small.
     """
     base = np.array(image.convert("RGB"))
     if mask.shape[:2] != base.shape[:2]:
@@ -323,6 +307,7 @@ def _encode_overlay(
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cv2.drawContours(overlay, contours, -1, color, thickness=2)
 
+    overlay = _downscale(overlay, max_side)
     success, buffer = cv2.imencode(
         ".jpg",
         cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR),

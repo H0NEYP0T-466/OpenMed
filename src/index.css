@@ -81,14 +81,21 @@ body {
 }
 
 /* --- Mandatory surface noise (DESIGN.md §2 "Surface noise") ----------
-   Hand-pressed paper: multiply turbulence + two warm radial bleeds. --- */
+   Hand-pressed paper: turbulence grain + two warm radial bleeds.
+
+   PERFORMANCE: this layer is fixed and covers the whole viewport. It used to
+   carry `mix-blend-mode: multiply`, which forces the compositor to re-blend
+   the entire viewport against the scrolling page content on *every* frame —
+   the single biggest cause of the laggy scroll. The grain and the bleeds are
+   both dark-at-low-alpha over light paper, so compositing them normally
+   (source-over) looks the same and costs nothing per frame. Do not reintroduce
+   a backdrop blend mode on a fixed full-viewport layer. --- */
 #root::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 400;
   pointer-events: none;
-  mix-blend-mode: multiply;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.055'/%3E%3C/svg%3E"),
     radial-gradient(1100px 700px at 12% -8%, rgba(106, 92, 56, 0.06), transparent 60%),

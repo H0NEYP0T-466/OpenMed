@@ -215,8 +215,9 @@ function matchPreset(fileName: string): BrainSegmentationResult | null {
  *
  * POST /api/brain/segment runs the full pipeline: EfficientNetV2-B2
  * classification with Grad-CAM, and if the prediction is any tumour type
- * (not "Normal"), LiteMedSAM segmentation using the Grad-CAM heatmap as both
- * a bounding-box prompt and a dense mask prompt.
+ * (not "Normal"), LiteMedSAM segmentation prompted by the bounding box
+ * derived from the Grad-CAM heatmap. The released LiteMedSAM weights are
+ * box-prompt-only, so no dense mask prompt is sent.
  */
 export const analyzeBrainImage = async (
   file: File,

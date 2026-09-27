@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react'
 import { RomanSection } from '../../../components/common/RomanSection'
+import { ThinkingOrb, DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import { BrainRegionViewer } from './BrainRegionViewer'
 import { analyzeBrainImage, getBrainHealth, getBrainModelInfo } from './brainApi'
 import type { BrainModelInfo, BrainSegmentationResult } from './brainTypes'
@@ -392,7 +393,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                         onClick={() => handleLoadPreset(preset)}
                       >
                         <div className="cassette-thumbnail-box">
-                          <img src={preset.path} alt={preset.name} className="cassette-thumbnail" />
+                          <img src={preset.path} alt={preset.name} className="cassette-thumbnail" loading="lazy" decoding="async" />
                           <span className="cassette-seq-badge">{preset.seq}</span>
                         </div>
                         <div className="cassette-info">
@@ -444,13 +445,18 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                 ) : (
                   <div className="lightbox-mounted-view">
                     <div className="film-viewport">
-                      <img src={previewUrl} alt="Mounted MRI Scan" className="film-image" />
+                      <img src={previewUrl} alt="Mounted MRI Scan" className="film-image" loading="lazy" decoding="async" />
                       <div className="film-overlay-hud">
                         <span className="hud-tag top-left">AXIAL T1/T2</span>
                         <span className="hud-tag top-right">FOV 240mm</span>
                         <span className="hud-tag btm-left">{file?.name ?? 'Specimen Scan'}</span>
                         <span className="hud-tag btm-right">{file ? `${(file.size / 1024).toFixed(1)} KB` : '512×512'}</span>
                       </div>
+
+                      {/* Diagnostic Thinking HUD Overlay during Inference */}
+                      {isAnalyzing && (
+                        <DiagnosticThinkingHUD classCountLabel={classCountLabel} />
+                      )}
                     </div>
 
                     <div className="film-action-bar">
@@ -462,7 +468,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       <div className="film-actions">
                         <button
                           type="button"
-                          className="btn btn-primary btn-evaluate"
+                          className={`btn btn-primary btn-evaluate ${isAnalyzing ? 'is-evaluating' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation()
                             handleAnalyze()
@@ -470,10 +476,19 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                           disabled={isAnalyzing}
                         >
                           <span>
-                            <Sparkles size={15} />
-                            {isAnalyzing ? `Evaluating ${classCountLabel}…` : 'Run EfficientNetV2-B2 Differential'}
+                            {isAnalyzing ? (
+                              <>
+                                <ThinkingOrb mode="hybrid" size={24} theme="dark" speed={1.3} className="btn-inline-orb" />
+                                {`Evaluating ${classCountLabel} & Contouring…`}
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles size={15} />
+                                Run EfficientNetV2-B2 Differential
+                              </>
+                            )}
                           </span>
-                          <span className="arr" aria-hidden="true">↗</span>
+                          <span className="arr" aria-hidden="true">{isAnalyzing ? '…' : '↗'}</span>
                         </button>
                       </div>
                     </div>
@@ -581,16 +596,18 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   <div className="gradcam-dual-plate">
                     {previewUrl && (
                       <div className="scan-frame">
-                        <img src={previewUrl} alt="Source MRI Scan" />
+                        <img src={previewUrl} alt="Source MRI Scan" loading="lazy" decoding="async" />
                         <span className="scan-tag">Source MRI</span>
                       </div>
                     )}
                     <div className="scan-frame">
                       {result.gradcam_base64 ? (
-                        <img src={result.gradcam_base64} alt="Grad-CAM Activation" />
+                        <img src={result.gradcam_base64} alt="Grad-CAM Activation" loading="lazy" decoding="async" />
                       ) : (
                         <div className="simulated-cam-plate">
-                          {previewUrl && <img src={previewUrl} alt="Base" className="underlay-img" />}
+                          {previewUrl && (
+                            <img src={previewUrl} alt="Base" className="underlay-img" loading="lazy" decoding="async" />
+                          )}
                           <div className="cam-glow-layer" />
                         </div>
                       )}
@@ -614,18 +631,16 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                     <>
                       <p className="sec-hint">
                         Model: LiteMedSAM (TinyViT-256) · Input: 256×256 ·
-                        Prompted by the Grad-CAM heatmap above — a bounding box
-                        and the dense activation map are run separately.
+                        Prompted by the Grad-CAM heatmap above — the bounding
+                        box around its activation is the prompt. LiteMedSAM's
+                        released weights segment from boxes, so the box prompt
+                        is used directly.
                       </p>
 
                       <div className="seg-metadata-strip">
                         <span className="seg-meta-chip">
                           <span className="k">Box prompt IoU</span>
                           <span className="v">{result.iou_box?.toFixed(3) ?? '—'}</span>
-                        </span>
-                        <span className="seg-meta-chip">
-                          <span className="k">Mask prompt IoU</span>
-                          <span className="v">{result.iou_mask?.toFixed(3) ?? '—'}</span>
                         </span>
                         <span className="seg-meta-chip">
                           <span className="k">Box coords (256²)</span>
@@ -641,16 +656,21 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                         </span>
                       </div>
 
-                      <div className="gradcam-dual-plate">
+                      <div className="scan-plate-triple">
                         {previewUrl && (
                           <div className="scan-frame">
-                            <img src={previewUrl} alt="Source MRI Scan" />
+                            <img src={previewUrl} alt="Source MRI Scan" loading="lazy" decoding="async" />
                             <span className="scan-tag">Source MRI</span>
                           </div>
                         )}
                         <div className="scan-frame">
                           {result.box_mask_base64 ? (
-                            <img src={result.box_mask_base64} alt="Box-prompt segmentation mask" />
+                            <img
+                              src={result.box_mask_base64}
+                              alt="Box-prompt segmentation mask"
+                              loading="lazy"
+                              decoding="async"
+                            />
                           ) : (
                             <div className="seg-empty-plate">No box mask produced</div>
                           )}
@@ -658,27 +678,16 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                         </div>
                         <div className="scan-frame">
                           {result.box_overlay_base64 ? (
-                            <img src={result.box_overlay_base64} alt="Segmentation overlay on MRI" />
+                            <img
+                              src={result.box_overlay_base64}
+                              alt="Box-prompt segmentation overlay on MRI"
+                              loading="lazy"
+                              decoding="async"
+                            />
                           ) : (
                             <div className="seg-empty-plate">No box overlay produced</div>
                           )}
                           <span className="scan-tag highlight">Box prompt · overlay</span>
-                        </div>
-                        <div className="scan-frame">
-                          {result.mask_prompt_mask_base64 ? (
-                            <img src={result.mask_prompt_mask_base64} alt="Mask-prompt segmentation mask" />
-                          ) : (
-                            <div className="seg-empty-plate">No mask-prompt mask</div>
-                          )}
-                          <span className="scan-tag">Mask prompt · mask</span>
-                        </div>
-                        <div className="scan-frame">
-                          {result.mask_prompt_overlay_base64 ? (
-                            <img src={result.mask_prompt_overlay_base64} alt="Mask-prompt overlay on MRI" />
-                          ) : (
-                            <div className="seg-empty-plate">No mask-prompt overlay</div>
-                          )}
-                          <span className="scan-tag">Mask prompt · overlay</span>
                         </div>
                       </div>
                     </>

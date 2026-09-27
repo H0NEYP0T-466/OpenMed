@@ -48,6 +48,8 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
   const hotspotsGroupRef = useRef<THREE.Group | null>(null)
   const animFrameIdRef = useRef<number | null>(null)
   const defaultDistanceRef = useRef<number>(7.5)
+  /** Set from the init effect; lets the other effects request a repaint. */
+  const invalidateRef = useRef<() => void>(() => {})
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [loadingProgress, setLoadingProgress] = useState<number>(0)
@@ -175,6 +177,22 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
     domElement.addEventListener('pointerdown', onPointerDown)
     domElement.addEventListener('pointermove', onPointerMove)
 
+    // ── Render on demand ────────────────────────────────────────────────
+    // This used to call renderer.render() unconditionally at 60fps, which
+    // meant a full WebGL draw pass was submitted on every display refresh
+    // even when the canvas was idle or scrolled off-screen. That work
+    // competes with the compositor and was a major contributor to the laggy
+    // page scroll. We now only submit a frame when something actually
+    // changed, and pause entirely while the plate is off-screen or the tab
+    // is hidden.
+    let needsRender = true
+    let onScreen = true
+
+    const invalidate = () => {
+      needsRender = true
+    }
+    invalidateRef.current = invalidate
+
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width: w, height: h } = entry.contentRect
@@ -182,23 +200,48 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
           camera.aspect = w / h
           camera.updateProjectionMatrix()
           renderer.setSize(w, h)
+          invalidate()
         }
       }
     })
     resizeObserver.observe(container)
 
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        onScreen = entries[0]?.isIntersecting ?? true
+        if (onScreen) invalidate()
+      },
+      { threshold: 0 },
+    )
+    intersectionObserver.observe(container)
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) invalidate()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    // OrbitControls fires 'change' on every damped step, so user orbiting,
+    // zooming and panning all invalidate the frame for free.
+    controls.addEventListener('change', invalidate)
+
     const animate = () => {
       animFrameIdRef.current = requestAnimationFrame(animate)
 
-      if (controlsRef.current) {
-        controlsRef.current.update()
-      }
+      if (document.hidden || !onScreen) return
 
       const currentSettings = settingsRef.current
       if (currentSettings.autoRotate && organPivotRef.current) {
         organPivotRef.current.rotation.y += 0.0035 * currentSettings.rotationSpeed
+        needsRender = true
       }
 
+      // update() returns true while damping is still settling the camera.
+      if (controls.update()) {
+        needsRender = true
+      }
+
+      if (!needsRender) return
+      needsRender = false
       renderer.render(scene, camera)
     }
     animate()
@@ -207,9 +250,13 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
       domElement.removeEventListener('pointerdown', onPointerDown)
       domElement.removeEventListener('pointermove', onPointerMove)
       resizeObserver.disconnect()
+      intersectionObserver.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      controls.removeEventListener('change', invalidate)
       if (animFrameIdRef.current) {
         cancelAnimationFrame(animFrameIdRef.current)
       }
+      invalidateRef.current = () => {}
       if (organPivotRef.current) {
         disposeObjectTree(organPivotRef.current)
       }
@@ -319,6 +366,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
   useEffect(() => {
     if (hotspotsGroupRef.current) {
       hotspotsGroupRef.current.visible = settings.showHotspots
+      invalidateRef.current()
     }
   }, [settings.showHotspots])
 
@@ -333,6 +381,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
           sprite.scale.set(scale, scale, 1)
         }
       })
+      invalidateRef.current()
     }
   }, [activeHotspot])
 
@@ -344,6 +393,7 @@ export const OrganViewer3D: React.FC<OrganViewer3DProps> = ({
         organ.accentColor,
         settings.wireframeOverlay
       )
+      invalidateRef.current()
     }
   }, [settings.renderMode, settings.wireframeOverlay, organ.accentColor])
 

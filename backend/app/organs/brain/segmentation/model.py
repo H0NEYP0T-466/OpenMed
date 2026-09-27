@@ -9,8 +9,11 @@ Architecture reference
     Repo   : https://github.com/bowang-lab/MedSAM (LiteMedSAM branch)
     Weights: Google Drive file ID 18Zed-TUTsmr2zc5CHUWd5Tu13nb6vq6z
 
-The model is promptable — it accepts bounding boxes, points, **and**
-dense mask prompts (heatmaps).
+The architecture is promptable — it accepts bounding boxes, points, **and**
+dense mask prompts (heatmaps). The released ``lite_medsam.pth`` weights,
+however, were only trained to segment from bounding boxes; a dense mask prompt
+is accepted by the prompt encoder but produces an empty prediction. The
+serving pipeline therefore prompts with boxes only.
 """
 
 from __future__ import annotations

@@ -1,0 +1,20 @@
+/* ThinkingOrb — Canvas Container Styles */
+
+.thinking-orb-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.thinking-orb-canvas {
+  display: block;
+  pointer-events: none;
+}
+
+/* Subtle glow filter on dark backgrounds */
+.thinking-orb-dark .thinking-orb-canvas {
+  filter: drop-shadow(0 0 12px rgba(237, 111, 92, 0.18));
+}

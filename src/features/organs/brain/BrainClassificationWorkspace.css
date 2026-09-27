@@ -437,8 +437,12 @@
 }
 
 .radiology-lightbox.analyzing {
-  opacity: 0.7;
   pointer-events: none;
+}
+
+.btn-inline-orb {
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
 /* Corner Reticles */
@@ -843,17 +847,45 @@
   transition: width 0.6s ease;
 }
 
-/* --- Grad-CAM Dual Plate --- */
+/* --- Grad-CAM Dual Plate ---
+   Tiles are capped at 320px to match .film-viewport. They used to stretch to
+   fill the 1180px workspace (~550px each), which is what made the images read
+   as oversized — and every extra CSS pixel is upscaled bitmap work for the
+   compositor on HiDPI displays. */
 .gradcam-dual-plate {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 320px));
+  justify-content: center;
   gap: 14px;
-  height: 100%;
 }
 
 @media (max-width: 600px) {
   .gradcam-dual-plate {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 320px);
+  }
+}
+
+/* --- Segmentation Triple Plate ---
+   Source MRI · box-prompt mask · box-prompt overlay, side by side. Three
+   320px tiles plus gaps is ~988px, which fits the 1180px dossier column.
+   Columns drop before the tiles are ever squeezed, so the MRI is never
+   distorted by the grid. */
+.scan-plate-triple {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 320px));
+  justify-content: center;
+  gap: 14px;
+}
+
+@media (max-width: 1060px) {
+  .scan-plate-triple {
+    grid-template-columns: repeat(2, minmax(0, 320px));
+  }
+}
+
+@media (max-width: 700px) {
+  .scan-plate-triple {
+    grid-template-columns: minmax(0, 320px);
   }
 }
 

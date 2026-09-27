@@ -192,18 +192,12 @@ class SegmentationResult(BaseModel):
     segmentation_performed: bool
     segmentation_skipped_reason: Optional[str] = None
 
-    # Box-prompt segmentation
+    # Box-prompt segmentation (LiteMedSAM is a box-prompt-only model)
     box_prompt_used: bool = False
     box_mask_base64: Optional[str] = None
     box_overlay_base64: Optional[str] = None
     iou_box: Optional[float] = None
     box_coords: Optional[list[float]] = None
-
-    # Mask-prompt segmentation (heatmap as prompt)
-    mask_prompt_used: bool = False
-    mask_prompt_mask_base64: Optional[str] = None
-    mask_prompt_overlay_base64: Optional[str] = None
-    iou_mask: Optional[float] = None
 
     # Metadata
     segmentation_input_size: Optional[str] = None
@@ -247,8 +241,9 @@ async def segment_brain_tumor(file: UploadFile = File(...)) -> SegmentationResul
     Pipeline:
     1. Run classifier with Grad-CAM.
     2. If predicted class is "Normal", return classification only.
-    3. Otherwise, use the Grad-CAM heatmap as both a box prompt and a
-       dense mask prompt for LiteMedSAM segmentation.
+    3. Otherwise, derive a bounding box from the Grad-CAM heatmap and use it
+       as the prompt for LiteMedSAM segmentation. The released LiteMedSAM
+       weights segment from boxes only, so no dense mask prompt is sent.
     """
     total_start = time.perf_counter()
 
@@ -360,10 +355,6 @@ async def segment_brain_tumor(file: UploadFile = File(...)) -> SegmentationResul
         box_overlay_base64=seg_result.get("box_overlay_base64"),
         iou_box=seg_result.get("iou_box"),
         box_coords=seg_result.get("box_coords"),
-        mask_prompt_used=seg_result.get("mask_prompt_used", False),
-        mask_prompt_mask_base64=seg_result.get("mask_prompt_mask_base64"),
-        mask_prompt_overlay_base64=seg_result.get("mask_prompt_overlay_base64"),
-        iou_mask=seg_result.get("iou_mask"),
         segmentation_input_size=seg_result.get("input_size"),
         original_size=seg_result.get("original_size"),
         total_ms=round(total_ms, 1),
@@ -446,7 +437,7 @@ async def seg_model_info() -> SegModelInfoResponse:
         "model_name": "LiteMedSAM",
         "architecture": "TinyViT-256 + SAM PromptEncoder + MaskDecoder",
         "input_size": "256x256",
-        "prompt_types": ["bounding_box", "dense_mask"],
+        "prompt_types": ["bounding_box"],
         "loaded": _segmenter is not None and _segmenter.is_loaded,
     }
     cls_info: dict[str, Any] = {

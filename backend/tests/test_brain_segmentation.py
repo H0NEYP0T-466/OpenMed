@@ -28,7 +28,6 @@ from app.organs.brain.segmentation.pipeline import (
 from app.organs.brain.segmentation.preprocessor import (
     MEDSAM_INPUT_SIZE,
     heatmap_to_box_prompt,
-    heatmap_to_mask_prompt,
     postprocess_mask,
     preprocess_image,
 )
@@ -113,12 +112,6 @@ def test_heatmap_to_box_prompt_none_for_flat_cam() -> None:
     assert heatmap_to_box_prompt(flat, resized_hw=(256, 209)) is None
 
 
-def test_heatmap_to_mask_prompt_shape(hot_cam: np.ndarray) -> None:
-    mask_prompt = heatmap_to_mask_prompt(hot_cam, target_size=MEDSAM_INPUT_SIZE)
-    assert mask_prompt.shape == (1, 1, 256, 256)
-    assert mask_prompt.sum().item() > 0  # hotspot survived thresholding
-
-
 # ── prepare_weights ───────────────────────────────────────────────────────
 
 
@@ -135,8 +128,10 @@ def test_verify_checkpoint_reports_ready_strict(synthetic_checkpoint: str) -> No
     assert report["parameters"] == sum(
         p.numel() for p in build_medsam_lite().parameters()
     )
+    # Box prompt only — the released LiteMedSAM weights are box-only, so the
+    # readiness forward pass no longer exercises a dense mask prompt.
     assert report["forward_shapes"]["box"] == (1, 1, 256, 256)
-    assert report["forward_shapes"]["mask"] == (1, 1, 256, 256)
+    assert "mask" not in report["forward_shapes"]
 
 
 def test_verify_checkpoint_rejects_garbage(tmp_path) -> None:
@@ -201,10 +196,45 @@ def test_pipeline_segment_with_box_end_to_end(
 
     raw = _b64.b64decode(res["box_mask_base64"].split(",", 1)[1])
     mask = np.asarray(Image.open(_io.BytesIO(raw)).convert("L"))
+    # The fixture (352px longest side) sits under SEG_MAX_SIDE, so the mask
+    # comes back at the original size. The downscale cap is covered separately.
     assert mask.shape == (h, w)
 
     pipe.unload()
     assert pipe.is_loaded is False
+
+
+def test_segmentation_output_is_capped_for_the_browser(
+    synthetic_checkpoint: str,
+) -> None:
+    """Regression: mask/overlay data URLs were encoded at full input
+    resolution, so a large upload produced megabyte-sized base64 payloads that
+    made the response heavy and the page scroll janky. Rendered output is now
+    downscaled to ``SEG_MAX_SIDE`` on its longest side before encoding."""
+    from app.organs.brain.segmentation.pipeline import SEG_MAX_SIDE
+
+    big = Image.fromarray(np.full((900, 700, 3), 30, dtype=np.uint8), "RGB")
+    pipe = BrainSegmentationPipeline(model_path=synthetic_checkpoint, device="cpu")
+
+    res = pipe.segment_with_box(big, (100.0, 100.0, 600.0, 700.0))
+
+    assert res["original_size"] == "700x900"
+
+    mask = np.asarray(
+        Image.open(
+            _io.BytesIO(_b64.b64decode(res["box_mask_base64"].split(",", 1)[1]))
+        ).convert("L")
+    )
+    assert max(mask.shape) == SEG_MAX_SIDE
+
+    overlay = np.asarray(
+        Image.open(
+            _io.BytesIO(_b64.b64decode(res["box_overlay_base64"].split(",", 1)[1]))
+        )
+    )
+    assert max(overlay.shape[:2]) == SEG_MAX_SIDE
+
+    pipe.unload()
 
 
 def test_pipeline_segment_with_heatmap_end_to_end(
@@ -212,7 +242,7 @@ def test_pipeline_segment_with_heatmap_end_to_end(
     sample_image: Image.Image,
     hot_cam,
 ) -> None:
-    """The exact router path: heatmap → box prompt + mask prompt → both masks."""
+    """The exact router path: heatmap → box prompt → box mask."""
     pipe = BrainSegmentationPipeline(
         model_path=synthetic_checkpoint, device="cpu"
     )
@@ -221,49 +251,29 @@ def test_pipeline_segment_with_heatmap_end_to_end(
 
     assert res["segmentation_performed"] is True
     assert res["box_prompt_used"] is True
-    assert res["mask_prompt_used"] is True
     assert res["box_mask_base64"].startswith("data:image/png;base64,")
-    assert res["mask_prompt_mask_base64"].startswith("data:image/png;base64,")
-    assert isinstance(res["iou_box"], float) and isinstance(res["iou_mask"], float)
+    assert res["box_overlay_base64"].startswith("data:image/jpeg;base64,")
+    assert isinstance(res["iou_box"], float)
+    assert "mask_prompt" not in res  # box-only pipeline
 
     pipe.unload()
 
 
-class _FakeMedSAM:
-    """Mimics the released LiteMedSAM weights: box prompts segment, dense mask
-    prompts return an all-negative logit map (hence an empty binarised mask).
-    This is exactly the behaviour the real checkpoint exhibits, so the pipeline
-    must fall back to the box result instead of rendering a black mask."""
-
-    def __call__(self, image, boxes=None, masks=None, points=None):
-        low = torch.zeros(image.shape[0], 1, 256, 256)
-        iou = torch.full((image.shape[0], 1), 0.72)
-        if masks is not None:
-            low.fill_(-2.0)   # all-negative → empty after `> 0`
-            iou.fill_(0.32)
-        elif boxes is not None:
-            low[:, :, 100:160, 100:160] = 2.0
-        return low, iou
-
-
-def test_mask_prompt_falls_back_to_box_when_empty(
-    sample_image: Image.Image, hot_cam,
+def test_pipeline_segment_with_heatmap_skips_when_flat_cam(
+    synthetic_checkpoint: str,
+    sample_image: Image.Image,
 ) -> None:
-    """If the dense mask prompt yields an empty mask (LiteMedSAM is box-only),
-    the pipeline reuses the box result so the UI never shows a black mask."""
-    pipe = BrainSegmentationPipeline()
-    pipe.model = _FakeMedSAM()   # type: ignore[assignment]
-    pipe.device = "cpu"
-    pipe._loaded = True
+    """No heatmap activation → no box → segmentation reports itself skipped."""
+    pipe = BrainSegmentationPipeline(
+        model_path=synthetic_checkpoint, device="cpu"
+    )
+    flat = np.zeros((224, 224), dtype=np.float32)
 
-    res = pipe.segment_with_heatmap(sample_image, hot_cam)
+    res = pipe.segment_with_heatmap(sample_image, flat)
 
-    assert res["mask_prompt_used"] is True
-    assert res["mask_prompt_fallback"] is True
-    assert res["mask_prompt_mask_base64"] == res["box_mask_base64"]
-    assert res["mask_prompt_overlay_base64"] == res["box_overlay_base64"]
-    assert res["iou_mask"] == res["iou_box"]
-    # The note explains why the box result is shown in the mask-prompt slot.
-    assert "box" in res["mask_prompt_note"].lower()
+    assert res["segmentation_performed"] is True
+    assert res["box_prompt_used"] is False
+    assert res.get("box_mask_base64") is None
+    assert "no region" in res["box_prompt_note"].lower()
 
     pipe.unload()

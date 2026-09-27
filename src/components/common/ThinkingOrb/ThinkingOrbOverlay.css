@@ -1,0 +1,100 @@
+/**
+ * ThinkingOrbOverlay.css — unclickable blurred loading backdrop.
+ * Borderless, cardless: just the orb on frosted warm ink glass.
+ */
+
+.thinking-orb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Unclickable background blur */
+  backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  background: rgba(15, 14, 11, 0.68);
+  pointer-events: all;
+  cursor: wait;
+  user-select: none;
+  animation: orbBackdropFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes orbBackdropFade {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(14px) saturate(125%);
+    -webkit-backdrop-filter: blur(14px) saturate(125%);
+  }
+}
+
+.thinking-orb-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Strictly borderless and unboxed */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Ambient soft radial glow in the coral accent - pure light */
+.thinking-orb-ambient-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+  height: 380px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(237, 111, 92, 0.24) 0%,
+    rgba(237, 111, 92, 0.06) 45%,
+    transparent 72%
+  );
+  pointer-events: none;
+  filter: blur(10px);
+  animation: orbAuraPulse 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes orbAuraPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.92);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.14);
+    opacity: 1;
+  }
+}
+
+.thinking-orb-canvas {
+  position: relative;
+  z-index: 2;
+  display: block;
+  filter: drop-shadow(0 0 14px rgba(237, 111, 92, 0.4));
+}
+
+/* Optional unboxed mono label */
+.thinking-orb-caption {
+  position: relative;
+  z-index: 2;
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.9;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.75);
+}

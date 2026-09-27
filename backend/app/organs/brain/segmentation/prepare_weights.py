@@ -7,9 +7,9 @@ inference``.  It:
 2. Builds the LiteMedSAM architecture (``build_medsam_lite()``).
 3. Applies the checkpoint with a strict state-dict load — so an incompatible
    download fails *here*, loudly, instead of silently at inference time.
-4. Runs a short end-to-end forward pass (box prompt + dense mask prompt) on a
-   synthetic input to prove the model actually executes on the exact input the
-   backend pipeline feeds it.
+4. Runs a short end-to-end forward pass (box prompt) on a synthetic input to
+   prove the model actually executes on the exact input the backend pipeline
+   feeds it.
 5. Places the verified checkpoint at the canonical path the backend loads from.
 
 The download is staged to a ``.part`` file and only moved into place after
@@ -199,6 +199,8 @@ def verify_checkpoint(path: Path, device: Optional[str] = None) -> dict[str, Any
         )
 
     # ── Readiness forward pass — exactly what the backend pipeline does ──
+    # Box prompt only: the released lite_medsam.pth weights were trained to
+    # segment from bounding boxes, which is the sole prompt the pipeline sends.
     dev = _resolve_device(device)
     model.to(dev).eval()
     n_params = sum(p.numel() for p in model.parameters())
@@ -208,21 +210,16 @@ def verify_checkpoint(path: Path, device: Optional[str] = None) -> dict[str, Any
         box = torch.tensor([[[60.0, 70.0, 190.0, 210.0]]], device=dev)
         box_masks, box_iou = model(dummy, boxes=box)
 
-        mask_prompt = torch.zeros((1, 1, MEDSAM_INPUT_SIZE, MEDSAM_INPUT_SIZE), device=dev)
-        mask_prompt[0, 0, 70:220, 60:200] = 1.0
-        mask_masks, mask_iou = model(dummy, masks=mask_prompt)
-
     expected_mask = (1, 1, MEDSAM_INPUT_SIZE, MEDSAM_INPUT_SIZE)
-    if tuple(box_masks.shape) != expected_mask or tuple(mask_masks.shape) != expected_mask:
+    if tuple(box_masks.shape) != expected_mask:
         raise RuntimeError(
-            f"Forward pass produced unexpected shapes: box={tuple(box_masks.shape)}, "
-            f"mask={tuple(mask_masks.shape)} (expected {expected_mask})."
+            f"Forward pass produced an unexpected shape: "
+            f"box={tuple(box_masks.shape)} (expected {expected_mask})."
         )
 
     logger.info(
-        "Forward pass OK: box prompt → %s iou=%s | mask prompt → %s iou=%s",
+        "Forward pass OK: box prompt → %s iou=%s",
         tuple(box_masks.shape), tuple(box_iou.shape),
-        tuple(mask_masks.shape), tuple(mask_iou.shape),
     )
 
     return {
@@ -232,7 +229,6 @@ def verify_checkpoint(path: Path, device: Optional[str] = None) -> dict[str, Any
         "device": str(dev),
         "forward_shapes": {
             "box": tuple(box_masks.shape),
-            "mask": tuple(mask_masks.shape),
         },
     }
 
