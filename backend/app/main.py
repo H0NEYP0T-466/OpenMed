@@ -19,6 +19,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.organs.brain.classification.router import checkpoint_path
 from app.organs.brain.classification.router import router as brain_router
+from app.organs.brain.segmentation.router import router as brain_seg_router
+from app.organs.brain.segmentation.prepare_weights import default_checkpoint_path as seg_checkpoint_path
 
 # ── Logging Setup ─────────────────────────────────────────────────────────
 
@@ -79,9 +81,14 @@ async def _lifespan(application: FastAPI) -> AsyncIterator[None]:
     logger.info("=" * 62)
     logger.info("  OpenMed FastAPI server")
     logger.info("  classify     : POST /api/brain/classify")
+    logger.info("  segment      : POST /api/brain/segment")
+    logger.info("  load models  : POST /api/brain/load-models")
+    logger.info("  unload models: POST /api/brain/unload-models")
     logger.info("  model info   : GET  /api/brain/model-info")
     logger.info("  health       : GET  /api/brain/health")
-    logger.info("  checkpoint   : %s", checkpoint_path())
+    logger.info("  seg health   : GET  /api/brain/seg-health")
+    logger.info("  cls checkpoint : %s", checkpoint_path())
+    logger.info("  seg checkpoint : %s", seg_checkpoint_path())
     logger.info("  cors origins : %s", ", ".join(_cors_origins()))
     logger.info("=" * 62)
     yield
@@ -104,6 +111,7 @@ app.add_middleware(
 )
 
 app.include_router(brain_router, prefix="/api/brain", tags=["Brain"])
+app.include_router(brain_seg_router, prefix="/api/brain", tags=["Brain Segmentation"])
 
 
 @app.get("/")
@@ -114,8 +122,13 @@ def read_root():
         "organs": ["brain"],
         "endpoints": [
             "/api/brain/classify",
+            "/api/brain/segment",
+            "/api/brain/load-models",
+            "/api/brain/unload-models",
             "/api/brain/model-info",
             "/api/brain/health",
+            "/api/brain/seg-health",
+            "/api/brain/seg-model-info",
         ],
     }
 

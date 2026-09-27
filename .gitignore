@@ -78,3 +78,12 @@ data/
 **/projec_dustbin/**
 projec_dustbin/
 
+# Graphify generated knowledge graph (reproducible via `graphify update .`)
+graphify-out/
+
+# Agent / local assistant config (not versioned)
+.agents/
+.claude/
+AGENTS.md
+CLAUDE.md
+
