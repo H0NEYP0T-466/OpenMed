@@ -17,7 +17,7 @@ export const MniStereotacticDocs: React.FC = () => {
             <span className="doc-block-title">Spatial Normalization &amp; Anatomical Projection</span>
           </div>
           <p className="doc-block-copy">
-            To bridge 2D MRI slice classification with spatial neuroanatomy, OpenMed maps all 38 anatomical sites from the
+            To bridge 2D MRI slice classification with spatial neuroanatomy, OpenMed maps all 50 anatomical sites from the
             curated dataset into the <strong>Montreal Neurological Institute (MNI152)</strong> stereotactic coordinate frame.
             Each region is assigned a 3D centroid $[X, Y, Z]$ in millimeters referenced from the anterior commissure.
           </p>

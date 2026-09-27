@@ -16,7 +16,7 @@ export const BrainDocs: React.FC<BrainDocsProps> = ({ onOpenArtifact }) => {
         <div className="dossier-head-left">
           <div className="organ-badge brain">Organ · Brain (Encephalon)</div>
           <h3 className="dossier-organ-title">Cranial Neuro-Oncology &amp; Volumetric Suite</h3>
-          <span className="dossier-sub">Central Nervous System (CNS) · 38 Stereotactic MNI Regions</span>
+          <span className="dossier-sub">Central Nervous System (CNS) · 50 Stereotactic MNI Regions</span>
         </div>
         <Link to="/app?organ=brain" className="btn-launch-workspace">
           <BrainIcon size={14} />
