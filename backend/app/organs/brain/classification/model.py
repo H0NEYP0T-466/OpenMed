@@ -151,17 +151,43 @@ def get_scheduler(
     )
 
 
+CAM_METHODS = ("gradcam", "gradcam++")
+
+
 class GradCAM:
     """Gradient-weighted Class Activation Mapping for one convolutional layer.
+
+    Two methods are supported:
+
+    ``gradcam``
+        Standard Grad-CAM. Channel weights are the mean gradient over the
+        spatial map. Cheap, but averaging makes the map broad and blurry — it
+        bleeds into normal tissue, which is exactly what you do not want when
+        the map is being turned into a tight bounding box.
+    ``gradcam++``
+        Grad-CAM++ (Chattopadhyay et al.). Weights each spatial location by its
+        own gradient importance rather than averaging, so activation peaks stay
+        sharp over the lesion. Used by the serving path because the box prompt
+        is only as good as the map it is derived from.
 
     Hooks stay attached for the object's lifetime so repeated `generate` calls on
     the same instance each read fresh activations; use it as a context manager to
     guarantee removal.
     """
 
-    def __init__(self, model: nn.Module, target_layer: nn.Module) -> None:
+    def __init__(
+        self,
+        model: nn.Module,
+        target_layer: nn.Module,
+        method: str = "gradcam",
+    ) -> None:
+        if method not in CAM_METHODS:
+            raise ValueError(
+                f"Unknown CAM method {method!r}; expected one of {CAM_METHODS}."
+            )
         self.model = model
         self.target_layer = target_layer
+        self.method = method
         self.activations: Optional[torch.Tensor] = None
         self.gradients: Optional[torch.Tensor] = None
         self.logits: Optional[torch.Tensor] = None
@@ -232,8 +258,7 @@ class GradCAM:
                     "may not participate in the forward pass."
                 )
 
-            weights = self.gradients.mean(dim=(2, 3), keepdim=True)
-            cam = torch.relu((weights * self.activations).sum(dim=1))
+            cam = self._weighted_sum(self.activations, self.gradients)
             cam = cam.squeeze(0).detach().to("cpu", dtype=torch.float32).numpy()
 
             cam = cam - float(cam.min())
@@ -245,6 +270,30 @@ class GradCAM:
             if was_training:
                 self.model.train()
             self.model.zero_grad(set_to_none=True)
+
+    def _weighted_sum(
+        self, activations: torch.Tensor, gradients: torch.Tensor
+    ) -> torch.Tensor:
+        """Reduce (B, C, H, W) activations+gradients to a (B, H, W) map.
+
+        Split out from ``generate`` so the two weighting schemes sit side by
+        side and can be compared without touching the hook plumbing.
+        """
+        if self.method == "gradcam":
+            weights = gradients.mean(dim=(2, 3), keepdim=True)
+            return torch.relu((weights * activations).sum(dim=1))
+
+        # Grad-CAM++: weight each location by its own gradient importance.
+        # The paper's third-order terms are not available from a single
+        # backward pass, so the standard approximation is used — the squared
+        # and cubed gradients stand in for the higher-order derivatives.
+        grads_sq = gradients.pow(2)
+        grads_cu = grads_sq * gradients
+        spatial_sum = activations.sum(dim=(2, 3), keepdim=True)
+        eps = torch.finfo(gradients.dtype).eps
+        alpha = grads_sq / (2.0 * grads_sq + spatial_sum * grads_cu + eps)
+        weights = (alpha * torch.relu(gradients)).sum(dim=(2, 3), keepdim=True)
+        return torch.relu((weights * activations).sum(dim=1))
 
 
 def overlay_cam_on_image(

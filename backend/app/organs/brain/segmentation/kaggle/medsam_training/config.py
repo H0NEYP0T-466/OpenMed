@@ -84,6 +84,10 @@ class TrainConfig:
     min_lr_ratio: float = 0.05
     grad_clip: float = 1.0
     amp: bool = True
+    # GradScaler's starting loss scale. torch's default (2**16) routinely
+    # overflows on the first few steps of a fresh fp16 run, and every
+    # overflow is a wasted step. None = torch's default.
+    amp_init_scale: Optional[int] = None
     grad_checkpoint: bool = False  # TinyViT gradient checkpointing
     freeze_prompt_encoder: bool = True
     freeze_bn: bool = True

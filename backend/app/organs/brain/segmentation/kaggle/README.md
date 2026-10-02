@@ -174,6 +174,84 @@ plus IoU-head calibration.
   looser and sometimes off-centre. These numbers are *conditional segmentation
   quality*. The perturbed-prompt run (`±6 px`) shows how much the score depends
   on prompt accuracy — it is a sensitivity check, not a simulation of Grad-CAM.
+- **Measured cost of the CAM-derived prompt, on real masks.** Evaluated against
+  the `openmed_seg_clean` held-out test split (50 sampled non-Normal stems, one
+  seed), swapping only the prompt source:
+
+  | prompt source | mean Dice | median Dice | mean IoU |
+  | :--- | ---: | ---: | ---: |
+  | ground-truth box (oracle) | 0.8776 | 0.9218 | 0.8027 |
+  | served Grad-CAM box | 0.3134 | 0.2348 | 0.2281 |
+
+  The CAM prompt cost **0.56 mean Dice**, and the served path matched or beat the
+  oracle box on **1 of 49** cases. So the ~0.88 in the tables above is reachable
+  only with ground-truth prompts; the served pipeline is far below it, and the
+  box prompt — not the mask decoder — is the bottleneck. Two caveats, both of
+  which make this figure *generous*: the sample is small, and 306 of the 1,112
+  held-out seg stems also appear in the classifier's image pool, so the CAM is
+  optimistically good on those. Treat 0.31 as an upper bound on served quality.
+- **How good the box has to be.** Scaling the ground-truth box about its centre
+  gives boxes of known quality, which separates "the box is misplaced" from "the
+  decoder cannot cope with a misplaced box" (16 samples, 112 runs):
+
+  | prompt box | box IoU vs truth | Dice |
+  | :--- | ---: | ---: |
+  | truth ×0.6 (clips the lesion) | 0.360 | 0.5978 |
+  | truth ×0.8 | 0.640 | 0.8336 |
+  | truth ×1.0 (oracle) | 1.000 | 0.8852 |
+  | truth ×1.3 (slightly loose) | 0.592 | **0.8937** |
+  | truth ×1.8 | 0.309 | 0.7209 |
+  | truth ×2.5 | 0.162 | 0.4046 |
+  | **actual CAM box** | **0.123** | **0.2348** |
+
+  Three things follow. The CAM box overlaps the true lesion at only **0.123 IoU** —
+  it is barely on target, which is the whole failure. A box **slightly larger than
+  the lesion scores best** (×1.3 beats the exact box, 0.8937 vs 0.8852), so an
+  over-generous margin is the right instinct. But it falls off a cliff past that:
+  ×1.8 costs 0.17 Dice and ×2.5 costs 0.49. An earlier adaptive-margin box landed
+  around ×1.8 and made things worse for exactly this reason — too loose, not
+  "loose is wrong". Binned by quality: Dice 0.89 at box IoU ≥ 0.7, 0.66 at
+  0.3–0.4, **0.075 at 0.0–0.1**. Target for any improvement to the prompt is
+  **box IoU ≥ 0.5**, which is worth ~0.86 Dice.
+- **The assistive fix that does work: let the clinician supply the box.** Since
+  the box is the bottleneck and the clinician knows where the lesion is, the
+  workspace now supports click-to-segment (`POST /api/brain/segment-click`): the
+  click becomes a small box centred on it, and no classification runs. Measured
+  on the held-out split with the click placed inside the ground-truth mask
+  (48px box, n=15): **mean Dice 0.795, median 0.917** — versus 0.31 for the CAM
+  box and 0.88 for the oracle. Two caveats. Sending the click as a *bare point*
+  scored only 0.254 mean (the weights were trained on boxes, not points), and
+  adding the point alongside the box made every box size worse. Response time on
+  CPU was ~4.5s p50; the forward pass is fast, the rest is decode and encode, so
+  this is not yet real-time on a CPU-only box.
+- **The raw serving mode returns an empty mask.** The pipeline can also be asked
+  to segment with no prompt at all (`POST /api/brain/segment` with
+  `use_heatmap_prompt=false`), in which case the decoder runs from the image
+  embedding alone. Measured against the released weights on the same scan: **0
+  foreground pixels unprompted vs 26,548 with the Grad-CAM box prompt**. These
+  weights only ever saw boxes, so with no prompt the decoder emits nothing at
+  all. The mode exists to *demonstrate* that the prompt is load-bearing — it is
+  not a scoreable baseline, and the metrics above do not describe it. Note also
+  that the IoU head still reports a number (0.457 in that run) for an empty mask;
+  do not put it in a results table.
+- **The serving box uses a fixed threshold and margin, deliberately.** Training
+  and evaluation boxes are tight ground-truth boxes; serving thresholds the
+  classifier's Grad-CAM at 0.5 with a 10px pad. An adaptive
+  percentile/morphology box was trialled and reverted: it measured a wash against
+  the decoder's own IoU head (0.6868 vs 0.6803) while producing roughly 3× larger
+  masks (32,084 vs 10,508 mean foreground px), and in the workspace it made the
+  decoder segment well beyond the lesion. It remains available via
+  `adaptive_box=True` for low-contrast scans where a fixed cut finds nothing.
+- **Grad-CAM++ was trialled and reverted.** It measured a tighter hot area (8.2%
+  vs 10.2% of frame above half-peak) but rendered a fragmented map on real scans —
+  scattered hot blobs rather than one coherent region over the lesion. Plain
+  Grad-CAM is the default; `OPENMED_CAM_METHOD=gradcam++` opts in. Note that this
+  map is both the workspace's displayed explanation and the source of the box
+  prompt, so a change here is visible in two places at once.
+- **The peak-point prompt is off by default because it measured worse.** Sending
+  a positive point at the peak activation alongside the box cost 0.051 mean IoU
+  (0.6868 → 0.6355) and was worse on five of eight samples. It is opt-in
+  (`use_peak_point=True`), not a default.
 - **Validation selects the model; test is evaluated once**, on the best
   checkpoint. No test-based model selection.
 

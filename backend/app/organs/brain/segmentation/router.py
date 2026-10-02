@@ -3,6 +3,7 @@
 Endpoints
 ---------
 POST /api/brain/segment        Classify + segment an MRI image
+POST /api/brain/segment-click  Segment from a doctor's click (no classification)
 POST /api/brain/load-models    Eagerly load both models into memory
 POST /api/brain/unload-models  Release both models from memory
 GET  /api/brain/seg-health     Segmentation readiness probe
@@ -13,6 +14,8 @@ Lifecycle
 The frontend calls ``/load-models`` when the user enters the brain
 section and ``/unload-models`` when they leave.  The ``/segment``
 endpoint also lazily loads models if they are not yet in memory.
+``/segment-click`` loads only the segmenter, which is what makes a
+click respond without a classification pass.
 """
 
 from __future__ import annotations
@@ -25,7 +28,7 @@ import time
 from typing import Any, Literal, Optional
 
 import torch
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
@@ -34,7 +37,13 @@ from ..classification.brain_regions import LOCALIZATION_BASIS, map_prediction_to
 from ..classification.label_space import CLASS_NAMES
 from ..classification.pipeline import BrainClassificationPipeline, ModelUnavailableError
 from ..classification.router import checkpoint_path as classification_checkpoint_path
-from .pipeline import BrainSegmentationPipeline, SegmentationUnavailableError
+from .pipeline import (
+    BrainSegmentationPipeline,
+    DEFAULT_CLICK_BOX_PX,
+    MAX_CLICK_BOX_PX,
+    MIN_CLICK_BOX_PX,
+    SegmentationUnavailableError,
+)
 from .prepare_weights import default_checkpoint_path, verify_weights
 
 logger = logging.getLogger(__name__)
@@ -58,6 +67,41 @@ _load_error: Optional[str] = None
 
 def segmentation_checkpoint_path() -> str:
     return str(default_checkpoint_path())
+
+
+async def _ensure_segmenter_loaded() -> BrainSegmentationPipeline:
+    """Load only the segmenter — the click path needs no classifier.
+
+    Keeping classification out of this path is what makes a click feel
+    immediate: one forward pass instead of two plus a backward.
+    """
+    global _segmenter, _load_error
+
+    if _segmenter is not None:
+        return _segmenter
+
+    async with _load_lock:
+        if _segmenter is not None:
+            return _segmenter
+
+        started = time.perf_counter()
+        try:
+            _segmenter = await run_in_threadpool(
+                lambda: BrainSegmentationPipeline(
+                    model_path=segmentation_checkpoint_path()
+                )
+            )
+            logger.info(
+                "Segmenter loaded in %.2fs (click path)",
+                time.perf_counter() - started,
+            )
+        except SegmentationUnavailableError as exc:
+            _load_error = f"Segmenter: {exc}"
+            logger.error("Segmenter unavailable: %s", exc)
+            raise HTTPException(status_code=503, detail=_load_error) from exc
+
+        _load_error = None
+        return _segmenter
 
 
 async def _ensure_models_loaded() -> tuple[BrainClassificationPipeline, BrainSegmentationPipeline]:
@@ -192,14 +236,48 @@ class SegmentationResult(BaseModel):
     segmentation_performed: bool
     segmentation_skipped_reason: Optional[str] = None
 
-    # Box-prompt segmentation (LiteMedSAM is a box-prompt-only model)
+    # Which prompt produced the mask:
+    #   "heatmap_box" — bounding box derived from the Grad-CAM heatmap
+    #   "raw"         — LiteMedSAM ran with no prompt at all
+    prompt_mode: Literal["heatmap_box", "raw"] = "heatmap_box"
+
+    # Mask payload, independent of which prompt produced it.
+    seg_mask_base64: Optional[str] = None
+    seg_overlay_base64: Optional[str] = None
+    iou_pred: Optional[float] = None
+    # Foreground pixel count of the returned mask. 0 means the model ran and
+    # found nothing — distinct from None, which means no mask was produced.
+    mask_foreground_px: Optional[int] = None
+
+    # Box-prompt specifics — only meaningful when prompt_mode == "heatmap_box".
     box_prompt_used: bool = False
-    box_mask_base64: Optional[str] = None
-    box_overlay_base64: Optional[str] = None
-    iou_box: Optional[float] = None
     box_coords: Optional[list[float]] = None
+    # The box is sent with a positive point at the peak activation by default.
+    point_prompt_used: bool = False
+    point_coords: Optional[list[float]] = None
 
     # Metadata
+    segmentation_input_size: Optional[str] = None
+    original_size: Optional[str] = None
+    total_ms: Optional[float] = None
+
+
+class ClickSegmentationResult(BaseModel):
+    """Response from POST /api/brain/segment-click.
+
+    No classification fields: the click path answers "segment here" without
+    asking the classifier anything, which is what makes it fast.
+    """
+
+    segmentation_performed: bool
+    prompt_mode: Literal["click_box"]
+    # The click, in 256×256 prompt space, and the box built around it.
+    click: list[float]
+    box_coords: list[float]
+    seg_mask_base64: Optional[str] = None
+    seg_overlay_base64: Optional[str] = None
+    iou_pred: Optional[float] = None
+    mask_foreground_px: Optional[int] = None
     segmentation_input_size: Optional[str] = None
     original_size: Optional[str] = None
     total_ms: Optional[float] = None
@@ -235,15 +313,28 @@ class UnloadModelsResponse(BaseModel):
 
 
 @router.post("/segment", response_model=SegmentationResult)
-async def segment_brain_tumor(file: UploadFile = File(...)) -> SegmentationResult:
+async def segment_brain_tumor(
+    file: UploadFile = File(...),
+    use_heatmap_prompt: bool = Form(True),
+) -> SegmentationResult:
     """Classify a brain MRI and, if a tumour is found, segment it.
 
     Pipeline:
     1. Run classifier with Grad-CAM.
-    2. If predicted class is "Normal", return classification only.
-    3. Otherwise, derive a bounding box from the Grad-CAM heatmap and use it
-       as the prompt for LiteMedSAM segmentation. The released LiteMedSAM
-       weights segment from boxes only, so no dense mask prompt is sent.
+    2. If predicted class is "Normal", return classification only — no
+       segmentation is attempted, regardless of the prompt mode below.
+    3. Otherwise segment with LiteMedSAM in the mode the caller asked for:
+
+       ``use_heatmap_prompt=True`` (default)
+           Derive a bounding box from the Grad-CAM heatmap and prompt the
+           model with it. This is the path the released LiteMedSAM weights
+           were trained for.
+       ``use_heatmap_prompt=False``
+           Send no prompt at all. The decoder runs from the image embedding
+           alone, which is the unprompted arm of the ablation.
+
+    Classification is identical in both modes; only the segmentation prompt
+    changes.
     """
     total_start = time.perf_counter()
 
@@ -295,33 +386,42 @@ async def segment_brain_tumor(file: UploadFile = File(...)) -> SegmentationResul
         logger.info("Classified as Normal — skipping segmentation.")
         return SegmentationResult(
             **base_response,
+            prompt_mode="heatmap_box" if use_heatmap_prompt else "raw",
             segmentation_performed=False,
             segmentation_skipped_reason="Classified as Normal — no tumour region to segment.",
             total_ms=round((time.perf_counter() - total_start) * 1000.0, 1),
         )
 
-    # ── Step 3: Segmentation with heatmap prompts ─────────────────
-
-    # Reconstruct the Grad-CAM heatmap from the pipeline
-    # The GradCAM.generate() returns a 2D normalised array —
-    # we need to re-run it or extract from the classifier pipeline.
-    # Since the classifier already ran predict_with_gradcam, we can
-    # get the cam directly by running Grad-CAM again.
-    from ..classification.model import GradCAM
-
-    tensor = classifier.transform(image).unsqueeze(0).to(classifier.device)
-    with GradCAM(classifier.model, classifier.target_layer) as grad_cam:
-        cam = grad_cam.generate(tensor)
-
+    # ── Step 3: Segmentation in the requested prompt mode ─────────
     seg_start = time.perf_counter()
+
+    if use_heatmap_prompt:
+        # Reuse the activation map from the classification pass — it was
+        # returned as "cam_array" for exactly this. Recomputing it here would
+        # double the backward cost and, worse, derive the box prompt from a
+        # different map than the one rendered for the user.
+        cam = cls_result.get("cam_array")
+        if cam is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Classifier returned no activation map for the box prompt.",
+            )
+
+        prompt_mode: Literal["heatmap_box", "raw"] = "heatmap_box"
+        segment_fn = lambda: segmenter.segment_with_heatmap(image, cam)  # noqa: E731
+    else:
+        # Raw: nothing is passed to the prompt encoder at all, so there is no
+        # reason to pay for a Grad-CAM pass.
+        prompt_mode = "raw"
+        segment_fn = lambda: segmenter.segment_raw(image)  # noqa: E731
+
     try:
-        seg_result = await run_in_threadpool(
-            segmenter.segment_with_heatmap, image, cam
-        )
+        seg_result = await run_in_threadpool(segment_fn)
     except SegmentationUnavailableError as exc:
         logger.error("Segmentation failed: %s", exc)
         return SegmentationResult(
             **base_response,
+            prompt_mode=prompt_mode,
             segmentation_performed=False,
             segmentation_skipped_reason=f"Segmentation error: {exc}",
             total_ms=round((time.perf_counter() - total_start) * 1000.0, 1),
@@ -330,18 +430,31 @@ async def segment_brain_tumor(file: UploadFile = File(...)) -> SegmentationResul
         logger.error("Segmentation inference failed: %s", exc, exc_info=True)
         return SegmentationResult(
             **base_response,
+            prompt_mode=prompt_mode,
             segmentation_performed=False,
             segmentation_skipped_reason=f"Segmentation inference error: {exc}",
             total_ms=round((time.perf_counter() - total_start) * 1000.0, 1),
         )
 
+    # The pipeline names its payload after the prompt it used; normalise both
+    # modes onto the same response fields here.
+    if prompt_mode == "heatmap_box":
+        mask_b64 = seg_result.get("box_mask_base64")
+        overlay_b64 = seg_result.get("box_overlay_base64")
+        iou_value = seg_result.get("iou_box")
+    else:
+        mask_b64 = seg_result.get("seg_mask_base64")
+        overlay_b64 = seg_result.get("seg_overlay_base64")
+        iou_value = seg_result.get("iou_pred")
+
     seg_ms = (time.perf_counter() - seg_start) * 1000.0
     total_ms = (time.perf_counter() - total_start) * 1000.0
 
     logger.info(
-        "Classification+Segmentation: class=%s conf=%.3f cls=%.0fms seg=%.0fms total=%.0fms",
+        "Classification+Segmentation: class=%s conf=%.3f prompt=%s cls=%.0fms seg=%.0fms total=%.0fms",
         cls_result["predicted_class"],
         cls_result["confidence"],
+        prompt_mode,
         cls_ms,
         seg_ms,
         total_ms,
@@ -350,13 +463,92 @@ async def segment_brain_tumor(file: UploadFile = File(...)) -> SegmentationResul
     return SegmentationResult(
         **base_response,
         segmentation_performed=seg_result.get("segmentation_performed", True),
+        prompt_mode=prompt_mode,
+        seg_mask_base64=mask_b64,
+        seg_overlay_base64=overlay_b64,
+        iou_pred=iou_value,
+        mask_foreground_px=seg_result.get("mask_foreground_px"),
         box_prompt_used=seg_result.get("box_prompt_used", False),
-        box_mask_base64=seg_result.get("box_mask_base64"),
-        box_overlay_base64=seg_result.get("box_overlay_base64"),
-        iou_box=seg_result.get("iou_box"),
         box_coords=seg_result.get("box_coords"),
+        point_prompt_used=seg_result.get("point_prompt_used", False),
+        point_coords=seg_result.get("point_coords"),
         segmentation_input_size=seg_result.get("input_size"),
         original_size=seg_result.get("original_size"),
+        total_ms=round(total_ms, 1),
+    )
+
+
+@router.post("/segment-click", response_model=ClickSegmentationResult)
+async def segment_by_click(
+    file: UploadFile = File(...),
+    click_x: float = Form(..., ge=0.0, le=1.0),
+    click_y: float = Form(..., ge=0.0, le=1.0),
+    box_size: int = Form(DEFAULT_CLICK_BOX_PX, ge=MIN_CLICK_BOX_PX, le=MAX_CLICK_BOX_PX),
+) -> ClickSegmentationResult:
+    """Segment from a single click on the suspicious region.
+
+    The assistive path: the clinician marks where they see something, and
+    LiteMedSAM segments inside a small box built around that click. The click is
+    converted to a box rather than sent as a bare point — measured against
+    ground truth on the held-out split, a 48px box centred on the click reached a
+    median Dice of 0.888 while the same click sent as a bare point scored 0.254,
+    because the released weights were trained on boxes only.
+
+    No classification runs here. That is deliberate: the clinician has already
+    seen the scan, so skipping the classifier is what keeps the click feeling
+    immediate. Coordinates are normalised against the displayed image, so they
+    are independent of its resolution.
+    """
+    started = time.perf_counter()
+
+    payload = await file.read(MAX_UPLOAD_BYTES + 1)
+    image = _validate_upload(file, payload)
+
+    try:
+        segmenter = await _ensure_segmenter_loaded()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Segmenter load failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    # Normalised click -> 256×256 prompt space.
+    cx, cy = click_x * 255.0, click_y * 255.0
+
+    try:
+        r = await run_in_threadpool(
+            lambda: segmenter.segment_with_click(image, cx, cy, box_size=box_size)
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except SegmentationUnavailableError as exc:
+        logger.error("Click segmentation failed: %s", exc)
+        raise HTTPException(status_code=503, detail=f"Segmentation error: {exc}") from exc
+    except RuntimeError as exc:
+        logger.error("Click segmentation inference failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail="Segmentation inference error.") from exc
+
+    total_ms = (time.perf_counter() - started) * 1000.0
+    logger.info(
+        "Click segmentation: click=(%.0f,%.0f) box=%s iou=%.4f fg=%s total=%.0fms",
+        cx, cy,
+        [round(v) for v in r.get("box_coords", [])],
+        r.get("iou_pred") or 0.0,
+        r.get("mask_foreground_px"),
+        total_ms,
+    )
+
+    return ClickSegmentationResult(
+        segmentation_performed=r.get("segmentation_performed", True),
+        prompt_mode="click_box",
+        click=[cx, cy],
+        box_coords=r.get("box_coords", []),
+        seg_mask_base64=r.get("seg_mask_base64"),
+        seg_overlay_base64=r.get("seg_overlay_base64"),
+        iou_pred=r.get("iou_pred"),
+        mask_foreground_px=r.get("mask_foreground_px"),
+        segmentation_input_size=r.get("input_size"),
+        original_size=r.get("original_size"),
         total_ms=round(total_ms, 1),
     )
 
@@ -438,6 +630,7 @@ async def seg_model_info() -> SegModelInfoResponse:
         "architecture": "TinyViT-256 + SAM PromptEncoder + MaskDecoder",
         "input_size": "256x256",
         "prompt_types": ["bounding_box"],
+        "serving_prompt_modes": ["heatmap_box", "raw"],
         "loaded": _segmenter is not None and _segmenter.is_loaded,
     }
     cls_info: dict[str, Any] = {

@@ -6,28 +6,46 @@ export const BrainSegmentationDocs: React.FC = () => {
       <div className="task-header-strip">
         <div className="task-tag-group">
           <span className="task-type-tag seg">Task · Segmentation</span>
-          <span className="task-name-text">Grad-CAM-Prompted Promptable Segmentation (LiteMedSAM)</span>
+          <span className="task-name-text">Promptable Segmentation (LiteMedSAM) · Heatmap-Prompt vs Raw Ablation</span>
         </div>
         <span className="task-model-pill">LiteMedSAM · TinyViT-256 · 256×256 input</span>
       </div>
 
       <div className="boilerplate-card">
         <p className="boilerplate-copy">
-          Segmentation runs only when the classifier returns a tumour class — a Normal prediction short-circuits it. The
-          Grad-CAM activation map from that same forward pass is thresholded into a bounding box, and that box is the
-          prompt handed to <strong>LiteMedSAM</strong> (TinyViT-256 image encoder + SAM prompt encoder + mask decoder) at a
-          256×256 input resolution. The decoder returns a single binary tumour mask, which is composited over the source
-          scan in the coral accent.
+          Segmentation runs only when the classifier returns a tumour class — a Normal prediction short-circuits it in
+          either prompt mode. Two modes are selectable per run. In the default <strong>heatmap box</strong> mode the
+          classifier's <strong>Grad-CAM</strong> activation map is thresholded into a bounding box, and that box is the
+          prompt handed to <strong>LiteMedSAM</strong> (TinyViT-256 image encoder + SAM prompt encoder + mask decoder) at
+          a 256×256 input resolution. In <strong>raw</strong> mode nothing is passed to the prompt encoder at all, so the
+          mask decoder works from the image embedding alone — the unprompted arm of the ablation. In both modes the
+          decoder returns a single binary mask, composited over the source scan in the coral accent, though unprompted
+          it comes back empty on the released weights. A dense mask prompt is accepted by the prompt encoder but returns
+          an empty prediction with those same weights, so it is never sent.
+        </p>
+        <p className="boilerplate-copy">
+          Two variants were trialled and <strong>reverted</strong>, and both are documented here because they are the
+          kind of change that looks better on paper than on a scan. <strong>Grad-CAM++</strong> measured a tighter hot
+          area (8.2% vs 10.2% of frame) but rendered a visibly fragmented map on real scans — scattered hot blobs rather
+          than one coherent region over the lesion — so plain Grad-CAM remains the default
+          (<code>OPENMED_CAM_METHOD=gradcam++</code> opts in). The <strong>adaptive percentile box</strong> measured a
+          wash against the decoder's own IoU head but produced roughly 3× larger masks, and made the decoder segment well
+          beyond the lesion; the fixed threshold and margin remain the default
+          (<code>adaptive_box=True</code> opts in). A positive point at the peak activation is likewise
+          <strong>off by default</strong>: it cost 0.051 mean IoU when sent unconditionally.
         </p>
         <div className="seg-targets-grid">
           <div className="seg-target-box">
-            <span className="seg-badge wt">Box Prompt</span>
+            <span className="seg-badge wt">Heatmap Box Prompt · default</span>
             <span className="seg-formula">argwhere(Grad-CAM ≥ τ) ± margin</span>
             <p className="seg-desc">
               Bounding box in 256² model space, derived from the classifier's own attention map — no manual click or
-              annotation required.
+              annotation required. The cut and the margin are fixed, which is the configuration this workspace was
+              validated with.
             </p>
-            <span className="seg-target-metric">Reported: box coordinates + decoder IoU estimate</span>
+            <span className="seg-target-metric">
+              Reported: prompt_mode=heatmap_box · box coordinates + decoder IoU estimate
+            </span>
           </div>
           <div className="seg-target-box">
             <span className="seg-badge tc">Binary Tumour Mask</span>
@@ -39,13 +57,15 @@ export const BrainSegmentationDocs: React.FC = () => {
             <span className="seg-target-metric">Delivered as PNG + coral overlay, capped at 384px</span>
           </div>
           <div className="seg-target-box">
-            <span className="seg-badge et">Prompt Constraint</span>
-            <span className="seg-formula">boxes = … · masks = ∅</span>
+            <span className="seg-badge et">Raw · no prompt</span>
+            <span className="seg-formula">points = ∅ · boxes = ∅ · masks = ∅</span>
             <p className="seg-desc">
-              The released lite_medsam.pth weights were trained to segment from boxes. A dense mask prompt is accepted by
-              the prompt encoder but returns an empty prediction, so the pipeline never sends one.
+              The unprompted arm: nothing reaches the prompt encoder, so the decoder segments from the image embedding
+              alone. On the released weights this returns an <strong>empty mask</strong> — measured 0 foreground pixels
+              versus 26,548 with the box prompt on the same scan. That is the finding: the box prompt is load-bearing,
+              not an optimisation.
             </p>
-            <span className="seg-target-metric">Model-reported: prompt_types = ["bounding_box"]</span>
+            <span className="seg-target-metric">Reported: prompt_mode=raw · decoder IoU estimate (not meaningful when the mask is empty)</span>
           </div>
         </div>
       </div>

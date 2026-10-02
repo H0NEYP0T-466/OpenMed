@@ -448,6 +448,66 @@ def test_gradcam_rejects_batched_input(tiny_backbone) -> None:
             grad_cam.generate(torch.zeros(2, 3, 208, 208))
 
 
+def test_gradcam_pp_produces_a_normalised_map_distinct_from_plain(tiny_backbone) -> None:
+    """Grad-CAM++ must actually take the ++ branch, not silently alias Grad-CAM."""
+    model, layer = tiny_backbone
+    torch = pytest.importorskip("torch")
+    from app.organs.brain.classification.model import GradCAM
+
+    sample = torch.from_numpy(
+        np.random.default_rng(23).random((1, 3, 208, 208)).astype("float32")
+    )
+
+    with GradCAM(model, layer, method="gradcam") as plain:
+        map_plain = plain.generate(sample, 3)
+    with GradCAM(model, layer, method="gradcam++") as plus:
+        map_plus = plus.generate(sample, 3)
+
+    assert map_plus.shape == map_plain.shape
+    assert map_plus.min() >= 0.0 and map_plus.max() <= 1.0 + 1e-6
+    assert map_plus.max() == pytest.approx(1.0)
+    assert not np.allclose(map_plain, map_plus), (
+        "gradcam++ returned the plain map — the method switch is not wired"
+    )
+
+
+def test_gradcam_rejects_an_unknown_method(tiny_backbone) -> None:
+    model, layer = tiny_backbone
+    from app.organs.brain.classification.model import GradCAM
+
+    with pytest.raises(ValueError, match="Unknown CAM method"):
+        GradCAM(model, layer, method="gradcam#")
+
+
+def test_cam_method_defaults_to_plain_gradcam(monkeypatch) -> None:
+    """Plain Grad-CAM is the default; ++ is opt-in.
+
+    Grad-CAM++ was trialled as the default and reverted: on real scans its map
+    was fragmented — scattered hot blobs rather than one coherent region over
+    the lesion — and this map is both what the workspace displays and the source
+    of the segmentation box prompt. Pinned so it cannot silently return.
+    """
+    from app.organs.brain.classification.pipeline import (
+        DEFAULT_CAM_METHOD,
+        resolve_cam_method,
+    )
+
+    monkeypatch.delenv("OPENMED_CAM_METHOD", raising=False)
+    assert DEFAULT_CAM_METHOD == "gradcam"
+    assert resolve_cam_method() == "gradcam"
+
+    monkeypatch.setenv("OPENMED_CAM_METHOD", "gradcam++")
+    assert resolve_cam_method() == "gradcam++"
+
+
+def test_cam_method_rejects_a_bad_override(monkeypatch) -> None:
+    from app.organs.brain.classification.pipeline import resolve_cam_method
+
+    monkeypatch.setenv("OPENMED_CAM_METHOD", "gradcam+++")
+    with pytest.raises(Exception, match="not one of"):
+        resolve_cam_method()
+
+
 def test_overlay_preserves_geometry() -> None:
     from app.organs.brain.classification.model import overlay_cam_on_image
 

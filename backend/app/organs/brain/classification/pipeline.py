@@ -27,6 +27,7 @@ from .label_space import (
     split_class_name,
 )
 from .model import (
+    CAM_METHODS,
     MODEL_TAG,
     GradCAM,
     checkpoint_class_count,
@@ -50,6 +51,27 @@ __all__ = [
 
 class ModelUnavailableError(RuntimeError):
     """No usable, label-consistent checkpoint could be prepared for inference."""
+
+
+DEFAULT_CAM_METHOD = "gradcam"
+
+
+def resolve_cam_method(explicit: Optional[str] = None) -> str:
+    """Resolve which CAM variant to run, rejecting unknown names.
+
+    Plain Grad-CAM is the default. Grad-CAM++ was trialled here and reverted:
+    on real scans its map read worse to the eye — sometimes missing the lesion,
+    sometimes over-highlighting — and this map is both what the workspace
+    displays and the source of the segmentation box prompt.
+
+    ``OPENMED_CAM_METHOD=gradcam++`` opts back in.
+    """
+    method = explicit or os.getenv("OPENMED_CAM_METHOD") or DEFAULT_CAM_METHOD
+    if method not in CAM_METHODS:
+        raise ModelUnavailableError(
+            f"CAM method {method!r} is not one of {CAM_METHODS}."
+        )
+    return method
 
 
 class BrainClassificationPipeline:
@@ -101,6 +123,12 @@ class BrainClassificationPipeline:
         self.transform = get_inference_transform(self.model)
         self.input_size = input_side_length(self.model)
         self.target_layer = resolve_gradcam_layer(self.model)
+
+        # Plain Grad-CAM by default. This map is both the displayed explanation
+        # and the source of the segmentation box prompt, so a change here shows
+        # up in two places at once — resolve_cam_method records why Grad-CAM++
+        # was trialled and reverted.
+        self.cam_method = resolve_cam_method()
 
         logger.info(
             "Brain pipeline ready  device=%s  classes=%d  label_source=%s  trained=%s  input=%d",
@@ -249,11 +277,18 @@ class BrainClassificationPipeline:
     def predict_with_gradcam(
         self, image_path_or_pil: Union[str, Image.Image]
     ) -> dict[str, Any]:
-        """Inference plus a Grad-CAM overlay rendered at model input resolution."""
+        """Inference plus a CAM overlay rendered at model input resolution.
+
+        Also returns the raw activation map under ``cam_array`` so callers that
+        need the geometry (the segmentation box prompt) can reuse this exact
+        computation. Without it they would have to run a second backward pass,
+        and the box would be derived from a *different* map than the one shown
+        to the user.
+        """
         image = self._load_image(image_path_or_pil)
         tensor = self.transform(image).unsqueeze(0).to(self.device)
 
-        with GradCAM(self.model, self.target_layer) as grad_cam:
+        with GradCAM(self.model, self.target_layer, method=self.cam_method) as grad_cam:
             cam = grad_cam.generate(tensor)
             logits = grad_cam.logits
             if logits is None:  # pragma: no cover - generate always sets it
@@ -264,8 +299,9 @@ class BrainClassificationPipeline:
         overlay = overlay_cam_on_image(base, cam)
         result["gradcam_base64"] = _encode_jpeg_data_url(overlay)
         result["gradcam_grid"] = [int(cam.shape[0]), int(cam.shape[1])]
+        result["cam_array"] = cam
         result["explainability"] = {
-            "method": "gradcam",
+            "method": self.cam_method,
             "layer": type(self.target_layer).__name__,
             "interpretation": (
                 "Coarse activation map at model input resolution. Indicates "

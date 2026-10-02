@@ -154,7 +154,12 @@ def test_classify_returns_the_full_contract(
     assert len(body["probabilities"]) == len(CLASS_NAMES)
     assert body["gradcam_base64"].startswith("data:image/jpeg;base64,")
     assert body["gradcam_grid"] == [7, 7]
-    assert body["explainability"]["method"] == "gradcam"
+    # Which CAM variant runs is configurable; the response must name a real one.
+    # The default being Grad-CAM++ is pinned separately in the classification
+    # tests, so this contract test stays valid if the default is ever changed.
+    from app.organs.brain.classification.model import CAM_METHODS
+
+    assert body["explainability"]["method"] in CAM_METHODS
     assert body["localization_basis"]
     assert body["model_trained"] is True
     assert "simulated" not in body

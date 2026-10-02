@@ -14,7 +14,7 @@ For_Agents/
 *.njsproj
 *.sln
 *.sw?
-
+outputs/
 brag-output-2026-09-27-112042/
 public/samples
 

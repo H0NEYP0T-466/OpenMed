@@ -466,9 +466,14 @@ def autocast_ctx(cfg: Any, device: torch.device):
 def make_grad_scaler(cfg: Any, device: torch.device):
     """``torch.amp.GradScaler`` where available, ``torch.cuda.amp`` otherwise."""
     enabled = cfg.amp and device.type == "cuda"
+    kwargs: dict[str, Any] = {"enabled": enabled}
+    init_scale = getattr(cfg, "amp_init_scale", None)
+    if init_scale:
+        kwargs["init_scale"] = float(init_scale)
     try:
-        return torch.amp.GradScaler("cuda", enabled=enabled)
+        return torch.amp.GradScaler("cuda", **kwargs)
     except (AttributeError, TypeError):  # torch < 2.3
+        kwargs.pop("init_scale", None)
         return torch.cuda.amp.GradScaler(enabled=enabled)
 
 
@@ -498,10 +503,23 @@ def train_one_epoch(
             torch.nn.utils.clip_grad_norm_(
                 [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
             )
+
+        # GradScaler silently SKIPS optimizer.step() when the gradients
+        # overflowed, and backs the scale off when it does. Advancing the
+        # schedule anyway lets the LR run ahead of the parameters — which is
+        # what PyTorch's "lr_scheduler.step() before optimizer.step()" warning
+        # is complaining about. Detect the skip and hold the schedule.
+        #
+        # Detected via the scale rather than optimizer._step_count or
+        # _opt_called: those are private and are not present in every version
+        # (2.14 has neither, 2.10 has _opt_called).
+        scale_before = scaler.get_scale()
         scaler.step(optimizer)
         scaler.update()
         optimizer.zero_grad(set_to_none=True)
-        scheduler.step()
+
+        if scaler.get_scale() >= scale_before:
+            scheduler.step()
 
     for step, batch in enumerate(loader):
         if cfg.max_steps_per_epoch and step >= cfg.max_steps_per_epoch:

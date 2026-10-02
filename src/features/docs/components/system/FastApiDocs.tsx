@@ -32,10 +32,32 @@ export const FastApiDocs: React.FC = () => {
                 <code className="endpoint-path">/api/brain/segment</code>
               </div>
               <p className="endpoint-desc">
-                The end-to-end route the workspace uses. Accepts a multipart image upload (JPEG/PNG/WebP, ≤12 MB),
-                classifies it, and — unless the prediction is Normal — derives a bounding box from the Grad-CAM heatmap
-                and runs LiteMedSAM against it. Returns the full classification payload plus the binary mask, the coral
-                overlay, box coordinates, decoder IoU and per-stage timings.
+                The end-to-end route the workspace uses. Accepts a multipart image upload (JPEG/PNG/WebP, ≤12 MB) plus a{' '}
+                <code>use_heatmap_prompt</code> flag (default true). Classifies the scan, and — unless the prediction is
+                Normal — runs LiteMedSAM: with the flag set, a bounding box is derived from the Grad-CAM heatmap and used
+                as the prompt; with it cleared, no prompt is sent at all and the decoder runs from the image embedding
+                alone. Returns the full classification payload plus the binary mask, the coral overlay, the{' '}
+                <code>prompt_mode</code> that produced it, box coordinates and decoder IoU in heatmap mode, and per-stage
+                timings.
+              </p>
+            </div>
+
+            <div className="api-endpoint-card">
+              <div className="endpoint-head">
+                <span className="http-method post">POST</span>
+                <code className="endpoint-path">/api/brain/segment-click</code>
+              </div>
+              <p className="endpoint-desc">
+                The assistive path. Takes the same multipart upload plus{' '}
+                <code>click_x</code> / <code>click_y</code> (normalised 0–1) and an
+                optional <code>box_size</code> (default 48px in 256² space). The
+                click becomes a small box prompt and LiteMedSAM segments inside it
+                — <strong>no classification runs</strong>, so the click responds
+                without a classifier pass. Measured against ground truth on the
+                held-out split: median Dice 0.917 at the default box size, against
+                0.235 for the CAM-derived box. Because the released weights were
+                trained on boxes, the click becomes a box rather than a bare point
+                — a point alone scored 0.254.
               </p>
             </div>
 

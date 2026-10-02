@@ -49,6 +49,16 @@ export interface BrainClassificationResult {
 }
 
 /**
+ * Which prompt was handed to LiteMedSAM for the segmentation pass.
+ *
+ * - `heatmap_box` — a bounding box derived from the Grad-CAM heatmap. This is
+ *   the path the released LiteMedSAM weights were trained for.
+ * - `raw` — no prompt at all; the decoder runs from the image embedding alone.
+ *   The unprompted arm of the ablation.
+ */
+export type SegPromptMode = 'heatmap_box' | 'raw'
+
+/**
  * Response from POST /api/brain/segment.
  *
  * A superset of {@link BrainClassificationResult}: every classification field
@@ -61,13 +71,47 @@ export interface BrainSegmentationResult extends BrainClassificationResult {
   /** Why segmentation did not run (e.g. classified as Normal). */
   readonly segmentation_skipped_reason?: string
 
-  /** Box-prompt segmentation (bounding box derived from the Grad-CAM heatmap). */
-  readonly box_prompt_used?: boolean
-  readonly box_mask_base64?: string
-  readonly box_overlay_base64?: string
-  readonly box_coords?: number[]
-  readonly iou_box?: number
+  /** Which prompt produced the mask below. */
+  readonly prompt_mode?: SegPromptMode
 
+  /** Mask payload, present whenever a mask was produced, in either mode. */
+  readonly seg_mask_base64?: string
+  readonly seg_overlay_base64?: string
+  readonly iou_pred?: number
+  /**
+   * Foreground pixel count of the returned mask. `0` means the model ran and
+   * found nothing — distinct from `undefined`, which means no mask was produced
+   * at all. An unprompted run commonly returns 0.
+   */
+  readonly mask_foreground_px?: number
+
+  /** Box-prompt specifics — only meaningful when prompt_mode is `heatmap_box`. */
+  readonly box_prompt_used?: boolean
+  readonly box_coords?: number[]
+
+  readonly segmentation_input_size?: string
+  readonly original_size?: string
+  readonly total_ms?: number
+}
+
+/**
+ * Response from POST /api/brain/segment-click — the assistive path.
+ *
+ * The clinician clicks the suspicious region; the backend turns that click into
+ * a small box and segments inside it. No classification runs on this path, so
+ * there are no classifier fields here.
+ */
+export interface ClickSegmentationResult {
+  readonly segmentation_performed: boolean
+  readonly prompt_mode: 'click_box'
+  /** The click, in 256×256 prompt space. */
+  readonly click: readonly [number, number]
+  /** The box built around the click. */
+  readonly box_coords: readonly number[]
+  readonly seg_mask_base64?: string
+  readonly seg_overlay_base64?: string
+  readonly iou_pred?: number
+  readonly mask_foreground_px?: number
   readonly segmentation_input_size?: string
   readonly original_size?: string
   readonly total_ms?: number
