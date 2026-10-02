@@ -64,6 +64,23 @@ export const FastApiDocs: React.FC = () => {
             <div className="api-endpoint-card">
               <div className="endpoint-head">
                 <span className="http-method post">POST</span>
+                <code className="endpoint-path">/api/brain/segment-box</code>
+              </div>
+              <p className="endpoint-desc">
+                The same assistive fast path, but the clinician drags a box around
+                the lesion rather than clicking. Takes <code>x1</code> /{' '}
+                <code>y1</code> / <code>x2</code> / <code>y2</code> normalised
+                0–1 in either corner order; corners are ordered and clamped to the
+                frame, and a box under 16px in 256² space is refused with a 400.
+                This is the prompt type the released weights were trained on, so a
+                well-drawn box is the strongest prompt available. No
+                classification runs.
+              </p>
+            </div>
+
+            <div className="api-endpoint-card">
+              <div className="endpoint-head">
+                <span className="http-method post">POST</span>
                 <code className="endpoint-path">/api/brain/classify</code>
               </div>
               <p className="endpoint-desc">

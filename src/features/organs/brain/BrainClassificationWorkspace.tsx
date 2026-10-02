@@ -9,7 +9,7 @@ import {
 import { RomanSection } from '../../../components/common/RomanSection'
 import { ThinkingOrb, DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import { BrainRegionViewer } from './BrainRegionViewer'
-import { analyzeBrainImage, getBrainHealth, getBrainModelInfo, segmentByClick } from './brainApi'
+import { analyzeBrainImage, getBrainHealth, getBrainModelInfo, segmentByBox, segmentByClick } from './brainApi'
 import type {
   BrainModelInfo,
   BrainSegmentationResult,
@@ -133,13 +133,25 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
    */
   const [useHeatmapPrompt, setUseHeatmapPrompt] = useState<boolean>(true)
   /**
-   * Assistive path: the clinician clicks the lesion on the source scan and that
-   * click becomes a small box prompt for LiteMedSAM. Kept separate from the
-   * automated result so the two can be compared side by side.
+   * Assistive path: the clinician marks the lesion (a click that becomes a
+   * small box, or a box they draw themselves) and that mark becomes the prompt
+   * for LiteMedSAM. Kept separate from the automated result so the two can be
+   * compared side by side.
    */
-  const [clickResult, setClickResult] = useState<ClickSegmentationResult | null>(null)
-  const [isClickSegmenting, setIsClickSegmenting] = useState(false)
-  const [clickError, setClickError] = useState<string | null>(null)
+  const [promptResult, setPromptResult] = useState<ClickSegmentationResult | null>(null)
+  const [isPromptSegmenting, setIsPromptSegmenting] = useState(false)
+  const [promptError, setPromptError] = useState<string | null>(null)
+  const [promptMode, setPromptMode] = useState<'click' | 'draw'>('click')
+  /**
+   * Draw start kept in a ref, not state: pointermove fires faster than React
+   * commits, and a handler reading stale state would drop moves and sometimes
+   * see no start at all. Only the rectangle itself needs to be state, since
+   * that is what renders.
+   */
+  const drawStartRef = useRef<{ x: number; y: number } | null>(null)
+  const [drawRect, setDrawRect] = useState<
+    { x1: number; y1: number; x2: number; y2: number } | null
+  >(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -178,7 +190,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
       setFile(selected)
       setPreviewUrl(URL.createObjectURL(selected))
       setSelectedPreset(null)
-      setResult(null)
+      resetResults()
       setError(null)
     }
   }
@@ -198,14 +210,13 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
       setFile(dropped)
       setPreviewUrl(URL.createObjectURL(dropped))
       setSelectedPreset(null)
-      setResult(null)
+      resetResults()
       setError(null)
     }
   }
 
   const handleLoadPreset = async (preset: SpecimenPreset) => {
-    setError(null)
-    setResult(null)
+    resetResults()
     setSelectedPreset(preset.plate)
     try {
       const resp = await fetch(preset.path)
@@ -240,27 +251,102 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const profile = organ?.clinicalProfile
 
   /**
-   * Assistive click-to-segment. The click is read relative to the image, so the
-   * coordinate is independent of how the browser scales the tile.
+   * A new scan invalidates everything computed from the previous one — the
+   * automated analysis and any interactive prompt result alike, since both were
+   * answers about a different image.
    */
+  const resetResults = () => {
+    setResult(null)
+    setPromptResult(null)
+    setPromptError(null)
+    drawStartRef.current = null
+    setDrawRect(null)
+  }
+
+  const normPos = (e: React.PointerEvent<HTMLImageElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    return {
+      x: Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)),
+      y: Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height)),
+    }
+  }
+
+  /** Click mode: the click becomes a small box prompt. */
   const handleClickSegment = async (e: React.MouseEvent<HTMLImageElement>) => {
-    if (!file || isClickSegmenting) return
+    if (!file || isPromptSegmenting || promptMode !== 'click') return
     const rect = e.currentTarget.getBoundingClientRect()
     const clickX = (e.clientX - rect.left) / rect.width
     const clickY = (e.clientY - rect.top) / rect.height
     if (clickX < 0 || clickX > 1 || clickY < 0 || clickY > 1) return
 
-    setIsClickSegmenting(true)
-    setClickError(null)
+    setIsPromptSegmenting(true)
+    setPromptError(null)
     try {
       const res = await segmentByClick(file, { clickX, clickY })
-      setClickResult(res)
+      setPromptResult(res)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Click segmentation failed.'
-      setClickError(msg)
+      setPromptError(msg)
     } finally {
-      setIsClickSegmenting(false)
+      setIsPromptSegmenting(false)
     }
+  }
+
+  /** Draw mode: drag a rectangle around the lesion; the rectangle is the prompt. */
+  const submitDrawnBox = async (rect: {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+  }) => {
+    if (!file || isPromptSegmenting) return
+    setIsPromptSegmenting(true)
+    setPromptError(null)
+    try {
+      const res = await segmentByBox(file, {
+        x1: rect.x1,
+        y1: rect.y1,
+        x2: rect.x2,
+        y2: rect.y2,
+      })
+      setPromptResult(res)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Box segmentation failed.'
+      setPromptError(msg)
+    } finally {
+      setIsPromptSegmenting(false)
+    }
+  }
+
+  const handleDrawStart = (e: React.PointerEvent<HTMLImageElement>) => {
+    if (promptMode !== 'draw' || isPromptSegmenting) return
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    drawStartRef.current = normPos(e)
+    const p = drawStartRef.current
+    setDrawRect({ x1: p.x, y1: p.y, x2: p.x, y2: p.y })
+  }
+
+  const handleDrawMove = (e: React.PointerEvent<HTMLImageElement>) => {
+    const start = drawStartRef.current
+    if (!start) return
+    const p = normPos(e)
+    setDrawRect({ x1: start.x, y1: start.y, x2: p.x, y2: p.y })
+  }
+
+  const handleDrawEnd = (e: React.PointerEvent<HTMLImageElement>) => {
+    const start = drawStartRef.current
+    if (!start) return
+    drawStartRef.current = null
+    const p = normPos(e)
+    const rect = { x1: start.x, y1: start.y, x2: p.x, y2: p.y }
+    setDrawRect(rect)
+    // Ignore accidental clicks in draw mode — a real drag has some extent.
+    if (Math.abs(rect.x2 - rect.x1) < 0.03 || Math.abs(rect.y2 - rect.y1) < 0.03) {
+      setDrawRect(null)
+      return
+    }
+    void submitDrawnBox(rect)
   }
 
   const classCount = modelInfo?.num_classes ?? null
@@ -608,101 +694,169 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   <div className="click-seg-head">
                     <span className="click-seg-title">Assistive Segmentation</span>
                     <span className="click-seg-sub">
-                      Click the suspicious region on the scan below — the click
-                      becomes the prompt. Runs without a classification pass.
+                      {promptMode === 'click'
+                        ? 'Click the suspicious region on the scan below — the click becomes the prompt.'
+                        : 'Drag a box around the suspicious region — the box itself is the prompt.'}{' '}
+                      Runs without a classification pass.
                     </span>
+                    <div className="prompt-mode-switch" role="group" aria-label="Prompt mode">
+                      <button
+                        type="button"
+                        className={promptMode === 'click' ? 'active' : ''}
+                        onClick={() => {
+                          setPromptMode('click')
+                          drawStartRef.current = null
+                          setDrawRect(null)
+                        }}
+                      >
+                        Click
+                      </button>
+                      <button
+                        type="button"
+                        className={promptMode === 'draw' ? 'active' : ''}
+                        onClick={() => setPromptMode('draw')}
+                      >
+                        Draw box
+                      </button>
+                    </div>
                   </div>
 
                   <div className="click-seg-plates">
-                    <div className={`scan-frame click-frame ${isClickSegmenting ? 'busy' : ''}`}>
+                    <div className={`scan-frame click-frame ${isPromptSegmenting ? 'busy' : ''}`}>
                       <img
                         src={previewUrl}
-                        alt="Click a region to segment"
+                        alt="Mark a region to segment"
                         className="click-target"
+                        draggable={false}
+                        style={{ touchAction: 'none' }}
                         onClick={(e) => {
                           e.stopPropagation()
                           void handleClickSegment(e)
                         }}
+                        onPointerDown={handleDrawStart}
+                        onPointerMove={handleDrawMove}
+                        onPointerUp={handleDrawEnd}
                       />
-                      {clickResult && (
-                        <span
-                          className="click-marker"
+                      {drawRect && (
+                        <div
+                          className="draw-rect"
                           style={{
-                            left: `${(clickResult.click[0] / 255) * 100}%`,
-                            top: `${(clickResult.click[1] / 255) * 100}%`,
+                            left: `${Math.min(drawRect.x1, drawRect.x2) * 100}%`,
+                            top: `${Math.min(drawRect.y1, drawRect.y2) * 100}%`,
+                            width: `${Math.abs(drawRect.x2 - drawRect.x1) * 100}%`,
+                            height: `${Math.abs(drawRect.y2 - drawRect.y1) * 100}%`,
                           }}
                         />
                       )}
-                      {isClickSegmenting && <span className="click-busy">Segmenting…</span>}
+                      {promptResult?.prompt_mode === 'click_box' && promptResult.click && (
+                        <span
+                          className="click-marker"
+                          style={{
+                            left: `${(promptResult.click[0] / 255) * 100}%`,
+                            top: `${(promptResult.click[1] / 255) * 100}%`,
+                          }}
+                        />
+                      )}
+                      {isPromptSegmenting && (
+                        <span className="click-busy">
+                          <ThinkingOrb mode="hybrid" size={30} theme="dark" speed={1.2} />
+                          <span>Segmenting…</span>
+                        </span>
+                      )}
+                      {/* Full-screen thinking overlay — same treatment as
+                          the Run EfficientNetV2-B2 button. */}
+                      <DiagnosticThinkingHUD
+                        isVisible={isPromptSegmenting}
+                        classCountLabel="assistive segmentation"
+                      />
                       <span className="scan-tag">
-                        {clickResult ? 'Clicked region' : 'Click the lesion'}
+                        {promptMode === 'click'
+                          ? promptResult?.prompt_mode === 'click_box'
+                            ? 'Clicked region'
+                            : 'Click the lesion'
+                          : drawRect
+                            ? 'Drawn box'
+                            : 'Drag to draw a box'}
                       </span>
                     </div>
 
                     <div className="scan-frame">
-                      {clickResult?.seg_mask_base64 ? (
+                      {promptResult?.seg_mask_base64 ? (
                         <img
-                          src={clickResult.seg_mask_base64}
-                          alt="Click-prompted segmentation mask"
+                          src={promptResult.seg_mask_base64}
+                          alt="Prompted segmentation mask"
                           loading="lazy"
                           decoding="async"
                         />
                       ) : (
-                        <div className="seg-empty-plate">Click the scan to produce a mask</div>
+                        <div className="seg-empty-plate">
+                          {promptMode === 'click' ? 'Click the scan' : 'Drag a box'} to produce a
+                          mask
+                        </div>
                       )}
-                      <span className="scan-tag highlight">Click box · mask</span>
+                      <span className="scan-tag highlight">
+                        {promptMode === 'click' ? 'Click box' : 'Drawn box'} · mask
+                      </span>
                     </div>
 
                     <div className="scan-frame">
-                      {clickResult?.seg_overlay_base64 ? (
+                      {promptResult?.seg_overlay_base64 ? (
                         <img
-                          src={clickResult.seg_overlay_base64}
-                          alt="Click-prompted segmentation overlay"
+                          src={promptResult.seg_overlay_base64}
+                          alt="Prompted segmentation overlay"
                           loading="lazy"
                           decoding="async"
                         />
                       ) : (
                         <div className="seg-empty-plate">No overlay yet</div>
                       )}
-                      <span className="scan-tag highlight">Click box · overlay</span>
+                      <span className="scan-tag highlight">
+                        {promptMode === 'click' ? 'Click box' : 'Drawn box'} · overlay
+                      </span>
                     </div>
                   </div>
 
-                  {clickError && <div className="lightbox-error-banner">{clickError}</div>}
+                  {promptError && <div className="lightbox-error-banner">{promptError}</div>}
 
-                  {clickResult && (
+                  {promptResult && (
                     <div className="seg-metadata-strip">
                       <span className="seg-meta-chip prompt-chip is-heatmap">
                         <span className="k">Prompt mode</span>
-                        <span className="v">Click box</span>
-                      </span>
-                      <span className="seg-meta-chip">
-                        <span className="k">Click (256²)</span>
                         <span className="v">
-                          {clickResult.click.map((c) => c.toFixed(0)).join(', ')}
+                          {promptResult.prompt_mode === 'click_box' ? 'Click box' : 'Drawn box'}
                         </span>
                       </span>
+                      {promptResult.prompt_mode === 'click_box' && promptResult.click && (
+                        <span className="seg-meta-chip">
+                          <span className="k">Click (256²)</span>
+                          <span className="v">
+                            {promptResult.click.map((c) => c.toFixed(0)).join(', ')}
+                          </span>
+                        </span>
+                      )}
                       <span className="seg-meta-chip">
                         <span className="k">Box side</span>
                         <span className="v">
-                          {`${Math.round(clickResult.box_coords[2] - clickResult.box_coords[0])} px`}
+                          {`${Math.round(promptResult.box_coords[2] - promptResult.box_coords[0])} × ${Math.round(
+                            promptResult.box_coords[3] - promptResult.box_coords[1],
+                          )} px`}
                         </span>
                       </span>
                       <span className="seg-meta-chip">
                         <span className="k">Predicted IoU</span>
-                        <span className="v">{clickResult.iou_pred?.toFixed(3) ?? '—'}</span>
+                        <span className="v">{promptResult.iou_pred?.toFixed(3) ?? '—'}</span>
                       </span>
                       <span className="seg-meta-chip">
                         <span className="k">Mask foreground</span>
                         <span className="v">
-                          {clickResult.mask_foreground_px == null
+                          {promptResult.mask_foreground_px == null
                             ? '—'
-                            : `${clickResult.mask_foreground_px.toLocaleString()} px`}
+                            : `${promptResult.mask_foreground_px.toLocaleString()} px`}
                         </span>
                       </span>
                       <span className="seg-meta-chip">
                         <span className="k">Response</span>
-                        <span className="v">{clickResult.total_ms?.toFixed(0)} ms</span>
+                        <span className="v">{promptResult.total_ms?.toFixed(0)} ms</span>
                       </span>
                     </div>
                   )}

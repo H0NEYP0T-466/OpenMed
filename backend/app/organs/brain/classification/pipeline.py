@@ -284,6 +284,12 @@ class BrainClassificationPipeline:
         computation. Without it they would have to run a second backward pass,
         and the box would be derived from a *different* map than the one shown
         to the user.
+
+        The base image for the overlay is center-cropped to match the inference
+        transform — the CAM belongs to the cropped tensor's spatial frame, so
+        overlaying it on the uncropped original shifts every activation by the
+        crop margin (typically 12.5% of each edge for EfficientNet's default
+        crop_pct of 0.875).
         """
         image = self._load_image(image_path_or_pil)
         tensor = self.transform(image).unsqueeze(0).to(self.device)
@@ -295,7 +301,9 @@ class BrainClassificationPipeline:
                 raise RuntimeError("Grad-CAM produced no logits to interpret.")
 
         result = self._interpret(logits)
-        base = np.array(image.resize((self.input_size, self.input_size)))
+        base = np.array(
+            _center_crop_pil(image, self.input_size, self.model)
+        )
         overlay = overlay_cam_on_image(base, cam)
         result["gradcam_base64"] = _encode_jpeg_data_url(overlay)
         result["gradcam_grid"] = [int(cam.shape[0]), int(cam.shape[1])]
@@ -323,6 +331,43 @@ class BrainClassificationPipeline:
             "trained_weights_loaded": self.using_trained_weights,
             "metrics": self.label_space.metrics,
         }
+
+
+def _center_crop_pil(
+    image: Image.Image, input_size: int, model: Any
+) -> Image.Image:
+    """Resize + center-crop a PIL image exactly like ``get_inference_transform``.
+
+    ``timm``'s validation/inference transform chain is:
+        Resize(input_size / crop_pct)  →  CenterCrop(input_size)
+    The CAM is computed in the cropped tensor's spatial frame.  If the base
+    image for the overlay is just ``image.resize((input_size, input_size))``
+    the CAM is shifted by the crop margin — about 12.5% of each edge for
+    EfficientNet's default ``crop_pct=0.875``.
+
+    This function applies the identical spatial transform in PIL so the overlay
+    base matches the tensor geometry pixel-for-pixel.
+    """
+    from .preprocessor import data_config
+
+    cfg = data_config(model)
+    crop_pct: float = cfg.get("crop_pct", 0.875)
+
+    # Step 1: resize so the shorter side = input_size / crop_pct
+    resize_side = int(input_size / crop_pct)
+    w, h = image.size
+    if w < h:
+        new_w = resize_side
+        new_h = int(h * resize_side / w)
+    else:
+        new_h = resize_side
+        new_w = int(w * resize_side / h)
+    resized = image.resize((new_w, new_h), Image.BICUBIC)
+
+    # Step 2: center-crop to input_size × input_size
+    left = (new_w - input_size) // 2
+    top = (new_h - input_size) // 2
+    return resized.crop((left, top, left + input_size, top + input_size))
 
 
 def _encode_jpeg_data_url(array_rgb: np.ndarray, quality: int = 90) -> str:

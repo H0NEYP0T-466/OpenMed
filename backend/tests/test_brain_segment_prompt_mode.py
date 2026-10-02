@@ -68,6 +68,7 @@ class _StubSegmenter:
         self.calls: list[str] = []
         self.heatmap_cams: list[object] = []
         self.clicks: list[tuple[float, float, int]] = []
+        self.drawn_boxes: list[tuple[float, float, float, float]] = []
 
     def segment_with_heatmap(self, image, cam):
         self.calls.append("segment_with_heatmap")
@@ -83,6 +84,21 @@ class _StubSegmenter:
             "box_coords": [10.0, 20.0, 200.0, 210.0],
             "point_prompt_used": True,
             "point_coords": [150.0, 112.0],
+            "input_size": "256x256",
+            "original_size": "288x288",
+        }
+
+    def segment_with_drawn_box(self, image, x1n, y1n, x2n, y2n):
+        self.calls.append("segment_with_drawn_box")
+        self.drawn_boxes.append((x1n, y1n, x2n, y2n))
+        return {
+            "segmentation_performed": True,
+            "prompt_mode": "drawn_box",
+            "seg_mask_base64": "data:image/png;base64,SEGDRAW",
+            "seg_overlay_base64": "data:image/jpeg;base64,OVLDRAW",
+            "iou_pred": 0.71,
+            "mask_foreground_px": 21040,
+            "box_coords": [x1n * 255, y1n * 255, x2n * 255, y2n * 255],
             "input_size": "256x256",
             "original_size": "288x288",
         }
@@ -311,6 +327,91 @@ def test_click_segment_rejects_a_bad_box_size(wired_click) -> None:
     response = client.post(
         "/api/brain/segment-click",
         data={"click_x": 0.6, "click_y": 0.45, "box_size": 8},
+        files={"file": ("scan.jpg", _jpeg_bytes(), "image/jpeg")},
+    )
+
+    assert response.status_code == 422
+    assert segmenter.calls == []
+
+
+@pytest.fixture()
+def wired_segmenter_only(monkeypatch):
+    """Patch the segmenter-only loader — shared by the drawn-box tests."""
+    pytest.importorskip("torch")
+
+    segmenter = _StubSegmenter()
+
+    async def _fake_seg():
+        return segmenter
+
+    monkeypatch.setattr(seg_router, "_ensure_segmenter_loaded", _fake_seg)
+
+    from app.main import app
+
+    return TestClient(app), segmenter
+
+
+def test_drawn_box_segment_reaches_the_pipeline(wired_segmenter_only) -> None:
+    client, segmenter = wired_segmenter_only
+
+    response = client.post(
+        "/api/brain/segment-box",
+        data={"x1": 0.2, "y1": 0.3, "x2": 0.7, "y2": 0.8},
+        files={"file": ("scan.jpg", _jpeg_bytes(), "image/jpeg")},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert segmenter.calls == ["segment_with_drawn_box"]
+    assert segmenter.drawn_boxes == [(0.2, 0.3, 0.7, 0.8)]
+    assert body["prompt_mode"] == "drawn_box"
+    assert body["click"] is None
+    assert body["seg_mask_base64"] == "data:image/png;base64,SEGDRAW"
+    assert body["mask_foreground_px"] == 21040
+
+
+def test_drawn_box_never_loads_the_classifier(wired_segmenter_only, monkeypatch) -> None:
+    client, _ = wired_segmenter_only
+
+    def _boom():
+        raise AssertionError("drawn-box path must not load the classifier")
+
+    monkeypatch.setattr(seg_router, "_ensure_models_loaded", _boom)
+
+    response = client.post(
+        "/api/brain/segment-box",
+        data={"x1": 0.2, "y1": 0.3, "x2": 0.7, "y2": 0.8},
+        files={"file": ("scan.jpg", _jpeg_bytes(), "image/jpeg")},
+    )
+
+    assert response.status_code == 200
+
+
+def test_drawn_box_too_small_is_a_client_error(wired_segmenter_only) -> None:
+    """A sliver of a drag is refused as 400, not sent to the model as a 500."""
+    client, segmenter = wired_segmenter_only
+
+    def _too_small(*args, **kwargs):
+        raise ValueError("Drawn box is too small")
+
+    segmenter.segment_with_drawn_box = _too_small
+
+    response = client.post(
+        "/api/brain/segment-box",
+        data={"x1": 0.5, "y1": 0.5, "x2": 0.52, "y2": 0.55},
+        files={"file": ("scan.jpg", _jpeg_bytes(), "image/jpeg")},
+    )
+
+    assert response.status_code == 400
+    assert "too small" in response.json()["detail"]
+
+
+def test_drawn_box_rejects_out_of_range_coordinates(wired_segmenter_only) -> None:
+    client, segmenter = wired_segmenter_only
+
+    response = client.post(
+        "/api/brain/segment-box",
+        data={"x1": -0.2, "y1": 0.3, "x2": 0.7, "y2": 0.8},
         files={"file": ("scan.jpg", _jpeg_bytes(), "image/jpeg")},
     )
 

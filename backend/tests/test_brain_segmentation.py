@@ -329,6 +329,62 @@ def test_click_segment_reports_click_box_mode(
     pipe.unload()
 
 
+def test_drawn_box_orders_reversed_corners_and_converts_units(
+    synthetic_checkpoint: str,
+    sample_image: Image.Image,
+) -> None:
+    """A drag from bottom-right to top-left is still a box.
+
+    Corners are normalised 0-1 against the scan and must land in 256² prompt
+    space in top-left/bottom-right order regardless of drag direction.
+    """
+    pipe = BrainSegmentationPipeline(
+        model_path=synthetic_checkpoint, device="cpu"
+    )
+
+    res = pipe.segment_with_drawn_box(sample_image, 0.6, 0.8, 0.2, 0.3)
+
+    x1, y1, x2, y2 = res["box_coords"]
+    assert x1 < x2 and y1 < y2, f"corners not ordered: {res['box_coords']}"
+    assert (x1, y1, x2, y2) == pytest.approx((0.2 * 255, 0.3 * 255, 0.6 * 255, 0.8 * 255))
+    assert res["prompt_mode"] == "drawn_box"
+    assert res["segmentation_performed"] is True
+
+    pipe.unload()
+
+
+def test_drawn_box_rejects_a_sliver(
+    synthetic_checkpoint: str,
+    sample_image: Image.Image,
+) -> None:
+    """A tiny drag cannot enclose a lesion and would score badly anyway."""
+    pipe = BrainSegmentationPipeline(
+        model_path=synthetic_checkpoint, device="cpu"
+    )
+
+    with pytest.raises(ValueError, match="too small"):
+        pipe.segment_with_drawn_box(sample_image, 0.5, 0.5, 0.52, 0.55)
+
+    pipe.unload()
+
+
+def test_drawn_box_clamps_to_the_frame(
+    synthetic_checkpoint: str,
+    sample_image: Image.Image,
+) -> None:
+    """A drag past the image edge must not push the prompt out of bounds."""
+    pipe = BrainSegmentationPipeline(
+        model_path=synthetic_checkpoint, device="cpu"
+    )
+
+    res = pipe.segment_with_drawn_box(sample_image, -0.5, -0.5, 0.9, 0.9)
+
+    x1, y1, x2, y2 = res["box_coords"]
+    assert x1 >= 0 and y1 >= 0 and x2 <= 255 and y2 <= 255
+
+    pipe.unload()
+
+
 # ── prepare_weights ───────────────────────────────────────────────────────
 
 

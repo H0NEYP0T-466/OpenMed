@@ -4,6 +4,7 @@ Endpoints
 ---------
 POST /api/brain/segment        Classify + segment an MRI image
 POST /api/brain/segment-click  Segment from a doctor's click (no classification)
+POST /api/brain/segment-box    Segment inside a doctor-drawn box (no classification)
 POST /api/brain/load-models    Eagerly load both models into memory
 POST /api/brain/unload-models  Release both models from memory
 GET  /api/brain/seg-health     Segmentation readiness probe
@@ -44,6 +45,10 @@ from .pipeline import (
     MIN_CLICK_BOX_PX,
     SegmentationUnavailableError,
 )
+
+# A drawn box smaller than this in 256² space is refused — same floor the
+# pipeline enforces, checked here so the client gets a 400 rather than a 500.
+MIN_DRAWN_BOX_PX = MIN_CLICK_BOX_PX
 from .prepare_weights import default_checkpoint_path, verify_weights
 
 logger = logging.getLogger(__name__)
@@ -263,16 +268,21 @@ class SegmentationResult(BaseModel):
 
 
 class ClickSegmentationResult(BaseModel):
-    """Response from POST /api/brain/segment-click.
+    """Response from the interactive prompt endpoints.
 
-    No classification fields: the click path answers "segment here" without
-    asking the classifier anything, which is what makes it fast.
+    Covers both assistive interactions — a click that becomes a small box, and
+    a box the clinician drew themselves — which return the same shape and differ
+    only in ``prompt_mode``.
+
+    No classification fields: both paths answer "segment here" without asking
+    the classifier anything, which is what makes them fast.
     """
 
     segmentation_performed: bool
-    prompt_mode: Literal["click_box"]
-    # The click, in 256×256 prompt space, and the box built around it.
-    click: list[float]
+    prompt_mode: Literal["click_box", "drawn_box"]
+    # Present for click prompts only; a drawn box has no single click point.
+    click: Optional[list[float]] = None
+    # The box built around the click, or the box as drawn.
     box_coords: list[float]
     seg_mask_base64: Optional[str] = None
     seg_overlay_base64: Optional[str] = None
@@ -542,6 +552,70 @@ async def segment_by_click(
         segmentation_performed=r.get("segmentation_performed", True),
         prompt_mode="click_box",
         click=[cx, cy],
+        box_coords=r.get("box_coords", []),
+        seg_mask_base64=r.get("seg_mask_base64"),
+        seg_overlay_base64=r.get("seg_overlay_base64"),
+        iou_pred=r.get("iou_pred"),
+        mask_foreground_px=r.get("mask_foreground_px"),
+        segmentation_input_size=r.get("input_size"),
+        original_size=r.get("original_size"),
+        total_ms=round(total_ms, 1),
+    )
+
+
+@router.post("/segment-box", response_model=ClickSegmentationResult)
+async def segment_by_drawn_box(
+    file: UploadFile = File(...),
+    x1: float = Form(..., ge=0.0, le=1.0),
+    y1: float = Form(..., ge=0.0, le=1.0),
+    x2: float = Form(..., ge=0.0, le=1.0),
+    y2: float = Form(..., ge=0.0, le=1.0),
+) -> ClickSegmentationResult:
+    """Segment inside a box the clinician drew on the scan.
+
+    The strongest assistive prompt available: the box is the prompt type the
+    released weights were trained on, so a well-drawn one scores near the
+    oracle. Coordinates are normalised 0-1 against the displayed scan and may be
+    given in either corner order. No classification runs.
+    """
+    started = time.perf_counter()
+
+    payload = await file.read(MAX_UPLOAD_BYTES + 1)
+    image = _validate_upload(file, payload)
+
+    try:
+        segmenter = await _ensure_segmenter_loaded()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Segmenter load failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    try:
+        r = await run_in_threadpool(
+            lambda: segmenter.segment_with_drawn_box(image, x1, y1, x2, y2)
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except SegmentationUnavailableError as exc:
+        logger.error("Drawn-box segmentation failed: %s", exc)
+        raise HTTPException(status_code=503, detail=f"Segmentation error: {exc}") from exc
+    except RuntimeError as exc:
+        logger.error("Drawn-box inference failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail="Segmentation inference error.") from exc
+
+    total_ms = (time.perf_counter() - started) * 1000.0
+    logger.info(
+        "Drawn-box segmentation: box=%s iou=%.4f fg=%s total=%.0fms",
+        [round(v) for v in r.get("box_coords", [])],
+        r.get("iou_pred") or 0.0,
+        r.get("mask_foreground_px"),
+        total_ms,
+    )
+
+    return ClickSegmentationResult(
+        segmentation_performed=r.get("segmentation_performed", True),
+        prompt_mode="drawn_box",
         box_coords=r.get("box_coords", []),
         seg_mask_base64=r.get("seg_mask_base64"),
         seg_overlay_base64=r.get("seg_overlay_base64"),

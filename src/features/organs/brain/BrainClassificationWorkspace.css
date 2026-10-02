@@ -2007,6 +2007,43 @@
   line-height: 1.5;
 }
 
+.prompt-mode-switch {
+  display: inline-flex;
+  margin-top: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.prompt-mode-switch button {
+  border: 0;
+  background: transparent;
+  padding: 5px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+
+.prompt-mode-switch button + button {
+  border-left: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.prompt-mode-switch button.active {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+}
+
+.draw-rect {
+  position: absolute;
+  border: 2px dashed var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
 .click-seg-plates {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2023,6 +2060,8 @@
   object-fit: contain;
   cursor: crosshair;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .click-frame.busy .click-target {
@@ -2043,11 +2082,15 @@
 .click-busy {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.28);
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--accent);
+  color: #fff;
   pointer-events: none;
 }
 

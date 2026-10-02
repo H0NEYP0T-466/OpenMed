@@ -18,6 +18,7 @@ outputs/
 brag-output-2026-09-27-112042/
 public/samples
 
+documentation/
 
 # Python Bytecode, Caches & Virtual Environments
 __pycache__/

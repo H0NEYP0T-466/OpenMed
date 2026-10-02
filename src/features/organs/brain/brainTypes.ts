@@ -103,10 +103,10 @@ export interface BrainSegmentationResult extends BrainClassificationResult {
  */
 export interface ClickSegmentationResult {
   readonly segmentation_performed: boolean
-  readonly prompt_mode: 'click_box'
-  /** The click, in 256×256 prompt space. */
-  readonly click: readonly [number, number]
-  /** The box built around the click. */
+  readonly prompt_mode: 'click_box' | 'drawn_box'
+  /** The click, in 256×256 prompt space. Present for click prompts only. */
+  readonly click?: readonly [number, number]
+  /** The box built around the click, or the box as drawn. */
   readonly box_coords: readonly number[]
   readonly seg_mask_base64?: string
   readonly seg_overlay_base64?: string
