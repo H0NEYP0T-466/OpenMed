@@ -1,0 +1,156 @@
+================================================================================
+BTSC UNet SEGMENTATION DATASET - AUDIT REPORT
+================================================================================
+Generated : 2026-10-02
+Dataset   : /home/honeypot/Projects/FAST_API/BTSC-UNet-ViT/backend/dataset/
+            UNet_Tumor_Dataset/
+Size      : 3,064 image/mask pairs, 331 MB
+
+Purpose   : Audit the BTSC segmentation set with the same hygiene tests applied
+            to the OpenMed archive, and determine whether the two can be
+            combined for LiteMedSAM fine-tuning.
+
+Audit script: OpenMed/scripts/btsc_seg_audit.py
+Read-only. Nothing in the dataset was modified.
+
+================================================================================
+1. WHAT THE DATASET IS
+================================================================================
+  Layout        images/*.png  +  masks/*.png, matched 1:1 by filename stem
+  Filenames     NUMERIC ONLY: 1.png ... 3064.png
+  Image format  every image 512x512, uint8, SINGLE CHANNEL (greyscale)
+  Mask format   every mask 512x512, uint8, strictly binary {0, 255}
+  Pairs         3,064
+
+  Difference from the OpenMed archive, which is 512x512x3 RGB and uses
+  descriptive filenames carrying tumour type, sequence and slice number.
+
+================================================================================
+2. VERIFIED STATE
+================================================================================
+  Pair integrity          images=3,064  masks=3,064
+                          image-without-mask=0   mask-without-image=0
+  Shape mismatch          0
+  Non-binary masks        0
+  Empty masks             0
+  Full masks              0
+  Misaligned masks        0     (inside-anatomy min 1.000, median 1.000)
+
+  Duplicate image files   0     (SHA256: 3,064 unique hashes / 3,064 files)
+  Duplicate image+mask    0
+  Image hash == mask hash 0
+
+  RESULT: CLEAN ON ARRIVAL - nothing required removal.
+
+  Foreground fraction   min 0.0010   median 0.0129   max 0.0971
+
+  Mask morphology
+    connected components : median 1, max 2
+    fragmented masks     : 0
+    solidity             : median 0.969, p5 0.798
+    circularity          : median 0.791, p95 0.874, none >= 0.90
+
+  This is materially cleaner than the OpenMed archive, which required 1,062
+  files to be removed. BTSC has zero duplicate files and zero misaligned masks.
+
+================================================================================
+3. THE ONE REAL LIMITATION - NO SERIES / LESION KEY
+================================================================================
+  The filenames carry no patient, sequence or lesion identity. Consequences:
+
+  a) Perceptual near-duplicates cannot be resolved.
+     pHash Hamming sweep, within BTSC:
+
+       threshold    pairs
+           0          12
+           2         161
+           3         161
+           4         716
+           6        1957
+
+     The step pattern (flat through 3, then climbing) matches the OpenMed set,
+     so ~161 pairs at threshold <= 3 are genuine near-identical candidates.
+     They are almost certainly adjacent slices of the same scan. With no group
+     key there is no way to separate "adjacent slice" from "true duplicate",
+     so they cannot be acted on.
+
+  b) A leakage-safe split CANNOT be built for BTSC alone.
+     There is no group to hold together. Splitting these 3,064 randomly will
+     place adjacent slices of the same patient in both train and validation,
+     producing an optimistic validation score.
+
+  This limitation matters more than anything else in this report.
+
+================================================================================
+4. CROSS-DATASET OVERLAP WITH THE CLEANED OPENMED SET
+================================================================================
+  Compared against: /home/honeypot/Downloads/openmed_seg_clean_strict
+                    (10,056 pairs)
+
+  Identical image bytes (SHA256) : 0
+    NOTE: this proves little on its own - one set is PNG greyscale, the other
+    JPG RGB, so byte identity was never possible even for a shared slice.
+    The perceptual test below is the meaningful one.
+
+  Perceptual overlap at Hamming <= 3 : 6 pairs out of 30.8 million comparisons
+
+  All 6 pixel-verified:
+
+    pixel MAE   mask IoU   pair
+    ---------   --------   --------------------------------------------------
+        13.69      0.000   btsc/132.png  ~  T1C+ - Glioblastoma NOS - multifocal frontal 003
+        17.89      0.562   btsc/197.png  ~  T2 - Supratentorial meningeal hemangioblastoma ... 006
+        22.41      0.599   btsc/197.png  ~  T2 - Supratentorial meningeal hemangioblastoma ... 004
+        22.11      0.689   btsc/2115.png ~  T2 - Oligodendroglioma NOS (grade 3) frontal 006
+        26.03      0.000   btsc/2096.png ~  T1 - Low-grade astrocytoma frontal , ventricle 001
+        31.33      0.000   btsc/2094.png ~  T1 - Low-grade astrocytoma frontal , ventricle 002
+        31.52      0.000   btsc/2094.png ~  T1C+ - Low-grade astrocytoma frontal , ventricle 006
+
+  Reference: a genuinely shared slice shows pixel MAE near 0-3. Independent MRI
+  slices of the same tumour type typically sit at 15-40.
+
+  VERDICT: all 6 are coincidence. The two datasets are DISJOINT - no shared
+  images.
+
+================================================================================
+5. IMPLICATIONS FOR COMBINING
+================================================================================
+  1. DISJOINT - safe to merge. No duplicates are created by combining.
+     Combined total: 10,056 + 3,064 = 13,120 pairs.
+
+  2. CHANNEL MISMATCH - BTSC is 1-channel greyscale, OpenMed is 3-channel RGB.
+     The serving pipeline stacks greyscale to 3 channels, so this is workable,
+     but the training data loader must handle both.
+
+  3. THE BLOCKER IS THE MISSING GROUP KEY.
+     OpenMed has 348 lesion groups and a verified leakage-free split.
+     BTSC has no group identity at all.
+
+     If the two are merged and split by file, BTSC's adjacent slices will
+     straddle the train/validation boundary and inflate the validation score.
+
+  RECOMMENDATION (preferred):
+     Assign all 3,064 BTSC slices to TRAIN ONLY. No BTSC slice ever appears in
+     validation or test, which stay OpenMed-only where grouping works. This
+     keeps the extra training volume without corrupting the evaluation.
+
+  ALTERNATIVE (arguably more valuable for the SRS):
+     Use BTSC as a held-out EXTERNAL test set. It is a different source, so it
+     would yield a genuine generalisation number - which the OpenMed set alone
+     cannot provide, since all of its 10,056 pairs come from one archive.
+     This directly addresses limitation 1 in the OpenMed cleaning report.
+
+================================================================================
+6. SUMMARY
+================================================================================
+  BTSC UNet segmentation dataset : CLEAN. 0 duplicates, 0 misaligned masks,
+                                   0 empty/full masks, perfect 1:1 pairing.
+  Removals required              : NONE
+  Overlap with OpenMed set       : NONE (6 perceptual hits, all verified as
+                                   coincidence)
+  Blocking issue for combining   : BTSC has no lesion/series key, so it cannot
+                                   be split without leakage.
+
+================================================================================
+END OF REPORT
+================================================================================

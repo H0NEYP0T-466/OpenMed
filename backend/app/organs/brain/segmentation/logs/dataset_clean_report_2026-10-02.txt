@@ -1,0 +1,174 @@
+================================================================================
+OPENMED - SEGMENTATION DATASET CLEANING REPORT
+================================================================================
+Generated : 2026-10-02
+Source    : /home/honeypot/Downloads/archive/   (Kaggle download, 11,194 pairs)
+Output    : /home/honeypot/Downloads/openmed_seg_clean_strict/   (10,056 pairs)
+
+================================================================================
+1. WHAT THE DATASET IS
+================================================================================
+Binary brain-MRI tumour segmentation set, for fine-tuning LiteMedSAM.
+
+  Layout        images/*.jpg  +  masks/*.png, matched 1:1 by filename stem
+  Image format  every image 512x512x3 (RGB)
+  Mask format   every mask 512x512 uint8, strictly binary {0, 255}
+  Pairs         11,194 in the raw archive
+
+The tumour class is irrelevant to this task. A binary segmentation model is
+trained on "lesion vs background"; the class label never enters the loss.
+
+================================================================================
+2. CURATION CHAIN
+================================================================================
+  archive/                     11,194 pairs   raw Kaggle download
+        |
+        v  drop byte-identical (image, mask) pairs        -76
+  openmed_seg_clean/           11,118 pairs   intermediate
+        |
+        v  resolve conflicting duplicates + drop misaligned masks   -1,062
+  openmed_seg_clean_strict/    10,056 pairs   FINAL
+
+Scripts (in OpenMed/scripts/):
+  seg_dataset_audit.py     first-pass audit of the raw archive
+  seg_build_clean.py       pair-level dedupe + group-aware split
+  seg_build_strict.py      resolves conflicting duplicates, one label per image
+  seg_verify_clean.py      final verification of the output directory
+
+================================================================================
+3. VERIFIED STATE  (re-audited on the output directory)
+================================================================================
+  Pair integrity        images=10,056   masks=10,056   orphans=0 (both directions)
+  Duplicate image files 0        (SHA256)
+  Duplicate image+mask   none
+  Shape mismatch         0
+  Non-binary masks       0
+  Empty masks            0
+  Full masks             0
+  Misaligned masks       0        (min inside-anatomy 0.926, median 1.000)
+  Unsplit images         0
+  Leaked lesions         0        (no lesion appears in more than one split)
+
+  RESULT: CLEAN - all checks passed.
+
+  Foreground fraction:  min 0.0006   median 0.0193   max 0.1723
+  (healthy small-lesion distribution, no degenerate masks)
+
+  Mask boundary shape (sampled 2,500):
+    solidity    median 0.936  (p5 0.652)
+    circularity median 0.72, nothing >= 0.90
+  Genuinely irregular lesion contours - not synthetic blobs.
+
+================================================================================
+4. SPLIT
+================================================================================
+Grouped on the LESION, not the file. Group key = filename stem with the
+sequence prefix (T1 - / T1C+ - / T2 -) and the trailing slice number removed.
+
+  train    8,044 slices  (80.0%)    281 lesions
+  val      1,006 slices  (10.0%)     33 lesions
+  test     1,006 slices  (10.0%)     33 lesions
+
+Balanced by slice count. Seeded and deterministic.
+
+WHY GROUPING MATTERS
+  The raw archive contains 300 lesions that appear under two or three sequence
+  prefixes, covering 842 series. For example "Meningioma frontal" exists as
+  "T1 - Meningioma frontal", "T1C+ - Meningioma frontal" and
+  "T2 - Meningioma frontal" - the same lesion, three separate series.
+  Splitting by file would place that lesion in train and validation at the same
+  time and inflate every reported metric.
+
+  manifest.csv carries the "group" column. Use it if the split is ever redone.
+
+================================================================================
+5. WHAT WAS REMOVED  (1,062 files, all listed in dropped.csv)
+================================================================================
+  Count   Reason
+  -----   ------------------------------------------------------------------
+    859   duplicate image bytes within ONE lesion
+          (kept the best-aligned member: highest inside-anatomy fraction,
+           then larger foreground, then alphabetical)
+
+    173   duplicate image bytes claiming TWO DIFFERENT lesions
+          (the whole group was dropped - the image cannot be both and nothing
+           in the files identifies which label is correct, so it is unusable
+           rather than merely duplicated)
+
+     30   mask sits below 90% on anatomy
+          (one at 0.000 - entirely off the head)
+
+  Reconciliation:  10,056 kept + 1,062 dropped = 11,118
+
+THE PROBLEM THIS FIXED
+  In the raw archive, 1,768 files share image bytes while carrying a DIFFERENT
+  mask (810 distinct image hashes). In some cases the two masks do not overlap
+  at all (IoU = 0.000). That is identical model input with contradictory
+  supervision - not noise a model can average away. The strict build resolves
+  every such case to a single label.
+
+================================================================================
+6. CHECKED AND CLEARED  (not removed)
+================================================================================
+  Cross-lesion perceptual near-duplicates
+    55 pairs at Hamming distance <= 3 on a 64-bit DCT perceptual hash.
+    Direct pixel comparison: the closest pair differs by a mean absolute error
+    of 5.3 grey levels, most at 15-30. ZERO pairs are the same image.
+    These are genuinely similar-looking slices of the same tumour type, not
+    duplicates. They stay in.
+
+  pHash threshold calibration
+    The usual default of 6 is too loose for medical images - it matches on
+    shared composition (brain centred, dark surround) rather than content.
+    Sweeping the threshold: the same-group / cross-group ratio is flat at
+    ~0.044 through threshold 3, then rises to 0.088 at 4 and 0.227 at 6.
+    Use 3 on this dataset, not 6.
+
+  Blank / low-contrast slices
+    None. Minimum grayscale standard deviation is 17.2.
+
+================================================================================
+7. HOW TO USE IT
+================================================================================
+  openmed_seg_clean_strict/
+    images/          10,056 .jpg   512x512x3
+    masks/           10,056 .png   512x512, binary {0,255}
+    splits/
+      train.csv      columns: stem, group
+      val.csv        columns: stem, group
+      test.csv       columns: stem, group
+    manifest.csv     stem, split, group, fg_frac, inside_frac, n_components,
+                     largest_frac, n_tiny, n_hole_px, touches_border
+    dropped.csv      stem, reason, kept_as
+    REPORT.md        this report in Markdown
+
+  Upload as a single zipped Kaggle Dataset. Read splits/*.csv in the notebook
+  and resolve images/<stem>.jpg and masks/<stem>.png. "stem" is the join key.
+
+  Preprocessing that MUST match the serving pipeline
+  (backend/app/organs/brain/segmentation/preprocessor.py):
+    - RGB, aspect-preserving resize of the longest side to 256, INTER_AREA
+    - per-image min-max normalisation to [0, 1]   <- NOT x/255
+    - zero-pad the shorter side to 256x256
+    - box prompt in 256x256 PIXEL coordinates, shape (B, 1, 4)
+
+================================================================================
+8. KNOWN LIMITATIONS
+================================================================================
+  1. SINGLE SOURCE. All 10,056 pairs derive from one Kaggle archive. Held-out
+     slices from the same source do not demonstrate generalisation. A small
+     external set is needed before quoting a final number.
+
+  2. No dataset card from the original publisher was available, so the
+     annotation provenance (who drew the masks, under what protocol) is
+     unverified.
+
+  3. The raw archive's duplicate pattern is consistent with a frame-duplication
+     artefact in the original extraction. Those slices are unrecoverable
+     without the upstream source.
+
+  4. No external validation split is included in this build.
+
+================================================================================
+END OF REPORT
+================================================================================
