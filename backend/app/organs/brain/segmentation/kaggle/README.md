@@ -23,13 +23,32 @@ Any stage can be run alone — see **Debugging** below.
 ## Expected Kaggle inputs
 
 ```
-/kaggle/input/fypseg                     OpenMed segmentation (10,056 pairs)
-/kaggle/input/brain-tumor-segmentation   figshare/BTSC (3,064 pairs)
+/kaggle/input/datasets/h0neyp0t/fypseg                     OpenMed segmentation
+/kaggle/input/datasets/nikhilroxtomar/brain-tumor-segmentation   figshare/BTSC
 ```
 
-Both are auto-detected, including the `images/` + `masks/` and the
-`<stem>.png` + `<stem>_mask.png` layouts. Override with
-`--openmed-root` / `--btsc-root` if a slug differs.
+Kaggle nests mounts inconsistently, so the resolver walks `/kaggle/input` to
+depth 4 and tries three strategies in order:
+
+1. a direct child whose name matches, i.e. `/kaggle/input/<slug>`
+2. **any depth, matched by directory name** — this is what handles the
+   `/kaggle/input/datasets/<owner>/<slug>/` shape above
+3. name-independent fallback: BTSC is recognised by numeric stems
+   (`1.png … 3064.png`), OpenMed by descriptive ones
+
+Layout inside each root is detected too — `images/` + `masks/`, a
+`png_dataset/` of `<stem>.png` + `<stem>_mask.png`, or any single folder of
+paired `_mask` files. If none match, the error prints the top-level listing.
+
+Override with `--openmed-root` / `--btsc-root`. When resolution fails the error
+lists every dataset-shaped directory it found, each tagged with what it looks
+like, so the fix is a copy-paste:
+
+```
+  Searched under /kaggle/input (depth 4). Dataset-shaped directories found:
+    /kaggle/input/datasets/h0neyp0t/fypseg  -> looks like: openmed
+    /kaggle/input/datasets/nikhi.../brain-tumor-segmentation  -> looks like: btsc
+```
 
 **Accelerator must be GPU T4 ×2.** The script asserts this and stops in the
 first seconds rather than silently running on CPU for twelve hours.

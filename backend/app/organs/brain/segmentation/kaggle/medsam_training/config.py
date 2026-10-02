@@ -156,58 +156,146 @@ class TrainConfig:
         return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
-def _first_existing(
-    candidates: tuple[str, ...], markers: tuple[str, ...] = ("images", "png_dataset")
-) -> Optional[str]:
-    """Return the first ``/kaggle/input/<name>`` that exists and holds a dataset.
+_DATASET_MARKERS = ("images", "png_dataset", "labels")
+# Directories that *contain* the data. Pruned during the walk so we never
+# descend into 10,000 image files looking for a nested dataset.
+_CONTENT_DIRS = ("images", "masks", "labels", "png_dataset")
 
-    Falls back to a recursive search when the mounted slug matches none of the
-    candidates, because Kaggle nests datasets as ``/kaggle/input/<slug>`` and the
-    slug is set by the uploader. Multiple markers are checked because the BTSC
-    mirror may keep the upstream ``png_dataset/`` layout instead of
-    ``images/`` + ``masks/``.
+
+def _looks_like_dataset(path: str) -> bool:
+    return os.path.isdir(path) and any(
+        os.path.isdir(os.path.join(path, marker)) for marker in _DATASET_MARKERS
+    )
+
+
+def _dataset_dirs(root: str, max_depth: int = 4) -> list[str]:
+    """Every dataset-shaped directory at or below ``root``, breadth-first.
+
+    Kaggle nests mounts inconsistently — sometimes ``/kaggle/input/<slug>``,
+    sometimes ``/kaggle/input/datasets/<owner>/<slug>``. Rather than hard-code
+    either shape, walk a bounded depth and collect everything that looks like a
+    dataset. Depth is capped so a stray symlink cannot turn this into a crawl.
     """
-    def looks_like_dataset(path: str) -> bool:
-        return any(os.path.isdir(os.path.join(path, marker)) for marker in markers)
+    found: list[str] = []
+    if not os.path.isdir(root):
+        return found
 
+    base_depth = os.path.abspath(root).rstrip(os.sep).count(os.sep)
+    for dirpath, dirnames, _filenames in os.walk(root):
+        depth = dirpath.rstrip(os.sep).count(os.sep) - base_depth
+        if depth > max_depth:
+            dirnames[:] = []
+            continue
+        dirnames[:] = sorted(d for d in dirnames if d not in _CONTENT_DIRS and not d.startswith("."))
+        if _looks_like_dataset(dirpath):
+            found.append(dirpath)
+    return found
+
+
+def _images_dir_of(path: str) -> Optional[str]:
+    for marker in _DATASET_MARKERS:
+        if os.path.isdir(os.path.join(path, marker)):
+            return marker
+    return None
+
+
+def _classify_dataset(path: str, sample: int = 400) -> Optional[str]:
+    """Guess which source a directory holds from its filenames.
+
+    The two datasets are trivially separable by naming convention: BTSC's PNG
+    export is ``1.png … 3064.png`` (all numeric stems), OpenMed's files are
+    descriptive (``T1C+ - Cystic glioblastoma occipital , ventricle 005``).
+    That makes a name-independent fallback possible when the mounted slug
+    matches nothing in the candidate lists.
+    """
+    images_dir = _images_dir_of(path)
+    if images_dir is None:
+        return None
+    try:
+        names = [
+            n for n in os.listdir(os.path.join(path, images_dir))[:sample]
+            if not n.startswith(".")
+        ]
+    except OSError:
+        return None
+
+    stems = [os.path.splitext(n)[0] for n in names]
+    if not stems:
+        return None
+
+    numeric = sum(1 for s in stems if s.isdigit())
+    ratio = numeric / len(stems)
+    if ratio >= 0.9:
+        return "btsc"
+    if ratio <= 0.1:
+        return "openmed"
+    return None
+
+
+def _locate(kind: str, candidates: tuple[str, ...], root: Optional[str] = None) -> Optional[str]:
+    """Find one dataset, trying three strategies in order of confidence."""
+    root = root or KAGGLE_INPUT
+    wanted = {c.lower() for c in candidates}
+
+    # 1. A direct child whose name matches — the common /kaggle/input/<slug> case.
     for name in candidates:
-        path = os.path.join(KAGGLE_INPUT, name)
-        if looks_like_dataset(path):
+        path = os.path.join(root, name)
+        if _looks_like_dataset(path):
             return path
 
-    if os.path.isdir(KAGGLE_INPUT):
-        for entry in sorted(os.listdir(KAGGLE_INPUT)):
-            path = os.path.join(KAGGLE_INPUT, entry)
-            if looks_like_dataset(path):
-                return path
+    dirs = _dataset_dirs(root)
+
+    # 2. Any depth, matched by directory name. Handles
+    #    /kaggle/input/datasets/<owner>/<slug> without needing the owner.
+    for path in dirs:
+        if os.path.basename(path).lower() in wanted:
+            return path
+
+    # 3. Last resort: infer from the filenames themselves.
+    for path in dirs:
+        if _classify_dataset(path) == kind:
+            return path
+
     return None
 
 
 def resolve_paths(cfg: TrainConfig) -> TrainConfig:
     """Fill in dataset roots from the Kaggle mount points when not given.
 
-    Raises a single, actionable error listing what was searched — a Kaggle
-    notebook failing at cell 1 with a clear message beats failing at epoch 40.
+    Raises a single, actionable error listing what was actually found — a
+    Kaggle notebook failing at cell 1 with a clear message beats failing at
+    epoch 40.
     """
     if cfg.openmed_root is None:
-        cfg.openmed_root = _first_existing(OPENMED_CANDIDATES)
+        cfg.openmed_root = _locate("openmed", OPENMED_CANDIDATES)
     if cfg.btsc_root is None:
-        cfg.btsc_root = _first_existing(BTSC_CANDIDATES)
+        cfg.btsc_root = _locate("btsc", BTSC_CANDIDATES)
+
+    if cfg.openmed_root and cfg.btsc_root and cfg.openmed_root == cfg.btsc_root:
+        raise FileNotFoundError(
+            f"Both sources resolved to the same directory: {cfg.openmed_root}. "
+            "Pass --openmed-root and --btsc-root explicitly."
+        )
 
     missing = []
     if not cfg.openmed_root:
-        missing.append(
-            f"OpenMed dataset (expected one of {OPENMED_CANDIDATES} under {KAGGLE_INPUT})"
-        )
+        missing.append(f"OpenMed dataset (names tried: {OPENMED_CANDIDATES})")
     if not cfg.btsc_root:
-        missing.append(
-            f"BTSC dataset (expected one of {BTSC_CANDIDATES} under {KAGGLE_INPUT})"
-        )
+        missing.append(f"BTSC dataset (names tried: {BTSC_CANDIDATES})")
     if missing:
-        found = sorted(os.listdir(KAGGLE_INPUT)) if os.path.isdir(KAGGLE_INPUT) else []
+        discovered = _dataset_dirs(KAGGLE_INPUT)
+        listing = (
+            "\n".join(
+                f"    {p}  -> looks like: {_classify_dataset(p) or 'unrecognised'}"
+                for p in discovered
+            )
+            or "    (none found)"
+        )
         raise FileNotFoundError(
-            "Could not locate dataset root(s): " + "; ".join(missing) + ". "
-            f"Contents of {KAGGLE_INPUT}: {found}. "
-            "Pass --openmed-root / --btsc-root explicitly if the slug differs."
+            "Could not locate dataset root(s): " + "; ".join(missing) + ".\n"
+            f"  Searched under {KAGGLE_INPUT} (depth 4). Dataset-shaped directories found:\n"
+            f"{listing}\n"
+            "  Fix: attach the datasets in the notebook's Data panel, or pass\n"
+            "  --openmed-root / --btsc-root with the paths printed above."
         )
     return cfg

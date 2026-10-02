@@ -65,8 +65,8 @@ def detect_layout(root: str, name: str) -> dict[str, str]:
 
     Kaggle mirrors vary: some keep ``images/`` + ``masks/``, some keep the
     upstream figshare export with ``<stem>.png`` + ``<stem>_mask.png`` in one
-    directory. Rather than guess, probe the known shapes and report what was
-    found.
+    directory. Rather than guess, probe the known shapes first, then fall back
+    to scanning for whichever pairing actually exists on disk.
     """
     candidates = [
         ("images", "masks", ""),
@@ -75,31 +75,65 @@ def detect_layout(root: str, name: str) -> dict[str, str]:
         (".", ".", "_mask"),
         ("images", "labels", ""),
     ]
-    for images_dir, masks_dir, suffix in candidates:
+
+    def usable(images_dir: str, masks_dir: str, suffix: str) -> int:
         images_path = os.path.join(root, images_dir)
         masks_path = os.path.join(root, masks_dir)
         if not (os.path.isdir(images_path) and os.path.isdir(masks_path)):
-            continue
-
+            return 0
         spec = audit_mod.SourceSpec(
             name=name, root=root,
             images_dir=images_dir, masks_dir=masks_dir, mask_suffix=suffix,
         )
         try:
-            stems = audit_mod.list_stems(spec)
+            return len(audit_mod.list_stems(spec))
         except OSError:
-            continue
-        if len(stems) >= 50:
+            return 0
+
+    for images_dir, masks_dir, suffix in candidates:
+        count = usable(images_dir, masks_dir, suffix)
+        if count >= 50:
             logger.info(
-                "[%s] layout: images/%s  masks/%s  suffix=%r  (%d paired stems)",
-                name, images_dir, masks_dir, suffix or "-", len(stems),
+                "[%s] layout: images=%s  masks=%s  suffix=%r  (%d paired stems)",
+                name, images_dir, masks_dir, suffix or "-", count,
             )
             return {"images_dir": images_dir, "masks_dir": masks_dir, "mask_suffix": suffix}
 
+    # Nothing matched a known shape. Scan one level down for whatever pairing
+    # does exist, so an unfamiliar mirror still works without a code change.
+    best: tuple[int, dict[str, str]] | None = None
+    try:
+        entries = sorted(os.listdir(root))
+    except OSError:
+        entries = []
+
+    for entry in entries:
+        full = os.path.join(root, entry)
+        if not os.path.isdir(full):
+            continue
+        for suffix in ("_mask", ""):
+            count = usable(entry, entry, suffix)
+            if count >= 50 and (best is None or count > best[0]):
+                best = (count, {"images_dir": entry, "masks_dir": entry, "mask_suffix": suffix})
+
+    if best is not None:
+        layout = best[1]
+        logger.info(
+            "[%s] layout found by scan: %s/%s  suffix=%r  (%d paired stems)",
+            name, layout["images_dir"], layout["masks_dir"], layout["mask_suffix"] or "-", best[0],
+        )
+        return layout
+
+    listing = {
+        entry: (len(os.listdir(os.path.join(root, entry)))
+                if os.path.isdir(os.path.join(root, entry)) else "file")
+        for entry in entries
+    }
     raise RuntimeError(
-        f"Could not determine the layout of {name} at {root}. "
-        f"Top level: {sorted(os.listdir(root))[:20]}. "
-        "Expected images/ + masks/, or a directory of <stem>.png + <stem>_mask.png."
+        f"Could not determine the layout of {name} at {root}.\n"
+        f"  Top level: {listing}\n"
+        "  Expected one of: images/ + masks/ · png_dataset/ with <stem>_mask.png ·\n"
+        "  a single folder of <stem>.png + <stem>_mask.png."
     )
 
 
