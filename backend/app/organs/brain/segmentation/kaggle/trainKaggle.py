@@ -94,8 +94,8 @@ def detect_layout(root: str, name: str) -> dict[str, str]:
         count = usable(images_dir, masks_dir, suffix)
         if count >= 50:
             logger.info(
-                "[%s] layout: images=%s  masks=%s  suffix=%r  (%d paired stems)",
-                name, images_dir, masks_dir, suffix or "-", count,
+                "[%s] layout: images=%s  masks=%s  mask_suffix=%r  (%d paired stems)",
+                name, images_dir, masks_dir, suffix, count,
             )
             return {"images_dir": images_dir, "masks_dir": masks_dir, "mask_suffix": suffix}
 
@@ -119,8 +119,8 @@ def detect_layout(root: str, name: str) -> dict[str, str]:
     if best is not None:
         layout = best[1]
         logger.info(
-            "[%s] layout found by scan: %s/%s  suffix=%r  (%d paired stems)",
-            name, layout["images_dir"], layout["masks_dir"], layout["mask_suffix"] or "-", best[0],
+            "[%s] layout found by scan: %s/%s  mask_suffix=%r  (%d paired stems)",
+            name, layout["images_dir"], layout["masks_dir"], layout["mask_suffix"], best[0],
         )
         return layout
 
@@ -398,7 +398,7 @@ def main(argv: list[str] | None = None) -> int:
             "  BTSC has no patient id: %d slices (%.2f%%) sit at a block boundary and may "
             "share a scan across splits. Reported, not hidden.",
             exposure["slices_touching_a_cross_split_pair"],
-            100 * (exposure["exposure_fraction"] or 0.0),
+            100 * (exposure["exposed_fraction"] or 0.0),
         )
 
     cfg.save(os.path.join(cfg.out_dir, "config.json"))

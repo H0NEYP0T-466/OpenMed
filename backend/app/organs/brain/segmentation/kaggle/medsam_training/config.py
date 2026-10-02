@@ -251,6 +251,21 @@ def _locate(kind: str, candidates: tuple[str, ...], root: Optional[str] = None) 
         if os.path.basename(path).lower() in wanted:
             return path
 
+    # 2b. A matching name whose dataset sits one level down, e.g.
+    #     /kaggle/input/datasets/<owner>/fypseg/data/. An explicit name beats
+    #     guessing from filenames, so try this before the content heuristic.
+    base = os.path.abspath(root).rstrip(os.sep).count(os.sep)
+    for dirpath, dirnames, _filenames in os.walk(root):
+        if dirpath.rstrip(os.sep).count(os.sep) - base > 4:
+            dirnames[:] = []
+            continue
+        if os.path.basename(dirpath).lower() not in wanted:
+            continue
+        for child in sorted(dirnames):
+            child_path = os.path.join(dirpath, child)
+            if _looks_like_dataset(child_path):
+                return child_path
+
     # 3. Last resort: infer from the filenames themselves.
     for path in dirs:
         if _classify_dataset(path) == kind:
