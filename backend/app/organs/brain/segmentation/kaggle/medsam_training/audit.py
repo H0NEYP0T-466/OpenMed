@@ -32,7 +32,7 @@ import os
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from multiprocessing import Pool
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
 
 import cv2
 import numpy as np
@@ -325,7 +325,7 @@ def audit_source(
     mask_paths = [resolve_mask_path(spec, s) for s in stems]
 
     # ── geometry + alignment + morphology ────────────────────────────────
-    jobs = list(zip(image_paths, mask_paths, [align_min_inside] * len(stems)))
+    jobs = list(zip(image_paths, mask_paths, [align_min_inside] * len(stems), strict=True))
     with Pool(workers) as pool:
         geom = pool.map(_geom, jobs, chunksize=32)
 
@@ -407,7 +407,7 @@ def audit_source(
     same_mask_groups = 0
     conflicting_groups = 0
     conflicting_files = 0
-    for digest, idxs in dup_groups.items():
+    for idxs in dup_groups.values():
         mask_set = {mask_hashes[i] for i in idxs}
         if len(mask_set) == 1:
             same_mask_groups += 1
@@ -558,7 +558,7 @@ def _phash_pass(
         block = values[start:start + chunk]
         dist = _popcount(block[:, None] ^ values[None, :])
         rows, cols = np.nonzero(dist <= hamming_max)
-        for r, c in zip(rows, cols):
+        for r, c in zip(rows, cols, strict=True):
             i, j = start + int(r), int(c)
             if i >= j:
                 continue
@@ -650,7 +650,7 @@ def cross_source_overlap(
     for start in range(0, len(va), chunk):
         dist = _popcount(va[start:start + chunk, None] ^ vb[None, :])
         rows, cols = np.nonzero(dist <= hamming_max)
-        for r, c in zip(rows, cols):
+        for r, c in zip(rows, cols, strict=True):
             candidates.append(
                 {"a": names_a[start + int(r)], "b": names_b[int(c)], "hamming": int(dist[r, c])}
             )

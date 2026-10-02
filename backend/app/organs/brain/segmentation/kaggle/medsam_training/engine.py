@@ -25,10 +25,12 @@ no validated pixel-spacing is available for these slices.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import math
 import os
+import sys
 import time
 import traceback
 from typing import Any, Optional
@@ -194,9 +196,11 @@ def segmentation_loss(
     probs = torch.sigmoid(logits)
     probs = probs * region
     tgt = targets * region
-    dims = (1, 2, 3)
-    intersection = (probs * tgt).sum(dim=dims)
-    denom = probs.sum(dim=dims) + tgt.sum(dim=dims)
+    # Dice pools channel + spatial into one scalar per sample, then averages —
+    # a per-sample Dice is what the metric reports, so it is what we optimise.
+    all_dims = (1, 2, 3)
+    intersection = (probs * tgt).sum(dim=all_dims)
+    denom = probs.sum(dim=all_dims) + tgt.sum(dim=all_dims)
     dice_loss = 1.0 - (2.0 * intersection + eps) / (denom + eps)
     dice_loss = dice_loss.mean()
 
@@ -207,10 +211,23 @@ def segmentation_loss(
     if cfg.iou_head_weight > 0:
         with torch.no_grad():
             hard = (probs > 0.5).float()
-            inter = (hard * tgt).sum(dim=dims)
-            union = hard.sum(dim=dims) + tgt.sum(dim=dims) - inter
-            true_iou = (inter + eps) / (union + eps)
-        iou_loss = F.mse_loss(iou_pred.float(), true_iou.detach())
+            # Sum over the SPATIAL dims only, keeping the channel dim, so the
+            # result is (B, 1) — the same shape the decoder emits. Collapsing
+            # to (B,) here would make F.mse_loss broadcast (B, 1) against (B,)
+            # into a (B, B) matrix, which trains the IoU head on nonsense.
+            spatial = (2, 3)
+            inter = (hard * tgt).sum(dim=spatial)
+            union = hard.sum(dim=spatial) + tgt.sum(dim=spatial) - inter
+            true_iou = ((inter + eps) / (union + eps)).detach()
+
+        pred_iou = iou_pred.float()
+        if pred_iou.shape != true_iou.shape:
+            raise RuntimeError(
+                f"IoU head shape mismatch: prediction {tuple(pred_iou.shape)} vs "
+                f"target {tuple(true_iou.shape)}. Broadcasting here silently "
+                "trains the head against a pairwise matrix."
+            )
+        iou_loss = F.mse_loss(pred_iou, true_iou)
         total = total + cfg.iou_head_weight * iou_loss
         parts["iou_head"] = float(iou_loss.detach())
 
@@ -472,7 +489,19 @@ def train_one_epoch(
 
     running: dict[str, float] = {}
     steps = 0
+    micro = 0                     # micro-batches since the last optimizer step
     optimizer.zero_grad(set_to_none=True)
+
+    def _optimizer_step() -> None:
+        if cfg.grad_clip > 0:
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(
+                [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
+            )
+        scaler.step(optimizer)
+        scaler.update()
+        optimizer.zero_grad(set_to_none=True)
+        scheduler.step()
 
     for step, batch in enumerate(loader):
         if cfg.max_steps_per_epoch and step >= cfg.max_steps_per_epoch:
@@ -495,29 +524,32 @@ def train_one_epoch(
         if finite.item() < 1.0:
             if rank == 0:
                 logger.warning("Non-finite loss at epoch %d step %d — skipping step", epoch, step)
+            # Drop the whole accumulation window: a poisoned micro-batch makes
+            # the accumulated gradient untrustworthy, not just this term.
             optimizer.zero_grad(set_to_none=True)
+            micro = 0
             continue
 
         scaler.scale(scaled).backward()
+        micro += 1
 
-        if (step + 1) % cfg.grad_accum == 0:
-            if cfg.grad_clip > 0:
-                scaler.unscale_(optimizer)
-                torch.nn.utils.clip_grad_norm_(
-                    [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
-                )
-            scaler.step(optimizer)
-            scaler.update()
-            optimizer.zero_grad(set_to_none=True)
-            scheduler.step()
+        if micro >= cfg.grad_accum:
+            _optimizer_step()
+            micro = 0
 
         for key, value in parts.items():
             running[key] = running.get(key, 0.0) + value
         running["loss"] = running.get("loss", 0.0) + float(loss.detach())
         steps += 1
 
+    # Flush a partial accumulation window. Without this the last
+    # (len(loader) % grad_accum) micro-batches would never reach an optimizer
+    # step and their gradients would be discarded.
+    if micro > 0:
+        _optimizer_step()
+
     if steps == 0:
-        return {"loss": float("nan"), "steps": 0}
+        return {"loss": float("nan"), "steps": 0, "lr_encoder": 0.0, "lr_decoder": 0.0}
 
     metrics = {k: v / steps for k, v in running.items()}
     metrics["steps"] = float(steps)
@@ -570,18 +602,33 @@ def save_best_weights(model: nn.Module, path: str) -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def setup_logging(out_dir: str, rank: int) -> None:
-    """Rank 0 logs to stdout; every rank also gets its own file."""
+    """Rank 0 logs to stdout; every rank also gets its own file.
+
+    Line buffering is forced on. ``mp.spawn`` children inherit a block-buffered
+    stdout, so without this their output sits in a buffer and never reaches the
+    notebook until the process exits — which makes a running job look hung even
+    though it is training fine.
+    """
     os.makedirs(out_dir, exist_ok=True)
-    handlers: list[logging.Handler] = [logging.FileHandler(os.path.join(out_dir, f"rank{rank}.log"))]
+
+    for stream in (sys.stdout, sys.stderr):
+        with contextlib.suppress(AttributeError, ValueError):  # not a real TTY
+            stream.reconfigure(line_buffering=True)
+
+    file_handler = logging.FileHandler(os.path.join(out_dir, f"rank{rank}.log"))
+    file_handler.setFormatter(logging.Formatter(
+        "%(asctime)s | r%(name)s | %(levelname)-7s | %(message)s", datefmt="%H:%M:%S"
+    ))
+
+    handlers: list[logging.Handler] = [file_handler]
     if rank == 0:
-        handlers.append(logging.StreamHandler())
-    logging.basicConfig(
-        level=logging.INFO,
-        format=f"%(asctime)s | r{rank} | %(levelname)-7s | %(name)-9s | %(message)s",
-        datefmt="%H:%M:%S",
-        handlers=handlers,
-        force=True,
-    )
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setFormatter(logging.Formatter(
+            "%(asctime)s | r0 | %(levelname)-7s | %(name)-9s | %(message)s", datefmt="%H:%M:%S"
+        ))
+        handlers.append(stream_handler)
+
+    logging.basicConfig(level=logging.INFO, handlers=handlers, force=True)
 
 
 def run_worker(rank: int, world_size: int, cfg_dict: dict[str, Any]) -> None:
@@ -644,7 +691,10 @@ def _run_worker_body(rank: int, world_size: int, cfg: Any) -> None:
         model,
         device_ids=[rank],
         output_device=rank,
-        find_unused_parameters=True,   # box-only prompts leave the point branch unused
+        # The prompt encoder is frozen, so its unused point/mask branches hold
+        # no trainable parameters and DDP reports none unused either. Leaving
+        # this on costs a full extra autograd traversal every iteration.
+        find_unused_parameters=cfg.find_unused_parameters,
         broadcast_buffers=False,       # BN is frozen; nothing to broadcast
     )
     # After DDP wrapping and weight loading, rebuild the attention bias cache.

@@ -181,7 +181,7 @@ plus IoU-head calibration.
 
 ```bash
 !python trainKaggle.py --audit-only              # hygiene + split, no training
-!python trainKaggle.py --skip-audit              # reuse cached audit.json
+!python trainKaggle.py --force-audit             # re-run the audit (cached by default)
 !python trainKaggle.py --epochs 30 --batch 8
 !python trainKaggle.py --gpus 1                  # single GPU
 !python trainKaggle.py --grad-checkpoint         # if VRAM is tight
@@ -191,6 +191,42 @@ plus IoU-head calibration.
 
 Each module also imports standalone, so a stage can be driven from a notebook
 cell without re-running the ones before it.
+
+## Watching a run
+
+The notebook cell will only show the tail of stdout when the process exits —
+that is a Kaggle display limitation, not something the script can change. Read
+the files instead:
+
+```python
+!tail -n 40 /kaggle/working/openmed_seg_run/rank0.log
+import pandas as pd
+pd.read_csv("/kaggle/working/openmed_seg_run/metrics/epochs.csv").tail(10)
+```
+
+`epochs.csv` gets a row the moment an epoch ends.
+
+## Testing
+
+```bash
+python test_medsam_pkg.py
+```
+
+88 checks over the pure logic: metric mathematics (including the `nan` HD95
+convention), the loss tensor shapes, group keys, box geometry, augmentation,
+the Dataset end-to-end on synthetic files, split construction with a **negative
+control** for the leakage check, and the config contract.
+
+No model construction, no forward passes, no CUDA, no training — importing
+torch is the heaviest thing it does. It runs in about 15 seconds.
+
+Static analysis, with the two serving snapshots excluded because they are
+byte-identical copies of code that is not ours to restyle:
+
+```bash
+python -m ruff check --select F,B,SIM,RUF100 \
+  --exclude medsam_training/medsam_model.py,medsam_training/preprocessor.py .
+```
 
 ## Known limitations
 

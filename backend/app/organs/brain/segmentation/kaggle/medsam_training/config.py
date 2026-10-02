@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import Any, Optional
 
 # ── Kaggle mount points ──────────────────────────────────────────────────────
@@ -71,10 +71,6 @@ class TrainConfig:
     # finer-grained splits but more block boundaries (each boundary is a
     # possible scan straddle). 32 keeps boundary risk near 2 % of slices.
     btsc_block_size: int = 32
-    # OpenMed group key: sequence-stripped, slice-number-stripped stem. This is
-    # a *lesion* key derived from the dataset's own naming, not a proven
-    # patient ID — recorded as such in the audit output.
-    openmed_group_is_subject_verified: bool = False
 
     # ── optimisation ─────────────────────────────────────────────────────
     epochs: int = 100
@@ -91,6 +87,10 @@ class TrainConfig:
     grad_checkpoint: bool = False  # TinyViT gradient checkpointing
     freeze_prompt_encoder: bool = True
     freeze_bn: bool = True
+    # DDP unused-parameter detection. Safe to disable here because the
+    # prompt encoder is frozen and DDP confirms no trainable parameter goes
+    # unused in the forward pass. Turn on if that ever changes.
+    find_unused_parameters: bool = False
 
     # ── loss ─────────────────────────────────────────────────────────────
     bce_weight: float = 0.5
@@ -114,7 +114,6 @@ class TrainConfig:
     # ── early stopping ───────────────────────────────────────────────────
     patience: int = 10
     min_delta: float = 1e-4
-    monitor: str = "val_macro_dice"
 
     # ── hygiene thresholds ───────────────────────────────────────────────
     align_min_inside: float = 0.90   # mask foreground on anatomy

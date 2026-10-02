@@ -48,10 +48,10 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from medsam_training import audit as audit_mod          # noqa: E402
-from medsam_training import bootstrap, config as C      # noqa: E402
-from medsam_training import data as data_mod            # noqa: E402
-from medsam_training import engine, reporting           # noqa: E402
+from medsam_training import audit as audit_mod
+from medsam_training import bootstrap, config as C
+from medsam_training import data as data_mod
+from medsam_training import engine, reporting
 
 logger = logging.getLogger("trainKaggle")
 
@@ -209,7 +209,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--grad-checkpoint", action="store_true", help="trade speed for VRAM")
     parser.add_argument("--no-amp", action="store_true")
     parser.add_argument("--audit-only", action="store_true", help="run hygiene + split, then stop")
-    parser.add_argument("--skip-audit", action="store_true", help="reuse an existing audit.json")
+    parser.add_argument(
+        "--force-audit", action="store_true",
+        help="re-run the hygiene audit even when a cached audit.json exists",
+    )
+    parser.add_argument(
+        "--skip-audit", action="store_true",
+        help="reuse the cached audit if present (this is the default)",
+    )
     parser.add_argument("--no-export", action="store_true", help="skip the final ZIP")
     parser.add_argument("--smoke", action="store_true", help="2 steps per epoch, for wiring checks only")
     return parser.parse_args(argv)
@@ -314,16 +321,31 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     audit_cache = os.path.join(cfg.out_dir, "audit.json")
-    if args.skip_audit and os.path.isfile(audit_cache):
+    # The audit is a one-time gate, not a per-run cost. Re-running it on every
+    # restart costs ~6 minutes of GPU-idle time and changes nothing, because it
+    # only reads the datasets. Reuse the cached result unless explicitly asked
+    # to redo it.
+    reuse_audit = os.path.isfile(audit_cache) and not args.force_audit
+
+    if reuse_audit:
         import json
 
+        logger.info("STAGE 2-3/7 — reusing cached audit (pass --force-audit to redo)")
         with open(audit_cache) as fh:
             cached = json.load(fh)
-        logger.info("reusing cached audit from %s", audit_cache)
         openmed_report = cached["openmed"]
         btsc_report = cached["btsc"]
         cross_source = cached["cross_source"]
+        logger.info(
+            "  cached: openmed %d stems, btsc %d stems, cross-source overlap %d",
+            openmed_report["n_stems"], btsc_report["n_stems"],
+            cross_source.get("confirmed_shared_images", 0),
+        )
     else:
+        if os.path.isfile(audit_cache):
+            logger.info("STAGE 2/7 — --force-audit: re-running the hygiene audit")
+        else:
+            logger.info("STAGE 2/7 — no cached audit found: running the hygiene audit")
         openmed_report = audit_mod.audit_source(
             openmed,
             workers=cfg.workers or 2,
@@ -428,10 +450,17 @@ def main(argv: list[str] | None = None) -> int:
     baseline_path = os.path.join(cfg.out_dir, "metrics", "baseline_val.json")
     test_path = os.path.join(cfg.out_dir, "metrics", "test_per_image.json")
 
-    history = json.load(open(history_path)) if os.path.isfile(history_path) else []
-    summary = json.load(open(summary_path)) if os.path.isfile(summary_path) else None
-    baseline = json.load(open(baseline_path)) if os.path.isfile(baseline_path) else {}
-    test_rows = json.load(open(test_path)) if os.path.isfile(test_path) else []
+    def _load(path, default):
+        """Read JSON if present, else the default. Closes the handle."""
+        if not os.path.isfile(path):
+            return default
+        with open(path) as fh:
+            return json.load(fh)
+
+    history = _load(history_path, [])
+    summary = _load(summary_path, None)
+    baseline = _load(baseline_path, {})
+    test_rows = _load(test_path, [])
 
     reporting.plot_learning_curves(history, cfg.out_dir)
     reporting.plot_lr_schedule(os.path.join(cfg.out_dir, "metrics", "epochs.csv"), cfg.out_dir)

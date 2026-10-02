@@ -8,7 +8,6 @@ would block the cell.
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import platform
@@ -19,8 +18,8 @@ from typing import Any, Optional
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
+import matplotlib.pyplot as plt
+import numpy as np
 
 logger = logging.getLogger("reporting")
 
@@ -115,7 +114,7 @@ def plot_metric_distributions(rows: list[dict[str, Any]], out_dir: str) -> Optio
     for source in sources:
         values = [r["dice"] for r in rows if r["source"] == source]
         axes[0].hist(values, bins=30, alpha=0.6, label=f"{source} (n={len(values)})",
-                     color=COLOURS.get(source, None))
+                     color=COLOURS.get(source))
     axes[0].set_title("Per-image Dice (test)")
     axes[0].set_xlabel("Dice")
     axes[0].set_ylabel("images")
@@ -133,7 +132,7 @@ def plot_metric_distributions(rows: list[dict[str, Any]], out_dir: str) -> Optio
         sub = [r for r in rows if r["source"] == source]
         axes[2].scatter([r["gt_fg_frac"] * 100 for r in sub],
                         [r["dice"] for r in sub],
-                        s=8, alpha=0.4, label=source, color=COLOURS.get(source, None))
+                        s=8, alpha=0.4, label=source, color=COLOURS.get(source))
     axes[2].set_title("Dice vs lesion size")
     axes[2].set_xlabel("ground-truth foreground (% of image)")
     axes[2].set_ylabel("Dice")
@@ -192,7 +191,7 @@ def plot_baseline_vs_finetuned(
     fig, ax = plt.subplots(figsize=(8, 4.4))
     ax.bar(x - width / 2, base_vals, width, label="pretrained (val)", color="#9aa0a6")
     ax.bar(x + width / 2, fine_vals, width, label="fine-tuned (test)", color="#ed6f5c")
-    for i, (b, f) in enumerate(zip(base_vals, fine_vals)):
+    for i, (b, f) in enumerate(zip(base_vals, fine_vals, strict=True)):
         ax.text(i - width / 2, b + 0.01, f"{b:.3f}", ha="center", fontsize=8)
         ax.text(i + width / 2, f + 0.01, f"{f:.3f}", ha="center", fontsize=8)
     ax.set_xticks(x)
@@ -284,8 +283,9 @@ def plot_qualitative(
         pred_bin = pred > 0
         gt_bin = native > 0
         inter = int((pred_bin & gt_bin).sum())
-        union = int((pred_bin | gt_bin).sum())
-        dice = (2 * inter / (int(pred_bin.sum()) + int(gt_bin.sum()))) if (pred_bin.sum() + gt_bin.sum()) else 1.0
+        total_fg = int(pred_bin.sum()) + int(gt_bin.sum())
+        # Same convention as engine.dice_iou: two empty masks score 1.0.
+        dice = (2 * inter / total_fg) if total_fg else 1.0
 
         base = (image[0].permute(1, 2, 0).float().cpu().numpy() * 255).astype(np.uint8)
         overlay = base.copy()
