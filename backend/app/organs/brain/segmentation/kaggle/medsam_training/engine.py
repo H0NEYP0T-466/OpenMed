@@ -270,11 +270,26 @@ def build_trainable_model(cfg: Any, device: torch.device) -> nn.Module:
     return model
 
 
+def unwrap(model: nn.Module) -> nn.Module:
+    """Return the underlying module, whether or not ``model`` is DDP-wrapped.
+
+    ``DistributedDataParallel`` does **not** proxy attribute access to the
+    module it wraps — ``ddp_model.image_encoder`` raises ``AttributeError``.
+    Anywhere the architecture's own submodules are needed, go through this
+    rather than assuming which form was passed in.
+    """
+    return model.module if isinstance(model, DDP) else model
+
+
 def build_param_groups(model: nn.Module, cfg: Any) -> list[dict[str, Any]]:
-    """Two groups: TinyViT encoder at ``encoder_lr``, the rest at ``lr``."""
-    encoder_ids = {id(p) for p in model.image_encoder.parameters()}
+    """Two groups: TinyViT encoder at ``encoder_lr``, the rest at ``lr``.
+
+    Accepts a DDP-wrapped model or a bare one.
+    """
+    base = unwrap(model)
+    encoder_ids = {id(p) for p in base.image_encoder.parameters()}
     encoder, rest = [], []
-    for param in model.parameters():
+    for param in base.parameters():
         if not param.requires_grad:
             continue
         (encoder if id(param) in encoder_ids else rest).append(param)
@@ -531,7 +546,7 @@ def save_checkpoint(
     state = {
         "epoch": epoch,
         "best": best,
-        "model": model.module.state_dict(),
+        "model": unwrap(model).state_dict(),
         "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict(),
         "scaler": scaler.state_dict(),
@@ -546,7 +561,7 @@ def save_checkpoint(
 def save_best_weights(model: nn.Module, path: str) -> None:
     """Save a bare, CPU, unwrapped state dict — the exact shape the server loads."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    state = {k: v.detach().cpu() for k, v in model.module.state_dict().items()}
+    state = {k: v.detach().cpu() for k, v in unwrap(model).state_dict().items()}
     torch.save(state, path)
 
 
@@ -659,7 +674,7 @@ def _run_worker_body(rank: int, world_size: int, cfg: Any) -> None:
                 "Resume refused: the checkpoint was produced by a different configuration. "
                 f"checkpoint={state.get('config_fingerprint')} current={cfg.fingerprint()}"
             )
-        model.module.load_state_dict(state["model"], strict=True)
+        unwrap(model).load_state_dict(state["model"], strict=True)
         optimizer.load_state_dict(state["optimizer"])
         scheduler.load_state_dict(state["scheduler"])
         scaler.load_state_dict(state["scaler"])
@@ -810,7 +825,9 @@ def _run_worker_body(rank: int, world_size: int, cfg: Any) -> None:
     # ── final test, once, on the best weights ────────────────────────────
     best_path = os.path.join(best_dir, "lite_medsam.pth")
     if os.path.isfile(best_path):
-        model.module.load_state_dict(torch.load(best_path, map_location="cpu", weights_only=True), strict=True)
+        unwrap(model).load_state_dict(
+            torch.load(best_path, map_location="cpu", weights_only=True), strict=True
+        )
         model.train()
         if cfg.freeze_bn:
             freeze_batchnorm(model)
