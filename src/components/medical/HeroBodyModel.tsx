@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { disposeObjectTree } from '../../utils/threeHelpers'
 
 /**
@@ -17,8 +18,8 @@ import { disposeObjectTree } from '../../utils/threeHelpers'
  */
 const HERO_MODEL_URL = '/models/atlas/hero-body.glb'
 
-/** Fraction of the container the model's longest axis should occupy. */
-const FIT = 0.86
+/** Target height of the model in world units (fills ~85% of camera frustum). */
+const FIT = 1.7
 
 export const HeroBodyModel: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -37,8 +38,8 @@ export const HeroBodyModel: React.FC = () => {
     container.appendChild(renderer.domElement)
 
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100)
-    camera.position.set(0, 0.12, 3.6)
+    const camera = new THREE.PerspectiveCamera(29, 1, 0.1, 100)
+    camera.position.set(0, 0, 3.6)
     camera.lookAt(0, 0, 0)
 
     // Warm key over a cool rim, matching the plate lighting.
@@ -69,6 +70,7 @@ export const HeroBodyModel: React.FC = () => {
     observer.observe(container)
 
     const loader = new GLTFLoader()
+    loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
       HERO_MODEL_URL,
       (gltf) => {
@@ -99,7 +101,8 @@ export const HeroBodyModel: React.FC = () => {
         tick()
       },
       undefined,
-      () => {
+      (err) => {
+        console.error('Failed to load hero model:', err)
         if (!disposed) setStatus('error')
       },
     )

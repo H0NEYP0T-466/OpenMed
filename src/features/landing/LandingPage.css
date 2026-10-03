@@ -6,11 +6,11 @@
 .lp-hero {
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
-  align-items: start;
-  gap: clamp(24px, 3vw, 48px);
-  max-width: 1180px;
-  padding: 4px 64px 56px 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+  align-items: center;
+  gap: clamp(24px, 3.5vw, 56px);
+  max-width: 1200px;
+  
 }
 
 .lp-hero-figure {
@@ -18,7 +18,7 @@
   flex-direction: column;
   gap: 14px;
   min-width: 0;
-  align-self: start;
+  align-self: center;
 }
 
 /* The model on its own: no plate, no border, no background box — the canvas is
@@ -26,7 +26,7 @@
 .hero-model {
   position: relative;
   width: 100%;
-  height: min(54vh, 440px);
+  height: min(72vh, 580px);
 }
 
 .hero-model canvas {

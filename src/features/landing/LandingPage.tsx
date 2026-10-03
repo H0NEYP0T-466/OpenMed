@@ -85,10 +85,16 @@ export const LandingPage: React.FC = () => (
           carries its benchmark, and every structure is named by Terminologia Anatomica.
         </p>
         <div className="lp-cta-row">
-          <a className="btn btn-ghost" href="#movements">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => {
+              document.getElementById('movements')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+          >
             <span>The consultation, in six movements</span>
             <span className="arr" aria-hidden="true">↓</span>
-          </a>
+          </button>
         </div>
         <p className="lp-edition mono">
           This edition ships the atlas &amp; benchmark dossiers - the AI pipeline is in press.

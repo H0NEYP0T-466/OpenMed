@@ -1,11 +1,12 @@
-"""Bake a low-poly hero model from the atlas geometry.
+"""Bake a clean, lightweight hero model from the atlas geometry.
 
-The atlas streams 33.6 MB of chunked geometry and takes ~22 s to bind — fine for
-an inspection plate, unusable as a front-page fold. This collapses the same
-geometry to a single GLB that loads in about a second, by vertex-clustering each
-anatomical system onto a shared grid and re-deriving normals from the new faces.
+The atlas streams 33.6 MB across 15 chunks (2,234 parts) which takes ~22 s to bind.
+This script merges all parts cleanly per anatomical system (with author normals and
+proper index offsets), writes a single GLB, and optionally optimizes via gltfpack.
 
-Per-system groups are preserved so the hero keeps the atlas palette.
+The integumentary (skin) system is configured with alphaMode BLEND (translucent),
+allowing the muscular, skeletal, and vascular systems to show through just like
+the atlas viewer, but in a single fast-loading asset for the landing page hero.
 
 Run from the repo root:  backend/venv/bin/python scripts/bake_hero_model.py
 """
@@ -14,22 +15,23 @@ from __future__ import annotations
 
 import gzip
 import json
+import os
 import re
+import shutil
 import struct
+import subprocess
 from pathlib import Path
 
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 ATLAS = ROOT / "public/models/atlas"
-OUT = ATLAS / "hero-body.glb"
+RAW_OUT = ATLAS / "hero-body-raw.glb"
+FINAL_OUT = ATLAS / "hero-body.glb"
 
-# Grid resolution for vertex clustering. Higher = more triangles. Tuned to land
-# near 70k triangles, which holds the silhouette at hero size.
-GRID = 350
+HERO_EXCLUDED_SYSTEMS = frozenset({"reproductive"})
 
-# System colours, read from the same source the atlas uses so the hero cannot
-# drift from the plate palette.
+
 def read_system_colours() -> dict[str, tuple[str, str]]:
     src = (ROOT / "src/types/atlas.ts").read_text()
     block = src[src.index("ATLAS_SYSTEMS"):]
@@ -40,88 +42,81 @@ def read_system_colours() -> dict[str, tuple[str, str]]:
     return {i: (name, hexcol) for i, name, hexcol in found}
 
 
-def hex_to_rgb(h: str) -> tuple[float, float, float]:
+def hex_to_rgb(h: str) -> list[float]:
     h = h.lstrip("#")
     srgb = np.array([int(h[i : i + 2], 16) / 255.0 for i in (0, 2, 4)])
-    # glTF baseColorFactor is linear; the palette is authored in sRGB.
     lin = np.where(srgb <= 0.04045, srgb / 12.92, ((srgb + 0.055) / 1.055) ** 2.4)
-    return tuple(float(v) for v in lin)
+    return [float(v) for v in lin]
 
 
-# Left out of the front-page model: it is a public-facing fold, and the plate
-# itself still carries the full anatomy.
-HERO_EXCLUDED_SYSTEMS = frozenset({"reproductive"})
-
-
-def load_system_meshes(meta: dict) -> dict[str, tuple[np.ndarray, np.ndarray]]:
-    """Decode every part into per-system (positions, indices) float/int arrays."""
+def load_and_merge_systems(meta: dict) -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    """Decode parts and merge them per system with accumulated index offsets and native normals."""
     by_chunk: dict[int, list[dict]] = {}
     for p in meta["parts"]:
         if p["system"] in HERO_EXCLUDED_SYSTEMS:
             continue
         by_chunk.setdefault(p["chunk"], []).append(p)
 
-    acc: dict[str, list[tuple[np.ndarray, np.ndarray]]] = {}
+    sys_pos: dict[str, list[np.ndarray]] = {}
+    sys_nrm: dict[str, list[np.ndarray]] = {}
+    sys_idx: dict[str, list[np.ndarray]] = {}
+    sys_vcount: dict[str, int] = {}
+
     for ci, chunkspec in enumerate(meta["chunks"]):
         if ci not in by_chunk:
             continue
-        raw = gzip.decompress((ROOT / "public" / chunkspec["gzip"].lstrip("/")).read_bytes())
+
+        raw_path = ROOT / "public" / chunkspec["gzip"].lstrip("/")
+        if not raw_path.exists():
+            raw_path = ATLAS / f"body-{ci}.bin"
+            raw = raw_path.read_bytes()
+        else:
+            raw = gzip.decompress(raw_path.read_bytes())
+
         for p in by_chunk[ci]:
+            s = p["system"]
+            if s not in sys_pos:
+                sys_pos[s] = []
+                sys_nrm[s] = []
+                sys_idx[s] = []
+                sys_vcount[s] = 0
+
+            v_count = p["vertexCount"]
+            i_count = p["indexCount"]
+
             pos = np.frombuffer(
-                raw, dtype="<f4", count=p["vertexCount"] * 3, offset=p["positions"]
+                raw, dtype="<f4", count=v_count * 3, offset=p["positions"]
             ).reshape(-1, 3)
+
+            # Native author normals are stored as normalized Int16
+            nrm_raw = np.frombuffer(
+                raw, dtype="<i2", count=v_count * 3, offset=p["normals"]
+            ).reshape(-1, 3)
+            nrm = nrm_raw.astype(np.float32) / 32767.0
+
+            # Crucial: offset indices by system accumulated vertex count
             idx = np.frombuffer(
-                raw, dtype="<u4", count=p["indexCount"], offset=p["indices"]
-            )
-            acc.setdefault(p["system"], []).append((pos.astype(np.float32), idx))
-    return {s: (np.concatenate([a for a, _ in v]), np.concatenate([b for _, b in v]))
-            for s, v in acc.items()}
+                raw, dtype="<u4", count=i_count, offset=p["indices"]
+            ).copy()
+            idx += sys_vcount[s]
+
+            sys_pos[s].append(pos)
+            sys_nrm[s].append(nrm)
+            sys_idx[s].append(idx)
+            sys_vcount[s] += v_count
+
+    merged = {}
+    for s in sorted(sys_pos.keys()):
+        merged[s] = (
+            np.concatenate(sys_pos[s]).astype("<f4"),
+            np.concatenate(sys_nrm[s]).astype("<f4"),
+            np.concatenate(sys_idx[s]).astype("<u4"),
+        )
+    return merged
 
 
-def cluster_decimate(
-    pos: np.ndarray, idx: np.ndarray, origin: np.ndarray, cell: float
-) -> tuple[np.ndarray, np.ndarray]:
-    """Vertex clustering: snap vertices to a grid, then drop what collapses."""
-    cells = np.floor((pos - origin) / cell).astype(np.int64) + 512
-    key = (cells[:, 0] * 1024 + cells[:, 1]) * 1024 + cells[:, 2]
-
-    _, inv = np.unique(key, return_inverse=True)
-    inv = inv.astype(np.int64)
-    n = int(inv.max()) + 1
-
-    # Representative = centroid of the cell's members, which keeps the surface
-    # closer to the original than snapping to the cell centre.
-    new_pos = np.zeros((n, 3), dtype=np.float64)
-    counts = np.zeros(n, dtype=np.float64)
-    np.add.at(new_pos, inv, pos)
-    np.add.at(counts, inv, 1.0)
-    new_pos /= counts[:, None]
-
-    tri = inv[idx].reshape(-1, 3)
-    keep = (tri[:, 0] != tri[:, 1]) & (tri[:, 1] != tri[:, 2]) & (tri[:, 0] != tri[:, 2])
-    tri = tri[keep]
-
-    # Collapsing merges many triangles onto the same three vertices; keep one.
-    _, first = np.unique(np.sort(tri, axis=1), axis=0, return_index=True)
-    tri = tri[np.sort(first)]
-
-    return new_pos.astype(np.float32), tri.astype(np.uint32)
-
-
-def compute_normals(pos: np.ndarray, tri: np.ndarray) -> np.ndarray:
-    """Area-weighted vertex normals from the decimated faces."""
-    a, b, c = pos[tri[:, 0]], pos[tri[:, 1]], pos[tri[:, 2]]
-    face = np.cross(b - a, c - a)  # magnitude is 2x area, so this weights by area
-    nrm = np.zeros_like(pos, dtype=np.float64)
-    for k in range(3):
-        np.add.at(nrm, tri[:, k], face)
-    lens = np.linalg.norm(nrm, axis=1, keepdims=True)
-    lens[lens == 0] = 1.0
-    return (nrm / lens).astype(np.float32)
-
-
-def write_glb(path: Path, prims: list[dict]) -> None:
-    """Minimal glTF 2.0 binary writer — one mesh, one primitive per system."""
+def write_glb(path: Path, systems: dict[str, tuple[np.ndarray, np.ndarray, np.ndarray]], colours: dict) -> None:
+    """Pack systems into one glTF 2.0 binary mesh with per-system primitives."""
     blob = bytearray()
     views: list[dict] = []
     accessors: list[dict] = []
@@ -135,35 +130,45 @@ def write_glb(path: Path, prims: list[dict]) -> None:
         blob.extend(data)
         return len(views) - 1
 
-    for prim in prims:
-        pos, nrm, tri = prim["positions"], prim["normals"], prim["indices"]
-        vmin = pos.min(axis=0).astype(float).tolist()
-        vmax = pos.max(axis=0).astype(float).tolist()
-
-        pv = add_view(pos.astype("<f4").tobytes(), 34962)
-        accessors.append({"bufferView": pv, "componentType": 5126, "count": int(pos.shape[0]),
-                          "type": "VEC3", "min": vmin, "max": vmax})
+    for s, (pos, nrm, tri) in systems.items():
+        pv = add_view(pos.tobytes(), 34962)
+        accessors.append({
+            "bufferView": pv, "componentType": 5126, "count": int(pos.shape[0]),
+            "type": "VEC3", "min": pos.min(axis=0).tolist(), "max": pos.max(axis=0).tolist()
+        })
         a_pos = len(accessors) - 1
 
-        nv = add_view(nrm.astype("<f4").tobytes(), 34962)
-        accessors.append({"bufferView": nv, "componentType": 5126, "count": int(nrm.shape[0]),
-                          "type": "VEC3"})
+        nv = add_view(nrm.tobytes(), 34962)
+        accessors.append({
+            "bufferView": nv, "componentType": 5126, "count": int(nrm.shape[0]),
+            "type": "VEC3"
+        })
         a_nrm = len(accessors) - 1
 
-        iv = add_view(tri.astype("<u4").tobytes(), 34963)
-        accessors.append({"bufferView": iv, "componentType": 5125, "count": int(tri.size),
-                          "type": "SCALAR"})
+        iv = add_view(tri.tobytes(), 34963)
+        accessors.append({
+            "bufferView": iv, "componentType": 5125, "count": int(tri.size),
+            "type": "SCALAR"
+        })
         a_idx = len(accessors) - 1
 
-        name, hexcol = prim["name"], prim["color"]
-        materials.append({
+        name, hexcol = colours.get(s, (s.title(), "#aebbb8"))
+        rgb = hex_to_rgb(hexcol)
+
+        is_skin = (s == "integumentary")
+        mat_def = {
             "name": name,
             "pbrMetallicRoughness": {
-                "baseColorFactor": [*hex_to_rgb(hexcol), 1.0],
-                "metallicFactor": 0.08,
-                "roughnessFactor": 0.62,
+                "baseColorFactor": [*rgb, 0.18 if is_skin else 1.0],
+                "metallicFactor": 0.05,
+                "roughnessFactor": 0.55,
             },
-        })
+            "doubleSided": True,
+        }
+        if is_skin:
+            mat_def["alphaMode"] = "BLEND"
+
+        materials.append(mat_def)
         mesh_prims.append({
             "attributes": {"POSITION": a_pos, "NORMAL": a_nrm},
             "indices": a_idx,
@@ -171,7 +176,7 @@ def write_glb(path: Path, prims: list[dict]) -> None:
         })
 
     gltf = {
-        "asset": {"version": "2.0", "generator": "OpenMed hero bake"},
+        "asset": {"version": "2.0", "generator": "OpenMed Clean Hero Bake"},
         "scene": 0,
         "scenes": [{"nodes": [0]}],
         "nodes": [{"mesh": 0, "name": "HumanBody"}],
@@ -196,33 +201,31 @@ def write_glb(path: Path, prims: list[dict]) -> None:
 def main() -> None:
     meta = json.loads((ATLAS / "atlas.json").read_text())
     colours = read_system_colours()
-    print(f"systems in palette: {len(colours)}")
+    print(f"Decoded {len(colours)} system palette entries.")
 
-    meshes = load_system_meshes(meta)
-    total_in = sum(len(i) // 3 for _, i in meshes.values())
-    print(f"decoded {total_in:,} triangles across {len(meshes)} systems")
+    systems = load_and_merge_systems(meta)
+    total_tri = sum(t.size // 3 for _, _, t in systems.values())
+    total_vert = sum(p.shape[0] for p, _, _ in systems.values())
+    print(f"Merged {len(systems)} systems: {total_vert:,} vertices, {total_tri:,} triangles.")
 
-    # One grid for every system, so neighbouring systems stay aligned.
-    allpos = np.concatenate([p for p, _ in meshes.values()])
-    lo, hi = allpos.min(axis=0), allpos.max(axis=0)
-    cell = float((hi - lo).max()) / GRID
-    print(f"grid {GRID} cells, cell size {cell:.5f}")
+    write_glb(RAW_OUT, systems, colours)
+    print(f"Wrote uncompressed model: {RAW_OUT} ({RAW_OUT.stat().st_size / 1e6:.2f} MB)")
 
-    prims = []
-    for sid, (pos, idx) in meshes.items():
-        dp, dt = cluster_decimate(pos, idx, lo, cell)
-        dn = compute_normals(dp, dt)
-        name, hexcol = colours.get(sid, (sid.title(), "#b0b0b0"))
-        prims.append({"positions": dp, "normals": dn, "indices": dt, "name": name, "color": hexcol})
-        print(f"  {sid:15s} {len(idx)//3:8,} -> {len(dt):7,} tris   {len(dp):7,} verts   {hexcol}")
-
-    prims.sort(key=lambda p: p["name"])
-    total_out = sum(len(p["indices"]) for p in prims)
-    print(f"\ntotal {total_in:,} -> {total_out:,} triangles "
-          f"({total_out/total_in*100:.1f}%)")
-
-    write_glb(OUT, prims)
-    print(f"wrote {OUT.relative_to(ROOT)}  {OUT.stat().st_size/1e6:.2f} MB")
+    # Run gltfpack simplification & compression if available
+    gltfpack_cmd = shutil.which("gltfpack") or "npx"
+    cmd = (
+        ["gltfpack", "-i", str(RAW_OUT), "-o", str(FINAL_OUT), "-si", "0.05", "-slb", "-c"]
+        if gltfpack_cmd == "gltfpack"
+        else ["npx", "gltfpack", "-i", str(RAW_OUT), "-o", str(FINAL_OUT), "-si", "0.05", "-slb", "-c"]
+    )
+    print(f"Running optimization: {' '.join(cmd)}")
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode == 0 and FINAL_OUT.exists():
+        print(f"Successfully baked optimized hero model: {FINAL_OUT} ({FINAL_OUT.stat().st_size / 1e6:.2f} MB)")
+        RAW_OUT.unlink(missing_ok=True)
+    else:
+        print(f"Optimization warning (keeping raw): {res.stderr}")
+        shutil.move(RAW_OUT, FINAL_OUT)
 
 
 if __name__ == "__main__":
