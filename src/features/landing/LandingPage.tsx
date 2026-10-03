@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom'
 import type { OrganId } from '../../types/organ'
 import { ORGANS_REGISTRY } from '../../types/organ'
 import { AppShell } from '../../components/common/AppShell'
+import { HeroBodyModel } from '../../components/medical/HeroBodyModel'
 import '../../components/medical/essay.css'
 import '../../components/medical/OrganSelector.css'
 import './LandingPage.css'
 
-const ORGAN_ORDER = Object.keys(ORGANS_REGISTRY) as OrganId[]
+/**
+ * The body is shown on the front page now, so it is no longer one of the
+ * departments listed below — the index runs to twelve.
+ */
+const DEPARTMENT_ORDER = (Object.keys(ORGANS_REGISTRY) as OrganId[]).filter(
+  (id) => id !== 'body',
+)
 
 const MOVEMENTS = [
   {
@@ -61,16 +68,10 @@ const STATUS_LABEL = {
 } as const
 
 export const LandingPage: React.FC = () => (
-  <AppShell
-    cta={
-      <Link className="btn btn-primary" to="/app">
-        <span>Enter the Annual</span>
-        <span className="nav-star" aria-hidden="true">★</span>
-        <span className="arr" aria-hidden="true">↗</span>
-      </Link>
-    }
-  >
-    {/* Hero - the frontispiece fold */}
+  <AppShell>
+    {/* Hero - the frontispiece fold. The body model sits opposite the type,
+        spinning on its own: no plate chrome, no picking, no user rotation.
+        Interactivity begins behind the Atlas link beneath it. */}
     <section className="lp-hero">
       <div className="lp-hero-type">
         <h1 className="dossier-title">
@@ -84,10 +85,6 @@ export const LandingPage: React.FC = () => (
           carries its benchmark, and every structure is named by Terminologia Anatomica.
         </p>
         <div className="lp-cta-row">
-          <Link className="btn btn-primary" to="/app">
-            <span>Open the Atlas</span>
-            <span className="arr" aria-hidden="true">↗</span>
-          </Link>
           <a className="btn btn-ghost" href="#movements">
             <span>The consultation, in six movements</span>
             <span className="arr" aria-hidden="true">↓</span>
@@ -98,6 +95,13 @@ export const LandingPage: React.FC = () => (
         </p>
       </div>
 
+      <div className="lp-hero-figure">
+        <HeroBodyModel />
+        <Link className="btn btn-primary lp-figure-cta" to="/app">
+          <span>Open the Atlas</span>
+          <span className="arr" aria-hidden="true">↗</span>
+        </Link>
+      </div>
     </section>
 
     {/* The consultation, in six movements */}
@@ -131,11 +135,11 @@ export const LandingPage: React.FC = () => (
         <div className="sec-rule">
           <span className="roman">III</span>
           <span className="sec-title">Index of Departments</span>
-          <span className="page-of">13 plates</span>
+          <span className="page-of">12 plates</span>
         </div>
       </div>
       <div className="pill-grid">
-        {ORGAN_ORDER.map((id, i) => {
+        {DEPARTMENT_ORDER.map((id, i) => {
           const organ = ORGANS_REGISTRY[id]
           return (
             <Link
@@ -145,10 +149,7 @@ export const LandingPage: React.FC = () => (
               aria-label={`Enter the ${organ.name} plate`}
             >
               <span className="p-num serif">{String(i + 1).padStart(2, '0')}</span>
-              <span className="p-name">
-                {organ.name}
-                {id === 'body' && <span className="p-star" aria-hidden="true">★</span>}
-              </span>
+              <span className="p-name">{organ.name}</span>
               <span className="p-mod">{organ.modality}</span>
             </Link>
           )

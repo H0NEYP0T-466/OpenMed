@@ -4,6 +4,14 @@
    Bone paper surfaces · ink hairlines · warm typography.
    ============================================================ */
 
+/* Long filesystem paths and identifiers appear in these docs. Without this an
+   unbreakable token sets a min-content wider than the layout and pushes the
+   whole page sideways. */
+.doc-page-layout code,
+.doc-page-layout pre {
+  overflow-wrap: anywhere;
+}
+
 .doc-page-layout {
   max-width: 1180px;
   margin: 0 auto;

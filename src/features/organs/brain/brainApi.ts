@@ -1,6 +1,7 @@
 import type {
   BrainHealthStatus,
   BrainModelInfo,
+  BrainClassificationResult,
   BrainSegmentationResult,
   ClickSegmentationResult,
 } from './brainTypes'
@@ -24,6 +25,50 @@ export interface AnalyzeBrainImageOptions {
 }
 
 /**
+ * Classify an MRI scan — POST /api/brain/classify.
+ *
+ * This is what the Run button calls. Segmentation was taken out of this flow
+ * when the automated heatmap-prompt path was retired: against ground truth it
+ * scored 0.31 mean Dice, because a CAM-derived box overlaps the lesion at only
+ * 0.123 IoU. Segmentation now lives in the Experimental Laboratory, where the
+ * clinician supplies the prompt and the same decoder reaches 0.92 median Dice.
+ *
+ * ``/api/brain/segment`` is untouched and still runs classification plus
+ * LiteMedSAM; it is kept for the retrained model.
+ *
+ * Every result is computed from the uploaded image by the backend. There is no
+ * cached or simulated fallback: if the service is unreachable this throws, so
+ * the UI can never show an invented finding.
+ */
+export const classifyBrainImage = async (file: File): Promise<BrainClassificationResult> => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE_URL}/classify`, { method: 'POST', body: formData })
+  } catch (error) {
+    throw new Error(
+      `The analysis service is unreachable at ${API_BASE_URL}. Start it with ` +
+        '`python -m app.main` from backend/, then run the analysis again. ' +
+        'No result is shown without a real inference run.',
+      { cause: error },
+    )
+  }
+
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null)
+    const message =
+      detail && typeof detail.detail === 'string'
+        ? detail.detail
+        : `Classification failed (HTTP ${response.status}).`
+    throw new Error(message)
+  }
+
+  return (await response.json()) as BrainClassificationResult
+}
+
+/**
  * Classify an MRI scan *and* segment any detected tumour in one round trip.
  *
  * POST /api/brain/segment runs the full pipeline: EfficientNetV2-B2
@@ -33,9 +78,8 @@ export interface AnalyzeBrainImageOptions {
  * when enabled, or no prompt at all when disabled. Either way the released
  * LiteMedSAM weights never receive a dense mask prompt.
  *
- * Every result returned here is computed from the uploaded image by the
- * backend. There is no cached or simulated fallback: if the service is
- * unreachable this throws, so the UI can never show an invented finding.
+ * No longer called by the workspace — kept for the retrained segmentation
+ * model. Use {@link classifyBrainImage} for the classification-only run.
  */
 export const analyzeBrainImage = async (
   file: File,

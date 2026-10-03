@@ -1,9 +1,12 @@
-"""Brain tumour segmentation with LiteMedSAM.
+"""Brain organ — segmentation.
 
-Provides a promptable segmentation pipeline backed by the distilled
-MedSAM-Lite model (TinyViT-256 encoder, SAM prompt encoder + mask decoder).
-Designed for seamless integration with the brain classifier: when a tumour is
-detected, a bounding box derived from the Grad-CAM heatmap is used as the
-segmentation prompt. The released LiteMedSAM weights were trained to segment
-from boxes only, so the dense mask prompt path is not used.
+The LiteMedSAM segmentation stack lives in :mod:`.experimental_lab`, kept
+separate because that engine is being replaced: the automated heatmap-prompt
+path has been retired from the classifier run and a retrained model is
+expected.
+
+Nothing in this package is imported directly by the application any more —
+``app.main`` mounts the experimental lab's router, and the classifier run no
+longer segments. This namespace stays as the home for whichever segmentation
+model the brain organ uses next.
 """

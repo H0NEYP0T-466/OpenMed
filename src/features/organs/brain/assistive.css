@@ -1,0 +1,200 @@
+/* Assistive segmentation module.
+   Self-contained: the plate/chip primitives the workspace uses (.scan-frame,
+   .seg-meta-chip) are mirrored here under assist-* names so this component can
+   live outside the brain workspace — it is rendered by the Experimental
+   Laboratory now. Keep the two in step if the chrome changes. */
+
+.assist-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.assist-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.assist-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.assist-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.assist-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+
+.prompt-mode-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.prompt-mode-switch button {
+  border: 0;
+  background: transparent;
+  padding: 6px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+
+.prompt-mode-switch button + button {
+  border-left: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.prompt-mode-switch button.active {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+}
+
+.assist-plates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.assist-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #000;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.assist-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.assist-target {
+  cursor: crosshair;
+}
+
+.assist-frame.busy .assist-target {
+  opacity: 0.55;
+}
+
+.assist-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #fff;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.assist-tag.highlight {
+  background: rgba(237, 111, 92, 0.85);
+}
+
+.assist-empty {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 1rem;
+  color: var(--ink-mute, #b2bec3);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.assist-error {
+  margin-top: 16px;
+  padding: 12px 18px;
+  background: rgba(237, 111, 92, 0.08);
+  border: 1px solid rgba(237, 111, 92, 0.3);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  line-height: 1.5;
+}
+
+.draw-rect {
+  position: absolute;
+  border: 2px dashed var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.click-marker {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.assist-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0;
+}
+
+.assist-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--ink-mute, #b2bec3);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+}
+
+.assist-chip .k {
+  font-weight: 600;
+  color: var(--ink-mute, #b2bec3);
+}
+
+.assist-chip .v {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.assist-chip.is-accent {
+  border-color: var(--accent);
+}
+
+.assist-chip.is-accent .v {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .assist-plates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

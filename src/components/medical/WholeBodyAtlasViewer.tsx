@@ -127,6 +127,7 @@ export const WholeBodyAtlasViewer: React.FC<WholeBodyAtlasViewerProps> = ({
     controls.dampingFactor = 0.08
     controls.minDistance = 0.2
     controls.maxDistance = 60
+
     controls.addEventListener('change', () => {
       dirty = true
     })

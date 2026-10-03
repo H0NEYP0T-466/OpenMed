@@ -80,7 +80,7 @@ The trained checkpoint is saved as a **bare, CPU, unwrapped state dict** at
 
 ```bash
 cp /kaggle/working/<run>/best/lite_medsam.pth \
-   backend/app/organs/brain/segmentation/checkpoints/lite_medsam.pth
+   backend/app/organs/brain/segmentation/experimental_lab/checkpoints/lite_medsam.pth
 ```
 
 No code change is needed. The backend loads it with `strict=True`, so a

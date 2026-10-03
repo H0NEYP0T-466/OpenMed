@@ -1,0 +1,220 @@
+/* Experimental Laboratory — specimen rack, upload, and the assistive module's
+   host section. Self-contained: the rack is styled here rather than borrowing
+   the brain workspace's cassette styles, so this page has no dependency on that
+   stylesheet. */
+
+.lab-page {
+  /* The shell is a flex column, so this is a flex item. Pinning the width keeps
+     it from being sized by its content's min-content — the specimen cards carry
+     nowrap text, which sets a floor wider than a phone screen. */
+  width: 100%;
+  min-width: 0;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 8px 40px 72px;
+}
+
+.lab-head {
+  padding: 18px 0 26px;
+}
+
+.lab-title {
+  margin: 14px 0 10px;
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: 1.08;
+  color: var(--ink);
+}
+
+.lab-title .dot {
+  color: var(--accent);
+}
+
+.lab-lead {
+  max-width: 68ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-mute);
+}
+
+/* ── Specimen rack ────────────────────────────────────────────────────── */
+.lab-rack {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.lab-card {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+  padding: 10px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lab-card:hover {
+  border-color: var(--ink);
+  background: var(--paper-warm);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 20, 15, 0.06);
+}
+
+.lab-card.is-selected {
+  background: var(--paper-warm);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(237, 111, 92, 0.12);
+}
+
+.lab-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--line);
+}
+
+.lab-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lab-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.lab-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+/* Flex children default to min-width:auto, so nowrap text sets a min-content
+   floor and the ellipsis never engages. Needed at every level of the card. */
+.lab-card-meta > *,
+.lab-card-body > * {
+  min-width: 0;
+}
+
+.lab-plate {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+}
+
+.lab-site {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lab-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lab-sub {
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Upload ───────────────────────────────────────────────────────────── */
+.lab-upload {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-bottom: 26px;
+}
+
+.lab-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  border: 1px dashed var(--ink-mute, #b2bec3);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.lab-upload-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lab-upload-btn input {
+  display: none;
+}
+
+.lab-upload-error {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--accent);
+}
+
+.lab-idle {
+  padding: 34px 22px;
+  border: 1px dashed var(--ink-mute, #b2bec3);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--ink-mute);
+  font-size: 0.9rem;
+}
+
+.lab-foot {
+  /* Carries a long filesystem path — an unbreakable token sets a min-content
+     wider than a phone screen, which is what pushed the page into overflow. */
+  overflow-wrap: anywhere;
+  margin-top: 34px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .lab-page {
+    padding: 8px 20px 56px;
+  }
+
+  .lab-rack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

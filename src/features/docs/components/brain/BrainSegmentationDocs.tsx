@@ -14,14 +14,24 @@ export const BrainSegmentationDocs: React.FC = () => {
       <div className="boilerplate-card">
         <p className="boilerplate-copy">
           Segmentation runs only when the classifier returns a tumour class — a Normal prediction short-circuits it in
-          either prompt mode. Two modes are selectable per run. In the default <strong>heatmap box</strong> mode the
-          classifier's <strong>Grad-CAM</strong> activation map is thresholded into a bounding box, and that box is the
-          prompt handed to <strong>LiteMedSAM</strong> (TinyViT-256 image encoder + SAM prompt encoder + mask decoder) at
-          a 256×256 input resolution. In <strong>raw</strong> mode nothing is passed to the prompt encoder at all, so the
-          mask decoder works from the image embedding alone — the unprompted arm of the ablation. In both modes the
-          decoder returns a single binary mask, composited over the source scan in the coral accent, though unprompted
-          it comes back empty on the released weights. A dense mask prompt is accepted by the prompt encoder but returns
-          an empty prediction with those same weights, so it is never sent.
+          either prompt mode. Two modes exist at the API level. In <strong>heatmap box</strong> mode the classifier's{' '}
+          <strong>Grad-CAM</strong> activation map is thresholded into a bounding box, and that box is the prompt handed
+          to <strong>LiteMedSAM</strong> (TinyViT-256 image encoder + SAM prompt encoder + mask decoder) at a 256×256
+          input resolution. In <strong>raw</strong> mode nothing is passed to the prompt encoder at all, so the mask
+          decoder works from the image embedding alone — the unprompted arm of the ablation. In both modes the decoder
+          returns a single binary mask, composited over the source scan in the coral accent, though unprompted it comes
+          back empty on the released weights. A dense mask prompt is accepted by the prompt encoder but returns an empty
+          prediction with those same weights, so it is never sent.
+        </p>
+        <p className="boilerplate-copy">
+          <strong>The automated path is no longer wired into the workspace.</strong> It measured 0.3134 mean Dice
+          against ground truth, because the CAM-derived box overlaps the lesion at only 0.123 IoU — the decoder was
+          never the bottleneck, the prompt was. The Run button is therefore classification-only, and the prompt-mode
+          toggle has been removed. Segmentation now lives in the{' '}
+          <strong>Experimental Laboratory</strong>, where the clinician supplies the prompt and the same decoder reaches
+          a median Dice of 0.917. The endpoints below are unchanged and still serve the automated path, ready for the
+          retrained model. The engine is isolated at{' '}
+          <code>backend/app/organs/brain/segmentation/experimental_lab/</code>.
         </p>
         <p className="boilerplate-copy">
           Two variants were trialled and <strong>reverted</strong>, and both are documented here because they are the

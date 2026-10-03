@@ -22,6 +22,12 @@ export interface DiagnosticThinkingHUDProps {
    */
   readonly isVisible: boolean
   readonly classCountLabel?: string
+  /**
+   * Which pipeline is running. Drives the phase wording and the step track so
+   * the HUD never claims work that is not happening — the classifier run has a
+   * Grad-CAM stage, the assistive segmentation run does not.
+   */
+  readonly task?: 'classification' | 'segmentation'
 }
 
 /** Must match the opacity transition on `.diagnostic-hud-fullscreen-backdrop`. */
@@ -106,6 +112,7 @@ function drawOrbFrame(
 export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
   isVisible,
   classCountLabel = '4 classes',
+  task = 'classification',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const animFrameRef = useRef<number>(0)
@@ -267,15 +274,17 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
   const secs = (elapsedSec % 60).toFixed(1)
   const timeFormatted = `${String(mins).padStart(2, '0')}:${secs.padStart(4, '0')}s`
 
-  // Phase headline — plain language, no jargon
+  // Phase headline — plain language, no jargon, and only the stages that this
+  // task actually runs.
+  const isSeg = task === 'segmentation'
   let phaseTitle = 'Analyzing scan'
-  let phaseSubtitle = 'Classifying the MRI'
+  let phaseSubtitle = isSeg ? 'Reading the marked region' : 'Classifying the MRI'
   if (activePhase === 'transition') {
     phaseTitle = 'Analyzing scan'
-    phaseSubtitle = 'Preparing segmentation'
+    phaseSubtitle = isSeg ? 'Encoding the prompt' : 'Preparing segmentation'
   } else if (activePhase === 'solving') {
-    phaseTitle = 'Segmenting tumour'
-    phaseSubtitle = 'Tracing the tumour boundary'
+    phaseTitle = isSeg ? 'Segmenting the mark' : 'Segmenting tumour'
+    phaseSubtitle = isSeg ? 'Tracing the boundary inside it' : 'Tracing the tumour boundary'
   }
 
   if (stage === 'hidden') return null
@@ -327,7 +336,7 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
           <div className="tracker-divider" />
           <div className={`tracker-step ${elapsedSec >= 1.5 ? 'active' : ''}`}>
             <span className="step-num">02</span>
-            <span className="step-label">Grad-CAM</span>
+            <span className="step-label">{isSeg ? 'Prompt' : 'Grad-CAM'}</span>
           </div>
           <div className="tracker-divider" />
           <div className={`tracker-step ${elapsedSec >= 3.0 ? 'active' : ''}`}>
@@ -339,7 +348,7 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
         {/* Footer Meta */}
         <div className="hud-card-footer">
           <span className="footer-target">
-            EVALUATING: <strong>{classCountLabel}</strong>
+            {isSeg ? 'RUNNING' : 'EVALUATING'}: <strong>{classCountLabel}</strong>
           </span>
         </div>
       </div>

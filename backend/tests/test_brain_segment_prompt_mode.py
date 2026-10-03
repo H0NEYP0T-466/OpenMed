@@ -19,7 +19,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from app.organs.brain.segmentation import router as seg_router
+from app.organs.brain.segmentation.experimental_lab import router as seg_router
 
 
 def _jpeg_bytes(seed: int = 0, size: int = 288) -> bytes:

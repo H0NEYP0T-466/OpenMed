@@ -198,30 +198,68 @@ a.brand {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-.om-menu {
-  position: absolute;
-  top: calc(100% + 8px);
+/* Sidebar — slides in from the left edge. Kept mounted and moved with a
+   transform so the exit animation plays; `visibility` takes it out of the tab
+   order and the accessibility tree while closed. */
+.om-sidebar {
+  position: fixed;
+  top: 0;
   left: 0;
-  z-index: 200;
-  min-width: 252px;
+  z-index: 300;
+  width: min(320px, 84vw);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 84px 14px 22px;
   background: var(--bone);
-  border: 1px solid var(--line-soft);
-  border-radius: 16px;
-  box-shadow: 0 30px 60px -30px rgba(21, 20, 15, 0.35),
-  inset 0 0 0 1px rgba(21, 20, 15, 0.05);
-  padding: 8px;
-  animation: om-menu-drop 0.18s ease-out;
+  border-right: 1px solid var(--line-soft);
+  box-shadow: 24px 0 60px -30px rgba(21, 20, 15, 0.35);
+  transform: translateX(-102%);
+  visibility: hidden;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.28s;
 }
 
-@keyframes om-menu-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.om-sidebar.is-open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.om-sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 12px;
+}
+
+.om-sidebar-title {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.om-sidebar-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line-soft);
+}
+
+.om-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.om-sidebar-foot {
+  margin-top: auto;
+  padding: 14px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--line-soft);
 }
 
 .om-menu-item {

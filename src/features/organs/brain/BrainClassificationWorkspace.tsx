@@ -9,12 +9,10 @@ import {
 import { RomanSection } from '../../../components/common/RomanSection'
 import { ThinkingOrb, DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import { BrainRegionViewer } from './BrainRegionViewer'
-import { analyzeBrainImage, getBrainHealth, getBrainModelInfo, segmentByBox, segmentByClick } from './brainApi'
-import type {
-  BrainModelInfo,
-  BrainSegmentationResult,
-  ClickSegmentationResult,
-} from './brainTypes'
+import { classifyBrainImage, getBrainHealth, getBrainModelInfo } from './brainApi'
+import type { BrainModelInfo, BrainClassificationResult } from './brainTypes'
+import { SPECIMEN_PRESETS } from './specimenPresets'
+import type { SpecimenPreset } from './specimenPresets'
 import { TUMOR_DATA } from './tumorData'
 import type { OrganMetadata, Hotspot } from '../../../types/organ'
 import './BrainClassificationWorkspace.css'
@@ -24,86 +22,6 @@ export interface BrainClassificationWorkspaceProps {
   readonly activeHotspot?: Hotspot | null
   readonly onSelectHotspot?: (hotspot: Hotspot | null) => void
 }
-
-interface SpecimenPreset {
-  readonly plate: string
-  readonly name: string
-  readonly path: string
-  readonly subtitle: string
-  readonly site: string
-}
-
-/**
- * One specimen per class in the classifier's 9-class label space, so every
- * class can be exercised from the cassette rack. Each plate is a real MRI
- * pulled from backend/datasets/brain/<class>/ — the subtitle and site come
- * from that series' own clinical filename, not from invented values.
- */
-const SPECIMEN_PRESETS: readonly SpecimenPreset[] = [
-  {
-    plate: 'Pl. A',
-    name: 'Germ Cell Tumors',
-    path: '/samples/brain/GermCellTumors.jpg',
-    subtitle: 'Pineal Germinoma',
-    site: 'Pineal Region / Ventricle',
-  },
-  {
-    plate: 'Pl. B',
-    name: 'Gliomas',
-    path: '/samples/brain/Gliomas.jpg',
-    subtitle: 'Cystic Glioblastoma',
-    site: 'Occipital / Ventricle',
-  },
-  {
-    plate: 'Pl. C',
-    name: 'Medulloblastoma',
-    path: '/samples/brain/Medulloblastoma.jpg',
-    subtitle: 'Desmoplastic Medulloblastoma',
-    site: 'Posterior Fossa / Cerebellum',
-  },
-  {
-    plate: 'Pl. D',
-    name: 'Meningothelial Tumors',
-    path: '/samples/brain/MeningothelialTumors.jpg',
-    subtitle: 'Angiomatous Meningioma',
-    site: 'Anterior Cranial Fossa / Frontal',
-  },
-  {
-    plate: 'Pl. E',
-    name: 'Mesenchymal (Non-Meningothelial)',
-    path: '/samples/brain/Mesenchymal.jpg',
-    subtitle: 'Dural Solitary Fibrous Tumor',
-    site: 'Parafalcine / Falx',
-  },
-  {
-    plate: 'Pl. F',
-    name: 'Mixed Neuronal & Neuronal-Glial',
-    path: '/samples/brain/MixedNeuronal.jpg',
-    subtitle: 'Central Neurocytoma',
-    site: 'Intraventricular / Ventricle',
-  },
-  {
-    plate: 'Pl. G',
-    name: 'Normal',
-    path: '/samples/brain/Normal.jpg',
-    subtitle: 'No Tumour Detected',
-    site: 'Whole Brain',
-  },
-  {
-    plate: 'Pl. H',
-    name: 'Pituitary',
-    path: '/samples/brain/Pituitary.jpg',
-    subtitle: 'Pituitary Tumour',
-    site: 'Sellar Region',
-  },
-  {
-    plate: 'Pl. I',
-    name: 'Schwannoma',
-    path: '/samples/brain/Schwannoma.jpg',
-    subtitle: 'Acoustic Schwannoma',
-    site: 'Cerebellopontine Angle',
-  },
-]
 
 type DossierViewMode = 'all' | 'diagnostic' | 'anatomical'
 
@@ -120,38 +38,11 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [result, setResult] = useState<BrainSegmentationResult | null>(null)
+  const [result, setResult] = useState<BrainClassificationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [apiReady, setApiReady] = useState<boolean>(false)
   const [modelInfo, setModelInfo] = useState<BrainModelInfo | null>(null)
   const [serviceDetail, setServiceDetail] = useState<string | null>(null)
-  /**
-   * Whether LiteMedSAM is prompted with the Grad-CAM heatmap. On (default) the
-   * heatmap is reduced to a bounding box and used as the prompt; off sends no
-   * prompt at all. Classification and the Normal-skips-segmentation rule are
-   * unaffected by this switch.
-   */
-  const [useHeatmapPrompt, setUseHeatmapPrompt] = useState<boolean>(true)
-  /**
-   * Assistive path: the clinician marks the lesion (a click that becomes a
-   * small box, or a box they draw themselves) and that mark becomes the prompt
-   * for LiteMedSAM. Kept separate from the automated result so the two can be
-   * compared side by side.
-   */
-  const [promptResult, setPromptResult] = useState<ClickSegmentationResult | null>(null)
-  const [isPromptSegmenting, setIsPromptSegmenting] = useState(false)
-  const [promptError, setPromptError] = useState<string | null>(null)
-  const [promptMode, setPromptMode] = useState<'click' | 'draw'>('click')
-  /**
-   * Draw start kept in a ref, not state: pointermove fires faster than React
-   * commits, and a handler reading stale state would drop moves and sometimes
-   * see no start at all. Only the rectangle itself needs to be state, since
-   * that is what renders.
-   */
-  const drawStartRef = useRef<{ x: number; y: number } | null>(null)
-  const [drawRect, setDrawRect] = useState<
-    { x1: number; y1: number; x2: number; y2: number } | null
-  >(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -237,7 +128,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
     setIsAnalyzing(true)
     setError(null)
     try {
-      const res = await analyzeBrainImage(file, { useHeatmapPrompt })
+      const res = await classifyBrainImage(file)
       setResult(res)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Inference failed.'
@@ -250,103 +141,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const tumorInfo = result?.tumor_type ? TUMOR_DATA[result.tumor_type] : null
   const profile = organ?.clinicalProfile
 
-  /**
-   * A new scan invalidates everything computed from the previous one — the
-   * automated analysis and any interactive prompt result alike, since both were
-   * answers about a different image.
-   */
+  /** A new scan invalidates the previous answer, so it is cleared. */
   const resetResults = () => {
     setResult(null)
-    setPromptResult(null)
-    setPromptError(null)
-    drawStartRef.current = null
-    setDrawRect(null)
-  }
-
-  const normPos = (e: React.PointerEvent<HTMLImageElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    return {
-      x: Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)),
-      y: Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height)),
-    }
-  }
-
-  /** Click mode: the click becomes a small box prompt. */
-  const handleClickSegment = async (e: React.MouseEvent<HTMLImageElement>) => {
-    if (!file || isPromptSegmenting || promptMode !== 'click') return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const clickX = (e.clientX - rect.left) / rect.width
-    const clickY = (e.clientY - rect.top) / rect.height
-    if (clickX < 0 || clickX > 1 || clickY < 0 || clickY > 1) return
-
-    setIsPromptSegmenting(true)
-    setPromptError(null)
-    try {
-      const res = await segmentByClick(file, { clickX, clickY })
-      setPromptResult(res)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Click segmentation failed.'
-      setPromptError(msg)
-    } finally {
-      setIsPromptSegmenting(false)
-    }
-  }
-
-  /** Draw mode: drag a rectangle around the lesion; the rectangle is the prompt. */
-  const submitDrawnBox = async (rect: {
-    x1: number
-    y1: number
-    x2: number
-    y2: number
-  }) => {
-    if (!file || isPromptSegmenting) return
-    setIsPromptSegmenting(true)
-    setPromptError(null)
-    try {
-      const res = await segmentByBox(file, {
-        x1: rect.x1,
-        y1: rect.y1,
-        x2: rect.x2,
-        y2: rect.y2,
-      })
-      setPromptResult(res)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Box segmentation failed.'
-      setPromptError(msg)
-    } finally {
-      setIsPromptSegmenting(false)
-    }
-  }
-
-  const handleDrawStart = (e: React.PointerEvent<HTMLImageElement>) => {
-    if (promptMode !== 'draw' || isPromptSegmenting) return
-    e.preventDefault()
-    e.currentTarget.setPointerCapture(e.pointerId)
-    drawStartRef.current = normPos(e)
-    const p = drawStartRef.current
-    setDrawRect({ x1: p.x, y1: p.y, x2: p.x, y2: p.y })
-  }
-
-  const handleDrawMove = (e: React.PointerEvent<HTMLImageElement>) => {
-    const start = drawStartRef.current
-    if (!start) return
-    const p = normPos(e)
-    setDrawRect({ x1: start.x, y1: start.y, x2: p.x, y2: p.y })
-  }
-
-  const handleDrawEnd = (e: React.PointerEvent<HTMLImageElement>) => {
-    const start = drawStartRef.current
-    if (!start) return
-    drawStartRef.current = null
-    const p = normPos(e)
-    const rect = { x1: start.x, y1: start.y, x2: p.x, y2: p.y }
-    setDrawRect(rect)
-    // Ignore accidental clicks in draw mode — a real drag has some extent.
-    if (Math.abs(rect.x2 - rect.x1) < 0.03 || Math.abs(rect.y2 - rect.y1) < 0.03) {
-      setDrawRect(null)
-      return
-    }
-    void submitDrawnBox(rect)
   }
 
   const classCount = modelInfo?.num_classes ?? null
@@ -354,37 +151,14 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const classCountLabel = classCount === null ? 'classes' : `${classCount} classes`
   const inputLabel = modelInfo?.input_size ?? 'model-native'
 
-  /**
-   * Prompt mode the *last run* actually used, read from the response rather
-   * than the switch — so a result is never labelled with a mode it did not run
-   * in. Toggling the switch does not relabel an existing result.
-   */
-  const ranPromptMode = result?.prompt_mode ?? null
-  const ranHeatmapPrompt = ranPromptMode === 'heatmap_box'
-  const ranPromptLabel =
-    ranPromptMode === 'heatmap_box'
-      ? 'Heatmap box prompt'
-      : ranPromptMode === 'raw'
-        ? 'Raw · no prompt'
-        : '—'
-
-  /**
-   * A mask came back but contains no foreground pixels. The model ran and found
-   * nothing — not the same as "no mask produced", and without this the UI would
-   * show an entirely black tile with no explanation.
-   */
-  const emptyMask =
-    result?.segmentation_performed === true &&
-    result.seg_mask_base64 != null &&
-    result.mask_foreground_px === 0
 
   // Total sections count depends on whether inference results are loaded and view mode
   const totalSections =
     viewMode === 'all'
-      ? (result ? 9 : 4)
+      ? (result ? 8 : 4)
       : viewMode === 'anatomical'
         ? 3
-        : (result ? 6 : 1)
+        : (result ? 5 : 1)
 
   return (
     <article className="organ-essay brain-master-dossier">
@@ -597,49 +371,11 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       />
                     </div>
 
-                    {/* Segmentation prompt mode. Decides what LiteMedSAM is
-                        prompted with — it does not touch classification, and a
-                        "Normal" prediction still skips segmentation entirely. */}
-                    <div className="prompt-mode-strip">
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={useHeatmapPrompt}
-                        aria-label="Prompt LiteMedSAM with the Grad-CAM heatmap"
-                        className={`prompt-toggle ${useHeatmapPrompt ? 'is-on' : 'is-off'}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setUseHeatmapPrompt((v) => !v)
-                        }}
-                        disabled={isAnalyzing}
-                      >
-                        <span className="prompt-toggle-track" aria-hidden="true">
-                          <span className="prompt-toggle-knob" />
-                        </span>
-                        <span className="prompt-toggle-copy">
-                          <span className="prompt-toggle-title">Heatmap prompt</span>
-                          <span className="prompt-toggle-sub">
-                            {useHeatmapPrompt
-                              ? 'Grad-CAM box → LiteMedSAM prompt'
-                              : 'No prompt — LiteMedSAM runs raw'}
-                          </span>
-                        </span>
-                      </button>
-
-                      <span
-                        className={`prompt-toggle-state ${useHeatmapPrompt ? 'is-on' : 'is-off'}`}
-                        title="Prompt mode the next run will use"
-                      >
-                        {useHeatmapPrompt ? 'ON' : 'OFF'}
-                      </span>
-                    </div>
-
                     <div className="film-action-bar">
                       <div className="film-meta-copy">
                         <span className="meta-title">{file?.name ?? 'Loaded Specimen'}</span>
                         <span className="meta-sub">
-                          Input tensor resolved to {inputLabel} · Model ready for {classLabel} evaluation ·
-                          Seg prompt: {useHeatmapPrompt ? 'heatmap box' : 'raw (none)'}
+                          Input tensor resolved to {inputLabel} · Model ready for {classLabel} evaluation
                         </span>
                       </div>
 
@@ -657,7 +393,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                             {isAnalyzing ? (
                               <>
                                 <ThinkingOrb mode="hybrid" size={24} theme="dark" speed={1.3} className="btn-inline-orb" />
-                                {`Evaluating ${classCountLabel} & Contouring…`}
+                                {`Evaluating ${classCountLabel}…`}
                               </>
                             ) : (
                               <>
@@ -683,185 +419,6 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
 
               {error && <div className="lightbox-error-banner">{error}</div>}
 
-              {/* ── Assistive click-to-segment ────────────────────────
-                  Available as soon as a scan is mounted: the clinician clicks
-                  the suspicious region, that click becomes a small box prompt
-                  for LiteMedSAM, and no classification pass runs on the way.
-                  This is the assistive interaction — it deliberately does not
-                  require the automated analysis to have been run first. */}
-              {previewUrl && file && (
-                <div className="click-seg-block">
-                  <div className="click-seg-head">
-                    <span className="click-seg-title">Assistive Segmentation</span>
-                    <span className="click-seg-sub">
-                      {promptMode === 'click'
-                        ? 'Click the suspicious region on the scan below — the click becomes the prompt.'
-                        : 'Drag a box around the suspicious region — the box itself is the prompt.'}{' '}
-                      Runs without a classification pass.
-                    </span>
-                    <div className="prompt-mode-switch" role="group" aria-label="Prompt mode">
-                      <button
-                        type="button"
-                        className={promptMode === 'click' ? 'active' : ''}
-                        onClick={() => {
-                          setPromptMode('click')
-                          drawStartRef.current = null
-                          setDrawRect(null)
-                        }}
-                      >
-                        Click
-                      </button>
-                      <button
-                        type="button"
-                        className={promptMode === 'draw' ? 'active' : ''}
-                        onClick={() => setPromptMode('draw')}
-                      >
-                        Draw box
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="click-seg-plates">
-                    <div className={`scan-frame click-frame ${isPromptSegmenting ? 'busy' : ''}`}>
-                      <img
-                        src={previewUrl}
-                        alt="Mark a region to segment"
-                        className="click-target"
-                        draggable={false}
-                        style={{ touchAction: 'none' }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          void handleClickSegment(e)
-                        }}
-                        onPointerDown={handleDrawStart}
-                        onPointerMove={handleDrawMove}
-                        onPointerUp={handleDrawEnd}
-                      />
-                      {drawRect && (
-                        <div
-                          className="draw-rect"
-                          style={{
-                            left: `${Math.min(drawRect.x1, drawRect.x2) * 100}%`,
-                            top: `${Math.min(drawRect.y1, drawRect.y2) * 100}%`,
-                            width: `${Math.abs(drawRect.x2 - drawRect.x1) * 100}%`,
-                            height: `${Math.abs(drawRect.y2 - drawRect.y1) * 100}%`,
-                          }}
-                        />
-                      )}
-                      {promptResult?.prompt_mode === 'click_box' && promptResult.click && (
-                        <span
-                          className="click-marker"
-                          style={{
-                            left: `${(promptResult.click[0] / 255) * 100}%`,
-                            top: `${(promptResult.click[1] / 255) * 100}%`,
-                          }}
-                        />
-                      )}
-                      {isPromptSegmenting && (
-                        <span className="click-busy">
-                          <ThinkingOrb mode="hybrid" size={30} theme="dark" speed={1.2} />
-                          <span>Segmenting…</span>
-                        </span>
-                      )}
-                      {/* Full-screen thinking overlay — same treatment as
-                          the Run EfficientNetV2-B2 button. */}
-                      <DiagnosticThinkingHUD
-                        isVisible={isPromptSegmenting}
-                        classCountLabel="assistive segmentation"
-                      />
-                      <span className="scan-tag">
-                        {promptMode === 'click'
-                          ? promptResult?.prompt_mode === 'click_box'
-                            ? 'Clicked region'
-                            : 'Click the lesion'
-                          : drawRect
-                            ? 'Drawn box'
-                            : 'Drag to draw a box'}
-                      </span>
-                    </div>
-
-                    <div className="scan-frame">
-                      {promptResult?.seg_mask_base64 ? (
-                        <img
-                          src={promptResult.seg_mask_base64}
-                          alt="Prompted segmentation mask"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div className="seg-empty-plate">
-                          {promptMode === 'click' ? 'Click the scan' : 'Drag a box'} to produce a
-                          mask
-                        </div>
-                      )}
-                      <span className="scan-tag highlight">
-                        {promptMode === 'click' ? 'Click box' : 'Drawn box'} · mask
-                      </span>
-                    </div>
-
-                    <div className="scan-frame">
-                      {promptResult?.seg_overlay_base64 ? (
-                        <img
-                          src={promptResult.seg_overlay_base64}
-                          alt="Prompted segmentation overlay"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div className="seg-empty-plate">No overlay yet</div>
-                      )}
-                      <span className="scan-tag highlight">
-                        {promptMode === 'click' ? 'Click box' : 'Drawn box'} · overlay
-                      </span>
-                    </div>
-                  </div>
-
-                  {promptError && <div className="lightbox-error-banner">{promptError}</div>}
-
-                  {promptResult && (
-                    <div className="seg-metadata-strip">
-                      <span className="seg-meta-chip prompt-chip is-heatmap">
-                        <span className="k">Prompt mode</span>
-                        <span className="v">
-                          {promptResult.prompt_mode === 'click_box' ? 'Click box' : 'Drawn box'}
-                        </span>
-                      </span>
-                      {promptResult.prompt_mode === 'click_box' && promptResult.click && (
-                        <span className="seg-meta-chip">
-                          <span className="k">Click (256²)</span>
-                          <span className="v">
-                            {promptResult.click.map((c) => c.toFixed(0)).join(', ')}
-                          </span>
-                        </span>
-                      )}
-                      <span className="seg-meta-chip">
-                        <span className="k">Box side</span>
-                        <span className="v">
-                          {`${Math.round(promptResult.box_coords[2] - promptResult.box_coords[0])} × ${Math.round(
-                            promptResult.box_coords[3] - promptResult.box_coords[1],
-                          )} px`}
-                        </span>
-                      </span>
-                      <span className="seg-meta-chip">
-                        <span className="k">Predicted IoU</span>
-                        <span className="v">{promptResult.iou_pred?.toFixed(3) ?? '—'}</span>
-                      </span>
-                      <span className="seg-meta-chip">
-                        <span className="k">Mask foreground</span>
-                        <span className="v">
-                          {promptResult.mask_foreground_px == null
-                            ? '—'
-                            : `${promptResult.mask_foreground_px.toLocaleString()} px`}
-                        </span>
-                      </span>
-                      <span className="seg-meta-chip">
-                        <span className="k">Response</span>
-                        <span className="v">{promptResult.total_ms?.toFixed(0)} ms</span>
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
             </RomanSection>
 
             {/* Diagnostic Inference Results (When Evaluated) */}
@@ -963,116 +520,9 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 </RomanSection>
 
-                {/* VII - Segmentio / LiteMedSAM */}
-                <RomanSection
-                  index={viewMode === 'all' ? 6 : 3}
-                  of={totalSections}
-                  title="Segmentio - LiteMedSAM Promptable Segmentation"
-                  className="sp12"
-                >
-                  {result.segmentation_performed ? (
-                    <>
-                      <p className="sec-hint">
-                        Model: LiteMedSAM (TinyViT-256) · Input: 256×256 ·{' '}
-                        {ranHeatmapPrompt
-                          ? 'Prompted by the Grad-CAM heatmap above — the bounding box around its activation is the prompt. LiteMedSAM’s released weights segment from boxes, so the box prompt is used directly.'
-                          : 'Run with no prompt at all: the prompt encoder received no box, no points and no mask, so the decoder worked from the image embedding alone. Classification is identical to the prompted run — only the segmentation prompt differs.'}
-                      </p>
-
-                      <div className="seg-metadata-strip">
-                        <span
-                          className={`seg-meta-chip prompt-chip ${ranHeatmapPrompt ? 'is-heatmap' : 'is-raw'}`}
-                        >
-                          <span className="k">Prompt mode</span>
-                          <span className="v">{ranPromptLabel}</span>
-                        </span>
-                        <span className="seg-meta-chip">
-                          <span className="k">Predicted IoU</span>
-                          <span className="v">{result.iou_pred?.toFixed(3) ?? '—'}</span>
-                        </span>
-                        {ranHeatmapPrompt && (
-                          <span className="seg-meta-chip">
-                            <span className="k">Box coords (256²)</span>
-                            <span className="v">
-                              {result.box_coords
-                                ? result.box_coords.map((c) => c.toFixed(0)).join(', ')
-                                : '—'}
-                            </span>
-                          </span>
-                        )}
-                        <span className="seg-meta-chip">
-                          <span className="k">Mask foreground</span>
-                          <span className="v">
-                            {result.mask_foreground_px == null
-                              ? '—'
-                              : `${result.mask_foreground_px.toLocaleString()} px`}
-                          </span>
-                        </span>
-                        <span className="seg-meta-chip">
-                          <span className="k">Segment step</span>
-                          <span className="v">{result.total_ms?.toFixed(0)} ms</span>
-                        </span>
-                      </div>
-
-                      {emptyMask && (
-                        <div className="seg-empty-mask-banner" role="status">
-                          <span className="seg-empty-mask-title">Empty mask</span>
-                          <span className="seg-empty-mask-copy">
-                            The model ran and returned zero foreground pixels. This is a
-                            result, not a rendering fault
-                            {!ranHeatmapPrompt
-                              ? ' — an unprompted LiteMedSAM forward routinely finds nothing, because the released weights only ever learned to segment from a box.'
-                              : '.'}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="scan-plate-triple">
-                        {previewUrl && (
-                          <div className="scan-frame">
-                            <img src={previewUrl} alt="Source MRI Scan" loading="lazy" decoding="async" />
-                            <span className="scan-tag">Source MRI</span>
-                          </div>
-                        )}
-                        <div className="scan-frame">
-                          {result.seg_mask_base64 ? (
-                            <img
-                              src={result.seg_mask_base64}
-                              alt={`Segmentation mask (${ranPromptLabel})`}
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          ) : (
-                            <div className="seg-empty-plate">No mask produced</div>
-                          )}
-                          <span className="scan-tag highlight">{ranPromptLabel} · mask</span>
-                        </div>
-                        <div className="scan-frame">
-                          {result.seg_overlay_base64 ? (
-                            <img
-                              src={result.seg_overlay_base64}
-                              alt={`Segmentation overlay on MRI (${ranPromptLabel})`}
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          ) : (
-                            <div className="seg-empty-plate">No overlay produced</div>
-                          )}
-                          <span className="scan-tag highlight">{ranPromptLabel} · overlay</span>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="seg-skipped-banner" role="status">
-                      {result.segmentation_skipped_reason ??
-                        'Segmentation was not performed on this scan.'}
-                    </div>
-                  )}
-                </RomanSection>
-
                 {/* VIII - Locus Anatomical Site */}
                 <RomanSection
-                  index={viewMode === 'all' ? 7 : 4}
+                  index={viewMode === 'all' ? 6 : 3}
                   of={totalSections}
                   title="Locus - Typical Presentation Sites & Approximate Centroid"
                   className="sp7"
@@ -1086,7 +536,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
 
                 {/* IX - Monograph */}
                 <RomanSection
-                  index={viewMode === 'all' ? 8 : 5}
+                  index={viewMode === 'all' ? 7 : 4}
                   of={totalSections}
                   title="Monograph - Clinical Tumor Dossier"
                   className="sp5"

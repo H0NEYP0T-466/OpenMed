@@ -20,12 +20,12 @@ import pytest
 import torch
 from PIL import Image
 
-from app.organs.brain.segmentation import prepare_weights
-from app.organs.brain.segmentation.pipeline import (
+from app.organs.brain.segmentation.experimental_lab import prepare_weights
+from app.organs.brain.segmentation.experimental_lab.pipeline import (
     BrainSegmentationPipeline,
     SegmentationUnavailableError,
 )
-from app.organs.brain.segmentation.preprocessor import (
+from app.organs.brain.segmentation.experimental_lab.preprocessor import (
     MEDSAM_INPUT_SIZE,
     heatmap_to_box_prompt,
     heatmap_to_point_label,
@@ -45,7 +45,7 @@ def synthetic_checkpoint(tmp_path_factory) -> str:
     so ``verify_checkpoint`` and ``BrainSegmentationPipeline._load`` treat it
     exactly like the real ``lite_medsam.pth``.
     """
-    from app.organs.brain.segmentation.model import build_medsam_lite
+    from app.organs.brain.segmentation.experimental_lab.model import build_medsam_lite
 
     model = build_medsam_lite()
     path = tmp_path_factory.mktemp("checkpoints") / "lite_medsam.pth"
@@ -389,7 +389,7 @@ def test_drawn_box_clamps_to_the_frame(
 
 
 def test_verify_checkpoint_reports_ready_strict(synthetic_checkpoint: str) -> None:
-    from app.organs.brain.segmentation.model import build_medsam_lite
+    from app.organs.brain.segmentation.experimental_lab.model import build_medsam_lite
 
     # Patch the min-size gate so the small synthetic file passes shape checks.
     prepare_weights.EXPECTED_MIN_BYTES = 0
@@ -484,7 +484,7 @@ def test_segmentation_output_is_capped_for_the_browser(
     resolution, so a large upload produced megabyte-sized base64 payloads that
     made the response heavy and the page scroll janky. Rendered output is now
     downscaled to ``SEG_MAX_SIDE`` on its longest side before encoding."""
-    from app.organs.brain.segmentation.pipeline import SEG_MAX_SIDE
+    from app.organs.brain.segmentation.experimental_lab.pipeline import SEG_MAX_SIDE
 
     big = Image.fromarray(np.full((900, 700, 3), 30, dtype=np.uint8), "RGB")
     pipe = BrainSegmentationPipeline(model_path=synthetic_checkpoint, device="cpu")

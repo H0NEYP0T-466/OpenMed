@@ -19,8 +19,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.organs.brain.classification.router import checkpoint_path
 from app.organs.brain.classification.router import router as brain_router
-from app.organs.brain.segmentation.router import router as brain_seg_router
-from app.organs.brain.segmentation.prepare_weights import default_checkpoint_path as seg_checkpoint_path
+from app.organs.brain.segmentation.experimental_lab.router import router as brain_seg_router
+from app.organs.brain.segmentation.experimental_lab.prepare_weights import default_checkpoint_path as seg_checkpoint_path
 
 # ── Logging Setup ─────────────────────────────────────────────────────────
 

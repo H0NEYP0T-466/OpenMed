@@ -34,10 +34,10 @@ from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
-from ..classification.brain_regions import LOCALIZATION_BASIS, map_prediction_to_3d
-from ..classification.label_space import CLASS_NAMES
-from ..classification.pipeline import BrainClassificationPipeline, ModelUnavailableError
-from ..classification.router import checkpoint_path as classification_checkpoint_path
+from ...classification.brain_regions import LOCALIZATION_BASIS, map_prediction_to_3d
+from ...classification.label_space import CLASS_NAMES
+from ...classification.pipeline import BrainClassificationPipeline, ModelUnavailableError
+from ...classification.router import checkpoint_path as classification_checkpoint_path
 from .pipeline import (
     BrainSegmentationPipeline,
     DEFAULT_CLICK_BOX_PX,

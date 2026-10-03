@@ -1,15 +1,52 @@
 /* LandingPage - hero, six-movements pipeline, department index and
    colophon. Reuses essay/pill classes. */
 
+/* Hero: the type on the left, the body model opposite it. Top-aligned so the
+   headline sits close under the masthead rather than floating down the fold. */
 .lp-hero {
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  max-width: 900px;
-  padding-top: 24px;
-  padding-bottom: 64px;
-  padding-left: 40px;
-  
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+  align-items: start;
+  gap: clamp(24px, 3vw, 48px);
+  max-width: 1180px;
+  padding: 4px 64px 56px 40px;
+}
+
+.lp-hero-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  align-self: start;
+}
+
+/* The model on its own: no plate, no border, no background box — the canvas is
+   transparent and sized to fit the fold. */
+.hero-model {
+  position: relative;
+  width: 100%;
+  height: min(54vh, 440px);
+}
+
+.hero-model canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hero-model-note {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.lp-figure-cta {
+  justify-content: center;
 }
 
 .lp-hero-sub {
@@ -209,6 +246,20 @@ a.lp-pill {
 @media (max-width: 980px) {
   .lp-hero {
     padding-top: 34px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Model first on a narrow screen: it is the frontispiece. */
+  .lp-hero-figure {
+    order: -1;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  /* Shorter on a stacked layout, so the model and the headline share the fold
+     instead of the model eating it. */
+  .hero-model {
+    height: min(38vh, 300px);
   }
 }
 

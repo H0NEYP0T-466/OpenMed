@@ -1819,35 +1819,6 @@
 }
 
 
-/* ── Segmentio (LiteMedSAM) ───────────────────────────────────────────── */
-.seg-metadata-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 0.75rem 0 1.25rem;
-}
-
-.seg-meta-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--ink-mute, #b2bec3);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 0.8rem;
-}
-
-.seg-meta-chip .k {
-  font-weight: 600;
-  color: var(--ink-mute, #b2bec3);
-}
-
-.seg-meta-chip .v {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
 .seg-empty-plate {
   display: grid;
   place-items: center;
@@ -1856,155 +1827,6 @@
   font-size: 0.8rem;
   text-align: center;
   padding: 1rem;
-}
-
-.seg-skipped-banner {
-  padding: 1rem 1.25rem;
-  border: 1px dashed var(--ink-mute, #b2bec3);
-  border-radius: 0.5rem;
-  color: var(--ink-mute, #b2bec3);
-  font-size: 0.9rem;
-}
-
-/* ── Segmentation prompt-mode toggle ──────────────────────────────────── */
-.prompt-mode-strip {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 600px;
-  margin-top: 12px;
-  padding: 10px 14px;
-  background: var(--bone);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-.prompt-toggle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1 1 auto;
-  min-width: 0;
-  padding: 0;
-  background: none;
-  border: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.prompt-toggle:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.prompt-toggle-track {
-  position: relative;
-  flex: 0 0 auto;
-  width: 40px;
-  height: 22px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  transition: background 160ms ease, border-color 160ms ease;
-}
-
-.prompt-toggle-knob {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--ink-faint);
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-.prompt-toggle.is-on .prompt-toggle-track {
-  background: rgba(237, 111, 92, 0.28);
-  border-color: rgba(237, 111, 92, 0.55);
-}
-
-.prompt-toggle.is-on .prompt-toggle-knob {
-  transform: translateX(18px);
-  background: var(--accent);
-}
-
-.prompt-toggle-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.prompt-toggle-title {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.prompt-toggle-sub {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-faint);
-}
-
-.prompt-toggle-state {
-  flex: 0 0 auto;
-  padding: 3px 8px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--ink-faint);
-}
-
-.prompt-toggle-state.is-on {
-  color: var(--accent);
-  border-color: rgba(237, 111, 92, 0.45);
-  background: rgba(237, 111, 92, 0.1);
-}
-
-.prompt-chip.is-heatmap .v {
-  color: var(--accent);
-}
-
-.prompt-chip.is-raw .v {
-  color: var(--ink);
-}
-
-/* ── Assistive click-to-segment ───────────────────────────────────────── */
-.click-seg-block {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px dashed var(--ink-mute, #b2bec3);
-}
-
-.click-seg-head {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 0.9rem;
-}
-
-.click-seg-title {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.02em;
-}
-
-.click-seg-sub {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-faint);
-  line-height: 1.5;
 }
 
 .prompt-mode-switch {
@@ -2044,30 +1866,6 @@
   pointer-events: none;
 }
 
-.click-seg-plates {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.click-frame {
-  position: relative;
-}
-
-.click-frame .click-target {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  cursor: crosshair;
-  display: block;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.click-frame.busy .click-target {
-  opacity: 0.55;
-}
-
 .click-marker {
   position: absolute;
   width: 10px;
@@ -2079,50 +1877,8 @@
   pointer-events: none;
 }
 
-.click-busy {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: rgba(0, 0, 0, 0.28);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: #fff;
-  pointer-events: none;
-}
-
 @media (max-width: 900px) {
   .click-seg-plates {
     grid-template-columns: 1fr;
   }
-}
-
-/* An empty mask is a finding, not a failure — styled as a notice, not an error. */
-.seg-empty-mask-banner {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 0 0 1.25rem;
-  padding: 12px 18px;
-  background: rgba(110, 116, 72, 0.08);
-  border: 1px solid rgba(110, 116, 72, 0.32);
-  border-radius: 6px;
-}
-
-.seg-empty-mask-title {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-.seg-empty-mask-copy {
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--ink-faint);
 }

@@ -2,6 +2,7 @@ import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-d
 import { useEffect } from 'react'
 import { LandingPage } from './features/landing/LandingPage'
 import { OrganDashboard } from './features/organs/OrganDashboard'
+import { ExperimentalLabPage } from './features/lab/ExperimentalLabPage'
 import { EvidencePage } from './features/evidence/EvidencePage'
 import { DocumentationPage } from './features/docs/DocumentationPage'
 
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/app" element={<OrganDashboard />} />
+        <Route path="/lab" element={<ExperimentalLabPage />} />
         <Route path="/evidence" element={<EvidencePage />} />
         <Route path="/docs" element={<DocumentationPage />} />
         <Route path="/documentation" element={<DocumentationPage />} />

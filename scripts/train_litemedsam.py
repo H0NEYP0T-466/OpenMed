@@ -2,7 +2,7 @@
 Fine-tune LiteMedSAM for binary brain-tumour segmentation.
 
 Designed to run on Kaggle, but works anywhere. Preprocessing deliberately
-mirrors ``backend/app/organs/brain/segmentation/preprocessor.py`` so the
+mirrors ``backend/app/organs/brain/segmentation/experimental_lab/preprocessor.py`` so the
 fine-tuned weights see the same input distribution the serving pipeline
 produces:
 
