@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenMed — New Front Page Design Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #efe7d2;
+      --paper-warm: #ece4cf;
+      --paper-dark: #ddd2b6;
+      --bone: #f7f1de;
+      --ink: #15140f;
+      --ink-soft: #2a2620;
+      --ink-mute: #5a5448;
+      --ink-faint: #8b8676;
+      --accent: #ed6f5c;
+      --accent-soft: #f08e7c;
+      --mustard: #e9b94a;
+      --olive: #6e7448;
+
+      --line: rgba(21, 20, 15, 0.2);
+      --line-soft: rgba(21, 20, 15, 0.1);
+      --line-hair: rgba(21, 20, 15, 0.06);
+
+      --font-display: 'Inter Tight', -apple-system, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient paper grain texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 990;
+      pointer-events: none;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.055'/%3E%3C/svg%3E"),
+        radial-gradient(1100px 700px at 12% -8%, rgba(106, 92, 56, 0.06), transparent 60%),
+        radial-gradient(900px 600px at 96% 108%, rgba(106, 92, 56, 0.06), transparent 60%);
+    }
+
+    .serif { font-family: var(--font-serif); font-style: italic; }
+    .mono { font-family: var(--font-mono); }
+    .dot { color: var(--accent); }
+
+    /* Top Sticky Selector */
+    .concept-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(21, 20, 15, 0.94);
+      backdrop-filter: blur(12px);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid rgba(247, 241, 222, 0.15);
+      flex-wrap: wrap;
+    }
+    .concept-label {
+      color: #efe7d2;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .concept-label strong { color: var(--accent); }
+
+    .concept-tabs {
+      display: flex;
+      gap: 10px;
+    }
+    .c-tab {
+      background: rgba(247, 241, 222, 0.08);
+      border: 1px solid rgba(247, 241, 222, 0.16);
+      color: #efe7d2;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .c-tab:hover {
+      background: rgba(247, 241, 222, 0.18);
+    }
+    .c-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Masthead */
+    .masthead {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 72px;
+      padding: 0 64px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 9px;
+      background: var(--bone);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 30px;
+      color: var(--ink);
+    }
+    .brand-word {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 38px;
+      letter-spacing: -0.035em;
+    }
+    .masthead-stats {
+      display: flex;
+      margin-left: auto;
+    }
+    .stat-fig {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px;
+      border-left: 1px solid var(--line-soft);
+    }
+    .stat-fig .fig {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .stat-fig .cap {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* Standard Button */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: transparent;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+    }
+    .btn-primary:hover {
+      background: var(--ink);
+      color: var(--bone);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+    .btn-ghost:hover {
+      border-color: var(--ink);
+    }
+    .lp-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    /* Concept Views */
+    .concept-view {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .concept-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================================================
+       CONCEPT 1: THE ARCHITECTURAL VITRUVIAN SCHEMATIC
+       ========================================================= */
+    .hero-c1 {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 60px 64px 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 480px);
+      align-items: center;
+      gap: 64px;
+    }
+
+    .dossier-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(42px, 4.4vw, 64px);
+      line-height: 1.0;
+      letter-spacing: -0.045em;
+    }
+    .lp-hero-sub {
+      margin: -2px 0 16px;
+      font-size: clamp(21px, 1.9vw, 29px);
+      color: var(--olive);
+    }
+    .dossier-lead {
+      font-size: 16.5px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      max-width: 58ch;
+    }
+
+    /* Architectural Anatomical Illustration (Clean Ink Lines on Paper) */
+    .vitruvian-figure {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vitruvian-card {
+      width: 100%;
+      height: 100%;
+      background: var(--bone);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: inset 0 0 0 1px rgba(21, 20, 15, 0.04);
+    }
+
+    /* Corner markings */
+    .v-corner {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: var(--line);
+    }
+    .v-corner.tl { top: 12px; left: 12px; border-top: 1px solid; border-left: 1px solid; }
+    .v-corner.tr { top: 12px; right: 12px; border-top: 1px solid; border-right: 1px solid; }
+    .v-corner.bl { bottom: 12px; left: 12px; border-bottom: 1px solid; border-left: 1px solid; }
+    .v-corner.br { bottom: 12px; right: 12px; border-bottom: 1px solid; border-right: 1px solid; }
+
+    .v-meta-top {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--line-soft);
+      padding-bottom: 8px;
+    }
+
+    .v-meta-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--line-soft);
+      padding-top: 8px;
+    }
+    .v-meta-bottom strong {
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 13px;
+    }
+
+    /* =========================================================
+       CONCEPT 2: THE OFFICIAL CLINICAL DISPATCH (ARCHIVAL FOLDER)
+       ========================================================= */
+    .hero-c2 {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 60px 64px 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(380px, 480px);
+      align-items: center;
+      gap: 60px;
+    }
+
+    .dispatch-card {
+      background: #faf6ea;
+      border: 1px solid var(--ink);
+      border-radius: 12px;
+      padding: 28px;
+      position: relative;
+      box-shadow: 12px 18px 40px -16px rgba(21, 20, 15, 0.22);
+    }
+
+    /* Wax / red seal stamp simulation */
+    .dispatch-seal {
+      position: absolute;
+      top: -16px;
+      right: 24px;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(237, 111, 92, 0.4);
+    }
+
+    .disp-head {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+    .disp-vol {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .disp-title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+
+    .disp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    .disp-table tr {
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .disp-table td {
+      padding: 9px 0;
+    }
+    .disp-table .lbl {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      width: 45%;
+    }
+    .disp-table .val {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--ink);
+      text-align: right;
+    }
+
+    .disp-sign {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .disp-sign-copy {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .disp-cursive {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      color: var(--olive);
+    }
+
+    /* =========================================================
+       CONCEPT 3: BROADSHEET DEPARTMENT DIRECTORY IN HERO
+       ========================================================= */
+    .hero-c3 {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 60px 64px 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(400px, 520px);
+      align-items: center;
+      gap: 60px;
+    }
+
+    .dir-ledger {
+      background: var(--bone);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .dir-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+    .dir-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .dir-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-faint);
+    }
+
+    .dir-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .dir-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 13px;
+      transition: background 0.15s ease;
+    }
+    .dir-row:hover {
+      background: var(--paper-warm);
+    }
+    .dr-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dr-num {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--accent);
+      width: 18px;
+    }
+    .dr-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+    .dr-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .dr-mod {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--ink-faint);
+    }
+    .dr-status {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--olive);
+      border: 1px solid rgba(110, 116, 72, 0.4);
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+    /* Common Sections */
+    .sec-rule {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .sec-rule .roman { font-family: var(--font-serif); font-style: italic; font-size: 16px; color: var(--accent); }
+    .sec-rule .sec-title { flex: 1; margin-left: 12px; font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); }
+    .sec-rule .page-of { font-family: var(--font-display); font-size: 12px; color: var(--ink-faint); }
+
+    .lp-pipeline {
+      max-width: 1260px;
+      margin: 40px auto 0;
+      padding: 20px 64px 6px;
+    }
+    .lp-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .lp-step {
+      background: var(--bone);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .lp-step-top { display: flex; justify-content: space-between; align-items: baseline; }
+    .lp-num { font-size: 28px; color: var(--ink-faint); }
+    .lp-status { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; }
+    .lp-status--live { border: 1px solid rgba(237, 111, 92, 0.45); color: var(--accent); }
+    .lp-status--press { border: 1px solid rgba(110, 116, 72, 0.5); color: var(--olive); }
+    .lp-status--draft { border: 1px solid var(--line-soft); color: var(--ink-faint); }
+    .lp-step-name { margin-top: 8px; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+    .lp-step-term { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; color: var(--ink-faint); margin-top: 2px; }
+    .lp-step-copy { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--ink-mute); }
+
+    .lp-foot {
+      margin-top: 60px;
+      border-top: 1px solid var(--line);
+      background: var(--paper-warm);
+      padding: 32px 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .lp-foot-line { font-size: 14.5px; color: var(--ink-mute); max-width: 60ch; }
+
+    @media (max-width: 980px) {
+      .hero-c1, .hero-c2, .hero-c3 { grid-template-columns: 1fr; gap: 40px; }
+      .masthead, .hero-c1, .hero-c2, .hero-c3, .lp-pipeline, .lp-foot { padding-left: 24px; padding-right: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Concept Switcher -->
+  <aside class="concept-bar">
+    <div class="concept-label">
+      <span>✦ Exploratory Concepts</span>
+      <span>·</span>
+      <strong>Fresh Directions for the Front Page</strong>
+    </div>
+    <div class="concept-tabs">
+      <button class="c-tab active" onclick="showConcept('c1')">
+        Concept 1: Vitruvian Schematic
+      </button>
+      <button class="c-tab" onclick="showConcept('c2')">
+        Concept 2: Clinical Dispatch Folder
+      </button>
+      <button class="c-tab" onclick="showConcept('c3')">
+        Concept 3: Broadside Department Index
+      </button>
+    </div>
+  </aside>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="brand">
+      <div class="brand-mark">Ψ</div>
+      <div class="brand-word">OpenMed<span class="dot">.</span></div>
+    </div>
+    <div class="masthead-stats">
+      <div class="stat-fig">
+        <span class="fig">12</span>
+        <span class="cap">Departments</span>
+      </div>
+      <div class="stat-fig">
+        <span class="fig">2,234</span>
+        <span class="cap">Structures</span>
+      </div>
+      <div class="stat-fig">
+        <span class="fig">99.26%</span>
+        <span class="cap">Validation</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       CONCEPT 1: THE ARCHITECTURAL VITRUVIAN SCHEMATIC
+       ============================================================ -->
+  <main id="c1" class="concept-view active">
+    <section class="hero-c1">
+      <div class="lp-hero-type">
+        <div class="mono" style="font-size:11.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px;">
+          Anatomia Digitalis · First Edition
+        </div>
+        <h1 class="dossier-title">
+          An AI hospital<span class="dot">.</span>
+        </h1>
+        <p class="lp-hero-sub serif">edited like a medical annual</p>
+        <p class="dossier-lead">
+          OpenMed reads scans the way an editor reads copy — twelve organ departments
+          classify, segment, and report on what the image says, then typeset the verdict
+          as a signed dispatch. Every plate in this volume is interactive, every claim
+          carries its benchmark, and every structure is named by Terminologia Anatomica.
+        </p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#app">
+            <span>Open the Atlas</span>
+            <span>↗</span>
+          </a>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('movements-c1').scrollIntoView({behavior:'smooth'})">
+            <span>The consultation, in six movements</span>
+            <span>↓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: High-Craft Vector Anatomical Schematic -->
+      <div class="vitruvian-figure">
+        <div class="vitruvian-card">
+          <span class="v-corner tl"></span>
+          <span class="v-corner tr"></span>
+          <span class="v-corner bl"></span>
+          <span class="v-corner br"></span>
+
+          <div class="v-meta-top">
+            <span>FIG. 01 · CORPUS SCHEMATIC</span>
+            <span>MNI STEREOTACTIC AXIS</span>
+          </div>
+
+          <!-- Delicate Architectural Anatomical Vector -->
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; padding: 10px 0;">
+            <svg viewBox="0 0 320 320" width="280" height="280" fill="none" stroke="currentColor">
+              <!-- Golden Ratio / Harmony Circle & Grid -->
+              <circle cx="160" cy="160" r="130" stroke="rgba(21,20,15,0.12)" stroke-width="1" stroke-dasharray="3 3"/>
+              <circle cx="160" cy="160" r="80" stroke="rgba(21,20,15,0.1)" stroke-width="1"/>
+              <rect x="55" y="55" width="210" height="210" stroke="rgba(21,20,15,0.12)" stroke-width="1"/>
+              
+              <!-- Crosshair Axes -->
+              <line x1="160" y1="20" x2="160" y2="300" stroke="rgba(21,20,15,0.15)" stroke-width="1"/>
+              <line x1="20" y1="160" x2="300" y2="160" stroke="rgba(21,20,15,0.15)" stroke-width="1"/>
+
+              <!-- Stylized Anatomical Wireframe Profile -->
+              <!-- Cranium & Brain Hemisphere -->
+              <path d="M160 52 C185 52 205 72 205 98 C205 116 195 130 180 138 C176 148 174 156 172 165" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M160 52 C135 52 115 72 115 98 C115 116 125 130 140 138 C144 148 146 156 148 165" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/>
+              
+              <!-- Cerebral Cortex Sulci / Gyri Folds -->
+              <path d="M142 80 C150 72 170 72 178 80 C182 85 178 94 170 94 C162 94 158 102 165 106" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round"/>
+              <path d="M135 96 C145 92 152 102 150 112" stroke="rgba(21,20,15,0.4)" stroke-width="1" stroke-linecap="round"/>
+              <path d="M170 115 C178 118 185 110 185 102" stroke="rgba(21,20,15,0.4)" stroke-width="1" stroke-linecap="round"/>
+
+              <!-- Spinal / Thoracic Arborization Lines -->
+              <line x1="160" y1="140" x2="160" y2="270" stroke="var(--accent)" stroke-width="1.5"/>
+              <circle cx="160" cy="140" r="3" fill="var(--accent)"/>
+              <circle cx="160" cy="180" r="3" fill="var(--ink)"/>
+              <circle cx="160" cy="220" r="3" fill="var(--ink)"/>
+              <circle cx="160" cy="260" r="3" fill="var(--ink)"/>
+
+              <!-- Thoracic Rib / Pulmonary Arcs -->
+              <path d="M160 170 C190 170 215 190 215 210" stroke="rgba(21,20,15,0.3)" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M160 170 C130 170 105 190 105 210" stroke="rgba(21,20,15,0.3)" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M160 190 C185 190 205 208 205 225" stroke="rgba(21,20,15,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M160 190 C135 190 115 208 115 225" stroke="rgba(21,20,15,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+
+              <!-- Coordinate Callout Lines -->
+              <line x1="178" y1="80" x2="240" y2="65" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 2"/>
+              <circle cx="240" cy="65" r="2" fill="var(--accent)"/>
+              <text x="246" y="68" font-family="JetBrains Mono" font-size="8" fill="var(--accent)" letter-spacing="0.08em">FMA:9622 · CEREBRUM</text>
+
+              <line x1="215" y1="210" x2="245" y2="230" stroke="rgba(21,20,15,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
+              <circle cx="245" cy="230" r="2" fill="var(--ink-faint)"/>
+              <text x="250" y="233" font-family="JetBrains Mono" font-size="8" fill="var(--ink-faint)">TA2: THORAX</text>
+            </svg>
+          </div>
+
+          <div class="v-meta-bottom">
+            <span>TERMINOLOGIA ANATOMICA 2</span>
+            <strong>2,234 Structures · 14 Systems</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Six movements -->
+    <section class="lp-pipeline" id="movements-c1">
+      <div class="sec-rule">
+        <span class="roman">II</span>
+        <span class="sec-title">The Consultation</span>
+        <span class="page-of">six movements</span>
+      </div>
+      <div class="lp-steps">
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">I</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Paper Intake</h3>
+          <div class="lp-step-term">Lectio</div>
+          <p class="lp-step-copy">A photograph of the handwritten clinic file goes in; structured text comes out.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">II</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Organ Routing</h3>
+          <div class="lp-step-term">Distributio</div>
+          <p class="lp-step-copy">The scan reads itself: a classifier tells you which department owns this image.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">III</span><span class="lp-status lp-status--press">In Press</span></div>
+          <h3 class="lp-step-name">Classification</h3>
+          <div class="lp-step-term">Judicium</div>
+          <p class="lp-step-copy">Twelve organ departments grading pathology — tumour type, stage, severity.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       CONCEPT 2: THE OFFICIAL CLINICAL DISPATCH FOLDER
+       ============================================================ -->
+  <main id="c2" class="concept-view">
+    <section class="hero-c2">
+      <div class="lp-hero-type">
+        <div class="mono" style="font-size:11.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px;">
+          Anatomia Digitalis · First Edition
+        </div>
+        <h1 class="dossier-title">
+          An AI hospital<span class="dot">.</span>
+        </h1>
+        <p class="lp-hero-sub serif">edited like a medical annual</p>
+        <p class="dossier-lead">
+          OpenMed reads scans the way an editor reads copy — twelve organ departments
+          classify, segment, and report on what the image says, then typeset the verdict
+          as a signed dispatch. Every plate in this volume is interactive, every claim
+          carries its benchmark, and every structure is named by Terminologia Anatomica.
+        </p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#app">
+            <span>Open the Atlas</span>
+            <span>↗</span>
+          </a>
+          <button type="button" class="btn btn-ghost">
+            <span>The consultation, in six movements</span>
+            <span>↓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Tactile Archival Medical Dispatch -->
+      <aside class="dispatch-card">
+        <span class="dispatch-seal">CONFIRMED · 99.26%</span>
+        
+        <div class="disp-head">
+          <div class="disp-vol">VOL. 01 · CLINICAL DISPATCH DEPT. 41</div>
+          <div class="disp-title">Consilium Medicum</div>
+        </div>
+
+        <table class="disp-table">
+          <tr>
+            <td class="lbl">Primary Specimen</td>
+            <td class="val">Multi-Organ Cohort (12 Depts)</td>
+          </tr>
+          <tr>
+            <td class="lbl">Inference Pipeline</td>
+            <td class="val">Vision Ensemble + LiteMedSAM</td>
+          </tr>
+          <tr>
+            <td class="lbl">Classification Core</td>
+            <td class="val" style="color:var(--accent);">EfficientNetV2-B2 · 99.26%</td>
+          </tr>
+          <tr>
+            <td class="lbl">Segmentation Prior</td>
+            <td class="val">Dice 0.887 · Peak HD95 9.8px</td>
+          </tr>
+          <tr>
+            <td class="lbl">3D Spatial Grounding</td>
+            <td class="val">BodyParts3D · 2,234 Meshes</td>
+          </tr>
+          <tr>
+            <td class="lbl">Report Standard</td>
+            <td class="val">Signed Dispatch · Clinician Review</td>
+          </tr>
+        </table>
+
+        <div class="disp-sign">
+          <div class="disp-sign-copy">
+            <span>Status: Verified In Press</span><br>
+            <span style="color:var(--ink-faint);">Supervised by N. Noreen</span>
+          </div>
+          <div class="disp-cursive">
+            OpenMed dispatch.
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       CONCEPT 3: BROADSIDE DEPARTMENT DIRECTORY IN HERO
+       ============================================================ -->
+  <main id="c3" class="concept-view">
+    <section class="hero-c3">
+      <div class="lp-hero-type">
+        <div class="mono" style="font-size:11.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px;">
+          Anatomia Digitalis · First Edition
+        </div>
+        <h1 class="dossier-title">
+          An AI hospital<span class="dot">.</span>
+        </h1>
+        <p class="lp-hero-sub serif">edited like a medical annual</p>
+        <p class="dossier-lead">
+          OpenMed reads scans the way an editor reads copy — twelve organ departments
+          classify, segment, and report on what the image says, then typeset the verdict
+          as a signed dispatch. Every plate in this volume is interactive, every claim
+          carries its benchmark, and every structure is named by Terminologia Anatomica.
+        </p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#app">
+            <span>Open the Atlas</span>
+            <span>↗</span>
+          </a>
+          <button type="button" class="btn btn-ghost">
+            <span>The consultation, in six movements</span>
+            <span>↓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Department Ledger Table -->
+      <aside class="dir-ledger">
+        <div class="dir-head">
+          <span class="dir-title">Index of Departments</span>
+          <span class="dir-count">12 Plates Online</span>
+        </div>
+        <div class="dir-rows">
+          <a href="#app?organ=brain" class="dir-row">
+            <div class="dr-left"><span class="dr-num">01</span><span class="dr-name">Brain</span></div>
+            <div class="dr-right"><span class="dr-mod">MRI (Axial T1/T2)</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=heart" class="dir-row">
+            <div class="dr-left"><span class="dr-num">02</span><span class="dr-name">Heart</span></div>
+            <div class="dr-right"><span class="dr-mod">Echo / CT</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=lungs" class="dir-row">
+            <div class="dr-left"><span class="dr-num">03</span><span class="dr-name">Lungs</span></div>
+            <div class="dr-right"><span class="dr-mod">CXR / CT</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=kidney" class="dir-row">
+            <div class="dr-left"><span class="dr-num">04</span><span class="dr-name">Kidney</span></div>
+            <div class="dr-right"><span class="dr-mod">CT Scan</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=liver" class="dir-row">
+            <div class="dr-left"><span class="dr-num">05</span><span class="dr-name">Liver</span></div>
+            <div class="dr-right"><span class="dr-mod">Ultrasound / CT</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=skin" class="dir-row">
+            <div class="dr-left"><span class="dr-num">06</span><span class="dr-name">Skin</span></div>
+            <div class="dr-right"><span class="dr-mod">Dermoscopy</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=eye" class="dr-row">
+            <div class="dr-left"><span class="dr-num">07</span><span class="dr-name">Eye</span></div>
+            <div class="dr-right"><span class="dr-mod">Fundus Photography</span><span class="dr-status">Ready</span></div>
+          </a>
+          <a href="#app?organ=breast" class="dir-row">
+            <div class="dr-left"><span class="dr-num">08</span><span class="dr-name">Breast</span></div>
+            <div class="dr-right"><span class="dr-mod">Mammogram</span><span class="dr-status">Ready</span></div>
+          </a>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="lp-foot">
+    <p class="lp-foot-line">
+      <em class="serif">How many times has AI actually helped a doctor?</em> A verified ledger of the published answers: thirteen clinical disclosures, every number linked to its source.
+    </p>
+    <a class="btn btn-ghost" href="#evidence">
+      <span>Begin reading</span>
+      <span>↗</span>
+    </a>
+  </footer>
+
+  <script>
+    function showConcept(id) {
+      document.querySelectorAll('.concept-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.c-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      const idx = id === 'c1' ? 0 : id === 'c2' ? 1 : 2;
+      document.querySelectorAll('.c-tab')[idx].classList.add('active');
+    }
+  </script>
+</body>
+</html>

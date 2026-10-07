@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenMed — Front Page Design Variants Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #efe7d2;
+      --paper-warm: #ece4cf;
+      --paper-dark: #ddd2b6;
+      --bone: #f7f1de;
+      --ink: #15140f;
+      --ink-soft: #2a2620;
+      --ink-mute: #5a5448;
+      --ink-faint: #8b8676;
+      --accent: #ed6f5c;
+      --accent-soft: #f08e7c;
+      --mustard: #e9b94a;
+      --olive: #6e7448;
+
+      --line: rgba(21, 20, 15, 0.2);
+      --line-soft: rgba(21, 20, 15, 0.1);
+      --line-hair: rgba(21, 20, 15, 0.06);
+
+      --plate: #15140f;
+      --plate-hi: #211d15;
+      --plate-line: rgba(247, 241, 222, 0.16);
+      --plate-line-soft: rgba(247, 241, 222, 0.08);
+      --plate-text: #efe7d2;
+      --plate-mute: rgba(239, 231, 210, 0.55);
+
+      --font-display: 'Inter Tight', -apple-system, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient paper grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      pointer-events: none;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.055'/%3E%3C/svg%3E"),
+        radial-gradient(1100px 700px at 12% -8%, rgba(106, 92, 56, 0.06), transparent 60%),
+        radial-gradient(900px 600px at 96% 108%, rgba(106, 92, 56, 0.06), transparent 60%);
+    }
+
+    .serif { font-family: var(--font-serif); font-style: italic; }
+    .mono { font-family: var(--font-mono); }
+    .dot { color: var(--accent); }
+
+    /* Top Floating Design Switcher */
+    .switcher-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(21, 20, 15, 0.94);
+      backdrop-filter: blur(12px);
+      color: var(--bone);
+      padding: 12px 24px;
+      border-bottom: 1px solid rgba(247, 241, 222, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .switcher-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--plate-mute);
+    }
+    .switcher-title strong { color: var(--bone); }
+
+    .switcher-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: rgba(247, 241, 222, 0.08);
+      border: 1px solid rgba(247, 241, 222, 0.18);
+      color: var(--plate-mute);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover {
+      background: rgba(247, 241, 222, 0.16);
+      color: var(--bone);
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tab-btn .tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    /* Masthead */
+    .masthead {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 72px;
+      padding: 0 64px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 9px;
+      background: var(--bone);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 32px;
+      color: var(--ink);
+    }
+    .brand-word {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 38px;
+      letter-spacing: -0.035em;
+    }
+
+    .masthead-stats {
+      display: flex;
+      margin-left: auto;
+      gap: 0;
+    }
+    .stat-fig {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 22px;
+      border-left: 1px solid var(--line-soft);
+    }
+    .stat-fig .fig {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 22px;
+    }
+    .stat-fig .cap {
+      font-family: var(--font-display);
+      font-size: 10.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* Common typography */
+    .dossier-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(40px, 4.2vw, 62px);
+      line-height: 1.0;
+      letter-spacing: -0.045em;
+      color: var(--ink);
+    }
+    .lp-hero-sub {
+      margin: -2px 0 16px;
+      font-size: clamp(20px, 1.8vw, 28px);
+      color: var(--olive);
+    }
+    .dossier-lead {
+      font-size: 16.5px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      max-width: 58ch;
+    }
+    .lp-overline {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lp-overline::before {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    /* Button styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: transparent;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+    }
+    .btn-primary:hover {
+      background: var(--ink);
+      color: var(--bone);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+    .btn-ghost:hover {
+      border-color: var(--ink);
+    }
+    .lp-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 26px;
+    }
+    .lp-edition {
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* -------------------------------------------------------------
+       VARIANT 1: THE DIAGNOSTIC SPECIMEN CASSETTE (RECOMMENDED)
+       ------------------------------------------------------------- */
+    .variant-container {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .variant-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-v1 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 460px);
+      align-items: center;
+      gap: 56px;
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 56px 64px 32px;
+    }
+
+    /* Dark Plate Cassette */
+    .specimen-cassette {
+      position: relative;
+      background: var(--plate);
+      border: 1px solid var(--plate-line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 24px 60px -20px rgba(21, 20, 15, 0.45);
+      color: var(--plate-text);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Corner brackets */
+    .cassette-brk {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: rgba(247, 241, 222, 0.4);
+      pointer-events: none;
+    }
+    .cassette-brk.tl { top: 8px; left: 8px; border-top: 1px solid; border-left: 1px solid; }
+    .cassette-brk.tr { top: 8px; right: 8px; border-top: 1px solid; border-right: 1px solid; }
+    .cassette-brk.bl { bottom: 8px; left: 8px; border-bottom: 1px solid; border-left: 1px solid; }
+    .cassette-brk.br { bottom: 8px; right: 8px; border-bottom: 1px solid; border-right: 1px solid; }
+
+    .cassette-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--plate-line-soft);
+      padding-bottom: 10px;
+    }
+    .cassette-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .cassette-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--plate-mute);
+    }
+
+    .scan-view-box {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 1 / 1;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scan-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: contrast(1.15) brightness(0.95);
+    }
+
+    /* Reticle / overlay contour simulated */
+    .scan-reticle {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(237, 111, 92, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(237, 111, 92, 0.12) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mix-blend-mode: screen;
+    }
+    .lesion-target {
+      position: absolute;
+      top: 38%;
+      left: 42%;
+      width: 84px;
+      height: 74px;
+      border: 1.5px dashed var(--accent);
+      border-radius: 48% 52% 45% 55% / 50% 48% 52% 50%;
+      box-shadow: 0 0 16px rgba(237, 111, 92, 0.45);
+      animation: pulseContour 3s ease-in-out infinite;
+    }
+    @keyframes pulseContour {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    .lesion-badge {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .cassette-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--plate-line-soft);
+    }
+    .cm-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .cm-label {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--plate-mute);
+    }
+    .cm-val {
+      font-family: var(--font-display);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--bone);
+    }
+    .cm-val.accent { color: var(--accent); }
+
+    .cassette-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 4px;
+    }
+    .cassette-actions {
+      display: flex;
+      width: 100%;
+      gap: 10px;
+    }
+    .btn-cassette {
+      flex: 1;
+      background: rgba(247, 241, 222, 0.1);
+      border: 1px solid var(--plate-line);
+      color: var(--plate-text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.2s ease;
+    }
+    .btn-cassette:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* -------------------------------------------------------------
+       VARIANT 2: THE CLINICAL BENCHMARK LEDGER
+       ------------------------------------------------------------- */
+    .hero-v2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 460px);
+      align-items: center;
+      gap: 56px;
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 56px 64px 32px;
+    }
+
+    .ledger-card {
+      background: var(--bone);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 18px 48px -16px rgba(21, 20, 15, 0.15);
+    }
+    .ledger-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line-soft);
+      padding-bottom: 12px;
+    }
+    .ledger-badge {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--olive);
+    }
+    .ledger-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .lg-stat {
+      border-left: 2px solid var(--accent);
+      padding-left: 12px;
+    }
+    .lg-num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .lg-lbl {
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* Pipeline tracker row */
+    .ledger-pipeline {
+      background: var(--paper);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .lp-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 8px;
+    }
+    .lp-chain {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-display);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .lp-arr { color: var(--accent); font-size: 10px; }
+
+    /* -------------------------------------------------------------
+       VARIANT 3: MULTI-ORGAN SPECIMEN RACK (CENTERED + 3 CASSETTES)
+       ------------------------------------------------------------- */
+    .hero-v3 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 56px 64px 32px;
+    }
+    .hero-v3 .dossier-lead {
+      margin: 0 auto;
+    }
+    .hero-v3 .lp-cta-row {
+      justify-content: center;
+    }
+
+    .specimen-rack {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+      margin-top: 44px;
+    }
+    .rack-card {
+      background: var(--bone);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    .rack-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px -12px rgba(21, 20, 15, 0.18);
+      border-color: var(--ink);
+    }
+    .rack-thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .rack-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .rack-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(21, 20, 15, 0.85);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+    }
+    .rc-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .rc-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-faint);
+    }
+    .rc-chip {
+      display: inline-block;
+      margin-top: 2px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(237, 111, 92, 0.15);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Rest of the page sections (consistent across all) */
+    .sec-rule {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .sec-rule .roman {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .sec-rule .sec-title {
+      flex: 1;
+      margin-left: 12px;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .sec-rule .page-of {
+      font-family: var(--font-display);
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+
+    .lp-pipeline {
+      max-width: 1260px;
+      margin: 40px auto 0;
+      padding: 30px 64px 6px;
+    }
+    .lp-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .lp-step {
+      background: var(--bone);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .lp-step-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .lp-num { font-size: 28px; color: var(--ink-faint); }
+    .lp-status {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .lp-status--live { border: 1px solid rgba(237, 111, 92, 0.45); color: var(--accent); }
+    .lp-status--press { border: 1px solid rgba(110, 116, 72, 0.5); color: var(--olive); }
+    .lp-status--draft { border: 1px solid var(--line-soft); color: var(--ink-faint); }
+
+    .lp-step-name {
+      margin-top: 8px;
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .lp-step-term {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 2px;
+    }
+    .lp-step-copy {
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--ink-mute);
+    }
+
+    .lp-departments {
+      max-width: 1260px;
+      margin: 40px auto 0;
+      padding: 0 64px;
+    }
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .pill {
+      background: var(--bone);
+      border: 1px solid var(--line-soft);
+      border-radius: 999px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: all 0.15s ease;
+    }
+    .pill:hover {
+      border-color: var(--ink);
+      background: var(--paper-warm);
+    }
+    .pill .p-num { font-size: 13px; color: var(--accent); }
+    .pill .p-name { font-weight: 700; font-size: 14px; flex: 1; }
+    .pill .p-mod { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); }
+
+    .lp-foot {
+      margin-top: 60px;
+      border-top: 1px solid var(--line);
+      background: var(--paper-warm);
+      padding: 32px 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .lp-foot-line { font-size: 14.5px; color: var(--ink-mute); max-width: 60ch; }
+
+    @media (max-width: 980px) {
+      .hero-v1, .hero-v2 { grid-template-columns: 1fr; }
+      .specimen-rack { grid-template-columns: 1fr; }
+      .masthead, .hero-v1, .hero-v2, .hero-v3, .lp-pipeline, .lp-departments, .lp-foot {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Switcher -->
+  <aside class="switcher-bar">
+    <div class="switcher-title">
+      <span>📐 Standalone Design Preview</span>
+      <span>·</span>
+      <strong>OpenMed Front Page</strong>
+    </div>
+    <div class="switcher-tabs">
+      <button class="tab-btn active" onclick="switchVariant('v1')">
+        <span>Option 1: Specimen Cassette</span>
+        <span class="tag">Recommended</span>
+      </button>
+      <button class="tab-btn" onclick="switchVariant('v2')">
+        <span>Option 2: Benchmark Ledger</span>
+      </button>
+      <button class="tab-btn" onclick="switchVariant('v3')">
+        <span>Option 3: Multi-Organ Rack</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="brand">
+      <div class="brand-mark">Ψ</div>
+      <div class="brand-word">OpenMed<span class="dot">.</span></div>
+    </div>
+    <div class="masthead-stats">
+      <div class="stat-fig">
+        <span class="fig">12</span>
+        <span class="cap">Departments</span>
+      </div>
+      <div class="stat-fig">
+        <span class="fig">2,234</span>
+        <span class="cap">Structures</span>
+      </div>
+      <div class="stat-fig">
+        <span class="fig">99.26%</span>
+        <span class="cap">Benchmark</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       VARIANT 1: THE DIAGNOSTIC SPECIMEN CASSETTE (RECOMMENDED)
+       ============================================================ -->
+  <main id="v1" class="variant-container active">
+    <section class="hero-v1">
+      <div class="lp-hero-type">
+        <div class="lp-overline">Anatomia Digitalis · First Edition</div>
+        <h1 class="dossier-title">
+          An AI hospital<span class="dot">.</span>
+        </h1>
+        <p class="lp-hero-sub serif">edited like a medical annual</p>
+        <p class="dossier-lead">
+          OpenMed reads scans the way an editor reads copy — twelve organ departments
+          classify, segment, and report on what the image says, then typeset the verdict
+          as a signed dispatch. Every plate in this volume is interactive, every claim
+          carries its benchmark, and every structure is named by Terminologia Anatomica.
+        </p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#app">
+            <span>Open the Atlas</span>
+            <span class="arr">↗</span>
+          </a>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('movements-v1').scrollIntoView({behavior:'smooth'})">
+            <span>The consultation, in six movements</span>
+            <span class="arr">↓</span>
+          </button>
+        </div>
+        <p class="lp-edition mono">
+          This edition ships the atlas &amp; benchmark dossiers — the AI pipeline is in press.
+        </p>
+      </div>
+
+      <!-- Right column: The dark plate specimen cassette -->
+      <aside class="specimen-cassette" aria-label="Live Diagnostic Specimen">
+        <span class="cassette-brk tl"></span>
+        <span class="cassette-brk tr"></span>
+        <span class="cassette-brk bl"></span>
+        <span class="cassette-brk br"></span>
+
+        <div class="cassette-header">
+          <span class="cassette-title">Plate Nº 01 · Diagnostic Specimen</span>
+          <span class="cassette-sub">Axial T1C+ · Brain MRI</span>
+        </div>
+
+        <div class="scan-view-box">
+          <img src="../public/samples/brain/Gliomas.jpg" alt="Clinical MRI Slice" class="scan-img">
+          <div class="scan-reticle"></div>
+          <div class="lesion-target">
+            <span class="lesion-badge">Mask · 98.4%</span>
+          </div>
+        </div>
+
+        <div class="cassette-meta-grid">
+          <div class="cm-item">
+            <span class="cm-label">Organ Department</span>
+            <span class="cm-val">Brain (Plate 01)</span>
+          </div>
+          <div class="cm-item">
+            <span class="cm-label">Judicium (Classification)</span>
+            <span class="cm-val accent">High-Grade Glioma</span>
+          </div>
+          <div class="cm-item">
+            <span class="cm-label">Segmentation Engine</span>
+            <span class="cm-val">LiteMedSAM (Fine-Tuned)</span>
+          </div>
+          <div class="cm-item">
+            <span class="cm-label">Clinical Concordance</span>
+            <span class="cm-val">Dice 0.887 · Verified</span>
+          </div>
+        </div>
+
+        <div class="cassette-footer">
+          <div class="cassette-actions">
+            <button class="btn-cassette" type="button">
+              <span>Inspect in Brain Workspace</span>
+              <span>↗</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Pipeline movements -->
+    <section class="lp-pipeline" id="movements-v1">
+      <div class="sec-rule">
+        <span class="roman">II</span>
+        <span class="sec-title">The Consultation</span>
+        <span class="page-of">six movements</span>
+      </div>
+      <div class="lp-steps">
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">I</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Paper Intake</h3>
+          <div class="lp-step-term">Lectio</div>
+          <p class="lp-step-copy">A photograph of the handwritten clinic file goes in; structured text comes out — OCR over paper is the front door.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">II</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Organ Routing</h3>
+          <div class="lp-step-term">Distributio</div>
+          <p class="lp-step-copy">The scan reads itself: a classifier tells you which department owns this image before any diagnosis begins.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">III</span><span class="lp-status lp-status--press">In Press</span></div>
+          <h3 class="lp-step-name">Classification</h3>
+          <div class="lp-step-term">Judicium</div>
+          <p class="lp-step-copy">Twelve organ departments, each with a fine-tuned vision ensemble grading the pathology — tumour type, stage, severity.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">IV</span><span class="lp-status lp-status--press">In Press</span></div>
+          <h3 class="lp-step-name">Segmentation</h3>
+          <div class="lp-step-term">Dissectio</div>
+          <p class="lp-step-copy">Not just what, but where: pixel-level masks trace every lesion boundary, later extruded into the 3D plate.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">V</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">The Report</h3>
+          <div class="lp-step-term">Scriptura</div>
+          <p class="lp-step-copy">A fine-tuned medical language model sets findings, impression and recommendation as a signed dispatch.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">VI</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Consultation</h3>
+          <div class="lp-step-term">Disputatio</div>
+          <p class="lp-step-copy">A RAG assistant answers questions about the case, the report, and the literature behind it — with citations to every line.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Department Index -->
+    <section class="lp-departments">
+      <div class="sec-rule">
+        <span class="roman">III</span>
+        <span class="sec-title">Index of Departments</span>
+        <span class="page-of">12 plates</span>
+      </div>
+      <div class="pill-grid">
+        <div class="pill"><span class="p-num">01</span><span class="p-name">Brain</span><span class="p-mod">MRI</span></div>
+        <div class="pill"><span class="p-num">02</span><span class="p-name">Heart</span><span class="p-mod">Echo / CT</span></div>
+        <div class="pill"><span class="p-num">03</span><span class="p-name">Lungs</span><span class="p-mod">CXR / CT</span></div>
+        <div class="pill"><span class="p-num">04</span><span class="p-name">Kidney</span><span class="p-mod">CT</span></div>
+        <div class="pill"><span class="p-num">05</span><span class="p-name">Liver</span><span class="p-mod">US / CT</span></div>
+        <div class="pill"><span class="p-num">06</span><span class="p-name">Skin</span><span class="p-mod">Dermoscopy</span></div>
+        <div class="pill"><span class="p-num">07</span><span class="p-name">Eye</span><span class="p-mod">Fundus</span></div>
+        <div class="pill"><span class="p-num">08</span><span class="p-name">Breast</span><span class="p-mod">Mammogram</span></div>
+        <div class="pill"><span class="p-num">09</span><span class="p-name">Bone</span><span class="p-mod">X-Ray</span></div>
+        <div class="pill"><span class="p-num">10</span><span class="p-name">Pancreas</span><span class="p-mod">CT</span></div>
+        <div class="pill"><span class="p-num">11</span><span class="p-name">Intestine</span><span class="p-mod">Endoscopy</span></div>
+        <div class="pill"><span class="p-num">12</span><span class="p-name">Blood</span><span class="p-mod">Smear</span></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       VARIANT 2: THE CLINICAL BENCHMARK LEDGER
+       ============================================================ -->
+  <main id="v2" class="variant-container">
+    <section class="hero-v2">
+      <div class="lp-hero-type">
+        <div class="lp-overline">Anatomia Digitalis · First Edition</div>
+        <h1 class="dossier-title">
+          An AI hospital<span class="dot">.</span>
+        </h1>
+        <p class="lp-hero-sub serif">edited like a medical annual</p>
+        <p class="dossier-lead">
+          OpenMed reads scans the way an editor reads copy — twelve organ departments
+          classify, segment, and report on what the image says, then typeset the verdict
+          as a signed dispatch. Every plate in this volume is interactive, every claim
+          carries its benchmark, and every structure is named by Terminologia Anatomica.
+        </p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#app">
+            <span>Open the Atlas</span>
+            <span class="arr">↗</span>
+          </a>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('movements-v2').scrollIntoView({behavior:'smooth'})">
+            <span>The consultation, in six movements</span>
+            <span class="arr">↓</span>
+          </button>
+        </div>
+        <p class="lp-edition mono">
+          This edition ships the atlas &amp; benchmark dossiers — the AI pipeline is in press.
+        </p>
+      </div>
+
+      <!-- Right column: The clinical benchmark ledger -->
+      <aside class="ledger-card">
+        <div class="ledger-top">
+          <span class="ledger-badge">Ledger · Clinical Audit</span>
+          <span class="mono" style="font-size:11px; color:var(--ink-faint);">FYP 2026</span>
+        </div>
+
+        <div class="ledger-grid">
+          <div class="lg-stat">
+            <div class="lg-num">12</div>
+            <div class="lg-lbl">Organ Departments</div>
+          </div>
+          <div class="lg-stat">
+            <div class="lg-num">99.26%</div>
+            <div class="lg-lbl">Peak Validation</div>
+          </div>
+          <div class="lg-stat">
+            <div class="lg-num">2,234</div>
+            <div class="lg-lbl">TA2 Structures</div>
+          </div>
+          <div class="lg-stat">
+            <div class="lg-num">0.887</div>
+            <div class="lg-lbl">LiteMedSAM Dice</div>
+          </div>
+        </div>
+
+        <div class="ledger-pipeline">
+          <div class="lp-title">Pipeline Architecture In In Situ</div>
+          <div class="lp-chain">
+            <span>Intake</span><span class="lp-arr">→</span>
+            <span>Route</span><span class="lp-arr">→</span>
+            <span style="color:var(--accent);">Judicium</span><span class="lp-arr">→</span>
+            <span style="color:var(--accent);">Mask</span><span class="lp-arr">→</span>
+            <span>Dispatch</span>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--line-soft); padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span class="mono" style="font-size:11px; color:var(--olive);">● System Active · 14 Systems Online</span>
+          <a href="#evidence" style="font-size:12px; font-weight:700; color:var(--ink); text-decoration:none;">Audit Evidence ↗</a>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Pipeline movements & departments replicated -->
+    <section class="lp-pipeline" id="movements-v2">
+      <div class="sec-rule">
+        <span class="roman">II</span>
+        <span class="sec-title">The Consultation</span>
+        <span class="page-of">six movements</span>
+      </div>
+      <div class="lp-steps">
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">I</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Paper Intake</h3>
+          <div class="lp-step-term">Lectio</div>
+          <p class="lp-step-copy">A photograph of the handwritten clinic file goes in; structured text comes out — OCR over paper is the front door.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">II</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Organ Routing</h3>
+          <div class="lp-step-term">Distributio</div>
+          <p class="lp-step-copy">The scan reads itself: a classifier tells you which department owns this image before any diagnosis begins.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">III</span><span class="lp-status lp-status--press">In Press</span></div>
+          <h3 class="lp-step-name">Classification</h3>
+          <div class="lp-step-term">Judicium</div>
+          <p class="lp-step-copy">Twelve organ departments, each with a fine-tuned vision ensemble grading the pathology — tumour type, stage, severity.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       VARIANT 3: MULTI-ORGAN SPECIMEN RACK
+       ============================================================ -->
+  <main id="v3" class="variant-container">
+    <section class="hero-v3">
+      <div class="lp-overline">Anatomia Digitalis · First Edition</div>
+      <h1 class="dossier-title">
+        An AI hospital<span class="dot">.</span>
+      </h1>
+      <p class="lp-hero-sub serif">edited like a medical annual</p>
+      <p class="dossier-lead">
+        OpenMed reads scans the way an editor reads copy — twelve organ departments
+        classify, segment, and report on what the image says, then typeset the verdict
+        as a signed dispatch. Every plate in this volume is interactive, every claim
+        carries its benchmark, and every structure is named by Terminologia Anatomica.
+      </p>
+      <div class="lp-cta-row">
+        <a class="btn btn-primary" href="#app">
+          <span>Open the Atlas</span>
+          <span class="arr">↗</span>
+        </a>
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('movements-v3').scrollIntoView({behavior:'smooth'})">
+          <span>The consultation, in six movements</span>
+          <span class="arr">↓</span>
+        </button>
+      </div>
+
+      <!-- 3-Cassette Rack -->
+      <div class="specimen-rack">
+        <div class="rack-card">
+          <div class="rack-thumb">
+            <img src="../public/samples/brain/Gliomas.jpg" alt="Brain Scan">
+            <span class="rack-badge">Plate 01 · MRI</span>
+          </div>
+          <div class="rc-title">Brain Workspace</div>
+          <div class="rc-meta">Axial T1C+ · 512×512</div>
+          <span class="rc-chip">Glioma · 98.4% Confidence</span>
+        </div>
+
+        <div class="rack-card">
+          <div class="rack-thumb">
+            <img src="../public/samples/brain/GermCellTumors.jpg" alt="Pineal Region Scan">
+            <span class="rack-badge">Plate 01 · Pineal</span>
+          </div>
+          <div class="rc-title">Germ Cell Region</div>
+          <div class="rc-meta">Pineal Ventricle · 512×512</div>
+          <span class="rc-chip">Germinoma · 96.2% Confidence</span>
+        </div>
+
+        <div class="rack-card">
+          <div class="rack-thumb">
+            <img src="../public/samples/brain/Normal.jpg" alt="Normal Control">
+            <span class="rack-badge">Plate 01 · Control</span>
+          </div>
+          <div class="rc-title">Normal Baseline</div>
+          <div class="rc-meta">Healthy Control Reference</div>
+          <span class="rc-chip" style="background:rgba(110,116,72,0.15); color:var(--olive);">Zero Lesion · Concordant</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-pipeline" id="movements-v3">
+      <div class="sec-rule">
+        <span class="roman">II</span>
+        <span class="sec-title">The Consultation</span>
+        <span class="page-of">six movements</span>
+      </div>
+      <div class="lp-steps">
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">I</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Paper Intake</h3>
+          <div class="lp-step-term">Lectio</div>
+          <p class="lp-step-copy">A photograph of the handwritten clinic file goes in; structured text comes out.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">II</span><span class="lp-status lp-status--draft">Draft</span></div>
+          <h3 class="lp-step-name">Organ Routing</h3>
+          <div class="lp-step-term">Distributio</div>
+          <p class="lp-step-copy">The scan reads itself: a classifier tells you which department owns this image.</p>
+        </article>
+        <article class="lp-step">
+          <div class="lp-step-top"><span class="lp-num serif">III</span><span class="lp-status lp-status--press">In Press</span></div>
+          <h3 class="lp-step-name">Classification</h3>
+          <div class="lp-step-term">Judicium</div>
+          <p class="lp-step-copy">Twelve organ departments grading the pathology — tumour type, stage, severity.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Colophon -->
+  <footer class="lp-foot">
+    <p class="lp-foot-line">
+      <em class="serif">How many times has AI actually helped a doctor?</em> A verified ledger of the published answers: thirteen clinical disclosures, every number linked to its source.
+    </p>
+    <a class="btn btn-ghost" href="#evidence">
+      <span>Begin reading</span>
+      <span>↗</span>
+    </a>
+  </footer>
+
+  <script>
+    function switchVariant(id) {
+      document.querySelectorAll('.variant-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      const idx = id === 'v1' ? 0 : id === 'v2' ? 1 : 2;
+      document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -177,7 +177,6 @@ export const DEFAULT_ATLAS_SYSTEMS: readonly SystemId[] = [
   'urinary',
   'lymphatic',
   'endocrine',
-  'reproductive',
   'connective',
   'integumentary',
 ]

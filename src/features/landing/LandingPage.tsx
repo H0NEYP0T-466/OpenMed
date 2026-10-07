@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom'
 import type { OrganId } from '../../types/organ'
 import { ORGANS_REGISTRY } from '../../types/organ'
 import { AppShell } from '../../components/common/AppShell'
-import { HeroBodyModel } from '../../components/medical/HeroBodyModel'
 import '../../components/medical/essay.css'
 import '../../components/medical/OrganSelector.css'
 import './LandingPage.css'
 
 /**
- * The body is shown on the front page now, so it is no longer one of the
- * departments listed below — the index runs to twelve.
+ * The body atlas is accessed via /app, not shown on the front page.
+ * The department index below lists the twelve organ workspaces.
  */
 const DEPARTMENT_ORDER = (Object.keys(ORGANS_REGISTRY) as OrganId[]).filter(
   (id) => id !== 'body',
@@ -69,22 +68,26 @@ const STATUS_LABEL = {
 
 export const LandingPage: React.FC = () => (
   <AppShell>
-    {/* Hero - the frontispiece fold. The body model sits opposite the type,
-        spinning on its own: no plate chrome, no picking, no user rotation.
-        Interactivity begins behind the Atlas link beneath it. */}
+    {/* Hero — centred editorial frontispiece. The 3D model is gone;
+        the typography is the fold. The atlas lives behind the link. */}
     <section className="lp-hero">
       <div className="lp-hero-type">
+        <div className="lp-overline mono">Anatomia Digitalis · First Edition</div>
         <h1 className="dossier-title">
           An AI hospital<span className="dot">.</span>
         </h1>
         <p className="lp-hero-sub serif">edited like a medical annual</p>
         <p className="dossier-lead">
-          OpenMed reads scans the way an editor reads copy twelve organ departments
+          OpenMed reads scans the way an editor reads copy — twelve organ departments
           classify, segment, and report on what the image says, then typeset the verdict
           as a signed dispatch. Every plate in this volume is interactive, every claim
           carries its benchmark, and every structure is named by Terminologia Anatomica.
         </p>
         <div className="lp-cta-row">
+          <Link className="btn btn-primary" to="/app">
+            <span>Open the Atlas</span>
+            <span className="arr" aria-hidden="true">↗</span>
+          </Link>
           <button
             type="button"
             className="btn btn-ghost"
@@ -96,17 +99,24 @@ export const LandingPage: React.FC = () => (
             <span className="arr" aria-hidden="true">↓</span>
           </button>
         </div>
+        <div className="lp-atlas-strip" aria-hidden="true">
+          {[
+            { color: '#e2d9ba', name: 'Skeleton' },
+            { color: '#b96760', name: 'Heart' },
+            { color: '#d8b565', name: 'Nervous' },
+            { color: '#b98991', name: 'Respiratory' },
+            { color: '#c05245', name: 'Arteries' },
+          ].map((s) => (
+            <div className="lp-swatch" key={s.name}>
+              <span className="lp-swatch-dot" style={{ backgroundColor: s.color }} />
+              <span className="lp-swatch-label">{s.name}</span>
+            </div>
+          ))}
+          <span className="lp-swatch-plus">+10 systems</span>
+        </div>
         <p className="lp-edition mono">
-          This edition ships the atlas &amp; benchmark dossiers - the AI pipeline is in press.
+          This edition ships the atlas &amp; benchmark dossiers — the AI pipeline is in press.
         </p>
-      </div>
-
-      <div className="lp-hero-figure">
-        <HeroBodyModel />
-        <Link className="btn btn-primary lp-figure-cta" to="/app">
-          <span>Open the Atlas</span>
-          <span className="arr" aria-hidden="true">↗</span>
-        </Link>
       </div>
     </section>
 
