@@ -95,6 +95,38 @@ export interface BrainSegmentationResult extends BrainClassificationResult {
 }
 
 /**
+ * Response from POST /api/brain/analyze — the Run button.
+ *
+ * Every classification field is always present. The MedNeXt segmentation fields
+ * are filled only when ``segmentation_performed`` is true. It is false when the
+ * scan was classified Normal, or when the MedNeXt checkpoint is missing or
+ * unusable — ``segmentation_skipped_reason`` says which, so the UI never has to
+ * guess and never shows an invented mask.
+ */
+export interface BrainAnalysisResult extends BrainClassificationResult {
+  readonly segmentation_performed: boolean
+  readonly segmentation_skipped_reason?: string | null
+  readonly segmentation_model?: string | null
+  readonly seg_mask_base64?: string | null
+  readonly seg_overlay_base64?: string | null
+  /** Foreground pixels in the original-resolution mask. */
+  readonly mask_foreground_px?: number | null
+  readonly mask_foreground_fraction?: number | null
+  /** Mean network probability inside the mask; a confidence proxy, not a calibrated one. */
+  readonly mean_probability?: number | null
+  readonly peak_probability?: number | null
+  readonly n_components?: number | null
+  /** Mask bounding box [x1, y1, x2, y2] in original pixels. */
+  readonly box_coords?: readonly number[] | null
+  readonly segmentation_input_size?: string | null
+  readonly original_size?: string | null
+  readonly segmentation_threshold?: number | null
+  readonly segmentation_tta?: boolean | null
+  readonly segmentation_ms?: number | null
+  readonly total_ms: number
+}
+
+/**
  * Response from POST /api/brain/segment-click — the assistive path.
  *
  * The clinician clicks the suspicious region; the backend turns that click into

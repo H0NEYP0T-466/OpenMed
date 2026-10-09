@@ -21,6 +21,8 @@ from app.organs.brain.classification.router import checkpoint_path
 from app.organs.brain.classification.router import router as brain_router
 from app.organs.brain.segmentation.experimental_lab.router import router as brain_seg_router
 from app.organs.brain.segmentation.experimental_lab.prepare_weights import default_checkpoint_path as seg_checkpoint_path
+from app.organs.brain.segmentation.mednext.router import router as mednext_router
+from app.organs.brain.segmentation.mednext.router import segmentation_checkpoint_path as mednext_checkpoint_path
 
 # ── Logging Setup ─────────────────────────────────────────────────────────
 
@@ -80,6 +82,7 @@ def _cors_origins() -> list[str]:
 async def _lifespan(application: FastAPI) -> AsyncIterator[None]:
     logger.info("=" * 62)
     logger.info("  OpenMed FastAPI server")
+    logger.info("  analyze      : POST /api/brain/analyze (classify, then MedNeXt unless Normal)")
     logger.info("  classify     : POST /api/brain/classify")
     logger.info("  segment      : POST /api/brain/segment")
     logger.info("  load models  : POST /api/brain/load-models")
@@ -89,6 +92,7 @@ async def _lifespan(application: FastAPI) -> AsyncIterator[None]:
     logger.info("  seg health   : GET  /api/brain/seg-health")
     logger.info("  cls checkpoint : %s", checkpoint_path())
     logger.info("  seg checkpoint : %s", seg_checkpoint_path())
+    logger.info("  mednext ckpt   : %s", mednext_checkpoint_path())
     logger.info("  cors origins : %s", ", ".join(_cors_origins()))
     logger.info("=" * 62)
     yield
@@ -112,6 +116,7 @@ app.add_middleware(
 
 app.include_router(brain_router, prefix="/api/brain", tags=["Brain"])
 app.include_router(brain_seg_router, prefix="/api/brain", tags=["Brain Segmentation"])
+app.include_router(mednext_router, prefix="/api/brain", tags=["Brain MedNeXt Segmentation"])
 
 
 @app.get("/")
@@ -121,6 +126,7 @@ def read_root():
         "status": "running",
         "organs": ["brain"],
         "endpoints": [
+            "/api/brain/analyze",
             "/api/brain/classify",
             "/api/brain/segment",
             "/api/brain/load-models",
@@ -129,6 +135,8 @@ def read_root():
             "/api/brain/health",
             "/api/brain/seg-health",
             "/api/brain/seg-model-info",
+            "/api/brain/mednext-health",
+            "/api/brain/mednext-model-info",
         ],
     }
 

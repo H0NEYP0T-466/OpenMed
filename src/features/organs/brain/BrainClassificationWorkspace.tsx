@@ -9,8 +9,9 @@ import {
 import { RomanSection } from '../../../components/common/RomanSection'
 import { ThinkingOrb, DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import { BrainRegionViewer } from './BrainRegionViewer'
-import { classifyBrainImage, getBrainHealth, getBrainModelInfo } from './brainApi'
-import type { BrainModelInfo, BrainClassificationResult } from './brainTypes'
+import { AssistiveSegmentation } from './AssistiveSegmentation'
+import { analyzeBrainScan, getBrainHealth, getBrainModelInfo } from './brainApi'
+import type { BrainModelInfo, BrainAnalysisResult } from './brainTypes'
 import { SPECIMEN_PRESETS } from './specimenPresets'
 import type { SpecimenPreset } from './specimenPresets'
 import { TUMOR_DATA } from './tumorData'
@@ -38,7 +39,8 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [result, setResult] = useState<BrainClassificationResult | null>(null)
+  const [result, setResult] = useState<BrainAnalysisResult | null>(null)
+  const [showAssistive, setShowAssistive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [apiReady, setApiReady] = useState<boolean>(false)
   const [modelInfo, setModelInfo] = useState<BrainModelInfo | null>(null)
@@ -128,7 +130,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
     setIsAnalyzing(true)
     setError(null)
     try {
-      const res = await classifyBrainImage(file)
+      const res = await analyzeBrainScan(file)
       setResult(res)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Inference failed.'
@@ -155,10 +157,10 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   // Total sections count depends on whether inference results are loaded and view mode
   const totalSections =
     viewMode === 'all'
-      ? (result ? 8 : 4)
+      ? (result ? 9 : 4)
       : viewMode === 'anatomical'
         ? 3
-        : (result ? 5 : 1)
+        : (result ? 6 : 1)
 
   return (
     <article className="organ-essay brain-master-dossier">
@@ -382,6 +384,17 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       <div className="film-actions">
                         <button
                           type="button"
+                          className={`btn btn-ghost btn-assistive ${showAssistive ? 'is-on' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setShowAssistive((on) => !on)
+                          }}
+                          aria-pressed={showAssistive}
+                        >
+                          <span>Assistive segmentation</span>
+                        </button>
+                        <button
+                          type="button"
                           className={`btn btn-primary btn-evaluate ${isAnalyzing ? 'is-evaluating' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation()
@@ -409,6 +422,12 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 )}
               </div>
+
+              {showAssistive && file && previewUrl && (
+                <div className="assistive-slot">
+                  <AssistiveSegmentation file={file} previewUrl={previewUrl} />
+                </div>
+              )}
 
               {!apiReady && serviceDetail && (
                 <div className="service-unavailable-banner" role="status">
@@ -520,9 +539,83 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 </RomanSection>
 
-                {/* VIII - Locus Anatomical Site */}
+                {/* VII - Segmentatio / MedNeXt lesion mask */}
                 <RomanSection
                   index={viewMode === 'all' ? 6 : 3}
+                  of={totalSections}
+                  title="Segmentatio - MedNeXt Lesion Mask"
+                  className="sp12"
+                >
+                  {result.segmentation_performed && result.seg_mask_base64 ? (
+                    <div className="seg-result-block">
+                      <div className="scan-plate-triple">
+                        {previewUrl && (
+                          <div className="scan-frame">
+                            <img src={previewUrl} alt="Source MRI Scan" loading="lazy" decoding="async" />
+                            <span className="scan-tag">Source MRI</span>
+                          </div>
+                        )}
+                        <div className="scan-frame">
+                          <img src={result.seg_mask_base64} alt="MedNeXt segmentation mask" loading="lazy" decoding="async" />
+                          <span className="scan-tag highlight">MedNeXt · mask</span>
+                        </div>
+                        <div className="scan-frame">
+                          {result.seg_overlay_base64 ? (
+                            <img src={result.seg_overlay_base64} alt="MedNeXt segmentation overlay" loading="lazy" decoding="async" />
+                          ) : (
+                            <div className="seg-empty-plate">No overlay produced</div>
+                          )}
+                          <span className="scan-tag highlight">MedNeXt · overlay</span>
+                        </div>
+                      </div>
+
+                      {result.mask_foreground_px === 0 && (
+                        <p className="seg-skip-notice" role="status">
+                          MedNeXt found no region above its decision threshold on this slice.
+                        </p>
+                      )}
+
+                      <div className="seg-chip-strip">
+                        <div className="meta-chip">
+                          <span className="k">Model</span>
+                          <span className="v">{result.segmentation_model ?? 'MedNeXt'}</span>
+                        </div>
+                        <div className="meta-chip">
+                          <span className="k">Lesion area</span>
+                          <span className="v">
+                            {result.mask_foreground_fraction == null
+                              ? '—'
+                              : `${(result.mask_foreground_fraction * 100).toFixed(2)}% · ${(result.mask_foreground_px ?? 0).toLocaleString()} px`}
+                          </span>
+                        </div>
+                        <div className="meta-chip">
+                          <span className="k">Mean probability</span>
+                          <span className="v">{result.mean_probability?.toFixed(3) ?? '—'}</span>
+                        </div>
+                        <div className="meta-chip">
+                          <span className="k">Regions</span>
+                          <span className="v">{result.n_components ?? '—'}</span>
+                        </div>
+                        <div className="meta-chip">
+                          <span className="k">Input → output</span>
+                          <span className="v">{`${result.segmentation_input_size ?? '—'} → ${result.original_size ?? '—'}`}</span>
+                        </div>
+                        <div className="meta-chip">
+                          <span className="k">Segmentation time</span>
+                          <span className="v">{result.segmentation_ms == null ? '—' : `${result.segmentation_ms.toFixed(0)} ms`}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="seg-skip-notice" role="status">
+                      Segmentation not run — {result.segmentation_skipped_reason ?? 'no reason reported.'}
+                    </p>
+                  )}
+                </RomanSection>
+
+                {/* VIII - Locus Anatomical Site */}
+                <RomanSection
+                  index={viewMode === 'all' ? 7 : 4}
                   of={totalSections}
                   title="Locus - Typical Presentation Sites & Approximate Centroid"
                   className="sp7"
@@ -536,7 +629,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
 
                 {/* IX - Monograph */}
                 <RomanSection
-                  index={viewMode === 'all' ? 7 : 4}
+                  index={viewMode === 'all' ? 8 : 5}
                   of={totalSections}
                   title="Monograph - Clinical Tumor Dossier"
                   className="sp5"

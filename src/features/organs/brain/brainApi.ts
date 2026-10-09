@@ -1,4 +1,5 @@
 import type {
+  BrainAnalysisResult,
   BrainHealthStatus,
   BrainModelInfo,
   BrainClassificationResult,
@@ -22,6 +23,46 @@ export interface AnalyzeBrainImageOptions {
    * skips segmentation entirely.
    */
   readonly useHeatmapPrompt?: boolean
+}
+
+/**
+ * Run the full analysis — POST /api/brain/analyze. This is what the Run button calls.
+ *
+ * EfficientNetV2-B2 classifies the scan first. If the predicted class is
+ * "Normal" the backend skips segmentation; otherwise MedNeXt segments the
+ * lesion in the same round trip. Segmentation never blocks the classification:
+ * when it cannot run, the response carries ``segmentation_performed: false``
+ * and the reason.
+ *
+ * Everything is computed from the uploaded image. There is no cached or
+ * simulated fallback: if the service is unreachable this throws.
+ */
+export const analyzeBrainScan = async (file: File): Promise<BrainAnalysisResult> => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE_URL}/analyze`, { method: 'POST', body: formData })
+  } catch (error) {
+    throw new Error(
+      `The analysis service is unreachable at ${API_BASE_URL}. Start it with ` +
+        '`python -m app.main` from backend/, then run the analysis again. ' +
+        'No result is shown without a real inference run.',
+      { cause: error },
+    )
+  }
+
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null)
+    const message =
+      detail && typeof detail.detail === 'string'
+        ? detail.detail
+        : `Analysis failed (HTTP ${response.status}).`
+    throw new Error(message)
+  }
+
+  return (await response.json()) as BrainAnalysisResult
 }
 
 /**

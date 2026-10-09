@@ -1882,3 +1882,51 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Run actions: classifier run + assistive toggle --- */
+.film-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-assistive.is-on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.assistive-slot {
+  width: 100%;
+  margin-top: 18px;
+}
+
+/* --- MedNeXt segmentation result --- */
+.seg-result-block {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.seg-chip-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px 20px;
+  padding: 16px 20px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.seg-skip-notice {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink);
+}
