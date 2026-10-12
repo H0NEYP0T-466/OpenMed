@@ -1,0 +1,422 @@
+source,stem,reason,kept_as
+openmed,"T1 - Anaplastic astrocytoma frontal , ventricle 004",mask sits below 90% on anatomy,
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 027","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 026"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 029","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 030"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 031","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 030"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 032","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 033"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 034","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 035"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 036","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 037"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 038","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 039"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 040","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 039"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 042","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 043"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 044","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 043"
+openmed,"T1 - Anaplastic astrocytoma parietal , ventricle 046","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Anaplastic astrocytoma parietal , ventricle 047"
+openmed,"T1 - Astrocytoma frontal , falx 068","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Astrocytoma frontal , falx 070"
+openmed,"T1 - Astrocytoma frontal , falx 073","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Astrocytoma frontal , falx 071"
+openmed,"T1 - Astrocytoma frontal , falx 076","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Astrocytoma frontal , falx 075"
+openmed,"T1 - Astrocytoma frontal , falx 080","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Astrocytoma frontal , falx 079"
+openmed,"T1 - Astrocytoma frontal , falx 081","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Astrocytoma frontal , falx 082"
+openmed,T1 - Central neurocytoma 060,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 061
+openmed,T1 - Central neurocytoma 065,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 063
+openmed,T1 - Central neurocytoma 066,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 067
+openmed,T1 - Central neurocytoma 068,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 067
+openmed,T1 - Central neurocytoma 069,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 070
+openmed,T1 - Central neurocytoma 071,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 072
+openmed,T1 - Central neurocytoma 075,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 074
+openmed,T1 - Central neurocytoma 077,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 076
+openmed,T1 - Central neurocytoma 079,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 078
+openmed,T1 - Central neurocytoma 081,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 080
+openmed,T1 - Central neurocytoma 083,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 082
+openmed,T1 - Central neurocytoma 085,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 086
+openmed,T1 - Central neurocytoma 087,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 088
+openmed,T1 - Central neurocytoma 089,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 088
+openmed,T1 - Central neurocytoma 090,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 091
+openmed,T1 - Central neurocytoma 093,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 092
+openmed,T1 - Central neurocytoma 097,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 098
+openmed,T1 - Central neurocytoma 099,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 100
+openmed,T1 - Central neurocytoma 102,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 101
+openmed,T1 - Central neurocytoma 105,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma 104
+openmed,"T1 - Central neurocytoma frontal , ventricle 041","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Central neurocytoma frontal , ventricle 042"
+openmed,"T1 - Central neurocytoma frontal , ventricle 043","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Central neurocytoma frontal , ventricle 044"
+openmed,"T1 - Central neurocytoma frontal , ventricle 045","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Central neurocytoma frontal , ventricle 044"
+openmed,T1 - Central neurocytoma ventricle 088,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 085
+openmed,T1 - Central neurocytoma ventricle 094,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 095
+openmed,T1 - Central neurocytoma ventricle 096,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 095
+openmed,T1 - Central neurocytoma ventricle 098,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 097
+openmed,T1 - Central neurocytoma ventricle 101,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 102
+openmed,T1 - Central neurocytoma ventricle 104,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 105
+openmed,T1 - Central neurocytoma ventricle 106,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 105
+openmed,T1 - Central neurocytoma ventricle 109,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 110
+openmed,T1 - Central neurocytoma ventricle 111,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Central neurocytoma ventricle 112
+openmed,"T1 - Cerebellopontine angle meningioma posterior fossa , temporal 004",mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic and gemistocytic components) frontal 004,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 029,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 030,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 031,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 032,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 033,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 035,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 037,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 038,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 039,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 044,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 046,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 047,mask sits below 90% on anatomy,
+openmed,T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 049,mask sits below 90% on anatomy,
+openmed,T1 - Ependymoma ventricle 004,mask sits below 90% on anatomy,
+openmed,T1 - Ependymoma ventricle 005,mask sits below 90% on anatomy,
+openmed,"T1 - Glioblastoma NOS parietal , occipital 003",mask sits below 90% on anatomy,
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 002","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 003"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 004","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 003"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 005","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 006"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 009","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 010"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 011","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 010"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 013","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 014"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 015","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 016"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 017","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 016"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 018","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 019"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 020","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 019"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 022","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 023"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 024","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 023"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 025","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 026"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 027","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 026"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 029","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 028"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 030","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 031"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 032","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 031"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 033","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 034"
+openmed,"T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 035","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 034"
+openmed,T1 - Intraventricular meningioma ventricle 099,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 100
+openmed,T1 - Intraventricular meningioma ventricle 101,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 100
+openmed,T1 - Intraventricular meningioma ventricle 104,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 105
+openmed,T1 - Intraventricular meningioma ventricle 106,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 105
+openmed,T1 - Intraventricular meningioma ventricle 107,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 108
+openmed,T1 - Intraventricular meningioma ventricle 109,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 110
+openmed,T1 - Intraventricular meningioma ventricle 111,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 112
+openmed,T1 - Intraventricular meningioma ventricle 114,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 113
+openmed,T1 - Intraventricular meningioma ventricle 117,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 116
+openmed,T1 - Intraventricular meningioma ventricle 119,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 118
+openmed,T1 - Intraventricular meningioma ventricle 121,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 120
+openmed,T1 - Intraventricular meningioma ventricle 123,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Intraventricular meningioma ventricle 122
+openmed,T1 - Large frontal meningioma frontal 028,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 027
+openmed,T1 - Large frontal meningioma frontal 030,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 031
+openmed,T1 - Large frontal meningioma frontal 032,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 031
+openmed,T1 - Large frontal meningioma frontal 034,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 033
+openmed,T1 - Large frontal meningioma frontal 035,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 036
+openmed,T1 - Large frontal meningioma frontal 039,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 038
+openmed,T1 - Large frontal meningioma frontal 042,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 043
+openmed,T1 - Large frontal meningioma frontal 044,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 043
+openmed,T1 - Large frontal meningioma frontal 045,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 046
+openmed,T1 - Large frontal meningioma frontal 048,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 047
+openmed,T1 - Large frontal meningioma frontal 049,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Large frontal meningioma frontal 050
+openmed,T1 - Meningioma frontal 252,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Meningioma frontal 253
+openmed,T1 - Meningioma frontal 256,mask sits below 90% on anatomy,
+openmed,T1 - Meningioma frontal 258,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Meningioma frontal 259
+openmed,T1 - Meningioma frontal 260,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Meningioma frontal 259
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 003","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 005"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 006","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 005"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 008","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 007"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 024","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 069"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 055","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 054"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 057","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 058"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 059","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 058"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 062","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 061"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 065","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 064"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 070","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 069"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 073","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 072"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 075","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 076"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 077","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 076"
+openmed,"T1 - Multicentric glioblastoma parietal , ventricle 079","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1 - Multicentric glioblastoma parietal , ventricle 078"
+openmed,T1 - Oligodendroglioma frontal 197,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 266
+openmed,T1 - Oligodendroglioma frontal 199,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 262
+openmed,T1 - Oligodendroglioma frontal 201,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 259
+openmed,T1 - Oligodendroglioma frontal 253,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 205
+openmed,T1 - Oligodendroglioma frontal 256,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 203
+openmed,T1 - Oligodendroglioma frontal 257,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 203
+openmed,T1 - Oligodendroglioma frontal 261,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 262
+openmed,T1 - Oligodendroglioma frontal 263,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 264
+openmed,T1 - Oligodendroglioma frontal 268,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1 - Oligodendroglioma frontal 195
+openmed,"T1 - Pilocytic astrocytoma posterior fossa , ventricle 068",mask sits below 90% on anatomy,
+openmed,T1 - Solitary fibrous tumor (hemangiopericytoma) 045,mask sits below 90% on anatomy,
+openmed,T1 - Solitary fibrous tumor (hemangiopericytoma) 046,mask sits below 90% on anatomy,
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 029","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 030"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 031","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 032"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 035","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 034"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 038","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 037"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 039","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 040"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 041","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 042"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 043","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 042"
+openmed,"T1C+ - Anaplastic astrocytoma parietal , ventricle 044","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Anaplastic astrocytoma parietal , ventricle 045"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 045","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 044"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 048","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 047"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 050","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 049"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 052","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 053"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 054","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 055"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 056","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 057"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 058","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 059"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 060","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 059"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 062","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 061"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 064","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 065"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 066","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 067"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 069","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 068"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 071","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 070"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 073","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 072"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 075","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 076"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 079","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 078"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 080","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 082"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 081","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 082"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 083","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 082"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 084","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 082"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 085","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 087"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 086","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 087"
+openmed,"T1C+ - Angiomatous meningioma falcine , parietal 088","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Angiomatous meningioma falcine , parietal 077"
+openmed,"T1C+ - Astrocytoma frontal , falx 051","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Astrocytoma frontal , falx 050"
+openmed,T1C+ - Central neurocytoma ventricle 127,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 128
+openmed,T1C+ - Central neurocytoma ventricle 129,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 128
+openmed,T1C+ - Central neurocytoma ventricle 131,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 130
+openmed,T1C+ - Central neurocytoma ventricle 133,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 134
+openmed,T1C+ - Central neurocytoma ventricle 135,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 136
+openmed,T1C+ - Central neurocytoma ventricle 137,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 138
+openmed,T1C+ - Central neurocytoma ventricle 139,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 138
+openmed,T1C+ - Central neurocytoma ventricle 141,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 140
+openmed,T1C+ - Central neurocytoma ventricle 142,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Central neurocytoma ventricle 143
+openmed,T1C+ - Diffuse astrocytoma NOS (protoplasmic) frontal 083,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Diffuse astrocytoma NOS (protoplasmic) frontal 082
+openmed,T1C+ - Diffuse astrocytoma NOS (protoplasmic) frontal 085,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Diffuse astrocytoma NOS (protoplasmic) frontal 084
+openmed,T1C+ - Diffuse astrocytoma NOS (protoplasmic) frontal 086,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Diffuse astrocytoma NOS (protoplasmic) frontal 087
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 051","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 052"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 054","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 055"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 056","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 057"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 058","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 059"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 060","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 061"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 062","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 063"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 065","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 066"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 067","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 068"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 069","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 070"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 071","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 072"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 073","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 072"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 075","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 076"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 077","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 078"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 079","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 080"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 081","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 082"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 083","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 084"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 085","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 086"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 087","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 088"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 089","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 088"
+openmed,"T1C+ - Dural solitary fibrous tumor parafalcine , falx 090","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Dural solitary fibrous tumor parafalcine , falx 091"
+openmed,T1C+ - Ependymoma 003,mask sits below 90% on anatomy,
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 002,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 001
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 004,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 005
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 006,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 005
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 007,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 008
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 009,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 008
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 011,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 012
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 013,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 012
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 015,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 014
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 016,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 017
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 018,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 017
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 020,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 019
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 021,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 022
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 024,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 023
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 026,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 025
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 028,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 027
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 030,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 031
+openmed,T1C+ - Glioblastoma NOS - multifocal frontal 032,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Glioblastoma NOS - multifocal frontal 031
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 014","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 015"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 018","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 017"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 020","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 021"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 022","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 021"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 025","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 024"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 027","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 028"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 034","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 033"
+openmed,"T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 037","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Glioblastoma with symptomatic postbiopsy hemorrhage parietal , temporal 036"
+openmed,T1C+ - Hemangiopericytoma - foramen magnum parietal 006,mask sits below 90% on anatomy,
+openmed,T1C+ - Large frontal meningioma frontal 037,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 038
+openmed,T1C+ - Large frontal meningioma frontal 040,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 039
+openmed,T1C+ - Large frontal meningioma frontal 041,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 042
+openmed,T1C+ - Large frontal meningioma frontal 044,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 043
+openmed,T1C+ - Large frontal meningioma frontal 046,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 045
+openmed,T1C+ - Large frontal meningioma frontal 048,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 047
+openmed,T1C+ - Large frontal meningioma frontal 050,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 049
+openmed,T1C+ - Large frontal meningioma frontal 052,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 051
+openmed,T1C+ - Large frontal meningioma frontal 054,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 053
+openmed,T1C+ - Large frontal meningioma frontal 056,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Large frontal meningioma frontal 055
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 003","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 004"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 006","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 007"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 008","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 009"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 010","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 011"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 014","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 015"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 017","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 018"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 019","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 018"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 022","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 021"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 025","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 026"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 028","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 027"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 030","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 029"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 032","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 033"
+openmed,"T1C+ - Medulloblastoma ventricle , supratentorial 034","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Medulloblastoma ventricle , supratentorial 035"
+openmed,T1C+ - Meningioma frontal 261,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 260
+openmed,T1C+ - Meningioma frontal 262,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 263
+openmed,T1C+ - Meningioma frontal 265,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 266
+openmed,T1C+ - Meningioma frontal 268,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 269
+openmed,T1C+ - Meningioma frontal 270,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 269
+openmed,T1C+ - Meningioma frontal 271,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 272
+openmed,T1C+ - Meningioma frontal 273,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 272
+openmed,T1C+ - Meningioma frontal 275,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Meningioma frontal 274
+openmed,"T1C+ - Meningioma ventricle , brainstem 179","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 178"
+openmed,"T1C+ - Meningioma ventricle , brainstem 181","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 180"
+openmed,"T1C+ - Meningioma ventricle , brainstem 183","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 182"
+openmed,"T1C+ - Meningioma ventricle , brainstem 191","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 192"
+openmed,"T1C+ - Meningioma ventricle , brainstem 193","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 192"
+openmed,"T1C+ - Meningioma ventricle , brainstem 195","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 194"
+openmed,"T1C+ - Meningioma ventricle , brainstem 197","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 198"
+openmed,"T1C+ - Meningioma ventricle , brainstem 199","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 198"
+openmed,"T1C+ - Meningioma ventricle , brainstem 203","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 202"
+openmed,"T1C+ - Meningioma ventricle , brainstem 206","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 205"
+openmed,"T1C+ - Meningioma ventricle , brainstem 208","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 209"
+openmed,"T1C+ - Meningioma ventricle , brainstem 210","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 209"
+openmed,"T1C+ - Meningioma ventricle , brainstem 211","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 212"
+openmed,"T1C+ - Meningioma ventricle , brainstem 213","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 212"
+openmed,"T1C+ - Meningioma ventricle , brainstem 215","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 216"
+openmed,"T1C+ - Meningioma ventricle , brainstem 217","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 216"
+openmed,"T1C+ - Meningioma ventricle , brainstem 219","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 220"
+openmed,"T1C+ - Meningioma ventricle , brainstem 221","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 220"
+openmed,"T1C+ - Meningioma ventricle , brainstem 223","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 222"
+openmed,"T1C+ - Meningioma ventricle , brainstem 226","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Meningioma ventricle , brainstem 225"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 001","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 002"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 004","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 003"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 007","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 006"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 058","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 059"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 060","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 061"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 062","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 061"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 065","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 066"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 067","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 066"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 068","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 069"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 070","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 069"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 072","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 071"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 074","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 073"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 076","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 075"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 078","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 077"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 079","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 080"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 081","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 080"
+openmed,"T1C+ - Multicentric glioblastoma parietal , ventricle 083","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicentric glioblastoma parietal , ventricle 082"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 086","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 087"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 089","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 090"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 091","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 092"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 095","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 096"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 097","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 098"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 100","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 101"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 102","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 103"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 104","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 105"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 106","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 107"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 108","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 109"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 110","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 111"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 112","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 111"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 113","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 114"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 115","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 114"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 117","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 116"
+openmed,"T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 133","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Multicompartmental trigeminal schwannoma middle cranial fossa , temporal 132"
+openmed,T1C+ - Oligodendroglioma (NOS) frontal 032,mask sits below 90% on anatomy,
+openmed,T1C+ - Oligodendroglioma 014,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma 015
+openmed,T1C+ - Oligodendroglioma 016,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma 017
+openmed,T1C+ - Oligodendroglioma 018,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma 017
+openmed,T1C+ - Oligodendroglioma 019,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma 020
+openmed,T1C+ - Oligodendroglioma 021,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma 020
+openmed,T1C+ - Oligodendroglioma frontal 151,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma frontal 193
+openmed,T1C+ - Oligodendroglioma frontal 153,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma frontal 190
+openmed,T1C+ - Oligodendroglioma frontal 199,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma frontal 147
+openmed,T1C+ - Oligodendroglioma frontal 202,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma frontal 145
+openmed,T1C+ - Oligodendroglioma frontal 208,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma frontal 141
+openmed,T1C+ - Oligodendroglioma frontal 209,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Oligodendroglioma frontal 141
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 251,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 252
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 254,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 255
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 256,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 257
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 258,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 259
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 261,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 262
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 263,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 264
+openmed,T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 265,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Solitary fibrous tumor (hemangiopericytoma) falx 266
+openmed,T1C+ - Supratentorial ependymoma 052,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 053
+openmed,T1C+ - Supratentorial ependymoma 054,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 055
+openmed,T1C+ - Supratentorial ependymoma 056,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 057
+openmed,T1C+ - Supratentorial ependymoma 063,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 064
+openmed,T1C+ - Supratentorial ependymoma 065,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 064
+openmed,T1C+ - Supratentorial ependymoma 066,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 067
+openmed,T1C+ - Supratentorial ependymoma 079,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 080
+openmed,T1C+ - Supratentorial ependymoma 084,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 085
+openmed,T1C+ - Supratentorial ependymoma 087,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 086
+openmed,T1C+ - Supratentorial ependymoma 089,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 088
+openmed,T1C+ - Supratentorial ependymoma 091,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 090
+openmed,T1C+ - Supratentorial ependymoma 097,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 096
+openmed,T1C+ - Supratentorial ependymoma 099,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 098
+openmed,T1C+ - Supratentorial ependymoma 100,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Supratentorial ependymoma 101
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 038","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 039"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 040","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 041"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 042","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 041"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 045","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 044"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 046","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 047"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 048","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 047"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 049","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 050"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 051","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 052"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 053","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 052"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 055","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 056"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 057","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 058"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 059","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 060"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 061","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 060"
+openmed,"T1C+ - Supratentorial ependymoma temporal , supratentorial 063","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Supratentorial ependymoma temporal , supratentorial 062"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 153","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 154"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 155","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 156"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 157","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 158"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 160","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 161"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 163","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 162"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 165","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 166"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 170","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 283"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 179","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 274"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 182","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 181"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 183","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 269"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 192","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 262"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 196","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 195"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 197","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 198"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 200","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 201"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 202","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 201"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 204","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 250"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 206","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 205"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 215","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 214"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 221","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 220"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 223","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 222"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 224","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 225"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 226","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 227"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 232","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 217"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 235","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 217"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 238","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 214"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 240","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 241"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 243","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 209"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 254","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 198"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 265","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 264"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 266","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 186"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 268","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 186"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 277","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 276"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 279","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 278"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 281","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 280"
+openmed,"T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 289","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T1C+ - Trigeminal schwannoma trigeminal , cerebellopontine angle 288"
+openmed,T1C+ - Trigeminal schwannoma ventricle 160,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Trigeminal schwannoma ventricle 159
+openmed,T1C+ - Trigeminal schwannoma ventricle 162,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T1C+ - Trigeminal schwannoma ventricle 161
+openmed,"T2 - Acoustic schwannoma cerebellopontine angle , trigeminal 001","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Acoustic schwannoma cerebellopontine angle , trigeminal 003"
+openmed,"T2 - Acoustic schwannoma cerebellopontine angle , trigeminal 029","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Acoustic schwannoma cerebellopontine angle , trigeminal 028"
+openmed,"T2 - Medulloblastoma posterior fossa , ventricle 080",mask sits below 90% on anatomy,
+openmed,"T2 - Medulloblastoma posterior fossa , ventricle 086",mask sits below 90% on anatomy,
+openmed,"T2 - Medulloblastoma ventricle , supratentorial 016",mask sits below 90% on anatomy,
+openmed,"T2 - Meningioma frontal , corona radiata 028",mask sits below 90% on anatomy,
+openmed,T2 - Posterior fossa ependymoma supratentorial 111,"near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))",T2 - Posterior fossa ependymoma supratentorial 110
+openmed,T2 - Posterior fossa ependymoma supratentorial 126,mask sits below 90% on anatomy,
+openmed,T2 - Posterior fossa ependymoma supratentorial 127,mask sits below 90% on anatomy,
+openmed,T2 - Posterior fossa ependymoma supratentorial 128,mask sits below 90% on anatomy,
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 180",mask sits below 90% on anatomy,
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 181","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 182"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 182",mask sits below 90% on anatomy,
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 183","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 184"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 185","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 186"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 187","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 186"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 195",mask sits below 90% on anatomy,
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 222","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 223"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 224","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 223"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 225","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 226"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 227","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 226"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 228","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 229"
+openmed,"T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 230","near-duplicate image, conflicting mask (near-identical pixels (pHash, pixel-confirmed))","T2 - Trigeminal schwannoma trigeminal , cerebellopontine angle 229"

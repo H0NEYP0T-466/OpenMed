@@ -72,7 +72,7 @@ export const DocumentationPage: React.FC = () => {
               III · FastAPI Backend Service
             </a>
             <a href="#section-stereotactic" className="doc-nav-anchor">
-              IV · MNI152 Stereotaxis
+              IV · Stereotactic Coordinates
             </a>
             <a href="#section-dataset" className="doc-nav-anchor">
               V · Dataset Sanitization

@@ -1,0 +1,10 @@
+{
+ "best": {
+  "score": 0.6982458049766345,
+  "epoch": 17,
+  "source": "ema"
+ },
+ "epochs_run": 37,
+ "stopped_early": true,
+ "elapsed_hours": 2.1624590396881103
+}

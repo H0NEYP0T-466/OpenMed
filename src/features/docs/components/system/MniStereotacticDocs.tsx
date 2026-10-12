@@ -8,7 +8,7 @@ export const MniStereotacticDocs: React.FC = () => {
       <RomanSection
         index={3}
         of={5}
-        title="Stereotaxis - MNI152 Coordinate Normalization System"
+        title="Stereotactic Coordinates — MNI Convention, Illustrative"
         className="sp12"
       >
         <div className="doc-info-block">
@@ -17,25 +17,32 @@ export const MniStereotacticDocs: React.FC = () => {
             <span className="doc-block-title">Spatial Normalization &amp; Anatomical Projection</span>
           </div>
           <p className="doc-block-copy">
-            To bridge 2D MRI slice classification with spatial neuroanatomy, OpenMed maps all 50 anatomical sites from the
-            curated dataset into the <strong>Montreal Neurological Institute (MNI152)</strong> stereotactic coordinate frame.
-            Each region is assigned a 3D centroid $[X, Y, Z]$ in millimeters referenced from the anterior commissure.
+            To bridge 2D MRI slice classification with spatial neuroanatomy, OpenMed assigns each of its 50 anatomical
+            sites an approximate centroid <strong>[X, Y, Z]</strong> in millimetres, expressed in MNI convention
+            (X = right, Y = anterior, Z = superior) so the viewer can place a highlight on the 3D model.
+          </p>
+          <p className="doc-block-copy">
+            <strong>These coordinates are illustrative.</strong> They are authored from standard neuroanatomy as
+            representative positions for a typical brain — not measurements registered to a template, and not derived
+            from the scanned patient. No image registration is performed. The mapping answers "which region does this
+            tumour type typically occupy", not "where is this patient's lesion"; that question is answered by the
+            segmentation track, not by this one.
           </p>
 
           <div className="mni-axes-diagram">
             <div className="mni-axis-card">
               <span className="axis-title">X Axis · Sagittal</span>
-              <span className="axis-range">-80 mm to +80 mm</span>
-              <span className="axis-note">Negative values represent Left Hemisphere; positive values represent Right Hemisphere.</span>
+              <span className="axis-range">0 to +48 mm in this registry</span>
+              <span className="axis-note">MNI convention: positive is Right Hemisphere, negative is Left. Every region here sits on the midline or the right hemisphere — the registry contains no left-sided entries.</span>
             </div>
             <div className="mni-axis-card">
               <span className="axis-title">Y Axis · Coronal</span>
-              <span className="axis-range">-110 mm to +70 mm</span>
+              <span className="axis-range">−56 to +46 mm</span>
               <span className="axis-note">Negative values indicate Posterior (Occipital/Cerebellar); positive indicate Anterior (Frontal).</span>
             </div>
             <div className="mni-axis-card">
               <span className="axis-title">Z Axis · Axial</span>
-              <span className="axis-range">-50 mm to +85 mm</span>
+              <span className="axis-range">−46 to +36 mm</span>
               <span className="axis-note">Negative values indicate Inferior (Skull Base/Brainstem); positive indicate Superior (Vertex).</span>
             </div>
           </div>

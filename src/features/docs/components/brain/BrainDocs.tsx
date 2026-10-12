@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Brain as BrainIcon, ArrowUpRight } from 'lucide-react'
 import { BrainClassificationDocs } from './BrainClassificationDocs'
 import { BrainSegmentationDocs } from './BrainSegmentationDocs'
+import { MedNextDocs } from './MedNextDocs'
 import type { ArtifactCard } from '../../types'
 
 interface BrainDocsProps {
@@ -27,6 +28,7 @@ export const BrainDocs: React.FC<BrainDocsProps> = ({ onOpenArtifact }) => {
 
       <BrainClassificationDocs onOpenArtifact={onOpenArtifact} />
       <BrainSegmentationDocs />
+      <MedNextDocs />
     </div>
   )
 }
