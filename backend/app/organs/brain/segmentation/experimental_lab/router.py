@@ -34,7 +34,6 @@ from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
-from ...classification.brain_regions import LOCALIZATION_BASIS, map_prediction_to_3d
 from ...classification.label_space import CLASS_NAMES
 from ...classification.pipeline import BrainClassificationPipeline, ModelUnavailableError
 from ...classification.router import checkpoint_path as classification_checkpoint_path
@@ -231,8 +230,6 @@ class SegmentationResult(BaseModel):
     gradcam_base64: str
     gradcam_grid: list[int]
     explainability: dict[str, Any]
-    locations_3d: list[dict[str, Any]]
-    localization_basis: str
     model_trained: bool
     label_space_source: str
     inference_ms: float
@@ -365,13 +362,6 @@ async def segment_brain_tumor(
 
     cls_ms = (time.perf_counter() - cls_start) * 1000.0
 
-    # 3D localisation
-    locations = map_prediction_to_3d(
-        cls_result["predicted_class"],
-        locations=None,
-        model_confidence=cls_result["confidence"],
-    )
-
     base_response = {
         "predicted_class": cls_result["predicted_class"],
         "confidence": cls_result["confidence"],
@@ -381,8 +371,6 @@ async def segment_brain_tumor(
         "gradcam_base64": cls_result["gradcam_base64"],
         "gradcam_grid": cls_result["gradcam_grid"],
         "explainability": cls_result["explainability"],
-        "locations_3d": locations,
-        "localization_basis": LOCALIZATION_BASIS,
         "model_trained": cls_result["model_trained"],
         "label_space_source": cls_result["label_space_source"],
         "inference_ms": round(cls_ms, 1),

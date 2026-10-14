@@ -7,8 +7,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react'
 import { RomanSection } from '../../../components/common/RomanSection'
-import { ThinkingOrb, DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
-import { BrainRegionViewer } from './BrainRegionViewer'
+import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import { AssistiveSegmentation } from './AssistiveSegmentation'
 import { analyzeBrainScan, getBrainHealth, getBrainModelInfo } from './brainApi'
 import type { BrainModelInfo, BrainAnalysisResult } from './brainTypes'
@@ -46,6 +45,15 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const [modelInfo, setModelInfo] = useState<BrainModelInfo | null>(null)
   const [serviceDetail, setServiceDetail] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // While inference runs, the dossier is locked: no scrolling away from the
+  // fullscreen thinking HUD.
+  useEffect(() => {
+    document.body.style.overflow = isAnalyzing ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isAnalyzing])
 
   useEffect(() => {
     let cancelled = false
@@ -157,10 +165,10 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   // Total sections count depends on whether inference results are loaded and view mode
   const totalSections =
     viewMode === 'all'
-      ? (result ? 9 : 4)
+      ? (result ? 8 : 4)
       : viewMode === 'anatomical'
         ? 3
-        : (result ? 6 : 1)
+        : (result ? 5 : 1)
 
   return (
     <article className="organ-essay brain-master-dossier">
@@ -384,17 +392,6 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       <div className="film-actions">
                         <button
                           type="button"
-                          className={`btn btn-ghost btn-assistive ${showAssistive ? 'is-on' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setShowAssistive((on) => !on)
-                          }}
-                          aria-pressed={showAssistive}
-                        >
-                          <span>Assistive segmentation</span>
-                        </button>
-                        <button
-                          type="button"
                           className={`btn btn-primary btn-evaluate ${isAnalyzing ? 'is-evaluating' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation()
@@ -404,10 +401,7 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                         >
                           <span>
                             {isAnalyzing ? (
-                              <>
-                                <ThinkingOrb mode="hybrid" size={24} theme="dark" speed={1.3} className="btn-inline-orb" />
-                                {`Evaluating ${classCountLabel}…`}
-                              </>
+                              `Evaluating ${classCountLabel}…`
                             ) : (
                               <>
                                 <Sparkles size={15} />
@@ -422,12 +416,6 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                   </div>
                 )}
               </div>
-
-              {showAssistive && file && previewUrl && (
-                <div className="assistive-slot">
-                  <AssistiveSegmentation file={file} previewUrl={previewUrl} />
-                </div>
-              )}
 
               {!apiReady && serviceDetail && (
                 <div className="service-unavailable-banner" role="status">
@@ -611,25 +599,56 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
                       Segmentation not run — {result.segmentation_skipped_reason ?? 'no reason reported.'}
                     </p>
                   )}
-                </RomanSection>
 
-                {/* VIII - Locus Anatomical Site */}
-                <RomanSection
-                  index={viewMode === 'all' ? 7 : 4}
-                  of={totalSections}
-                  title="Locus - Typical Presentation Sites & Approximate Centroid"
-                  className="sp7"
-                >
-                  <BrainRegionViewer
-                    locations={result.locations_3d}
-                    basis={result.localization_basis}
-                    tumourType={result.tumor_type}
-                  />
+                  {result.segmentation_performed && (
+                    <div className="assistive-section-block">
+                      <div className="assistive-bar">
+                        <button
+                          type="button"
+                          className={`btn btn-ghost btn-assistive ${showAssistive ? 'is-on' : ''}`}
+                          onClick={() => setShowAssistive((on) => !on)}
+                          aria-pressed={showAssistive}
+                        >
+                          <span>Assistive segmentation</span>
+                        </button>
+                        <span className="assistive-flow-hint">
+                          1 · Classifier heatmap → 2 · MedNeXt overlay → 3 · Source + LiteMedSAM
+                        </span>
+                      </div>
+
+                      {showAssistive && (
+                        <div className="assistive-stages">
+                          <div className="scan-plate-triple">
+                            <div className="scan-frame">
+                              {result.gradcam_base64 ? (
+                                <img src={result.gradcam_base64} alt="Classifier Grad-CAM heatmap" loading="lazy" decoding="async" />
+                              ) : (
+                                <div className="seg-empty-plate">No activation map produced</div>
+                              )}
+                              <span className="scan-tag highlight">EfficientNetV2-B2 · heatmap</span>
+                            </div>
+                            <div className="scan-frame">
+                              {result.seg_overlay_base64 ? (
+                                <img src={result.seg_overlay_base64} alt="MedNeXt overlay" loading="lazy" decoding="async" />
+                              ) : (
+                                <div className="seg-empty-plate">No MedNeXt overlay</div>
+                              )}
+                              <span className="scan-tag highlight">MedNeXt · overlay</span>
+                            </div>
+                          </div>
+
+                          {file && previewUrl && (
+                            <AssistiveSegmentation file={file} previewUrl={previewUrl} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </RomanSection>
 
                 {/* IX - Monograph */}
                 <RomanSection
-                  index={viewMode === 'all' ? 8 : 5}
+                  index={viewMode === 'all' ? 7 : 4}
                   of={totalSections}
                   title="Monograph - Clinical Tumor Dossier"
                   className="sp5"

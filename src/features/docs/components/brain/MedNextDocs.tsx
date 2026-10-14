@@ -32,7 +32,8 @@ export const MedNextDocs: React.FC = () => {
         </p>
         <p className="boilerplate-copy">
           <strong>Held-out test: Dice 0.73 mean / 0.86 median</strong> across 1,274 slices from 41 lesions, at{' '}
-          <strong>120 ms</strong> per slice, with <strong>0 missed lesions</strong> and calibration error{' '}
+          <strong>60 ms</strong> per slice in the deployed configuration (TTA off; 120 ms with it), with{' '}
+          <strong>0 missed lesions</strong> and calibration error{' '}
           <strong>0.0094</strong>. The gap between the mean and the median is not noise — it is the distribution.
           Lesions occupying under 0.5% of the frame score 0.41 while medium lesions reach 0.82, and the low tail pulls
           the mean down. Both numbers are reported deliberately; quoting either alone misrepresents the model.
@@ -84,7 +85,7 @@ export const MedNextDocs: React.FC = () => {
               0.0094. Best on every test metric, every size bin and both sources. No image registration loss — the
               masks are bit-identical to the source at native resolution.
             </p>
-            <span className="seg-target-metric">OpenMed 0.7040 · BTSC 0.8051 · 120 ms/slice · trained 34 of 60 epochs</span>
+            <span className="seg-target-metric">OpenMed 0.7040 · BTSC 0.8051 · 60 ms/slice (TTA off) · trained 34 of 60 epochs</span>
           </div>
         </div>
       </div>
@@ -195,7 +196,7 @@ export const MedNextDocs: React.FC = () => {
               <td>34 ms</td>
               <td>—</td>
               <td>31 ms</td>
-              <td><strong>120 ms</strong></td>
+              <td><strong>120 ms · 60 ms deployed</strong></td>
             </tr>
           </tbody>
         </table>
@@ -203,7 +204,8 @@ export const MedNextDocs: React.FC = () => {
           <p className="boilerplate-copy" style={{ margin: 0 }}>
             <strong>The three 256px runs varied 2.4× in training loss and 0.003 in test Dice.</strong> Moving to native
             512px broke that plateau: <strong>every test metric improved over every 256px configuration</strong>, and
-            the gain concentrated in the smallest lesions. The cost is inference time — 120 ms against 34 ms — which is
+            the gain concentrated in the smallest lesions. The cost is inference time — 120 ms against 34 ms on GPU
+            (60 ms in the deployed TTA-off configuration) — which is
             still far inside clinical latency but is no longer "real-time" in the way the 256px model was.
           </p>
         </div>

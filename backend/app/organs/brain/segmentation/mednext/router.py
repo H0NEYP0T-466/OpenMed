@@ -18,6 +18,7 @@ The LiteMedSAM assistive endpoints (``/segment-click``, ``/segment-box``) live i
 from __future__ import annotations
 
 import asyncio
+import gc
 import logging
 import os
 import time
@@ -27,7 +28,6 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from ...classification.brain_regions import LOCALIZATION_BASIS, map_prediction_to_3d
 from ...classification.router import (
     MAX_UPLOAD_BYTES,
     ClassificationResponse,
@@ -198,10 +198,6 @@ async def analyze_brain_scan(file: UploadFile = File(...)) -> AnalyzeResponse:
             status_code=500, detail="Inference failed while processing the image."
         ) from exc
 
-    result["locations_3d"] = map_prediction_to_3d(
-        result["predicted_class"], locations=None, model_confidence=result["confidence"],
-    )
-    result["localization_basis"] = LOCALIZATION_BASIS
     result["inference_ms"] = round((time.perf_counter() - started) * 1000.0, 1)
 
     if _is_normal(result):
@@ -217,6 +213,32 @@ async def analyze_brain_scan(file: UploadFile = File(...)) -> AnalyzeResponse:
         segmentation["segmentation_performed"], total_ms,
     )
     return AnalyzeResponse(**result, **segmentation, total_ms=total_ms)
+
+
+@router.post("/mednext/warmup", response_model=MedNeXtHealth)
+async def warmup_mednext() -> MedNeXtHealth:
+    """Load the MedNeXt segmenter into memory ahead of the first analyze.
+
+    The frontend calls this when the user enters the brain section.
+    """
+    segmenter = await _get_segmenter()
+    return MedNeXtHealth(
+        status="ok",
+        model_loaded=True,
+        checkpoint_present=True,
+        detail=f"MedNeXt ready on {segmenter.device}.",
+    )
+
+
+@router.post("/mednext/unload")
+async def unload_mednext() -> dict[str, Any]:
+    """Release the MedNeXt segmenter when the user leaves the section."""
+    global _segmenter, _segmenter_error, _segmenter_error_key
+    _segmenter = None
+    _segmenter_error = None
+    _segmenter_error_key = None
+    gc.collect()
+    return {"status": "ok", "message": "MedNeXt unloaded. Memory freed."}
 
 
 @router.get("/mednext-health", response_model=MedNeXtHealth)

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import io
+import gc
 import json
 import logging
 import os
@@ -22,7 +23,6 @@ from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from .brain_regions import LOCALIZATION_BASIS, map_prediction_to_3d
 from .label_space import (
     CLASS_NAMES,
     LabelSpaceError,
@@ -198,18 +198,6 @@ class Top5Prediction(BaseModel):
     confidence: float
 
 
-class BrainRegion(BaseModel):
-    name: str
-    display_name: str
-    coordinates_3d: list[float]
-    color: str
-    lobe: str
-    description: str
-    probability: float
-    rank: int
-    basis: str
-
-
 class ClassificationResponse(BaseModel):
     predicted_class: str
     confidence: float
@@ -220,8 +208,6 @@ class ClassificationResponse(BaseModel):
     gradcam_base64: str
     gradcam_grid: list[int]
     explainability: dict[str, Any]
-    locations_3d: list[BrainRegion]
-    localization_basis: str
     model_trained: bool
     label_space_source: str
     inference_ms: float
@@ -279,6 +265,31 @@ def _validate_upload(file: UploadFile, payload: bytes) -> Image.Image:
         ) from exc
 
 
+@router.post("/warmup")
+async def warmup_brain_classifier() -> dict[str, Any]:
+    """Load the classifier into memory so the first analyze request is fast.
+
+    The frontend calls this when the user enters the brain section.
+    """
+    pipeline = await _get_pipeline()
+    return {
+        "status": "ok",
+        "message": "Brain classifier loaded.",
+        "device": str(pipeline.device),
+    }
+
+
+@router.post("/unload")
+async def unload_brain_classifier() -> dict[str, Any]:
+    """Release the classifier from memory when the user leaves the section."""
+    global _pipeline, _pipeline_error, _pipeline_error_key
+    _pipeline = None
+    _pipeline_error = None
+    _pipeline_error_key = None
+    gc.collect()
+    return {"status": "ok", "message": "Brain classifier unloaded. Memory freed."}
+
+
 @router.post("/classify", response_model=ClassificationResponse)
 async def classify_brain_tumor(file: UploadFile = File(...)) -> ClassificationResponse:
     """Classify a brain MRI image and return Grad-CAM and localisation hints."""
@@ -299,13 +310,6 @@ async def classify_brain_tumor(file: UploadFile = File(...)) -> ClassificationRe
             status_code=500, detail="Inference failed while processing the image."
         ) from exc
 
-    locations = map_prediction_to_3d(
-        result["predicted_class"],
-        locations=None,
-        model_confidence=result["confidence"],
-    )
-    result["locations_3d"] = locations
-    result["localization_basis"] = LOCALIZATION_BASIS
     result["inference_ms"] = round((time.perf_counter() - started) * 1000.0, 1)
 
     logger.info(

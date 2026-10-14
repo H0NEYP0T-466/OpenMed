@@ -14,7 +14,9 @@ import { AtlasDossier } from '../../components/medical/AtlasDossier'
 import { EssayHead } from '../../components/medical/EssayHead'
 import { Maximize2, ExternalLink, X } from 'lucide-react'
 import { AppShell } from '../../components/common/AppShell'
+import { ThinkingOrbOverlay } from '../../components/common/ThinkingOrb'
 import { BrainClassificationWorkspace } from './brain/BrainClassificationWorkspace'
+import { warmBrainModels, unloadBrainModels } from './brain/brainApi'
 import './OrganDashboard.css'
 
 const ORGAN_ORDER: readonly OrganId[] = Object.keys(ORGANS_REGISTRY) as OrganId[]
@@ -75,6 +77,40 @@ export const OrganDashboard: React.FC = () => {
 
   const [atlasState, setAtlasState] = useState<AtlasSceneState>(INITIAL_ATLAS_STATE)
   const [selectedPart, setSelectedPart] = useState<Part | null>(null)
+
+  /**
+   * Organ-scoped model residency: entering the brain section warms the
+   * classifier, MedNeXt and the assistive LiteMedSAM stack on the backend and
+   * holds them in memory while the user stays. Leaving the section releases
+   * them again. Other organs have no trained models yet, so only brain warms.
+   */
+  const [brainModelsWarming, setBrainModelsWarming] = useState(false)
+  const prevOrganRef = useRef<OrganId>(selectedOrganId)
+
+  useEffect(() => {
+    const prev = prevOrganRef.current
+    prevOrganRef.current = selectedOrganId
+
+    if (selectedOrganId === 'brain' && prev !== 'brain') {
+      setBrainModelsWarming(true)
+      warmBrainModels()
+        .catch(() => false)
+        .then(() => setBrainModelsWarming(false))
+    }
+    if (prev === 'brain' && selectedOrganId !== 'brain') {
+      void unloadBrainModels().catch(() => false)
+    }
+  }, [selectedOrganId])
+
+  // Leaving /app entirely releases the brain models too.
+  useEffect(() => {
+    return () => {
+      if (prevOrganRef.current === 'brain') {
+        void unloadBrainModels().catch(() => false)
+      }
+    }
+  }, [])
+
 
   const plateRef = useRef<HTMLElement>(null)
   const organCameraApi = useRef<OrganCameraApi | null>(null)
@@ -312,6 +348,9 @@ export const OrganDashboard: React.FC = () => {
           onSelectOrgan={handleSelectOrgan}
         />
       </footer>
+      {brainModelsWarming && (
+        <ThinkingOrbOverlay isVisible label="Loading neural suite…" size={110} />
+      )}
     </AppShell>
   )
 }

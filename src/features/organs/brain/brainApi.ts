@@ -277,3 +277,34 @@ export const getBrainHealth = async (): Promise<BrainHealthStatus> => {
   }
   return (await response.json()) as BrainHealthStatus
 }
+
+/**
+ * Warm every brain model the workspace uses — classifier (EfficientNetV2-B2),
+ * MedNeXt segmenter and the assistive LiteMedSAM stack — before the user's
+ * first interaction. Called when the user enters the brain section.
+ */
+export const warmBrainModels = async (): Promise<boolean> => {
+  const base = API_BASE_URL
+  const calls = [
+    fetch(`${base}/warmup`, { method: 'POST' }).catch(() => null),
+    fetch(`${base}/mednext/warmup`, { method: 'POST' }).catch(() => null),
+    fetch(`${base}/load-models`, { method: 'POST' }).catch(() => null),
+  ]
+  const results = await Promise.all(calls)
+  return results.every((r) => r !== null && r.ok)
+}
+
+/**
+ * Release every brain model from backend memory. Called when the user leaves
+ * the brain section for another organ.
+ */
+export const unloadBrainModels = async (): Promise<boolean> => {
+  const base = API_BASE_URL
+  const calls = [
+    fetch(`${base}/unload`, { method: 'POST' }).catch(() => null),
+    fetch(`${base}/mednext/unload`, { method: 'POST' }).catch(() => null),
+    fetch(`${base}/unload-models`, { method: 'POST' }).catch(() => null),
+  ]
+  const results = await Promise.all(calls)
+  return results.every((r) => r !== null && r.ok)
+}

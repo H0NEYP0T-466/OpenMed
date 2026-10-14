@@ -10,20 +10,6 @@ export interface Top5Prediction {
   readonly confidence: number
 }
 
-export interface BrainRegion3D {
-  readonly name: string
-  readonly display_name: string
-  /** Approximate MNI centroid in millimetres. */
-  readonly coordinates_3d: [number, number, number]
-  readonly color: string
-  readonly lobe: string
-  readonly description: string
-  /** Typical-site prior scaled by classifier confidence, not a lesion measurement. */
-  readonly probability: number
-  readonly rank: number
-  readonly basis: string
-}
-
 export interface Explainability {
   readonly method: string
   readonly layer: string
@@ -41,8 +27,6 @@ export interface BrainClassificationResult {
   readonly gradcam_base64: string
   readonly gradcam_grid: readonly [number, number]
   readonly explainability: Explainability
-  readonly locations_3d: readonly BrainRegion3D[]
-  readonly localization_basis: string
   readonly model_trained: boolean
   readonly label_space_source: string
   readonly inference_ms: number

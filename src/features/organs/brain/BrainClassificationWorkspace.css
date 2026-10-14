@@ -305,10 +305,6 @@
   pointer-events: none;
 }
 
-.btn-inline-orb {
-  margin-right: 6px;
-  vertical-align: middle;
-}
 
 /* Corner Reticles */
 .reticle {
@@ -1896,10 +1892,6 @@
   color: var(--accent);
 }
 
-.assistive-slot {
-  width: 100%;
-  margin-top: 18px;
-}
 
 /* --- MedNeXt segmentation result --- */
 .seg-result-block {
@@ -1929,4 +1921,50 @@
   font-size: 12px;
   line-height: 1.6;
   color: var(--ink);
+}
+
+/* ── Assistive staged strip (inside Segmentatio) ─────────────────────── */
+
+.assistive-section-block {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.assistive-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.assistive-flow-hint {
+  font-family: var(--font-display, inherit);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mute, #8a8a8a);
+}
+
+.assistive-stages {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.assistive-stages .scan-plate-triple {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* ── Native file input: never rendered, only driven programmatically ── */
+
+.hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
