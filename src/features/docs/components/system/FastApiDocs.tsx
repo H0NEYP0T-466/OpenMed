@@ -7,7 +7,7 @@ export const FastApiDocs: React.FC = () => {
     <section id="section-api-infra" className="doc-section-wrapper">
       <RomanSection
         index={2}
-        of={5}
+        of={4}
         title="Infrastructura - Production FastAPI Inference Service"
         className="sp12"
       >

@@ -1,0 +1,139 @@
+15:40:45 | INFO    | train_mednext | STAGE 1/7 — environment
+15:40:46 | INFO    | numexpr.utils | NumExpr defaulting to 4 threads.
+15:40:47 | INFO    | bootstrap     | python 3.13.15 | torch 2.11.0+cu128 | cuda 12.8 | cudnn 91900
+15:40:47 | INFO    | bootstrap     | cpus 4 | free disk 19.3 GB | kaggle True
+15:40:47 | INFO    | bootstrap     | GPU 0: Tesla T4 14.6 GB (sm_75)
+15:40:47 | INFO    | bootstrap     | GPU 1: Tesla T4 14.6 GB (sm_75)
+15:40:47 | INFO    | train_mednext | dependencies: {'torch': '2.11.0+cu128', 'numpy': '2.1.3', 'cv2': '4.14.0', 'scipy': '1.16.3', 'matplotlib': '3.10.0', 'sklearn': '1.6.1'}
+15:41:04 | INFO    | train_mednext | openmed root: /kaggle/input/datasets/h0neyp0t/fypseg/data
+15:41:04 | INFO    | train_mednext | btsc root   : /kaggle/input/datasets/nikhilroxtomar/brain-tumor-segmentation
+15:41:04 | INFO    | train_mednext | MedNeXt-B (2D) | k=3 | width=32 | blocks=[2, 2, 2, 2, 2, 2, 2, 2, 2] | exp_r=[2, 3, 4, 4, 4, 4, 4, 3, 2] | grn=False | drop_path=0.15 | 10.45 M params
+15:41:04 | INFO    | train_mednext | STAGE 2/7 — dataset hygiene
+15:41:04 | INFO    | audit         | [openmed] layout: images=images masks=masks mask_suffix='' (10056 paired stems)
+15:41:04 | INFO    | audit         | [btsc] layout: images=images masks=masks mask_suffix='' (3064 paired stems)
+15:41:04 | INFO    | splits        | [openmed] group keys from manifest.csv (10056 entries)
+15:41:05 | INFO    | audit         | [openmed] H01 pair integrity             PASS 10056 paired stems; 0 images without mask, 0 masks without image
+15:41:05 | INFO    | audit         | [openmed] inspecting 10056 pairs with 4 workers
+15:41:22 | INFO    | audit         | [openmed] inspected 1005 / 10056
+15:41:39 | INFO    | audit         | [openmed] inspected 2010 / 10056
+15:41:56 | INFO    | audit         | [openmed] inspected 3015 / 10056
+15:42:13 | INFO    | audit         | [openmed] inspected 4020 / 10056
+15:42:30 | INFO    | audit         | [openmed] inspected 5025 / 10056
+15:42:47 | INFO    | audit         | [openmed] inspected 6030 / 10056
+15:43:03 | INFO    | audit         | [openmed] inspected 7035 / 10056
+15:43:20 | INFO    | audit         | [openmed] inspected 8040 / 10056
+15:43:37 | INFO    | audit         | [openmed] inspected 9045 / 10056
+15:43:54 | INFO    | audit         | [openmed] inspected 10050 / 10056
+15:43:56 | INFO    | audit         | [openmed] H02 readability                PASS 0 unreadable of 10056
+15:43:56 | INFO    | audit         | [openmed] H03 geometry                   PASS 0 image/mask shape mismatches; resolutions {'512x512': 10056}
+15:43:56 | INFO    | audit         | [openmed] H04 channels                   PASS channel census {3: 10056}; 387 frames hold a few coloured pixels (annotation marks, <2% of the frame, harmless to a 1-channel model); 0 frames are genuinely coloured (>2%)
+15:43:56 | INFO    | audit         | [openmed] H05 mask values                PASS 0 masks hold values other than {0,255} (max ambiguous fraction 0.0000); masks binarised at >=128
+15:43:56 | INFO    | audit         | [openmed] H06 mask extent                PASS 0 empty, 0 full-frame, 0 below 0.02% of frame; fg fraction min 0.0006 median 0.0193 max 0.1723
+15:43:56 | WARNING | audit         | [openmed] H07 mask alignment             WARN 38 masks below 90% on anatomy (min 0.000, median 1.000)
+15:43:56 | INFO    | audit         | [openmed] H08 mask morphology            INFO components median 1 max 1; 0 fragmented (>2); 397 with holes; 0 touch the border; solidity median 0.938
+15:43:56 | INFO    | audit         | [openmed] H09 image content              PASS 0 constant frames, 0 with std < 8, 0 with >25% saturated pixels; gray mean median 40.2, std median 48.3
+15:43:56 | INFO    | audit         | [openmed] H10 exact duplicates           PASS 0 byte-identical image groups (0 files); 0 decoded-pixel-identical groups (0 files)
+15:43:56 | INFO    | audit         | [openmed] H11 conflicting duplicates     PASS 0 identical images carry different masks (0 files); 0 span more than one lesion
+15:44:30 | WARNING | audit         | [openmed] H12 near duplicates            WARN pHash pairs <= 3: {'within_group': 6169, 'cross_group': 56}; 605 pixel-confirmed twins (MAE < 3), 5620 similar-but-distinct (neighbouring slices, kept)
+15:44:30 | INFO    | audit         | [openmed] H13 group integrity            INFO 347 lesion groups; slices/group median 18 max 298; 30 singletons. Filename-derived, NOT a verified patient id (merging distinct patients is safe, splitting one is not)
+15:44:30 | WARNING | audit         | [openmed] CLEAN cleaning policy            WARN kept 9635 of 10056; dropped 421: {'near-duplicate image, conflicting mask': 385, 'mask sits below 90% on anatomy': 36}
+15:44:30 | INFO    | audit         | [openmed] VERIFY post-clean state           PASS no unreadable/empty/full masks and no exact duplicates remain
+15:44:30 | INFO    | audit         | [btsc] H01 pair integrity             PASS 3064 paired stems; 0 images without mask, 0 masks without image
+15:44:30 | INFO    | audit         | [btsc] inspecting 3064 pairs with 4 workers
+15:44:36 | INFO    | audit         | [btsc] inspected 306 / 3064
+15:44:42 | INFO    | audit         | [btsc] inspected 612 / 3064
+15:44:47 | INFO    | audit         | [btsc] inspected 918 / 3064
+15:44:52 | INFO    | audit         | [btsc] inspected 1224 / 3064
+15:44:57 | INFO    | audit         | [btsc] inspected 1530 / 3064
+15:45:03 | INFO    | audit         | [btsc] inspected 1836 / 3064
+15:45:08 | INFO    | audit         | [btsc] inspected 2142 / 3064
+15:45:14 | INFO    | audit         | [btsc] inspected 2448 / 3064
+15:45:19 | INFO    | audit         | [btsc] inspected 2754 / 3064
+15:45:24 | INFO    | audit         | [btsc] inspected 3060 / 3064
+15:45:25 | INFO    | audit         | [btsc] H02 readability                PASS 0 unreadable of 3064
+15:45:25 | INFO    | audit         | [btsc] H03 geometry                   PASS 0 image/mask shape mismatches; resolutions {'512x512': 3049, '256x256': 15}
+15:45:25 | INFO    | audit         | [btsc] H04 channels                   PASS channel census {1: 3064}; 0 frames hold a few coloured pixels (annotation marks, <2% of the frame, harmless to a 1-channel model); 0 frames are genuinely coloured (>2%)
+15:45:25 | INFO    | audit         | [btsc] H05 mask values                PASS 0 masks hold values other than {0,255} (max ambiguous fraction 0.0000); masks binarised at >=128
+15:45:25 | INFO    | audit         | [btsc] H06 mask extent                PASS 0 empty, 0 full-frame, 0 below 0.02% of frame; fg fraction min 0.0010 median 0.0129 max 0.0971
+15:45:25 | INFO    | audit         | [btsc] H07 mask alignment             PASS 0 masks below 90% on anatomy (min 0.988, median 1.000)
+15:45:25 | INFO    | audit         | [btsc] H08 mask morphology            INFO components median 1 max 2; 0 fragmented (>2); 0 with holes; 0 touch the border; solidity median 0.969
+15:45:25 | INFO    | audit         | [btsc] H09 image content              PASS 0 constant frames, 0 with std < 8, 0 with >25% saturated pixels; gray mean median 39.6, std median 41.1
+15:45:25 | INFO    | audit         | [btsc] H10 exact duplicates           PASS 0 byte-identical image groups (0 files); 0 decoded-pixel-identical groups (0 files)
+15:45:25 | INFO    | audit         | [btsc] H11 conflicting duplicates     PASS 0 identical images carry different masks (0 files); 0 span more than one lesion
+15:45:27 | INFO    | audit         | [btsc] H12 near duplicates            PASS pHash pairs <= 3: {'within_group': 149, 'cross_group': 12}; 0 pixel-confirmed twins (MAE < 3), 161 similar-but-distinct (neighbouring slices, kept)
+15:45:27 | WARNING | audit         | [btsc] H13 group integrity            WARN no recoverable group key — split will use snapped contiguous blocks
+15:45:27 | INFO    | audit         | [btsc] CLEAN cleaning policy            INFO kept 3064 of 3064; dropped 0: {}
+15:45:27 | INFO    | audit         | [btsc] VERIFY post-clean state           PASS no unreadable/empty/full masks and no exact duplicates remain
+15:45:27 | INFO    | audit         | [cross-source] H14 overlap PASS 6 pHash candidates, 0 pixel-confirmed shared, 0 exact-pixel shared -> DISJOINT
+15:45:27 | INFO    | train_mednext | STAGE 3/7 — splits
+15:45:51 | INFO    | splits        | [openmed] {"n_records": 9635, "twin_merge": {"twin_pairs": 4688, "merges": 23, "refused_over_cap": 0, "cap_slices": 963}, "n_groups": 324, "group_sizes": {"median": 17.0, "max": 358, "min": 1}, "partition": {"mode": "grouped", "score": 0.1358, "tries": 400, "n_groups": 324}}
+15:45:51 | INFO    | splits        | [btsc] adjacency evidence: adjacent-slice corr median 0.925 vs random 0.536; 93 snapped blocks
+15:45:56 | INFO    | splits        | [btsc] {"n_records": 3064, "n_blocks_before_merge": 93, "twin_merge": {"twin_pairs": 161, "merges": 6, "refused_over_cap": 0, "cap_slices": 306}, "n_groups": 87, "group_sizes": {"median": 33.0, "max": 119, "min": 25}, "partition": {"mode": "block", "score": 0.2381, "tries": 400, "n_groups": 87}}
+15:45:56 | INFO    | audit         | [split] V1 group leakage              PASS 0 groups appear in more than one split
+15:45:56 | INFO    | audit         | [split] V2 stem overlap               PASS 0 stems appear in more than one split
+15:45:56 | INFO    | audit         | [split] V3 exact content leakage      PASS decoded-pixel overlap train/val 0, train/test 0, val/test 0
+15:45:56 | INFO    | audit         | [split] V4 near-dup twins             PASS 0 val/test slices were pixel-near-identical to a training slice and were purged from evaluation; 0 further pHash<= 3 pairs are merely similar-looking neighbouring anatomy (kept)
+15:45:56 | WARNING | audit         | [split] V5 btsc adjacency             WARN 30 adjacent index pairs cross a split boundary (median corr 0.515); 0 val/test slices purged for sitting beside a near-identical training slice
+15:45:56 | INFO    | audit         | [split] V6 distribution parity        PASS KS(lesion-size) train-vs-eval worst 0.061 (0 identical, >0.15 notable)
+15:45:56 | INFO    | audit         | [split] V7 split sizes                INFO train=10136 (79.8%) {'openmed': 7705, 'btsc': 2431}; val=1289 (10.2%) {'openmed': 967, 'btsc': 322}; test=1274 (10.0%) {'openmed': 963, 'btsc': 311}
+15:45:56 | INFO    | audit         | [split] V8 evaluation size            PASS val=1289 test=1274 slices
+15:45:56 | INFO    | train_mednext | STAGE 4/7 — array cache
+15:45:57 | INFO    | data          | building array cache: 12699 records at 512x512
+15:46:00 | INFO    | data          |   cached 1269 / 12699
+15:46:04 | INFO    | data          |   cached 2538 / 12699
+15:46:07 | INFO    | data          |   cached 3807 / 12699
+15:46:10 | INFO    | data          |   cached 5076 / 12699
+15:46:14 | INFO    | data          |   cached 6345 / 12699
+15:46:21 | INFO    | data          |   cached 7614 / 12699
+15:46:29 | INFO    | data          |   cached 8883 / 12699
+15:46:34 | INFO    | data          |   cached 10152 / 12699
+15:46:38 | INFO    | data          |   cached 11421 / 12699
+15:46:41 | INFO    | data          |   cached 12690 / 12699
+15:46:54 | INFO    | audit         | [cache] H15 cache resolution           PASS 0 masks vanish at 512px, 0 keep < 16 px; median relative area change 0.000%, p99 0.000%; mask values in {0,1}: True
+15:46:54 | INFO    | audit         | [cache] H16 cache vs files             PASS 64 random rows re-derived from disk, 0 differ
+15:46:55 | INFO    | train_mednext |   train 10136 slices {'openmed': 7705, 'btsc': 2431}
+15:46:55 | INFO    | train_mednext |   val   1289 slices {'openmed': 967, 'btsc': 322}
+15:46:55 | INFO    | train_mednext |   test  1274 slices {'openmed': 963, 'btsc': 311}
+15:46:55 | INFO    | train_mednext | STAGE 5/7 — training on 2 device(s)
+23:31:12 | INFO    | train_mednext | STAGE 6/7 — post-processing search, held-out test, export
+23:31:12 | INFO    | mednext.pipeline | MedNeXt-B loaded: 10.45M params, input 512px, threshold 0.50, min_area 0.0000, tta False, device cuda
+23:31:12 | INFO    | audit         | [final] H17 train/serve parity         PASS 50 test files decoded from raw bytes through the serving path; 0 differ from the canvas training saw
+23:37:47 | INFO    | evaluate      | post-processing search (tta=False): best 0.7104 over 45 settings
+23:45:17 | INFO    | evaluate      | post-processing search (tta=True): best 0.7191 over 45 settings
+23:45:17 | INFO    | evaluate      | chosen post-processing: threshold 0.45, min_area 0.0020, tta True | val macro Dice 0.7101 -> 0.7191
+23:45:54 | INFO    | evaluate      | test: 200 / 1274 scored
+23:46:27 | INFO    | evaluate      | test: 400 / 1274 scored
+23:47:01 | INFO    | evaluate      | test: 600 / 1274 scored
+23:47:35 | INFO    | evaluate      | test: 800 / 1274 scored
+23:48:08 | INFO    | evaluate      | test: 1000 / 1274 scored
+23:48:42 | INFO    | evaluate      | test: 1200 / 1274 scored
+23:48:56 | INFO    | evaluate      | test: Dice mean 0.7287 median 0.8620 | IoU 0.6377 | HD95 median 18.0 px | missed 0 / 1274 | ECE 0.0094
+23:49:20 | INFO    | evaluate      | test_no_tta: 200 / 1274 scored
+23:49:39 | INFO    | evaluate      | test_no_tta: 400 / 1274 scored
+23:49:59 | INFO    | evaluate      | test_no_tta: 600 / 1274 scored
+23:50:19 | INFO    | evaluate      | test_no_tta: 800 / 1274 scored
+23:50:38 | INFO    | evaluate      | test_no_tta: 1000 / 1274 scored
+23:50:58 | INFO    | evaluate      | test_no_tta: 1200 / 1274 scored
+23:51:07 | INFO    | evaluate      | test_no_tta: Dice mean 0.7257 median 0.8610 | IoU 0.6358 | HD95 median 17.0 px | missed 0 / 1274 | ECE 0.0107
+23:51:41 | INFO    | evaluate      | val: 200 / 1289 scored
+23:52:14 | INFO    | evaluate      | val: 400 / 1289 scored
+23:52:48 | INFO    | evaluate      | val: 600 / 1289 scored
+23:53:21 | INFO    | evaluate      | val: 800 / 1289 scored
+23:53:55 | INFO    | evaluate      | val: 1000 / 1289 scored
+23:54:29 | INFO    | evaluate      | val: 1200 / 1289 scored
+23:54:47 | INFO    | evaluate      | val: Dice mean 0.6939 median 0.8333 | IoU 0.6040 | HD95 median 19.9 px | missed 0 / 1289 | ECE 0.0099
+23:54:47 | INFO    | evaluate      | final serving checkpoint written: /kaggle/working/mednext_run/best/mednext_brain_seg.pth (39.9 MB)
+23:54:47 | INFO    | mednext.pipeline | MedNeXt-B loaded: 10.45M params, input 512px, threshold 0.45, min_area 0.0020, tta True, device cpu
+23:54:57 | INFO    | audit         | [final] H18 export round-trip          PASS final checkpoint reloads strictly on CPU and segments T1 - Medulloblastoma ventricle 001 (4443 foreground px)
+23:54:57 | INFO    | train_mednext | STAGE 7/7 — plots, report, ZIP
+23:54:58 | INFO    | reporting     | plot written: 01_learning_curves.png
+23:55:00 | INFO    | reporting     | plot written: 02_dataset_overview.png
+23:55:00 | INFO    | reporting     | plot written: 03_btsc_adjacency.png
+23:55:02 | INFO    | reporting     | plot written: 04_training_samples.png
+23:55:04 | INFO    | reporting     | plot written: 05_augmentation_preview.png
+23:55:05 | INFO    | reporting     | plot written: 06_test_distributions.png
+23:55:06 | INFO    | reporting     | plot written: 07_postprocess_search.png
+23:55:10 | INFO    | reporting     | plot written: 08_calibration_pr.png
+23:55:10 | INFO    | mednext.pipeline | MedNeXt-B loaded: 10.45M params, input 512px, threshold 0.45, min_area 0.0020, tta True, device cuda
+23:55:14 | INFO    | reporting     | plot written: 09_qualitative.png
+23:55:14 | INFO    | train_mednext | report: /kaggle/working/mednext_run/logs/TRAINING_REPORT.txt

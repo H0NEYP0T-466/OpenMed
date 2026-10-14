@@ -9,7 +9,6 @@ import {
   Copy,
   Check,
 } from 'lucide-react'
-import { RomanSection } from '../../../../components/common/RomanSection'
 
 export const DatasetSanitizationDocs: React.FC = () => {
   const [copiedAuditCmd, setCopiedAuditCmd] = useState(false)
@@ -49,12 +48,13 @@ print(f'Byte Duplicates Found: {len(byte_dups)}')
 
   return (
     <section id="section-dataset" className="doc-section-wrapper">
-      <RomanSection
-        index={5}
-        of={5}
-        title="Curatio - Dataset Integrity, Modality Flattening & Verification"
-        className="sp12"
-      >
+      <div className="decision-matrix-table-wrap">
+        <div style={{ padding: '12px 16px', background: 'var(--bone)', borderBottom: '1px solid var(--line)' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink)' }}>
+            Curatio · Brain Classification Dataset Integrity, Modality Flattening &amp; Verification
+          </span>
+        </div>
+        <div style={{ padding: '14px 16px' }}>
         {/* Top Summary Block */}
         <div className="doc-info-block">
           <div className="doc-block-header">
@@ -523,7 +523,8 @@ print(f'Byte Duplicates Found: {len(byte_dups)}')
             </pre>
           </div>
         </div>
-      </RomanSection>
+      </div>
+      </div>
     </section>
   )
 }

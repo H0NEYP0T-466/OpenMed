@@ -7,7 +7,7 @@ export const MniStereotacticDocs: React.FC = () => {
     <section id="section-stereotactic" className="doc-section-wrapper">
       <RomanSection
         index={3}
-        of={5}
+        of={4}
         title="Stereotactic Coordinates — MNI Convention, Illustrative"
         className="sp12"
       >

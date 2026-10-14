@@ -1,0 +1,1039 @@
+{
+ "sources": {
+  "openmed": {
+   "source": "openmed",
+   "n_paired": 10056,
+   "n_kept": 9635,
+   "n_dropped": 421,
+   "checks": [
+    {
+     "code": "H01",
+     "name": "pair integrity",
+     "status": "PASS",
+     "detail": "10056 paired stems; 0 images without mask, 0 masks without image",
+     "data": {
+      "orphans": {
+       "images_without_mask": [],
+       "masks_without_image": []
+      },
+      "n_orphans": 0
+     }
+    },
+    {
+     "code": "H02",
+     "name": "readability",
+     "status": "PASS",
+     "detail": "0 unreadable of 10056",
+     "data": {
+      "examples": []
+     }
+    },
+    {
+     "code": "H03",
+     "name": "geometry",
+     "status": "PASS",
+     "detail": "0 image/mask shape mismatches; resolutions {'512x512': 10056}",
+     "data": {
+      "mismatched": [],
+      "resolutions": {
+       "512x512": 10056
+      }
+     }
+    },
+    {
+     "code": "H04",
+     "name": "channels",
+     "status": "PASS",
+     "detail": "channel census {3: 10056}; 387 frames hold a few coloured pixels (annotation marks, <2% of the frame, harmless to a 1-channel model); 0 frames are genuinely coloured (>2%)",
+     "data": {
+      "channels": {
+       "3": 10056
+      },
+      "annotation_frames": 387,
+      "colour_examples": []
+     }
+    },
+    {
+     "code": "H05",
+     "name": "mask values",
+     "status": "PASS",
+     "detail": "0 masks hold values other than {0,255} (max ambiguous fraction 0.0000); masks binarised at >=128",
+     "data": {
+      "examples": []
+     }
+    },
+    {
+     "code": "H06",
+     "name": "mask extent",
+     "status": "PASS",
+     "detail": "0 empty, 0 full-frame, 0 below 0.02% of frame; fg fraction min 0.0006 median 0.0193 max 0.1723",
+     "data": {
+      "fg_frac": {
+       "min": 0.00058746337890625,
+       "p5": 0.0030517578125,
+       "median": 0.019289016723632812,
+       "p95": 0.06637096405029297,
+       "max": 0.17230224609375
+      },
+      "tiny_examples": []
+     }
+    },
+    {
+     "code": "H07",
+     "name": "mask alignment",
+     "status": "WARN",
+     "detail": "38 masks below 90% on anatomy (min 0.000, median 1.000)",
+     "data": {
+      "inside": {
+       "min": 0.0,
+       "p5": 1.0,
+       "median": 1.0,
+       "p95": 1.0,
+       "max": 1.0
+      },
+      "examples": [
+       "T1 - Anaplastic astrocytoma frontal , ventricle 004",
+       "T1 - Cerebellopontine angle meningioma posterior fossa , temporal 004",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic and gemistocytic components) frontal 004",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 029",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 030",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 031",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 032",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 033",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 035",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 037",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 038",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 039",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 044",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 046",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 047",
+       "T1 - Diffuse astrocytoma NOS (protoplasmic) frontal 049",
+       "T1 - Ependymoma ventricle 004",
+       "T1 - Ependymoma ventricle 005",
+       "T1 - Glioblastoma NOS parietal , occipital 003",
+       "T1 - Meningioma frontal 256"
+      ]
+     }
+    },
+    {
+     "code": "H08",
+     "name": "mask morphology",
+     "status": "INFO",
+     "detail": "components median 1 max 1; 0 fragmented (>2); 397 with holes; 0 touch the border; solidity median 0.938",
+     "data": {
+      "components": {
+       "min": 1.0,
+       "p5": 1.0,
+       "median": 1.0,
+       "p95": 1.0,
+       "max": 1.0
+      },
+      "solidity": {
+       "min": 0.3554643426837334,
+       "p5": 0.651507625956959,
+       "median": 0.9376214935604736,
+       "p95": 0.9816624639849274,
+       "max": 0.9926641949152543
+      },
+      "circularity": {
+       "min": 0.09130146382289503,
+       "p5": 0.28516927308216733,
+       "median": 0.7265040981058202,
+       "p95": 0.8691079666110488,
+       "max": 0.879978180278703
+      },
+      "border_touching": 0
+     }
+    },
+    {
+     "code": "H09",
+     "name": "image content",
+     "status": "PASS",
+     "detail": "0 constant frames, 0 with std < 8, 0 with >25% saturated pixels; gray mean median 40.2, std median 48.3",
+     "data": {
+      "gray_mean": {
+       "min": 10.5928955078125,
+       "p5": 22.940248489379883,
+       "median": 40.16763496398926,
+       "p95": 58.23089408874512,
+       "max": 120.09411239624023
+      },
+      "gray_std": {
+       "min": 17.24145424161914,
+       "p5": 35.13025800545736,
+       "median": 48.31290622697429,
+       "p95": 63.21988231334882,
+       "max": 93.40705040448975
+      },
+      "zero_frac": {
+       "min": 0.0,
+       "p5": 0.0,
+       "median": 0.15625,
+       "p95": 0.6755495071411133,
+       "max": 0.8356590270996094
+      },
+      "low_contrast_examples": [],
+      "saturated_examples": []
+     }
+    },
+    {
+     "code": "H10",
+     "name": "exact duplicates",
+     "status": "PASS",
+     "detail": "0 byte-identical image groups (0 files); 0 decoded-pixel-identical groups (0 files)",
+     "data": {
+      "byte_groups": 0,
+      "pixel_groups": 0,
+      "examples": []
+     }
+    },
+    {
+     "code": "H11",
+     "name": "conflicting duplicates",
+     "status": "PASS",
+     "detail": "0 identical images carry different masks (0 files); 0 span more than one lesion",
+     "data": {
+      "conflicting": 0,
+      "cross_lesion": 0,
+      "examples": []
+     }
+    },
+    {
+     "code": "H12",
+     "name": "near duplicates",
+     "status": "WARN",
+     "detail": "pHash pairs <= 3: {'within_group': 6169, 'cross_group': 56}; 605 pixel-confirmed twins (MAE < 3), 5620 similar-but-distinct (neighbouring slices, kept)",
+     "data": {
+      "counts": {
+       "hamming<=0": {
+        "within_group": 1378,
+        "cross_group": 5
+       },
+       "hamming<=1": {
+        "within_group": 1378,
+        "cross_group": 5
+       },
+       "hamming<=2": {
+        "within_group": 6169,
+        "cross_group": 56
+       },
+       "hamming<=3": {
+        "within_group": 6169,
+        "cross_group": 56
+       }
+      },
+      "cross_group_examples": [
+       {
+        "a": "T1 - Ependymoma intraventricular , ventricle 027",
+        "b": "T1 - Posterior fossa ependymoma supratentorial 070",
+        "hamming": 2
+       },
+       {
+        "a": "T1 - Intraventricular meningioma ventricle , temporal 228",
+        "b": "T1C+ - Oligodendroglioma NOS (grade 3) frontal 007",
+        "hamming": 2
+       },
+       {
+        "a": "T1 - Oligodendroglioma (IDH-mt, 1p19q codeleted) frontal , parietal 001",
+        "b": "T1C+ - Oligodendroglioma NOS (grade 3) frontal 007",
+        "hamming": 2
+       },
+       {
+        "a": "T1 - Oligodendroglioma (IDH-mt, 1p19q codeleted) frontal , parietal 002",
+        "b": "T2 - Meningioma parietal 005",
+        "hamming": 2
+       },
+       {
+        "a": "T1 - Oligodendroglioma NOS (grade 3) frontal 004",
+        "b": "T1 - Solitary fibrous tumor (hemangiopericytoma) falx 089",
+        "hamming": 2
+       },
+       {
+        "a": "T1 - Oligodendroglioma NOS (grade 3) frontal 004",
+        "b": "T1 - Solitary fibrous tumor (hemangiopericytoma) falx 090",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Angiomatous meningioma frontal , supratentorial 012",
+        "b": "T1C+ - Glioblastoma NOS frontal 006",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Atypical meningioma frontal , ventricle 026",
+        "b": "T2 - Solitary fibrous tumor (hemangiopericytoma) frontal , ventricle 062",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Atypical meningioma frontal , ventricle 026",
+        "b": "T2 - Solitary fibrous tumor (hemangiopericytoma) frontal , ventricle 063",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Ependymoma intraventricular , ventricle 037",
+        "b": "T1C+ - Posterior fossa ependymoma supratentorial 048",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 009",
+        "b": "T2 - Multicentric glioblastoma occipital , ventricle 001",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 010",
+        "b": "T2 - Multicentric glioblastoma occipital , ventricle 001",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 011",
+        "b": "T2 - Multicentric glioblastoma occipital , ventricle 001",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 013",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 014",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 015",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 016",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 017",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 018",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       },
+       {
+        "a": "T1C+ - Glioblastoma NOS - multifocal frontal 019",
+        "b": "T1C+ - Glioblastoma NOS 010",
+        "hamming": 2
+       }
+      ],
+      "confirmed_twins": 605,
+      "similar_distinct": 5620
+     }
+    },
+    {
+     "code": "H13",
+     "name": "group integrity",
+     "status": "INFO",
+     "detail": "347 lesion groups; slices/group median 18 max 298; 30 singletons. Filename-derived, NOT a verified patient id (merging distinct patients is safe, splitting one is not)",
+     "data": {
+      "kind": "lesion",
+      "subject_verified": false,
+      "n_groups": 347,
+      "slices_per_group": {
+       "median": 18.0,
+       "mean": 28.979827089337174,
+       "max": 298
+      },
+      "singletons": 30
+     }
+    },
+    {
+     "code": "CLEAN",
+     "name": "cleaning policy",
+     "status": "WARN",
+     "detail": "kept 9635 of 10056; dropped 421: {'near-duplicate image, conflicting mask': 385, 'mask sits below 90% on anatomy': 36}",
+     "data": {
+      "reasons": {
+       "near-duplicate image, conflicting mask": 385,
+       "mask sits below 90% on anatomy": 36
+      },
+      "n_kept": 9635,
+      "n_dropped": 421
+     }
+    },
+    {
+     "code": "VERIFY",
+     "name": "post-clean state",
+     "status": "PASS",
+     "detail": "no unreadable/empty/full masks and no exact duplicates remain",
+     "data": {}
+    }
+   ],
+   "summary": {
+    "n_paired": 10056,
+    "n_kept": 9635,
+    "n_dropped": 421,
+    "drop_reasons": {
+     "near-duplicate image, conflicting mask": 385,
+     "mask sits below 90% on anatomy": 36
+    },
+    "groups": {
+     "kind": "lesion",
+     "subject_verified": false,
+     "n_groups": 347,
+     "slices_per_group": {
+      "median": 18.0,
+      "mean": 28.979827089337174,
+      "max": 298
+     },
+     "singletons": 30
+    },
+    "fg_frac": {
+     "min": 0.00058746337890625,
+     "p5": 0.0030517578125,
+     "median": 0.019289016723632812,
+     "p95": 0.06637096405029297,
+     "max": 0.17230224609375
+    },
+    "gray_mean": {
+     "min": 10.5928955078125,
+     "p5": 22.940248489379883,
+     "median": 40.16763496398926,
+     "p95": 58.23089408874512,
+     "max": 120.09411239624023
+    },
+    "gray_std": {
+     "min": 17.24145424161914,
+     "p5": 35.13025800545736,
+     "median": 48.31290622697429,
+     "p95": 63.21988231334882,
+     "max": 93.40705040448975
+    },
+    "phash": {
+     "hamming<=0": {
+      "within_group": 1378,
+      "cross_group": 5
+     },
+     "hamming<=1": {
+      "within_group": 1378,
+      "cross_group": 5
+     },
+     "hamming<=2": {
+      "within_group": 6169,
+      "cross_group": 56
+     },
+     "hamming<=3": {
+      "within_group": 6169,
+      "cross_group": 56
+     }
+    },
+    "twin_pairs": 605
+   }
+  },
+  "btsc": {
+   "source": "btsc",
+   "n_paired": 3064,
+   "n_kept": 3064,
+   "n_dropped": 0,
+   "checks": [
+    {
+     "code": "H01",
+     "name": "pair integrity",
+     "status": "PASS",
+     "detail": "3064 paired stems; 0 images without mask, 0 masks without image",
+     "data": {
+      "orphans": {
+       "images_without_mask": [],
+       "masks_without_image": []
+      },
+      "n_orphans": 0
+     }
+    },
+    {
+     "code": "H02",
+     "name": "readability",
+     "status": "PASS",
+     "detail": "0 unreadable of 3064",
+     "data": {
+      "examples": []
+     }
+    },
+    {
+     "code": "H03",
+     "name": "geometry",
+     "status": "PASS",
+     "detail": "0 image/mask shape mismatches; resolutions {'512x512': 3049, '256x256': 15}",
+     "data": {
+      "mismatched": [],
+      "resolutions": {
+       "512x512": 3049,
+       "256x256": 15
+      }
+     }
+    },
+    {
+     "code": "H04",
+     "name": "channels",
+     "status": "PASS",
+     "detail": "channel census {1: 3064}; 0 frames hold a few coloured pixels (annotation marks, <2% of the frame, harmless to a 1-channel model); 0 frames are genuinely coloured (>2%)",
+     "data": {
+      "channels": {
+       "1": 3064
+      },
+      "annotation_frames": 0,
+      "colour_examples": []
+     }
+    },
+    {
+     "code": "H05",
+     "name": "mask values",
+     "status": "PASS",
+     "detail": "0 masks hold values other than {0,255} (max ambiguous fraction 0.0000); masks binarised at >=128",
+     "data": {
+      "examples": []
+     }
+    },
+    {
+     "code": "H06",
+     "name": "mask extent",
+     "status": "PASS",
+     "detail": "0 empty, 0 full-frame, 0 below 0.02% of frame; fg fraction min 0.0010 median 0.0129 max 0.0971",
+     "data": {
+      "fg_frac": {
+       "min": 0.000972747802734375,
+       "p5": 0.0027074813842773438,
+       "median": 0.01285552978515625,
+       "p95": 0.045622253417968744,
+       "max": 0.09712600708007812
+      },
+      "tiny_examples": []
+     }
+    },
+    {
+     "code": "H07",
+     "name": "mask alignment",
+     "status": "PASS",
+     "detail": "0 masks below 90% on anatomy (min 0.988, median 1.000)",
+     "data": {
+      "inside": {
+       "min": 0.9876397881106533,
+       "p5": 1.0,
+       "median": 1.0,
+       "p95": 1.0,
+       "max": 1.0
+      },
+      "examples": []
+     }
+    },
+    {
+     "code": "H08",
+     "name": "mask morphology",
+     "status": "INFO",
+     "detail": "components median 1 max 2; 0 fragmented (>2); 0 with holes; 0 touch the border; solidity median 0.969",
+     "data": {
+      "components": {
+       "min": 1.0,
+       "p5": 1.0,
+       "median": 1.0,
+       "p95": 1.0,
+       "max": 2.0
+      },
+      "solidity": {
+       "min": 0.46752228862545314,
+       "p5": 0.797991810994828,
+       "median": 0.9689881480917326,
+       "p95": 0.9862649926450197,
+       "max": 0.9922133462438474
+      },
+      "circularity": {
+       "min": 0.22389948913288046,
+       "p5": 0.4724750178889754,
+       "median": 0.7910766612633006,
+       "p95": 0.8738109823245346,
+       "max": 0.9008169809830576
+      },
+      "border_touching": 0
+     }
+    },
+    {
+     "code": "H09",
+     "name": "image content",
+     "status": "PASS",
+     "detail": "0 constant frames, 0 with std < 8, 0 with >25% saturated pixels; gray mean median 39.6, std median 41.1",
+     "data": {
+      "gray_mean": {
+       "min": 14.057235717773438,
+       "p5": 23.32387809753418,
+       "median": 39.56657028198242,
+       "p95": 57.518823051452635,
+       "max": 76.04220199584961
+      },
+      "gray_std": {
+       "min": 20.847499634985205,
+       "p5": 30.88607244399268,
+       "median": 41.08807248102079,
+       "p95": 50.18462769471924,
+       "max": 63.60714203780428
+      },
+      "zero_frac": {
+       "min": 0.0121917724609375,
+       "p5": 0.015529632568359375,
+       "median": 0.1629314422607422,
+       "p95": 0.3332208633422852,
+       "max": 0.3568687438964844
+      },
+      "low_contrast_examples": [],
+      "saturated_examples": []
+     }
+    },
+    {
+     "code": "H10",
+     "name": "exact duplicates",
+     "status": "PASS",
+     "detail": "0 byte-identical image groups (0 files); 0 decoded-pixel-identical groups (0 files)",
+     "data": {
+      "byte_groups": 0,
+      "pixel_groups": 0,
+      "examples": []
+     }
+    },
+    {
+     "code": "H11",
+     "name": "conflicting duplicates",
+     "status": "PASS",
+     "detail": "0 identical images carry different masks (0 files); 0 span more than one lesion",
+     "data": {
+      "conflicting": 0,
+      "cross_lesion": 0,
+      "examples": []
+     }
+    },
+    {
+     "code": "H12",
+     "name": "near duplicates",
+     "status": "PASS",
+     "detail": "pHash pairs <= 3: {'within_group': 149, 'cross_group': 12}; 0 pixel-confirmed twins (MAE < 3), 161 similar-but-distinct (neighbouring slices, kept)",
+     "data": {
+      "counts": {
+       "hamming<=0": {
+        "within_group": 10,
+        "cross_group": 2
+       },
+       "hamming<=1": {
+        "within_group": 10,
+        "cross_group": 2
+       },
+       "hamming<=2": {
+        "within_group": 149,
+        "cross_group": 12
+       },
+       "hamming<=3": {
+        "within_group": 149,
+        "cross_group": 12
+       }
+      },
+      "cross_group_examples": [
+       {
+        "a": "1183",
+        "b": "1188",
+        "hamming": 2
+       },
+       {
+        "a": "1183",
+        "b": "1208",
+        "hamming": 2
+       },
+       {
+        "a": "1188",
+        "b": "1208",
+        "hamming": 0
+       },
+       {
+        "a": "1194",
+        "b": "1221",
+        "hamming": 2
+       },
+       {
+        "a": "1211",
+        "b": "1784",
+        "hamming": 2
+       },
+       {
+        "a": "147",
+        "b": "1918",
+        "hamming": 2
+       },
+       {
+        "a": "1923",
+        "b": "1935",
+        "hamming": 2
+       },
+       {
+        "a": "1923",
+        "b": "1936",
+        "hamming": 0
+       },
+       {
+        "a": "2019",
+        "b": "2030",
+        "hamming": 2
+       },
+       {
+        "a": "2751",
+        "b": "3040",
+        "hamming": 2
+       },
+       {
+        "a": "2977",
+        "b": "2982",
+        "hamming": 2
+       },
+       {
+        "a": "3053",
+        "b": "476",
+        "hamming": 2
+       }
+      ],
+      "confirmed_twins": 0,
+      "similar_distinct": 161
+     }
+    },
+    {
+     "code": "H13",
+     "name": "group integrity",
+     "status": "WARN",
+     "detail": "no recoverable group key \u2014 split will use snapped contiguous blocks",
+     "data": {
+      "kind": "block",
+      "subject_verified": false
+     }
+    },
+    {
+     "code": "CLEAN",
+     "name": "cleaning policy",
+     "status": "INFO",
+     "detail": "kept 3064 of 3064; dropped 0: {}",
+     "data": {
+      "reasons": {},
+      "n_kept": 3064,
+      "n_dropped": 0
+     }
+    },
+    {
+     "code": "VERIFY",
+     "name": "post-clean state",
+     "status": "PASS",
+     "detail": "no unreadable/empty/full masks and no exact duplicates remain",
+     "data": {}
+    }
+   ],
+   "summary": {
+    "n_paired": 3064,
+    "n_kept": 3064,
+    "n_dropped": 0,
+    "drop_reasons": {},
+    "groups": {
+     "kind": "block",
+     "subject_verified": false
+    },
+    "fg_frac": {
+     "min": 0.000972747802734375,
+     "p5": 0.0027074813842773438,
+     "median": 0.01285552978515625,
+     "p95": 0.045622253417968744,
+     "max": 0.09712600708007812
+    },
+    "gray_mean": {
+     "min": 14.057235717773438,
+     "p5": 23.32387809753418,
+     "median": 39.56657028198242,
+     "p95": 57.518823051452635,
+     "max": 76.04220199584961
+    },
+    "gray_std": {
+     "min": 20.847499634985205,
+     "p5": 30.88607244399268,
+     "median": 41.08807248102079,
+     "p95": 50.18462769471924,
+     "max": 63.60714203780428
+    },
+    "phash": {
+     "hamming<=0": {
+      "within_group": 10,
+      "cross_group": 2
+     },
+     "hamming<=1": {
+      "within_group": 10,
+      "cross_group": 2
+     },
+     "hamming<=2": {
+      "within_group": 149,
+      "cross_group": 12
+     },
+     "hamming<=3": {
+      "within_group": 149,
+      "cross_group": 12
+     }
+    },
+    "twin_pairs": 0
+   }
+  }
+ },
+ "cross_source": {
+  "exact_bytes_shared": 0,
+  "exact_pixels_shared": 0,
+  "phash_candidates": 6,
+  "confirmed_shared_images": 0,
+  "candidates_checked": 6,
+  "verdict": "DISJOINT"
+ },
+ "split": [
+  {
+   "code": "V1",
+   "name": "group leakage",
+   "status": "PASS",
+   "detail": "0 groups appear in more than one split",
+   "data": {
+    "examples": []
+   }
+  },
+  {
+   "code": "V2",
+   "name": "stem overlap",
+   "status": "PASS",
+   "detail": "0 stems appear in more than one split",
+   "data": {}
+  },
+  {
+   "code": "V3",
+   "name": "exact content leakage",
+   "status": "PASS",
+   "detail": "decoded-pixel overlap train/val 0, train/test 0, val/test 0",
+   "data": {
+    "val": 0,
+    "test": 0,
+    "val_test": 0
+   }
+  },
+  {
+   "code": "V4",
+   "name": "near-dup twins",
+   "status": "PASS",
+   "detail": "0 val/test slices were pixel-near-identical to a training slice and were purged from evaluation; 0 further pHash<= 3 pairs are merely similar-looking neighbouring anatomy (kept)",
+   "data": {
+    "purged": 0,
+    "similar_pairs": 0
+   }
+  },
+  {
+   "code": "V5",
+   "name": "btsc adjacency",
+   "status": "WARN",
+   "detail": "30 adjacent index pairs cross a split boundary (median corr 0.515); 0 val/test slices purged for sitting beside a near-identical training slice",
+   "data": {
+    "applicable": true,
+    "source": "btsc",
+    "adjacent_pairs_crossing_a_split": 30,
+    "crossing_corr_median": 0.5146751403808594,
+    "eval_slices_purged": 0
+   }
+  },
+  {
+   "code": "V6",
+   "name": "distribution parity",
+   "status": "PASS",
+   "detail": "KS(lesion-size) train-vs-eval worst 0.061 (0 identical, >0.15 notable)",
+   "data": {
+    "parity": {
+     "openmed:val": {
+      "ks_fg_frac": 0.0335,
+      "ks_gray_mean": 0.0742,
+      "n": 967
+     },
+     "openmed:test": {
+      "ks_fg_frac": 0.0292,
+      "ks_gray_mean": 0.0637,
+      "n": 963
+     },
+     "btsc:val": {
+      "ks_fg_frac": 0.0615,
+      "ks_gray_mean": 0.0523,
+      "n": 322
+     },
+     "btsc:test": {
+      "ks_fg_frac": 0.0451,
+      "ks_gray_mean": 0.0789,
+      "n": 311
+     }
+    }
+   }
+  },
+  {
+   "code": "V7",
+   "name": "split sizes",
+   "status": "INFO",
+   "detail": "train=10136 (79.8%) {'openmed': 7705, 'btsc': 2431}; val=1289 (10.2%) {'openmed': 967, 'btsc': 322}; test=1274 (10.0%) {'openmed': 963, 'btsc': 311}",
+   "data": {
+    "counts": {
+     "train": {
+      "openmed": 7705,
+      "btsc": 2431
+     },
+     "val": {
+      "openmed": 967,
+      "btsc": 322
+     },
+     "test": {
+      "openmed": 963,
+      "btsc": 311
+     }
+    },
+    "total": {
+     "train": 10136,
+     "val": 1289,
+     "test": 1274
+    }
+   }
+  },
+  {
+   "code": "V8",
+   "name": "evaluation size",
+   "status": "PASS",
+   "detail": "val=1289 test=1274 slices",
+   "data": {
+    "too_small": []
+   }
+  }
+ ],
+ "split_report": {
+  "seed": 42,
+  "sources": {
+   "openmed": {
+    "n_records": 9635,
+    "twin_merge": {
+     "twin_pairs": 4688,
+     "merges": 23,
+     "refused_over_cap": 0,
+     "cap_slices": 963
+    },
+    "n_groups": 324,
+    "group_sizes": {
+     "median": 17.0,
+     "max": 358,
+     "min": 1
+    },
+    "partition": {
+     "mode": "grouped",
+     "score": 0.1358,
+     "tries": 400,
+     "n_groups": 324
+    }
+   },
+   "btsc": {
+    "n_records": 3064,
+    "adjacency_evidence": {
+     "adjacent_corr_median": 0.9252027869224548,
+     "adjacent_corr_p10": 0.5949428081512451,
+     "random_corr_median": 0.5362249612808228,
+     "random_corr_p90": 0.7121237516403198,
+     "frac_adjacent_above_0.8": 0.7737512242899118,
+     "frac_random_above_0.8": 0.0214
+    },
+    "n_blocks_before_merge": 93,
+    "twin_merge": {
+     "twin_pairs": 161,
+     "merges": 6,
+     "refused_over_cap": 0,
+     "cap_slices": 306
+    },
+    "n_groups": 87,
+    "group_sizes": {
+     "median": 33.0,
+     "max": 119,
+     "min": 25
+    },
+    "partition": {
+     "mode": "block",
+     "score": 0.2381,
+     "tries": 400,
+     "n_groups": 87
+    }
+   }
+  },
+  "counts": {
+   "train": {
+    "openmed": 7705,
+    "btsc": 2431
+   },
+   "val": {
+    "openmed": 967,
+    "btsc": 322
+   },
+   "test": {
+    "openmed": 963,
+    "btsc": 311
+   }
+  },
+  "total": {
+   "train": 10136,
+   "val": 1289,
+   "test": 1274
+  },
+  "group_leaks": [],
+  "n_group_leaks": 0,
+  "exact_leakage": {
+   "val": 0,
+   "test": 0,
+   "val_test": 0
+  },
+  "twins_purged": 0,
+  "adjacency": {
+   "applicable": true,
+   "source": "btsc",
+   "adjacent_pairs_crossing_a_split": 30,
+   "crossing_corr_median": 0.5146751403808594,
+   "eval_slices_purged": 0,
+   "interpretation": "Residual risk of the block split. Crossing pairs with high similarity are likely the same scan; those evaluation slices were purged. Without a patient id this cannot be driven to a proof of zero."
+  },
+  "parity": {
+   "openmed:val": {
+    "ks_fg_frac": 0.0335,
+    "ks_gray_mean": 0.0742,
+    "n": 967
+   },
+   "openmed:test": {
+    "ks_fg_frac": 0.0292,
+    "ks_gray_mean": 0.0637,
+    "n": 963
+   },
+   "btsc:val": {
+    "ks_fg_frac": 0.0615,
+    "ks_gray_mean": 0.0523,
+    "n": 322
+   },
+   "btsc:test": {
+    "ks_fg_frac": 0.0451,
+    "ks_gray_mean": 0.0789,
+    "n": 311
+   }
+  },
+  "caveat": "OpenMed groups are filename-derived lesion/series keys; BTSC groups are snapped contiguous blocks. Neither is a verified patient identifier. No group appears in more than one split; residual BTSC risk is quantified under 'adjacency'."
+ },
+ "cache": [
+  {
+   "code": "H15",
+   "name": "cache resolution",
+   "status": "PASS",
+   "detail": "0 masks vanish at 512px, 0 keep < 16 px; median relative area change 0.000%, p99 0.000%; mask values in {0,1}: True",
+   "data": {
+    "vanished": [],
+    "area_drift_p99": 0.0
+   }
+  },
+  {
+   "code": "H16",
+   "name": "cache vs files",
+   "status": "PASS",
+   "detail": "64 random rows re-derived from disk, 0 differ",
+   "data": {}
+  }
+ ]
+}

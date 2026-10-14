@@ -57,7 +57,7 @@ export const DocumentationPage: React.FC = () => {
               II · Models &amp; Neural Suites
             </a>
             <a href="#model-brain" className="doc-nav-anchor">
-              ↳ Brain (Classification &amp; Segmentation)
+              ↳ Brain (Classification, Segmentation &amp; Dataset Sanitization)
             </a>
             <a href="#model-heart" className="doc-nav-anchor">
               ↳ Heart (Classification &amp; Segmentation)
@@ -73,9 +73,6 @@ export const DocumentationPage: React.FC = () => {
             </a>
             <a href="#section-stereotactic" className="doc-nav-anchor">
               IV · Stereotactic Coordinates
-            </a>
-            <a href="#section-dataset" className="doc-nav-anchor">
-              V · Dataset Sanitization
             </a>
           </div>
         </header>
@@ -96,6 +93,9 @@ export const DocumentationPage: React.FC = () => {
             {/* Organ: Brain (Classification & Segmentation) */}
             <BrainDocs onOpenArtifact={setActiveArtifact} />
 
+            {/* Brain Classification Dataset — Sanitization & Verification */}
+            <DatasetSanitizationDocs />
+
             {/* Organ: Heart (Classification & Segmentation) */}
             <HeartDocs />
 
@@ -112,9 +112,6 @@ export const DocumentationPage: React.FC = () => {
 
         {/* SECTION IV: STEREOTACTIC MNI LOCALIZATION */}
         <MniStereotacticDocs />
-
-        {/* SECTION V: DATASET CURATION & PURGING */}
-        <DatasetSanitizationDocs />
       </main>
 
       {/* Artifact Lightbox Modal */}
