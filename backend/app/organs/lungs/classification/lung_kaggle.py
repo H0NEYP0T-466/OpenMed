@@ -425,9 +425,18 @@ def compute_pos_weight(dataset: ChestXray14, clip: float = 50.0) -> torch.Tensor
                         dtype=torch.float32)
 
 
+def _quiet_output() -> bool:
+    """Kaggle kernels report stderr as a TTY, so isatty() is not enough —
+    progress bars there bloat the notebook and stall autosave."""
+    if os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+        return True
+    if os.environ.get("OPENMED_NO_PROGRESS"):
+        return True
+    return not sys.stderr.isatty()
+
+
 def _progress(iterable, desc: str):
-    """Progress bar only on a real terminal; notebooks get periodic log lines."""
-    return tqdm(iterable, desc=desc, leave=False, disable=not sys.stderr.isatty())
+    return tqdm(iterable, desc=desc, leave=False, disable=_quiet_output())
 
 
 def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
@@ -450,7 +459,7 @@ def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
         running += float(loss.item()) * images.size(0)
         total += images.size(0)
         progress.set_postfix(loss=f"{loss.item():.4f}")
-        if step % 100 == 0:
+        if step % 200 == 0:
             logger.info("  epoch %02d step %d/%d | loss %.4f | %.2f it/s",
                         epoch, step, len(loader), running / max(total, 1),
                         step / max(time.time() - _T0[0], 1e-6))
