@@ -106,12 +106,45 @@ def _patient_id(filename: str) -> str:
     return os.path.splitext(os.path.basename(filename))[0].split("_")[0]
 
 
-def locate_root(root: str) -> str:
+def locate_root(root: str, max_depth: int = 3) -> str:
+    """Find the directory that contains `images/`, breadth-first, with a listing on failure."""
     root = os.path.abspath(root)
-    for candidate in [root] + [os.path.join(root, e) for e in sorted(os.listdir(root))]:
-        if os.path.isdir(os.path.join(candidate, "images")):
-            return candidate
-    raise FileNotFoundError(f"No images/ under {root!r}")
+    queue = [(root, 0)]
+    visited = set()
+    while queue:
+        current, depth = queue.pop(0)
+        if current in visited:
+            continue
+        visited.add(current)
+        if os.path.isdir(os.path.join(current, "images")):
+            return current
+        if depth >= max_depth:
+            continue
+        try:
+            entries = sorted(os.listdir(current))
+        except OSError:
+            continue
+        for entry in entries:
+            path = os.path.join(current, entry)
+            if os.path.isdir(path):
+                queue.append((path, depth + 1))
+
+    listing = []
+    for base, depth in ((root, 1), (root, 2)):
+        try:
+            entries = sorted(os.listdir(base))
+        except OSError:
+            continue
+        for entry in entries[:25]:
+            path = os.path.join(base, entry)
+            if os.path.isdir(path):
+                listing.append(os.path.relpath(path, root))
+    raise FileNotFoundError(
+        f"No `images/` directory under {root!r} (searched {max_depth} levels).\n"
+        f"Directories found: {listing or 'none — /kaggle/input looks empty, the dataset is not attached'}\n"
+        "Attach the images dataset (Add Input → jbeltranleon/nih-chest-xrays-224-rgb) "
+        "or pass --data_root /kaggle/input/<dataset-slug>."
+    )
 
 
 METADATA_NAMES = {
@@ -122,38 +155,53 @@ METADATA_NAMES = {
 }
 
 
+def _walk_dirs(base: str, max_depth: int = 4, cap: int = 20000) -> list[str]:
+    """Bounded breadth-first directory walk; skips files entirely."""
+    found: list[str] = []
+    queue = [(base, 0)]
+    seen: set[str] = set()
+    while queue and len(found) < cap:
+        current, depth = queue.pop(0)
+        if current in seen:
+            continue
+        seen.add(current)
+        found.append(current)
+        if depth >= max_depth:
+            continue
+        try:
+            entries = sorted(os.listdir(current))
+        except OSError:
+            continue
+        for entry in entries:
+            path = os.path.join(current, entry)
+            if os.path.isdir(path):
+                queue.append((path, depth + 1))
+    return found
+
+
 def _search_roots(root: str, labels_dir: Optional[str]) -> list[str]:
     """Directories that may hold the NIH metadata files.
 
-    On Kaggle the images live in one dataset and the label CSVs in another, so
-    the search covers the images root, its parent (/kaggle/input) and two
-    levels below the parent (e.g. /kaggle/input/nih-chest-xrays/data).
+    Kaggle has moved between mount layouts — `/kaggle/input/<slug>` and
+    `/kaggle/input/datasets/<owner>/<slug>` — so walk both the images root and
+    its parent a few levels deep and check every directory.
     """
     roots: list[str] = []
     if labels_dir:
         roots.append(os.path.abspath(labels_dir))
-    roots.append(root)
-    parent = os.path.dirname(root.rstrip(os.sep))
-    roots.append(parent)
-    for base, depth in ((root, 1), (parent, 2)):
-        try:
-            entries = sorted(os.listdir(base))
-        except OSError:
-            continue
-        for entry in entries:
-            candidate = os.path.join(base, entry)
-            if not os.path.isdir(candidate):
-                continue
-            roots.append(candidate)
-            if depth == 2:
-                try:
-                    for inner in sorted(os.listdir(candidate)):
-                        nested = os.path.join(candidate, inner)
-                        if os.path.isdir(nested):
-                            roots.append(nested)
-                except OSError:
-                    continue
-    # de-duplicate, keep order
+    # Walk up to three ancestors — the label dataset may sit beside the images
+    # dataset at any level (`/kaggle/input/<slug>`, `/kaggle/input/datasets/<owner>/<slug>`).
+    ancestors = [root]
+    cursor = root
+    for _ in range(3):
+        cursor = os.path.dirname(cursor.rstrip(os.sep))
+        if not cursor or cursor == "/":
+            break
+        ancestors.append(cursor)
+    roots.extend(ancestors)
+    for base in ancestors:
+        if base and os.path.isdir(base):
+            roots.extend(_walk_dirs(base, max_depth=3))
     seen: set[str] = set()
     unique = []
     for path in roots:
