@@ -31,6 +31,7 @@ import logging
 import math
 import os
 import random
+import sys
 import time
 import zipfile
 from dataclasses import dataclass
@@ -80,6 +81,7 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger("lung_kaggle")
+_T0 = [time.time()]
 
 FINDINGS = (
     "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule",
@@ -412,6 +414,8 @@ def set_seed(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+        # Fixed 224x224 input: let cuDNN autotune the conv kernels once.
+        torch.backends.cudnn.benchmark = True
 
 
 def compute_pos_weight(dataset: ChestXray14, clip: float = 50.0) -> torch.Tensor:
@@ -421,11 +425,16 @@ def compute_pos_weight(dataset: ChestXray14, clip: float = 50.0) -> torch.Tensor
                         dtype=torch.float32)
 
 
+def _progress(iterable, desc: str):
+    """Progress bar only on a real terminal; notebooks get periodic log lines."""
+    return tqdm(iterable, desc=desc, leave=False, disable=not sys.stderr.isatty())
+
+
 def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
     model.train()
     running, total = 0.0, 0
-    progress = tqdm(loader, desc=f"Epoch {epoch:02d} [train]", leave=False)
-    for images, targets in progress:
+    progress = _progress(loader, f"Epoch {epoch:02d} [train]")
+    for step, (images, targets) in enumerate(progress, start=1):
         images, targets = images.to(device, non_blocking=True), targets.to(device, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
         with autocast_cuda(scaler is not None):
@@ -441,6 +450,10 @@ def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
         running += float(loss.item()) * images.size(0)
         total += images.size(0)
         progress.set_postfix(loss=f"{loss.item():.4f}")
+        if step % 100 == 0:
+            logger.info("  epoch %02d step %d/%d | loss %.4f | %.2f it/s",
+                        epoch, step, len(loader), running / max(total, 1),
+                        step / max(time.time() - _T0[0], 1e-6))
     return running / max(total, 1)
 
 
@@ -449,7 +462,7 @@ def evaluate(model, loader, criterion, device, tag: str = "val"):
     model.eval()
     running, total = 0.0, 0
     probs, targets_all = [], []
-    for images, targets in tqdm(loader, desc=f"[{tag}]", leave=False):
+    for images, targets in _progress(loader, f"[{tag}]"):
         images = images.to(device, non_blocking=True)
         logits = model(images)
         loss = criterion(logits, targets.to(device))
@@ -702,6 +715,7 @@ def main() -> int:
     logger.info("  device=%s seed=%d batch=%d epochs=%d lr=%g wd=%g momentum=%.2f",
                 device, args.seed, args.batch_size, args.epochs, args.lr,
                 args.weight_decay, args.momentum)
+    logger.info("  data_root=%s", args.data_root)
     if torch.cuda.is_available():
         logger.info("  gpu=%s (%.1f GB)", torch.cuda.get_device_name(0),
                     torch.cuda.get_device_properties(0).total_memory / 1e9)
@@ -763,6 +777,7 @@ def main() -> int:
     started = time.time()
     for epoch in range(start_epoch, args.epochs + 1):
         epoch_start = time.time()
+        _T0[0] = epoch_start
         train_loss = train_epoch(model, train_loader, criterion, optimizer, scaler, device, epoch)
         val_loss, val_auc, per_class, _, _ = evaluate(model, val_loader, criterion, device)
         scheduler.step()  # paper: lr / 10 after epoch 20 — epoch cadence, not batch
