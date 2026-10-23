@@ -17,6 +17,8 @@ import { AppShell } from '../../components/common/AppShell'
 import { ThinkingOrbOverlay } from '../../components/common/ThinkingOrb'
 import { BrainClassificationWorkspace } from './brain/BrainClassificationWorkspace'
 import { warmBrainModels, unloadBrainModels } from './brain/brainApi'
+import { LungsClassificationWorkspace } from './lungs/LungsClassificationWorkspace'
+import { warmLungModels, unloadLungModels } from './lungs/lungsApi'
 import './OrganDashboard.css'
 
 const ORGAN_ORDER: readonly OrganId[] = Object.keys(ORGANS_REGISTRY) as OrganId[]
@@ -79,34 +81,53 @@ export const OrganDashboard: React.FC = () => {
   const [selectedPart, setSelectedPart] = useState<Part | null>(null)
 
   /**
-   * Organ-scoped model residency: entering the brain section warms the
-   * classifier, MedNeXt and the assistive LiteMedSAM stack on the backend and
-   * holds them in memory while the user stays. Leaving the section releases
-   * them again. Other organs have no trained models yet, so only brain warms.
+   * Organ-scoped model residency: entering a section with trained models warms
+   * them on the backend and holds them while the user stays; leaving releases
+   * them. Brain warms the classifier + MedNeXt + LiteMedSAM stack, lungs warms
+   * Z-Net. Organs without trained models load nothing.
    */
-  const [brainModelsWarming, setBrainModelsWarming] = useState(false)
+  const [modelsWarming, setModelsWarming] = useState(false)
   const prevOrganRef = useRef<OrganId>(selectedOrganId)
 
   useEffect(() => {
     const prev = prevOrganRef.current
     prevOrganRef.current = selectedOrganId
 
-    if (selectedOrganId === 'brain' && prev !== 'brain') {
-      setBrainModelsWarming(true)
-      warmBrainModels()
+    if (prev !== selectedOrganId && (selectedOrganId === 'brain' || selectedOrganId === 'lungs')) {
+      setModelsWarming(true)
+      const warm = selectedOrganId === 'brain' ? warmBrainModels : warmLungModels
+      warm()
         .catch(() => false)
-        .then(() => setBrainModelsWarming(false))
+        .then(() => setModelsWarming(false))
     }
-    if (prev === 'brain' && selectedOrganId !== 'brain') {
-      void unloadBrainModels().catch(() => false)
+    if (prev !== selectedOrganId && (prev === 'brain' || prev === 'lungs')) {
+      const release = prev === 'brain' ? unloadBrainModels : unloadLungModels
+      void release().catch(() => false)
     }
   }, [selectedOrganId])
+
+  // Deep-linking straight into a model-bearing section (e.g. /app?organ=brain)
+  // never fires the change effect above, so warm the initial organ here.
+  useEffect(() => {
+    const initial = prevOrganRef.current
+    if (initial !== 'brain' && initial !== 'lungs') return
+    setModelsWarming(true)
+    const warm = initial === 'brain' ? warmBrainModels : warmLungModels
+    warm()
+      .catch(() => false)
+      .then(() => setModelsWarming(false))
+    // Mount-only: the change effect owns every later transition.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Leaving /app entirely releases the brain models too.
   useEffect(() => {
     return () => {
       if (prevOrganRef.current === 'brain') {
         void unloadBrainModels().catch(() => false)
+      }
+      if (prevOrganRef.current === 'lungs') {
+        void unloadLungModels().catch(() => false)
       }
     }
   }, [])
@@ -323,6 +344,8 @@ export const OrganDashboard: React.FC = () => {
       <section className="dossier-flow">
         {isWholeBodyView ? (
           <AtlasDossier />
+        ) : selectedOrganId === 'lungs' ? (
+          <LungsClassificationWorkspace />
         ) : selectedOrganId === 'brain' ? (
           <BrainClassificationWorkspace
             organ={currentOrgan}
@@ -348,8 +371,12 @@ export const OrganDashboard: React.FC = () => {
           onSelectOrgan={handleSelectOrgan}
         />
       </footer>
-      {brainModelsWarming && (
-        <ThinkingOrbOverlay isVisible label="Loading neural suite…" size={110} />
+      {modelsWarming && (
+        <ThinkingOrbOverlay
+          isVisible
+          label={selectedOrganId === 'lungs' ? 'Loading thoracic model…' : 'Loading neural suite…'}
+          size={110}
+        />
       )}
     </AppShell>
   )

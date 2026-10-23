@@ -42,6 +42,8 @@ venv.bak/
 *.safetensors
 *.ckpt
 *.h5
+*.npz
+*.npy
 checkpoints/*.pth
 checkpoints/*.pt
 !checkpoints/.gitkeep
@@ -80,6 +82,8 @@ data/
 # Archived old artifacts and models
 **/projec_dustbin/**
 projec_dustbin/
+**/project_dustbin/**
+project_dustbin/
 
 # Graphify generated knowledge graph (reproducible via `graphify update .`)
 graphify-out/
