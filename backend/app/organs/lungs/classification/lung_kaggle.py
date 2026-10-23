@@ -30,9 +30,11 @@ import json
 import logging
 import math
 import os
+import io
 import random
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 import zipfile
 from dataclasses import dataclass
 from typing import Optional
@@ -232,7 +234,7 @@ class Sample:
 
 class ChestXray14(Dataset):
     def __init__(self, root: str, split: str, transform=None, seed: int = 42,
-                 labels_dir: Optional[str] = None):
+                 labels_dir: Optional[str] = None, cache_ram: bool = False):
         self.root = locate_root(root)
         self.images_dir = os.path.join(self.root, "images")
         self.transform = transform
@@ -293,12 +295,34 @@ class ChestXray14(Dataset):
         logger.info("%s split: %d images / %d patients", split, len(self.samples),
                     len({s.patient for s in self.samples}))
 
+        # Optional in-RAM byte cache. Loaded in the parent process, so fork
+        # shares the pages with every worker (no duplication) and epochs never
+        # touch the filesystem again. 112k x ~38 KB ~= 4.2 GB.
+        self._cache: Optional[dict[str, bytes]] = None
+        if cache_ram:
+            started = time.time()
+            names = [os.path.basename(s.path) for s in self.samples]
+
+            def _read(sample):
+                with open(sample.path, "rb") as handle:
+                    return os.path.basename(sample.path), handle.read()
+
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                self._cache = dict(pool.map(_read, self.samples))
+            total_mb = sum(len(v) for v in self._cache.values()) / 1e6
+            logger.info("%s: cached %.0f MB in RAM in %.1fs", split, total_mb,
+                        time.time() - started)
+
     def __len__(self) -> int:
         return len(self.samples)
 
     def __getitem__(self, index: int):
         sample = self.samples[index]
-        image = Image.open(sample.path).convert("RGB")
+        if self._cache is not None:
+            image = Image.open(io.BytesIO(self._cache[os.path.basename(sample.path)]))
+        else:
+            image = Image.open(sample.path)
+        image = image.convert("RGB")
         if self.transform is not None:
             image = self.transform(image)
         return image, torch.tensor(sample.labels, dtype=torch.float32)
@@ -459,7 +483,7 @@ def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
         running += float(loss.item()) * images.size(0)
         total += images.size(0)
         progress.set_postfix(loss=f"{loss.item():.4f}")
-        if step % 200 == 0:
+        if step == 1 or step % 100 == 0:
             logger.info("  epoch %02d step %d/%d | loss %.4f | %.2f it/s",
                         epoch, step, len(loader), running / max(total, 1),
                         step / max(time.time() - _T0[0], 1e-6))
@@ -703,6 +727,14 @@ def parse_args():
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--transition_dim", type=int, default=224)
+    parser.add_argument("--cache_ram", action="store_true",
+                        help="Load all PNG bytes into RAM (shared to workers by fork)")
+    parser.add_argument("--multi_gpu", action="store_true",
+                        help="Use DataParallel across all visible GPUs. Measured 2.8x "
+                             "SLOWER than one GPU for this model (76 vs 216 img/s) — "
+                             "opt in only if that changes.")
+    parser.add_argument("--single_gpu", action="store_true",
+                        help="Accepted for compatibility; single GPU is already the default")
     parser.add_argument("--resume", action="store_true", default=True)
     parser.add_argument("--no_resume", dest="resume", action="store_false")
     return parser.parse_args()
@@ -725,17 +757,19 @@ def main() -> int:
                 device, args.seed, args.batch_size, args.epochs, args.lr,
                 args.weight_decay, args.momentum)
     logger.info("  data_root=%s", args.data_root)
+    logger.info("  gpus=%d  parallelism=%s", torch.cuda.device_count(),
+                "DataParallel" if (torch.cuda.device_count() > 1 and args.multi_gpu) else "single")
     if torch.cuda.is_available():
         logger.info("  gpu=%s (%.1f GB)", torch.cuda.get_device_name(0),
                     torch.cuda.get_device_properties(0).total_memory / 1e9)
 
     labels_dir = args.labels_dir or None
     train_set = ChestXray14(args.data_root, "train", build_transforms(True), seed=args.seed,
-                            labels_dir=labels_dir)
+                            labels_dir=labels_dir, cache_ram=args.cache_ram)
     val_set = ChestXray14(args.data_root, "val", build_transforms(False), seed=args.seed,
-                          labels_dir=labels_dir)
+                          labels_dir=labels_dir, cache_ram=args.cache_ram)
     test_set = ChestXray14(args.data_root, "test", build_transforms(False), seed=args.seed,
-                           labels_dir=labels_dir)
+                           labels_dir=labels_dir, cache_ram=args.cache_ram)
     logger.info("Split sizes — train %d / val %d / test %d", len(train_set), len(val_set), len(test_set))
 
     def loader(dataset, shuffle):
@@ -749,7 +783,7 @@ def main() -> int:
 
     raw_model = ZNet(len(FINDINGS), pretrained=True, transition_dim=args.transition_dim).to(device)
     model = raw_model
-    if torch.cuda.device_count() > 1:
+    if torch.cuda.device_count() > 1 and args.multi_gpu:
         model = torch.nn.DataParallel(raw_model)
         logger.info("DataParallel across %d GPUs", torch.cuda.device_count())
     pos_weight = compute_pos_weight(train_set).to(device)
