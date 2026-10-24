@@ -70,6 +70,12 @@ export const TorchXRayVisionTab: React.FC = () => {
     }
   }, [])
 
+  // Blob URLs hold the file in memory until revoked — release the previous
+  // one whenever the preview changes, and the last one on unmount.
+  useEffect(() => () => {
+    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
+  }, [previewUrl])
+
   const mountFile = useCallback((candidate: File) => {
     if (!candidate.type.startsWith('image/')) {
       setError('Selected file is not an image (JPEG, PNG).')

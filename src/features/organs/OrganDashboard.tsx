@@ -86,7 +86,12 @@ export const OrganDashboard: React.FC = () => {
    * them. Brain warms the classifier + MedNeXt + LiteMedSAM stack, lungs warms
    * Z-Net. Organs without trained models load nothing.
    */
-  const [modelsWarming, setModelsWarming] = useState(false)
+  // Model-bearing organs start warming on mount, so begin in the warming
+  // state: the heavy workspace must not flash into existence for one frame
+  // (and start its Three.js loop) before the overlay covers it.
+  const [modelsWarming, setModelsWarming] = useState<boolean>(
+    selectedOrganId === 'brain' || selectedOrganId === 'lungs',
+  )
   const prevOrganRef = useRef<OrganId>(selectedOrganId)
 
   useEffect(() => {
@@ -249,7 +254,10 @@ export const OrganDashboard: React.FC = () => {
       {/* Stage - the plate stays clear; all controls live in the rail */}
       <main className={`stage ${isWholeBodyView ? 'stage-atlas' : ''}`}>
         <section className="plate" ref={plateRef}>
-          {isWholeBodyView ? (
+          {/* While models warm, the Three.js render loop stays down: it runs its
+              own rAF loop, and rendering a WebGL scene behind the loading orb
+              is what made the orb stutter. The orb covers this area anyway. */}
+          {modelsWarming ? null : isWholeBodyView ? (
             <WholeBodyAtlasViewer
               plateNo={plateNo}
               state={atlasState}
@@ -345,13 +353,15 @@ export const OrganDashboard: React.FC = () => {
         {isWholeBodyView ? (
           <AtlasDossier />
         ) : selectedOrganId === 'lungs' ? (
-          <LungsClassificationWorkspace />
+          modelsWarming ? null : <LungsClassificationWorkspace />
         ) : selectedOrganId === 'brain' ? (
-          <BrainClassificationWorkspace
-            organ={currentOrgan}
-            activeHotspot={activeHotspot}
-            onSelectHotspot={handleSelectHotspot}
-          />
+          modelsWarming ? null : (
+            <BrainClassificationWorkspace
+              organ={currentOrgan}
+              activeHotspot={activeHotspot}
+              onSelectHotspot={handleSelectHotspot}
+            />
+          )
         ) : (
           <OrganInfoCard
             organ={currentOrgan}

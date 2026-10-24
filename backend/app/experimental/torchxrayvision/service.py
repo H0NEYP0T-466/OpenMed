@@ -29,6 +29,7 @@ except ImportError:  # pragma: no cover
     xrv = None
 
 _model: Optional[Any] = None
+_device: Optional[torch.device] = None
 _pathologies: list[str] = []
 _loaded_at: Optional[float] = None
 _load_ms: Optional[float] = None
@@ -44,6 +45,10 @@ def is_installed() -> bool:
 
 def is_loaded() -> bool:
     return _model is not None
+
+
+def device() -> torch.device:
+    return _device if _device is not None else torch.device("cpu")
 
 
 def status() -> dict[str, Any]:
@@ -67,6 +72,8 @@ def load() -> dict[str, Any]:
 
     started = time.perf_counter()
     model = load_model()
+    _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(_device)
     _model = model
     _pathologies = pathology_names(model)
     _load_ms = (time.perf_counter() - started) * 1000.0
@@ -77,11 +84,12 @@ def load() -> dict[str, Any]:
 
 
 def unload() -> dict[str, Any]:
-    global _model, _pathologies, _loaded_at, _load_ms
+    global _model, _device, _pathologies, _loaded_at, _load_ms
 
     if _model is not None:
         del _model
         _model = None
+    _device = None
     _pathologies = []
     _loaded_at = None
     _load_ms = None
@@ -135,7 +143,7 @@ def predict(image: Image.Image) -> dict[str, Any]:
 
     assert _model is not None
     started = time.perf_counter()
-    tensor = _preprocess(image)
+    tensor = _preprocess(image).to(device())
 
     logits = _logits(tensor)
     probabilities = 1.0 / (1.0 + np.exp(-logits))  # sigmoid of the raw logits

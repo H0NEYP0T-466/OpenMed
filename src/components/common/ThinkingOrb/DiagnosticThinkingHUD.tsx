@@ -51,6 +51,25 @@ const DURATION_TRANSITION = 0.8
 const DURATION_SOLVING = 2.6
 const CYCLE_TOTAL = DURATION_CONNECTING + DURATION_TRANSITION + DURATION_SOLVING + DURATION_TRANSITION // 6.8s
 
+// Colour strings cached per (palette, alpha bucket); drawing grouped by
+// colour — one path per bucket, one fill. Same treatment as the overlay:
+// per-dot fills and string allocation were the stutter.
+const ALPHA_BUCKETS = 16
+const colourCache = new Map<number, string>()
+
+function coralFor(isHighlight: boolean, alpha: number): string {
+  const bucket = Math.max(1, Math.min(ALPHA_BUCKETS, Math.round(alpha * ALPHA_BUCKETS)))
+  const key = (isHighlight ? 1000 : 0) + bucket
+  let value = colourCache.get(key)
+  if (value === undefined) {
+    const a = (bucket / ALPHA_BUCKETS).toFixed(3)
+    value = isHighlight ? `rgba(${HIGHLIGHT_R}, ${HIGHLIGHT_G}, ${HIGHLIGHT_B}, ${a})`
+                        : `rgba(${CORAL_R}, ${CORAL_G}, ${CORAL_B}, ${a})`
+    colourCache.set(key, value)
+  }
+  return value
+}
+
 function drawOrbFrame(
   ctx: CanvasRenderingContext2D,
   frame: OrbFrame,
@@ -70,38 +89,53 @@ function drawOrbFrame(
     ctx.translate(-cx, -cy)
   }
 
-  // Draw connecting synaptic lines in coral orange
+  // Lines: bucket by (colour, rounded width), stroke each bucket once.
   if (frame.lines && frame.lines.length > 0) {
+    const lineBuckets = new Map<string, number[][]>()
     for (const line of frame.lines) {
       const lineAlpha = (line.a ?? 1) * alphaWeight * 0.75
       if (lineAlpha < 0.02) continue
-
-      ctx.strokeStyle = `rgba(${CORAL_R}, ${CORAL_G}, ${CORAL_B}, ${lineAlpha})`
-      ctx.lineWidth = Math.max(0.4, line.w || 0.6)
+      const width = Math.round(Math.max(0.4, line.w || 0.6) * 2) / 2
+      const key = `${coralFor(false, lineAlpha)}|${width}`
+      const bucket = lineBuckets.get(key)
+      if (bucket) bucket.push([line.x1, line.y1, line.x2, line.y2])
+      else lineBuckets.set(key, [[line.x1, line.y1, line.x2, line.y2]])
+    }
+    for (const [key, segments] of lineBuckets) {
+      const [colour, widthText] = key.split('|')
+      ctx.strokeStyle = colour
+      ctx.lineWidth = Number(widthText)
       ctx.beginPath()
-      ctx.moveTo(line.x1, line.y1)
-      ctx.lineTo(line.x2, line.y2)
+      for (const [x1, y1, x2, y2] of segments) {
+        ctx.moveTo(x1, y1)
+        ctx.lineTo(x2, y2)
+      }
       ctx.stroke()
     }
   }
 
-  // Draw dots in coral orange (NO white)
+  // Dots: one path per colour bucket, one fill.
   if (frame.dots && frame.dots.length > 0) {
+    const dotBuckets = new Map<string, number[][]>()
     for (const dot of frame.dots) {
       const baseAlpha = dot.a ?? 1
       if (baseAlpha < 0.02) continue
-
       const zNorm = Math.min(1, Math.max(0, (dot.z + 1) / 2))
       const dotAlpha = Math.min(1, Math.max(0.2, baseAlpha * (0.35 + 0.65 * zNorm))) * alphaWeight
-
       const isHighlight = (dot.white ?? 0) > 0.62 || zNorm > 0.85
-      const fillR = isHighlight ? HIGHLIGHT_R : CORAL_R
-      const fillG = isHighlight ? HIGHLIGHT_G : CORAL_G
-      const fillB = isHighlight ? HIGHLIGHT_B : CORAL_B
-
-      ctx.fillStyle = `rgba(${fillR}, ${fillG}, ${fillB}, ${dotAlpha})`
+      const key = coralFor(isHighlight, dotAlpha)
+      const entry = [dot.x, dot.y, Math.max(0.4, dot.r)]
+      const bucket = dotBuckets.get(key)
+      if (bucket) bucket.push(entry)
+      else dotBuckets.set(key, [entry])
+    }
+    for (const [colour, circles] of dotBuckets) {
+      ctx.fillStyle = colour
       ctx.beginPath()
-      ctx.arc(dot.x, dot.y, Math.max(0.4, dot.r), 0, Math.PI * 2)
+      for (const [x, y, r] of circles) {
+        ctx.moveTo(x + r, y)
+        ctx.arc(x, y, r, 0, Math.PI * 2)
+      }
       ctx.fill()
     }
   }
@@ -168,7 +202,7 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const dpr = Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1)
+    const dpr = Math.min(1.25, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1)
     canvas.width = Math.round(size * dpr)
     canvas.height = Math.round(size * dpr)
 
@@ -179,8 +213,10 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
 
     startTimeRef.current = performance.now()
     let isRunning = true
+    let lastPaint = 0
+    const FRAME_MS = 1000 / 30  // ambient indicator; the React tick stays at 10 Hz
 
-    // The canvas redraws every frame, but React must NOT re-render every
+    // The canvas redraws at 30 fps, but React must NOT re-render every
     // frame. The timer only shows tenths, so state is pushed at 10 Hz, and
     // the phase only when it actually changes. Re-rendering this whole card
     // at 60 fps was what made the animation stutter.
@@ -188,6 +224,9 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
 
     const render = (now: number) => {
       if (!isRunning) return
+      animFrameRef.current = requestAnimationFrame(render)
+      if (now - lastPaint < FRAME_MS) return
+      lastPaint = now
 
       const elapsed = (now - startTimeRef.current) / 1000
 
@@ -256,7 +295,6 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
         drawOrbFrame(ctx, frameSolv, weightSolving, scaleSolving, size)
       }
 
-      animFrameRef.current = requestAnimationFrame(render)
     }
 
     animFrameRef.current = requestAnimationFrame(render)

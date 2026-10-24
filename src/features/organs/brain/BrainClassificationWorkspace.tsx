@@ -36,6 +36,12 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
   const [viewMode, setViewMode] = useState<DossierViewMode>('all')
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  // Blob URLs pin the file in memory until revoked. Preset paths are plain
+  // URLs, so only blob: entries are released.
+  useEffect(() => () => {
+    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
+  }, [previewUrl])
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState<BrainAnalysisResult | null>(null)

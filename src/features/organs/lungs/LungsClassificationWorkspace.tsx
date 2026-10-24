@@ -144,7 +144,15 @@ export const LungsClassificationWorkspace: React.FC = () => {
         </div>
         <div className="lw-status">
           <span className={`lw-dot ${health?.model_loaded ? 'is-on' : ''}`} aria-hidden="true" />
-          <span>{health?.model_loaded ? 'Model in memory' : 'Model idle · loads on entry'}</span>
+          <span>
+            {health === null
+              ? 'Checking…'
+              : !health.checkpoint_present
+                ? 'Not trained yet · awaiting checkpoint'
+                : health.model_loaded
+                  ? 'Model in memory'
+                  : 'Model idle · loads on entry'}
+          </span>
         </div>
       </header>
 
@@ -191,6 +199,8 @@ export const LungsClassificationWorkspace: React.FC = () => {
                 src={showHeatmap && heatmapSrc ? heatmapSrc : previewUrl}
                 alt={showHeatmap ? 'Grad-CAM overlay' : 'Uploaded chest radiograph'}
                 className="lw-image"
+                loading="lazy"
+                decoding="async"
               />
               <div className="lw-hud">
                 <span>{showHeatmap ? 'GRAD-CAM' : 'SOURCE'}</span>

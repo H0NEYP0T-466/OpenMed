@@ -13,10 +13,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Unclickable background blur */
-  backdrop-filter: blur(14px) saturate(125%);
-  -webkit-backdrop-filter: blur(14px) saturate(125%);
-  background: rgba(15, 14, 11, 0.72);
+  /* No backdrop-filter: a full-viewport blur is recomposited every frame
+     while the canvas above it animates. A near-opaque veil reads the same
+     and costs nothing. */
+  background: rgba(13, 12, 10, 0.88);
   pointer-events: all;
   cursor: wait;
   user-select: none;

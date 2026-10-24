@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { RomanSection } from '../../../components/common/RomanSection'
 import { AssistiveSegmentation } from '../../organs/brain/AssistiveSegmentation'
 import { SPECIMEN_PRESETS } from '../../organs/brain/specimenPresets'
@@ -15,6 +15,12 @@ import type { SpecimenPreset } from '../../organs/brain/specimenPresets'
 export const LiteMedSAMTab: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  // Same rule as the other workspaces: blob URLs are revoked when replaced or
+  // on unmount, so uploads never pin their files in memory.
+  useEffect(() => () => {
+    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
+  }, [previewUrl])
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
