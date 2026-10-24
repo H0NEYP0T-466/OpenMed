@@ -234,7 +234,8 @@ class Sample:
 
 class ChestXray14(Dataset):
     def __init__(self, root: str, split: str, transform=None, seed: int = 42,
-                 labels_dir: Optional[str] = None, cache_ram: bool = False):
+                 labels_dir: Optional[str] = None, cache_ram: bool = False,
+                 split_mode: str = "official"):
         self.root = locate_root(root)
         self.images_dir = os.path.join(self.root, "images")
         self.transform = transform
@@ -263,6 +264,27 @@ class ChestXray14(Dataset):
 
         available = set(os.listdir(self.images_dir))
         labels_by_image = {k: v for k, v in labels_by_image.items() if k in available}
+
+        if split_mode == "paper":
+            # Paper Section 5.2, literally: patient-level 70 / 10 / 20 over the
+            # whole labelled pool, ignoring the official list files.
+            patients = sorted({_patient_id(n) for n in labels_by_image})
+            random.Random(seed).shuffle(patients)
+            n_test = int(round(0.20 * len(patients)))
+            n_val = int(round(0.10 * len(patients)))
+            test_patients = set(patients[:n_test])
+            val_patients = set(patients[n_test:n_test + n_val])
+            train_patients = set(patients[n_test + n_val:])
+            chosen = {"train": train_patients, "val": val_patients, "test": test_patients}[split]
+            for name, vector in sorted(labels_by_image.items()):
+                if _patient_id(name) in chosen:
+                    self.samples.append(Sample(os.path.join(self.images_dir, name), vector, _patient_id(name)))
+            logger.info("%s split (paper 70/10/20): %d images / %d patients", split,
+                        len(self.samples), len({s.patient for s in self.samples}))
+            self._cache = None
+            if cache_ram:
+                self._build_cache()
+            return
 
         train_val_path = locate_metadata(self.root, "train_val", labels_dir)
         test_path = locate_metadata(self.root, "test", labels_dir)
@@ -295,23 +317,23 @@ class ChestXray14(Dataset):
         logger.info("%s split: %d images / %d patients", split, len(self.samples),
                     len({s.patient for s in self.samples}))
 
-        # Optional in-RAM byte cache. Loaded in the parent process, so fork
-        # shares the pages with every worker (no duplication) and epochs never
-        # touch the filesystem again. 112k x ~38 KB ~= 4.2 GB.
         self._cache: Optional[dict[str, bytes]] = None
         if cache_ram:
-            started = time.time()
-            names = [os.path.basename(s.path) for s in self.samples]
+            self._build_cache()
 
-            def _read(sample):
-                with open(sample.path, "rb") as handle:
-                    return os.path.basename(sample.path), handle.read()
+    def _build_cache(self) -> None:
+        """Load every PNG as bytes in the parent process; fork shares the pages."""
+        started = time.time()
 
-            with ThreadPoolExecutor(max_workers=16) as pool:
-                self._cache = dict(pool.map(_read, self.samples))
-            total_mb = sum(len(v) for v in self._cache.values()) / 1e6
-            logger.info("%s: cached %.0f MB in RAM in %.1fs", split, total_mb,
-                        time.time() - started)
+        def _read(sample):
+            with open(sample.path, "rb") as handle:
+                return os.path.basename(sample.path), handle.read()
+
+        with ThreadPoolExecutor(max_workers=16) as pool:
+            self._cache = dict(pool.map(_read, self.samples))
+        total_mb = sum(len(v) for v in self._cache.values()) / 1e6
+        logger.info("%s: cached %.0f MB in RAM in %.1fs", self.split, total_mb,
+                    time.time() - started)
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -723,10 +745,21 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
     parser.add_argument("--momentum", type=float, default=0.9)
-    parser.add_argument("--patience", type=int, default=10)
+    # The paper has no early stopping, and its LR decays x0.1 at epoch 20.
+    # A patience of 10 stops the run before that decay is ever applied — the
+    # measured failure mode (best AUC at epoch 9, stopped at 19, lr still 1e-3).
+    parser.add_argument("--patience", type=int, default=100,
+                        help="Epochs without val-AUC improvement before stopping; "
+                             "100 = effectively off, matching the paper")
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--transition_dim", type=int, default=224)
+    parser.add_argument("--split", dest="split_mode", default="official",
+                        choices=("official", "paper"),
+                        help="official = the canonical train_val/test lists (77/23, "
+                             "val carved from train_val); paper = literal patient-level 70/10/20")
+    parser.add_argument("--optimizer", default="sgd", choices=("sgd", "adam"),
+                        help="Paper names both Adam and SGD; SGD with momentum 0.9 is the default")
     parser.add_argument("--cache_ram", action="store_true",
                         help="Load all PNG bytes into RAM (shared to workers by fork)")
     parser.add_argument("--multi_gpu", action="store_true",
@@ -765,11 +798,14 @@ def main() -> int:
 
     labels_dir = args.labels_dir or None
     train_set = ChestXray14(args.data_root, "train", build_transforms(True), seed=args.seed,
-                            labels_dir=labels_dir, cache_ram=args.cache_ram)
+                            labels_dir=labels_dir, cache_ram=args.cache_ram,
+                            split_mode=args.split_mode)
     val_set = ChestXray14(args.data_root, "val", build_transforms(False), seed=args.seed,
-                          labels_dir=labels_dir, cache_ram=args.cache_ram)
+                          labels_dir=labels_dir, cache_ram=args.cache_ram,
+                          split_mode=args.split_mode)
     test_set = ChestXray14(args.data_root, "test", build_transforms(False), seed=args.seed,
-                           labels_dir=labels_dir, cache_ram=args.cache_ram)
+                           labels_dir=labels_dir, cache_ram=args.cache_ram,
+                           split_mode=args.split_mode)
     logger.info("Split sizes — train %d / val %d / test %d", len(train_set), len(val_set), len(test_set))
 
     def loader(dataset, shuffle):
@@ -790,8 +826,12 @@ def main() -> int:
     logger.info("W-CEL pos_weight (neg/pos, clipped 50): %s", np.round(pos_weight.cpu().numpy(), 2))
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum,
-                                weight_decay=args.weight_decay)
+    if args.optimizer == "adam":
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr,
+                                     weight_decay=args.weight_decay)
+    else:
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum,
+                                    weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
     scaler = make_scaler(torch.cuda.is_available())
 
