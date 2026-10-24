@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
+import { DiagnosticThinkingHUD, ThinkingOrbOverlay } from '../../../components/common/ThinkingOrb'
 import { getXrvStatus, loadXrv, predictXrv, unloadXrv } from '../torchxrayvisionApi'
 import type { XrvResult, XrvStatus } from '../torchxrayvisionApi'
 
@@ -40,6 +40,7 @@ export const TorchXRayVisionTab: React.FC = () => {
   const [selected, setSelected] = useState<string | null>(null)
   const [result, setResult] = useState<XrvResult | null>(null)
   const [isRunning, setIsRunning] = useState(false)
+  const [isLoadingModel, setIsLoadingModel] = useState(false)
   const [opacity, setOpacity] = useState(55)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -49,6 +50,9 @@ export const TorchXRayVisionTab: React.FC = () => {
     let cancelled = false
     void (async () => {
       try {
+        // First visit downloads 28 MB of weights — the full-screen orb is the
+        // model-loading indicator; inference uses the diagnostic HUD instead.
+        if (!cancelled) setIsLoadingModel(true)
         const state = await loadXrv()
         if (!cancelled) setStatus(state)
       } catch (cause) {
@@ -56,6 +60,8 @@ export const TorchXRayVisionTab: React.FC = () => {
           setError(cause instanceof Error ? cause.message : 'Model unavailable.')
           void getXrvStatus().then((s) => !cancelled && setStatus(s)).catch(() => undefined)
         }
+      } finally {
+        if (!cancelled) setIsLoadingModel(false)
       }
     })()
     return () => {
@@ -113,6 +119,8 @@ export const TorchXRayVisionTab: React.FC = () => {
 
   return (
     <div className="xrv">
+      <ThinkingOrbOverlay isVisible={isLoadingModel} label="Loading TorchXRayVision…" size={210} />
+
       <DiagnosticThinkingHUD
         isVisible={isRunning}
         classCountLabel="18 findings"

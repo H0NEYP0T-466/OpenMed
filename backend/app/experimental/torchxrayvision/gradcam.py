@@ -52,11 +52,16 @@ class GradCAM:
         self.model.eval()
         self.activations = None
         try:
-            logits = self.model(tensor)
+            # Score the raw logit, not xrv's operating-point-normalised
+            # output: Grad-CAM needs the gradient of the model's own logit.
+            if hasattr(self.model, "classifier") and hasattr(self.model, "features2"):
+                logits = self.model.classifier(self.model.features2(tensor))[0]
+            else:
+                logits = self.model(tensor)[0]
             if self.activations is None:
                 raise RuntimeError("Grad-CAM forward hook captured no activation")
 
-            score = logits[0, int(class_index)]
+            score = logits[int(class_index)]
             gradients = torch.autograd.grad(
                 outputs=score,
                 inputs=self.activations,

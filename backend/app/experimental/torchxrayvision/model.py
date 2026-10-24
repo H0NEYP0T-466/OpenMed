@@ -58,12 +58,16 @@ def load_model() -> Any:
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
     local = weights_path()
 
-    if os.path.isfile(local):
-        logger.info("Loading TorchXRayVision weights from %s", local)
-        model = xrv.models.DenseNet(weights=local)
+    # `weights` must be a key in xrv's model_urls — handing it a path raises
+    # "Weights not found". cache_dir is the supported way to keep the file
+    # local: xrv checks that folder first and only downloads when it is empty.
+    logger.info("TorchXRayVision weights dir: %s", CHECKPOINT_DIR)
+    model = xrv.models.DenseNet(weights=WEIGHTS_NAME, cache_dir=CHECKPOINT_DIR)
+    # xrv names the file after the URL, not after the weights key.
+    landed = [f for f in os.listdir(CHECKPOINT_DIR) if f.endswith(".pt")]
+    if landed:
+        logger.info("Weights present locally: %s", os.path.join(CHECKPOINT_DIR, landed[0]))
     else:
-        logger.info("No local weights at %s — downloading %s once", local, WEIGHTS_NAME)
-        model = xrv.models.DenseNet(weights=WEIGHTS_NAME)
         _persist_download()
 
     model.eval()

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ThinkingOrbOverlay } from '../../../components/common/ThinkingOrb'
+import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import {
   NIH_FINDINGS,
   classifyLungScan,
@@ -128,9 +128,11 @@ export const LungsClassificationWorkspace: React.FC = () => {
 
   return (
     <section className="lungs-workspace">
-      {isAnalyzing && (
-        <ThinkingOrbOverlay isVisible label="Evaluating 14 findings…" size={210} />
-      )}
+      <DiagnosticThinkingHUD
+        isVisible={isAnalyzing}
+        classCountLabel="14 findings"
+        task="classification"
+      />
 
       <header className="lw-head">
         <div>

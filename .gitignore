@@ -84,6 +84,9 @@ data/
 projec_dustbin/
 **/project_dustbin/**
 project_dustbin/
+backend/app/organs/lungs/classification/dustbin/
+dustbin/
+**/dustbin/**
 
 # Graphify generated knowledge graph (reproducible via `graphify update .`)
 graphify-out/

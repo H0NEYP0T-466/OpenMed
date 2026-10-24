@@ -109,10 +109,22 @@ def _preprocess(image: Image.Image) -> torch.Tensor:
     return tensor
 
 
+def raw_logits(model: Any, tensor: torch.Tensor) -> torch.Tensor:
+    """The head's raw logits, before xrv's operating-point normalisation.
+
+    `DenseNet.forward` applies sigmoid *and* `op_norm` when the checkpoint
+    carries thresholds, which remaps every posterior toward 0.5 (a 0.022
+    posterior becomes 0.293). The honest posterior is sigmoid of the raw
+    logits, so the head is called directly.
+    """
+    features = model.features2(tensor)
+    return model.classifier(features)[0]
+
+
 @torch.no_grad()
 def _logits(tensor: torch.Tensor) -> np.ndarray:
     assert _model is not None
-    return _model(tensor)[0].float().cpu().numpy()
+    return raw_logits(_model, tensor).float().cpu().numpy()
 
 
 def predict(image: Image.Image) -> dict[str, Any]:
@@ -125,8 +137,8 @@ def predict(image: Image.Image) -> dict[str, Any]:
     started = time.perf_counter()
     tensor = _preprocess(image)
 
-    raw = _logits(tensor)
-    probabilities = 1.0 / (1.0 + np.exp(-raw))  # xrv heads are logits
+    logits = _logits(tensor)
+    probabilities = 1.0 / (1.0 + np.exp(-logits))  # sigmoid of the raw logits
     ranked = np.argsort(-probabilities)
     top_index = int(ranked[0])
 

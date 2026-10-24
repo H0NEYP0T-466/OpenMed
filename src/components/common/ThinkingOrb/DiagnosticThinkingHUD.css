@@ -29,8 +29,10 @@
 }
 
 .diagnostic-hud-fullscreen-backdrop.is-closing {
+  /* Keeps pointer-events: all while it fades. The component unmounts this node
+     after the transition, so it never lingers as a blocker — but during the
+     320ms fade the page must not become clickable again. */
   opacity: 0;
-  pointer-events: none;
   cursor: default;
 }
 

@@ -333,7 +333,11 @@ export const BrainClassificationWorkspace: React.FC<BrainClassificationWorkspace
               {/* Main Radiological Lightbox */}
               <div
                 className={`radiology-lightbox ${previewUrl ? 'has-scan' : ''} ${isAnalyzing ? 'analyzing' : ''}`}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => {
+                  // A run in flight owns the screen: the picker stays shut.
+                  if (isAnalyzing) return
+                  fileInputRef.current?.click()
+                }}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
               >
