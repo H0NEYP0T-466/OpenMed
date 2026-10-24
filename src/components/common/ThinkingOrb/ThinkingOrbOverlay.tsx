@@ -37,6 +37,24 @@ const DURATION_TRANSITION = 0.8 // seconds
 const DURATION_SOLVING = 2.6 // seconds
 const CYCLE_TOTAL = DURATION_CONNECTING + DURATION_TRANSITION + DURATION_SOLVING + DURATION_TRANSITION // 6.8s
 
+// Colour strings are cached per (palette, alpha bucket) so a frame allocates
+// nothing. Drawing is grouped by colour: one path per bucket, one fill.
+const ALPHA_BUCKETS = 16
+const colourCache = new Map<number, string>()
+
+function coralFor(isHighlight: boolean, alpha: number): string {
+  const bucket = Math.max(1, Math.min(ALPHA_BUCKETS, Math.round(alpha * ALPHA_BUCKETS)))
+  const key = (isHighlight ? 1000 : 0) + bucket
+  let value = colourCache.get(key)
+  if (value === undefined) {
+    const a = (bucket / ALPHA_BUCKETS).toFixed(3)
+    value = isHighlight ? `rgba(${HIGHLIGHT_R}, ${HIGHLIGHT_G}, ${HIGHLIGHT_B}, ${a})`
+                        : `rgba(${CORAL_R}, ${CORAL_G}, ${CORAL_B}, ${a})`
+    colourCache.set(key, value)
+  }
+  return value
+}
+
 function drawOrbFrame(
   ctx: CanvasRenderingContext2D,
   frame: OrbFrame,
@@ -56,40 +74,53 @@ function drawOrbFrame(
     ctx.translate(-cx, -cy)
   }
 
-  // Draw connecting synaptic lines
+  // Lines: bucket by (colour, rounded width) and stroke each bucket once.
   if (frame.lines && frame.lines.length > 0) {
+    const lineBuckets = new Map<string, number[][]>()
     for (const line of frame.lines) {
       const lineAlpha = (line.a ?? 1) * alphaWeight * 0.72
       if (lineAlpha < 0.02) continue
-
-      ctx.strokeStyle = `rgba(${CORAL_R}, ${CORAL_G}, ${CORAL_B}, ${lineAlpha})`
-      ctx.lineWidth = Math.max(0.4, line.w || 0.6)
+      const width = Math.round(Math.max(0.4, line.w || 0.6) * 2) / 2
+      const key = `${coralFor(false, lineAlpha)}|${width}`
+      const bucket = lineBuckets.get(key)
+      if (bucket) bucket.push([line.x1, line.y1, line.x2, line.y2])
+      else lineBuckets.set(key, [[line.x1, line.y1, line.x2, line.y2]])
+    }
+    for (const [key, segments] of lineBuckets) {
+      const [colour, widthText] = key.split('|')
+      ctx.strokeStyle = colour
+      ctx.lineWidth = Number(widthText)
       ctx.beginPath()
-      ctx.moveTo(line.x1, line.y1)
-      ctx.lineTo(line.x2, line.y2)
+      for (const [x1, y1, x2, y2] of segments) {
+        ctx.moveTo(x1, y1)
+        ctx.lineTo(x2, y2)
+      }
       ctx.stroke()
     }
   }
 
-  // Draw dots with depth shading in pure coral-orange
+  // Dots: one path per colour bucket, one fill. Radii stay per-dot.
   if (frame.dots && frame.dots.length > 0) {
+    const dotBuckets = new Map<string, number[][]>()
     for (const dot of frame.dots) {
       const baseAlpha = dot.a ?? 1
       if (baseAlpha < 0.02) continue
-
-      // Normalized depth z: [-1, 1] -> [0, 1]
       const zNorm = Math.min(1, Math.max(0, (dot.z + 1) / 2))
       const dotAlpha = Math.min(1, Math.max(0.18, baseAlpha * (0.35 + 0.65 * zNorm))) * alphaWeight
-
-      // Highlight/signal points get luminous coral, standard dots get pure #ed6f5c
       const isHighlight = (dot.white ?? 0) > 0.62 || zNorm > 0.85
-      const fillR = isHighlight ? HIGHLIGHT_R : CORAL_R
-      const fillG = isHighlight ? HIGHLIGHT_G : CORAL_G
-      const fillB = isHighlight ? HIGHLIGHT_B : CORAL_B
-
-      ctx.fillStyle = `rgba(${fillR}, ${fillG}, ${fillB}, ${dotAlpha})`
+      const key = coralFor(isHighlight, dotAlpha)
+      const bucket = dotBuckets.get(key)
+      const entry = [dot.x, dot.y, Math.max(0.4, dot.r)]
+      if (bucket) bucket.push(entry)
+      else dotBuckets.set(key, [entry])
+    }
+    for (const [colour, circles] of dotBuckets) {
+      ctx.fillStyle = colour
       ctx.beginPath()
-      ctx.arc(dot.x, dot.y, Math.max(0.4, dot.r), 0, Math.PI * 2)
+      for (const [x, y, r] of circles) {
+        ctx.moveTo(x + r, y)
+        ctx.arc(x, y, r, 0, Math.PI * 2)
+      }
       ctx.fill()
     }
   }
@@ -100,7 +131,7 @@ function drawOrbFrame(
 export const ThinkingOrbOverlay: React.FC<ThinkingOrbOverlayProps> = ({
   isVisible,
   label,
-  size = 176,
+  size = 220,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const animFrameRef = useRef<number>(0)
@@ -115,7 +146,8 @@ export const ThinkingOrbOverlay: React.FC<ThinkingOrbOverlayProps> = ({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const dpr = Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1)
+    // A particle field gains nothing from 2x pixels; 1.5 halves the fill cost.
+    const dpr = Math.min(1.25, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1)
     canvas.width = Math.round(size * dpr)
     canvas.height = Math.round(size * dpr)
 
@@ -127,9 +159,14 @@ export const ThinkingOrbOverlay: React.FC<ThinkingOrbOverlayProps> = ({
 
     startTimeRef.current = performance.now()
     let isRunning = true
+    let lastPaint = 0
+    const FRAME_MS = 1000 / 24  // ambient indicator: 24 fps is indistinguishable
 
     const render = (now: number) => {
       if (!isRunning) return
+      animFrameRef.current = requestAnimationFrame(render)
+      if (now - lastPaint < FRAME_MS) return
+      lastPaint = now
 
       const elapsedSec = (now - startTimeRef.current) / 1000
       const cycleTime = elapsedSec % CYCLE_TOTAL
@@ -188,7 +225,6 @@ export const ThinkingOrbOverlay: React.FC<ThinkingOrbOverlayProps> = ({
         drawOrbFrame(ctx, frameSolv, weightSolving, scaleSolving, size)
       }
 
-      animFrameRef.current = requestAnimationFrame(render)
     }
 
     animFrameRef.current = requestAnimationFrame(render)
@@ -212,7 +248,11 @@ export const ThinkingOrbOverlay: React.FC<ThinkingOrbOverlayProps> = ({
     >
       <div className="thinking-orb-stage">
         {/* Ambient coral radiance (pure light, zero borders/card) */}
-        <div className="thinking-orb-ambient-glow" aria-hidden="true" />
+        <div
+          className="thinking-orb-ambient-glow"
+          aria-hidden="true"
+          style={{ width: size * 2.2, height: size * 2.2 }}
+        />
 
         {/* Pure 3D Canvas */}
         <canvas

@@ -375,7 +375,7 @@ export const OrganDashboard: React.FC = () => {
         <ThinkingOrbOverlay
           isVisible
           label={selectedOrganId === 'lungs' ? 'Loading thoracic model…' : 'Loading neural suite…'}
-          size={110}
+          size={210}
         />
       )}
     </AppShell>

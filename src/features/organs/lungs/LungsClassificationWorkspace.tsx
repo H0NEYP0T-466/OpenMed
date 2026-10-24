@@ -129,7 +129,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
   return (
     <section className="lungs-workspace">
       {isAnalyzing && (
-        <ThinkingOrbOverlay isVisible label="Evaluating 14 findings…" size={110} />
+        <ThinkingOrbOverlay isVisible label="Evaluating 14 findings…" size={210} />
       )}
 
       <header className="lw-head">

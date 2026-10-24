@@ -350,20 +350,46 @@ class ChestXray14(Dataset):
         return image, torch.tensor(sample.labels, dtype=torch.float32)
 
 
-def build_transforms(train: bool) -> transforms.Compose:
+def compute_normalization(root: str, labels_dir: Optional[str], sample_size: int = 5000,
+                          seed: int = 42) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    """Mean/std of the training pixels — paper §5.2 normalises with train statistics."""
+    dataset = ChestXray14(root, "train", transform=None, seed=seed, labels_dir=labels_dir)
+    rng = random.Random(seed)
+    picks = rng.sample(range(len(dataset)), min(sample_size, len(dataset)))
+    total = np.zeros(3, dtype=np.float64)
+    total_sq = np.zeros(3, dtype=np.float64)
+    count = 0
+    for index in tqdm(picks, desc="[norm]", leave=False, disable=_quiet_output()):
+        image = Image.open(dataset.samples[index].path).convert("RGB").resize((224, 224))
+        array = np.asarray(image, dtype=np.float64) / 255.0
+        total += array.reshape(-1, 3).sum(axis=0)
+        total_sq += (array.reshape(-1, 3) ** 2).sum(axis=0)
+        count += array.shape[0] * array.shape[1]
+    mean = total / count
+    std = np.sqrt(np.maximum(total_sq / count - mean ** 2, 1e-12))
+    return tuple(float(v) for v in mean), tuple(float(v) for v in std)
+
+
+def build_transforms(train: bool, mean=IMAGENET_MEAN, std=IMAGENET_STD) -> transforms.Compose:
+    """Paper §5.2 / Algorithm 1 step 6.
+
+    resize 256 -> crop 224 -> FlipLr(0.5) -> +/-12 px translate -> normalise
+    with the training-set mean and std (passed in, computed in main).
+    """
     if train:
         return transforms.Compose([
             transforms.Resize(256),
             transforms.RandomCrop(224),
+            transforms.RandomHorizontalFlip(p=0.5),  # Algorithm 1, step 6: FlipLr(0.5)
             transforms.RandomAffine(degrees=0, translate=(12 / 224, 12 / 224)),
             transforms.ToTensor(),
-            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+            transforms.Normalize(mean, std),
         ])
     return transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
-        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        transforms.Normalize(mean, std),
     ])
 
 
@@ -485,11 +511,13 @@ def _progress(iterable, desc: str):
     return tqdm(iterable, desc=desc, leave=False, disable=_quiet_output())
 
 
-def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
+def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch, max_steps=None):
     model.train()
     running, total = 0.0, 0
     progress = _progress(loader, f"Epoch {epoch:02d} [train]")
     for step, (images, targets) in enumerate(progress, start=1):
+        if max_steps is not None and step > max_steps:
+            break
         images, targets = images.to(device, non_blocking=True), targets.to(device, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
         with autocast_cuda(scaler is not None):
@@ -513,11 +541,13 @@ def train_epoch(model, loader, criterion, optimizer, scaler, device, epoch):
 
 
 @torch.no_grad()
-def evaluate(model, loader, criterion, device, tag: str = "val"):
+def evaluate(model, loader, criterion, device, tag: str = "val", max_batches=None):
     model.eval()
     running, total = 0.0, 0
     probs, targets_all = [], []
-    for images, targets in _progress(loader, f"[{tag}]"):
+    for batch_index, (images, targets) in enumerate(_progress(loader, f"[{tag}]"), start=1):
+        if max_batches is not None and batch_index > max_batches:
+            break
         images = images.to(device, non_blocking=True)
         logits = model(images)
         loss = criterion(logits, targets.to(device))
@@ -748,6 +778,15 @@ def parse_args():
     # The paper has no early stopping, and its LR decays x0.1 at epoch 20.
     # A patience of 10 stops the run before that decay is ever applied — the
     # measured failure mode (best AUC at epoch 9, stopped at 19, lr still 1e-3).
+    parser.add_argument("--epoch_fraction", type=float, default=0.1,
+                        help="Algorithm 1 step 10: trainstep = totalsamples/batchsize/10, "
+                             "i.e. one epoch is a 10%% slice of the training set")
+    parser.add_argument("--val_fraction", type=float, default=1.0,
+                        help="Step 10 sets validation steps the same way; 1.0 keeps the "
+                             "AUC monitor on the full validation set")
+    parser.add_argument("--scheduler", default="plateau", choices=("plateau", "step"),
+                        help="plateau = ReduceLROnPlateau to 1e-8 (step 9); "
+                             "step = divide by 10 at epoch 20 (paper text)")
     parser.add_argument("--patience", type=int, default=100,
                         help="Epochs without val-AUC improvement before stopping; "
                              "100 = effectively off, matching the paper")
@@ -758,8 +797,14 @@ def parse_args():
                         choices=("official", "paper"),
                         help="official = the canonical train_val/test lists (77/23, "
                              "val carved from train_val); paper = literal patient-level 70/10/20")
-    parser.add_argument("--optimizer", default="sgd", choices=("sgd", "adam"),
-                        help="Paper names both Adam and SGD; SGD with momentum 0.9 is the default")
+    parser.add_argument("--optimizer", default="adam", choices=("sgd", "adam"),
+                        help="Algorithm 1 step 12: Adam optimizer for training model")
+    parser.add_argument("--normalize", default="dataset", choices=("dataset", "imagenet"),
+                        help="dataset = mean/std of the training pixels (paper §5.2); "
+                             "imagenet = the fixed ImageNet constants")
+    parser.add_argument("--freeze_backbone", action="store_true",
+                        help="Train only the transition/prediction head (literal reading of "
+                             "§4.1). Off by default: 0.858 AUC is not reachable head-only.")
     parser.add_argument("--cache_ram", action="store_true",
                         help="Load all PNG bytes into RAM (shared to workers by fork)")
     parser.add_argument("--multi_gpu", action="store_true",
@@ -790,6 +835,8 @@ def main() -> int:
                 device, args.seed, args.batch_size, args.epochs, args.lr,
                 args.weight_decay, args.momentum)
     logger.info("  data_root=%s", args.data_root)
+    logger.info("  optimizer=%s scheduler=%s epoch_fraction=%.2f flip=0.5",
+                args.optimizer, args.scheduler, args.epoch_fraction)
     logger.info("  gpus=%d  parallelism=%s", torch.cuda.device_count(),
                 "DataParallel" if (torch.cuda.device_count() > 1 and args.multi_gpu) else "single")
     if torch.cuda.is_available():
@@ -797,13 +844,19 @@ def main() -> int:
                     torch.cuda.get_device_properties(0).total_memory / 1e9)
 
     labels_dir = args.labels_dir or None
-    train_set = ChestXray14(args.data_root, "train", build_transforms(True), seed=args.seed,
+    if args.normalize == "dataset":
+        norm_mean, norm_std = compute_normalization(args.data_root, labels_dir, seed=args.seed)
+        logger.info("Train-set normalization: mean=%s std=%s",
+                    [round(v, 4) for v in norm_mean], [round(v, 4) for v in norm_std])
+    else:
+        norm_mean, norm_std = IMAGENET_MEAN, IMAGENET_STD
+    train_set = ChestXray14(args.data_root, "train", build_transforms(True, norm_mean, norm_std), seed=args.seed,
                             labels_dir=labels_dir, cache_ram=args.cache_ram,
                             split_mode=args.split_mode)
-    val_set = ChestXray14(args.data_root, "val", build_transforms(False), seed=args.seed,
+    val_set = ChestXray14(args.data_root, "val", build_transforms(False, norm_mean, norm_std), seed=args.seed,
                           labels_dir=labels_dir, cache_ram=args.cache_ram,
                           split_mode=args.split_mode)
-    test_set = ChestXray14(args.data_root, "test", build_transforms(False), seed=args.seed,
+    test_set = ChestXray14(args.data_root, "test", build_transforms(False, norm_mean, norm_std), seed=args.seed,
                            labels_dir=labels_dir, cache_ram=args.cache_ram,
                            split_mode=args.split_mode)
     logger.info("Split sizes — train %d / val %d / test %d", len(train_set), len(val_set), len(test_set))
@@ -819,6 +872,10 @@ def main() -> int:
 
     raw_model = ZNet(len(FINDINGS), pretrained=True, transition_dim=args.transition_dim).to(device)
     model = raw_model
+    if args.freeze_backbone:
+        for parameter in raw_model.features.parameters():
+            parameter.requires_grad = False
+        logger.info("Backbone frozen: only transition + prediction layers train (§4.1 literal)")
     if torch.cuda.device_count() > 1 and args.multi_gpu:
         model = torch.nn.DataParallel(raw_model)
         logger.info("DataParallel across %d GPUs", torch.cuda.device_count())
@@ -832,7 +889,14 @@ def main() -> int:
     else:
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum,
                                     weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
+    if args.scheduler == "plateau":
+        # Algorithm 1 step 9 gives initial 1e-3 and minimum 1e-8; plateau decay
+        # x0.1 reaches 1e-8 in five steps.
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode="min", factor=0.1, patience=3, min_lr=1e-8
+        )
+    else:
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
     scaler = make_scaler(torch.cuda.is_available())
 
     history = {"train_loss": [], "val_loss": [], "val_auc": []}
@@ -858,12 +922,27 @@ def main() -> int:
 
     patience = 0
     started = time.time()
+    # Algorithm 1, step 10: trainstep = totalsamples/batchsize/10.
+    # shuffle=True reshuffles every epoch, so truncating at max_steps shows a
+    # fresh random slice each time rather than replaying the same head.
+    max_steps = max(1, int(round(len(train_loader) * args.epoch_fraction)))
+    val_batches = (max(1, int(round(len(val_loader) * args.val_fraction)))
+                   if args.val_fraction < 1.0 else None)
+    logger.info("Epoch definition: %d of %d train batches (%.0f%%), %s val batches",
+                max_steps, len(train_loader), args.epoch_fraction * 100,
+                "all" if val_batches is None else val_batches)
+
     for epoch in range(start_epoch, args.epochs + 1):
         epoch_start = time.time()
         _T0[0] = epoch_start
-        train_loss = train_epoch(model, train_loader, criterion, optimizer, scaler, device, epoch)
-        val_loss, val_auc, per_class, _, _ = evaluate(model, val_loader, criterion, device)
-        scheduler.step()  # paper: lr / 10 after epoch 20 — epoch cadence, not batch
+        train_loss = train_epoch(model, train_loader, criterion, optimizer, scaler, device, epoch,
+                                 max_steps=max_steps)
+        val_loss, val_auc, per_class, _, _ = evaluate(model, val_loader, criterion, device,
+                                                      max_batches=val_batches)
+        if args.scheduler == "plateau":
+            scheduler.step(val_loss)  # Algorithm 1: plateau on validation loss
+        else:
+            scheduler.step()
         elapsed = time.time() - epoch_start
 
         history["train_loss"].append(train_loss)
@@ -923,6 +1002,10 @@ def main() -> int:
     localization = evaluate_localization(raw_model, args.data_root, device, artifacts,
                                          labels_dir=labels_dir)
 
+    with open(os.path.join(checkpoints, "normalization.json"), "w") as handle:
+        json.dump({"mean": list(norm_mean), "std": list(norm_std),
+                   "source": args.normalize}, handle, indent=2)
+
     metrics = {
         "model_tag": MODEL_TAG,
         "paper": "Ahmad et al., Diagnostics 2023, 13(22), 3462",
@@ -937,10 +1020,17 @@ def main() -> int:
         "paper_mean_auc": 0.858,
         "splits": {"train": len(train_set), "val": len(val_set), "test": len(test_set)},
         "hyperparameters": {
-            "optimizer": "SGD", "momentum": args.momentum, "weight_decay": args.weight_decay,
-            "lr": args.lr, "lr_step": "x0.1 @ epoch 20", "batch_size": args.batch_size,
+            "optimizer": args.optimizer, "momentum": args.momentum,
+            "weight_decay": args.weight_decay, "lr": args.lr,
+            "scheduler": ("ReduceLROnPlateau(factor=0.1, patience=3, min_lr=1e-8)"
+                          if args.scheduler == "plateau" else "StepLR(x0.1 @ 20)"),
+            "batch_size": args.batch_size, "epoch_fraction": args.epoch_fraction,
             "loss": "weighted BCE (pos_weight = neg/pos, clip 50)",
-            "augmentation": "resize 256, random crop 224, +/-12px translate",
+            "augmentation": "resize 256, random crop 224, hflip 0.5, +/-12px translate",
+            "normalization": {"source": args.normalize,
+                              "mean": [round(v, 6) for v in norm_mean],
+                              "std": [round(v, 6) for v in norm_std]},
+            "backbone": "frozen" if args.freeze_backbone else "fine-tuned",
         },
         "localization": localization,
     }
@@ -962,7 +1052,9 @@ def main() -> int:
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for path, arcname in ((log_path, "training_log.csv"),
                               (best_path, "lung_best_model.pth"),
-                              (last_path, "lung_last.pth")):
+                              (last_path, "lung_last.pth"),
+                              (os.path.join(checkpoints, "normalization.json"),
+                               "checkpoints/normalization.json")):
             if os.path.isfile(path):
                 archive.write(path, arcname)
         for root, _, files in os.walk(artifacts):

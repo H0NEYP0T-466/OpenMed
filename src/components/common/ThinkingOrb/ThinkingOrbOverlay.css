@@ -10,27 +10,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Unclickable background blur */
-  backdrop-filter: blur(14px) saturate(125%);
-  -webkit-backdrop-filter: blur(14px) saturate(125%);
-  background: rgba(15, 14, 11, 0.68);
+  /* No backdrop-filter at all. Even static, a full-viewport backdrop blur is
+     recomposited every frame while the canvas above it repaints — that was the
+     remaining stutter. A near-opaque veil reads the same and costs nothing. */
+  background: rgba(13, 12, 10, 0.88);
   pointer-events: all;
   cursor: wait;
   user-select: none;
-  animation: orbBackdropFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  contain: layout paint;
+  will-change: opacity;
+  animation: orbBackdropFade 0.18s ease-out forwards;
 }
 
 @keyframes orbBackdropFade {
-  from {
-    opacity: 0;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-  }
-  to {
-    opacity: 1;
-    backdrop-filter: blur(14px) saturate(125%);
-    -webkit-backdrop-filter: blur(14px) saturate(125%);
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .thinking-orb-stage {
@@ -52,8 +46,6 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 380px;
-  height: 380px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(

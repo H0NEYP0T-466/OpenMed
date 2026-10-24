@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import io
+import json
 import logging
 import os
 import time
@@ -34,6 +35,23 @@ IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
 
+def load_normalization(checkpoint_path: str) -> tuple[tuple[float, float, float],
+                                                      tuple[float, float, float]]:
+    """Training normalisation persisted beside the checkpoint (paper §5.2).
+
+    Falls back to ImageNet constants when the sidecar is absent, and says so —
+    a silent mismatch here would shift every probability.
+    """
+    sidecar = os.path.join(os.path.dirname(checkpoint_path), "normalization.json")
+    try:
+        with open(sidecar) as handle:
+            data = json.load(handle)
+        return tuple(data["mean"]), tuple(data["std"])
+    except (OSError, KeyError, TypeError, json.JSONDecodeError):
+        logger.warning("No normalization.json beside the checkpoint — using ImageNet stats")
+        return IMAGENET_MEAN, IMAGENET_STD
+
+
 class LungClassificationPipeline:
     """Lazily-loaded inference wrapper; the router owns the singleton."""
 
@@ -44,6 +62,7 @@ class LungClassificationPipeline:
         )
         self.model: Optional[ZNet] = None
         self.load_time_ms: Optional[float] = None
+        self.mean, self.std = load_normalization(checkpoint_path)
 
     # ── lifecycle ──────────────────────────────────────────────────────────
 
@@ -89,8 +108,8 @@ class LungClassificationPipeline:
         top = (resized.height - 224) // 2
         cropped = resized.crop((left, top, left + 224, top + 224))
         array = np.asarray(cropped, dtype=np.float32) / 255.0
-        array = (array - np.array(IMAGENET_MEAN, dtype=np.float32)) / np.array(
-            IMAGENET_STD, dtype=np.float32
+        array = (array - np.array(self.mean, dtype=np.float32)) / np.array(
+            self.std, dtype=np.float32
         )
         tensor = torch.from_numpy(array.transpose(2, 0, 1)).unsqueeze(0)
         return tensor.to(self.device)
