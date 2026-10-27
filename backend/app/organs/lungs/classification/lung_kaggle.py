@@ -1761,6 +1761,7 @@ def main() -> int:
                 _fmt(val_metrics_raw["group_mean_auc"]["TB"]),
                 candidate_score,
                 candidate_kind,
+                optimizer.param_groups[1]["lr"],
                 best_score,
                 best_epoch,
                 elapsed,
