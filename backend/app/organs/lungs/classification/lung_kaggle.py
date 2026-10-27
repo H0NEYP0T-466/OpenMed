@@ -599,11 +599,14 @@ def stage_images(
         summary["skipped"],
         (time.time() - started) / 60.0,
     )
-    if summary["resized"] != 4_316:
+    # Only meaningful on a cold cache: a warm cache re-encodes nothing, so
+    # `resized` is legitimately 0 and the count proves nothing.
+    if summary["newly_staged"] > 0 and summary["resized"] != 4_316:
         logger.warning(
-            "Resized %d images; the contract expects 4,316 COVID/TB files "
-            "(NIH should already be 224x224).",
+            "Resized %d of %d newly staged images; the contract expects 4,316 "
+            "COVID/TB files (NIH should already be 224x224).",
             summary["resized"],
+            summary["newly_staged"],
         )
     return summary
 
