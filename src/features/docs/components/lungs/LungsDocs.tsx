@@ -27,15 +27,34 @@ const WEIGHT_ROWS: readonly { label: string; positives: number; share: string; r
   { label: 'Infiltration', positives: 12125, share: '15.89%', ratio: '5.3:1', weight: '5.3' },
 ]
 
+const PER_CLASS: readonly { finding: string; auc: number; sens: number; spec: number; support: string }[] = [
+  { finding: 'Atelectasis', auc: 0.7576, sens: 0.400, spec: 0.885, support: '3,279 / 22,317' },
+  { finding: 'Cardiomegaly', auc: 0.8892, sens: 0.523, spec: 0.955, support: '1,069 / 24,527' },
+  { finding: 'Effusion', auc: 0.8236, sens: 0.692, spec: 0.785, support: '4,658 / 20,938' },
+  { finding: 'Infiltration', auc: 0.6989, sens: 0.496, spec: 0.785, support: '6,112 / 19,484' },
+  { finding: 'Mass', auc: 0.8164, sens: 0.461, spec: 0.919, support: '1,748 / 23,848' },
+  { finding: 'Nodule', auc: 0.7370, sens: 0.212, spec: 0.966, support: '1,623 / 23,973' },
+  { finding: 'Pneumonia', auc: 0.7120, sens: 0.036, spec: 0.992, support: '555 / 25,041' },
+  { finding: 'Pneumothorax', auc: 0.8409, sens: 0.442, spec: 0.928, support: '2,665 / 22,931' },
+  { finding: 'Consolidation', auc: 0.7455, sens: 0.280, spec: 0.912, support: '1,815 / 23,781' },
+  { finding: 'Edema', auc: 0.8405, sens: 0.531, spec: 0.891, support: '925 / 24,671' },
+  { finding: 'Emphysema', auc: 0.8631, sens: 0.404, spec: 0.960, support: '1,093 / 24,503' },
+  { finding: 'Fibrosis', auc: 0.8183, sens: 0.177, spec: 0.986, support: '435 / 25,161' },
+  { finding: 'Pleural_Thickening', auc: 0.7595, sens: 0.195, spec: 0.954, support: '1,143 / 24,453' },
+  { finding: 'Hernia', auc: 0.9275, sens: 0.523, spec: 0.997, support: '86 / 25,510' },
+  { finding: 'COVID', auc: 0.9999, sens: 0.989, spec: 0.998, support: '361 / 25,666' },
+  { finding: 'TB', auc: 1.0000, sens: 0.986, spec: 0.9995, support: '70 / 25,596' },
+]
+
 export const LungsDocs: React.FC = () => {
   return (
     <div id="model-lungs" className="organ-model-dossier">
       <div className="organ-dossier-header">
         <div className="dossier-head-left">
           <div className="organ-badge lungs">Organ · Lungs (Pulmones)</div>
-          <h3 className="dossier-organ-title">Z-Net — NIH ChestX-ray14 14-Pathology Classification</h3>
+          <h3 className="dossier-organ-title">XRV-16 — 16-Class Chest Radiograph Classification</h3>
           <span className="dossier-sub">
-            Respiratory System · Frontal Radiographs · Replication of Ahmad et al., Diagnostics 2023, 13(22), 3462
+            Respiratory System · Frontal Radiographs · NIH ChestX-ray14 + COVID-19 Radiography + TB Chest Radiography
           </span>
         </div>
         <Link to="/app?organ=lungs" className="btn-launch-workspace">
@@ -45,12 +64,124 @@ export const LungsDocs: React.FC = () => {
         </Link>
       </div>
 
-      {/* Task 1: Classification */}
+
+      {/* Production model */}
+      <div className="task-block classification">
+        <div className="task-header-strip">
+          <div className="task-tag-group">
+            <span className="task-type-tag class">Task · Classification (in production)</span>
+            <span className="task-name-text">16-Class Multi-Label Differential — 14 NIH Findings plus COVID and TB</span>
+          </div>
+          <span className="task-model-pill">XRV-16 · DenseNet-121 (CXR-pretrained) · 116,436 images</span>
+        </div>
+        <div className="boilerplate-card">
+          <p className="boilerplate-copy">
+            A TorchXRayVision <strong>densenet121-res224-all</strong> backbone — trained on NIH, CheXpert, MIMIC,
+            PadChest and VinDr — has its 18-class head replaced by <strong>Dropout(0.3) → Linear(1024, 16)</strong> and
+            is fine-tuned on 116,436 radiographs from three collections. Training uses masked binary cross-entropy:
+            a <code>−1</code> marks a finding that source never annotated, and those terms are excluded from the loss
+            rather than counted as negatives. Per-class weights are <code>√(neg/pos)</code>, computed only over
+            assessed rows.
+          </p>
+        </div>
+      </div>
+
+      <div className="archival-ledger-card">
+        <div className="ledger-card-title-strip">
+          <span className="ledger-tag">Held-out Test Ledger</span>
+          <span className="ledger-sub">26,027 images · best checkpoint epoch 23 (EMA) · early-stopped at 38</span>
+        </div>
+        <div className="stat-monoliths-grid">
+          <div className="stat-monolith">
+            <span className="mono-num">0.8021</span>
+            <span className="mono-label">Findings Mean AUC</span>
+            <span className="mono-desc">The 14 NIH classes — the number comparable with published ChestX-ray14 baselines.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.9999</span>
+            <span className="mono-label">COVID AUC</span>
+            <span className="mono-desc">3,616 positives from a 2020–21 collection; negatives are pre-pandemic cohorts.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">1.0000</span>
+            <span className="mono-label">TB AUC</span>
+            <span className="mono-desc">700 positives. Read the caveat below before quoting this anywhere.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.9319</span>
+            <span className="mono-label">Specificity @ 0.5</span>
+            <span className="mono-desc">Macro over 16 classes. Sensitivity at the same threshold is 0.4592 — see below.</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="class-inventory-table-wrap">
+        <div style={{ padding: '12px 16px', background: 'var(--bone)', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink)' }}>
+            Per-Class Test Performance
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-soft)' }}>
+            25,596 NIH test images · thresholds at 0.5
+          </span>
+        </div>
+        <table className="class-inventory-table">
+          <thead>
+            <tr>
+              <th>Finding</th>
+              <th>AUC</th>
+              <th>Sensitivity</th>
+              <th>Specificity</th>
+              <th>Support (n+ / n−)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PER_CLASS.map((row) => (
+              <tr key={row.finding}>
+                <td className="class-name-cell">{row.finding}</td>
+                <td style={{ fontWeight: 600 }}>{row.auc.toFixed(4)}</td>
+                <td>{row.sens.toFixed(3)}</td>
+                <td>{row.spec.toFixed(3)}</td>
+                <td>{row.support}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="anomaly-breakdown-grid" style={{ marginBottom: '18px' }}>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <AlertTriangle size={15} className="text-warning" />
+            <span>TB and COVID are separable by source, not by pathology</span>
+          </div>
+          <p className="anomaly-copy">
+            TB reached AUC 0.9983 after two epochs — from 560 training images. A model cannot learn tuberculosis that
+            fast. What it learned is that TB scans are 512×512 greyscale from Montgomery/Shenzhen while NIH scans are
+            224 RGB: different scanners, different acquisition. The negatives for both classes come from the
+            pre-pandemic cohorts, so the class boundary is partly a domain boundary. On a radiograph from a hospital
+            neither dataset covers, these two numbers will not hold.
+          </p>
+        </div>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <AlertTriangle size={15} className="text-warning" />
+            <span>Sensitivity 0.4592 at the 0.5 threshold</span>
+          </div>
+          <p className="anomaly-copy">
+            Class weighting shifts the posterior distribution, so 0.5 is no longer a balanced operating point: the
+            model misses roughly half the positives while keeping 93 % specificity. AUC is unaffected — the ranking is
+            sound — but a screening tool needs per-class thresholds calibrated on the validation split, not a global
+            0.5. Until that lands, treat the probabilities as ranks, not decisions.
+          </p>
+        </div>
+      </div>
+
+      {/* Replication baseline */}
       <div className="task-block classification">
         <div className="task-header-strip">
           <div className="task-tag-group">
             <span className="task-type-tag class">Task · Classification</span>
-            <span className="task-name-text">Frontal Chest Radiograph — 14-Pathology Multi-Label Differential</span>
+            <span className="task-name-text">Replication Baseline — Z-Net on 14 NIH Findings</span>
           </div>
           <span className="task-model-pill">Z-Net · DenseNet-121 + Log-Sum-Exp Pooling · NIH ChestX-ray14</span>
         </div>

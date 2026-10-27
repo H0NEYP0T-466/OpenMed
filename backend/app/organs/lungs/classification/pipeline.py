@@ -1,8 +1,12 @@
-"""Serving pipeline for the Z-Net lung classifier.
+"""Serving pipeline for the XRV 16-class lung classifier.
 
-Loads `checkpoints/lung_best_model.pth`, runs the paper's preprocessing
-(resize 256 -> center crop 224 -> ImageNet normalisation), returns calibrated
-probabilities for the 14 NIH findings plus a Grad-CAM overlay.
+Loads `checkpoints/xrv_best.pth` — a TorchXRayVision DenseNet-121 fine-tuned on
+NIH + COVID + TB — and returns raw sigmoid posteriors for the 16 classes plus a
+Grad-CAM overlay.
+
+Preprocessing must match training exactly: one grayscale channel, resized to
+224, scaled to [-1024, 1024]. Any deviation here silently degrades every
+prediction, so the constants live in `model.py` beside the architecture.
 """
 
 from __future__ import annotations
@@ -22,34 +26,40 @@ from PIL import Image
 from .model import (
     FINDING_INDEX,
     FINDINGS,
-    GradCAM,
+    INPUT_SIZE,
     MODEL_TAG,
-    ZNet,
+    GradCAM,
+    build_model,
     cam_to_bbox,
     overlay_cam_on_image,
 )
 
 logger = logging.getLogger(__name__)
 
-IMAGENET_MEAN = (0.485, 0.456, 0.406)
-IMAGENET_STD = (0.229, 0.224, 0.225)
+DEFAULT_THRESHOLD = 0.5
 
 
-def load_normalization(checkpoint_path: str) -> tuple[tuple[float, float, float],
-                                                      tuple[float, float, float]]:
-    """Training normalisation persisted beside the checkpoint (paper §5.2).
+def load_thresholds(checkpoint_path: str) -> Optional[list[float]]:
+    """Per-class decision thresholds written by ``calibrate_thresholds.py``.
 
-    Falls back to ImageNet constants when the sidecar is absent, and says so —
-    a silent mismatch here would shift every probability.
+    Returns None when the sidecar is absent — serving then falls back to 0.5,
+    which is a defensible rank cut but a poor screening operating point. The
+    absence is logged, not hidden.
     """
-    sidecar = os.path.join(os.path.dirname(checkpoint_path), "normalization.json")
+    sidecar = os.path.join(os.path.dirname(checkpoint_path), "thresholds.json")
     try:
         with open(sidecar) as handle:
             data = json.load(handle)
-        return tuple(data["mean"]), tuple(data["std"])
-    except (OSError, KeyError, TypeError, json.JSONDecodeError):
-        logger.warning("No normalization.json beside the checkpoint — using ImageNet stats")
-        return IMAGENET_MEAN, IMAGENET_STD
+        if list(data.get("classes", [])) != list(FINDINGS):
+            raise ValueError("thresholds.json class order does not match serving order")
+        per_class = data["per_class"]
+        return [float(per_class[name]["threshold"]) for name in FINDINGS]
+    except FileNotFoundError:
+        logger.warning("No thresholds.json beside the checkpoint — using 0.5 for every class")
+        return None
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        logger.warning("thresholds.json unusable (%s) — using 0.5", exc)
+        return None
 
 
 class LungClassificationPipeline:
@@ -60,9 +70,11 @@ class LungClassificationPipeline:
         self.device = torch.device(
             device or ("cuda" if torch.cuda.is_available() else "cpu")
         )
-        self.model: Optional[ZNet] = None
+        self.model: Optional[torch.nn.Module] = None
         self.load_time_ms: Optional[float] = None
-        self.mean, self.std = load_normalization(checkpoint_path)
+        self.checkpoint_epoch: Optional[int] = None
+        self.checkpoint_kind: Optional[str] = None
+        self.thresholds: Optional[list[float]] = load_thresholds(checkpoint_path)
 
     # ── lifecycle ──────────────────────────────────────────────────────────
 
@@ -70,19 +82,31 @@ class LungClassificationPipeline:
         if self.model is not None:
             return
         started = time.perf_counter()
-        model = ZNet(len(FINDINGS), pretrained=False)
-        state = torch.load(self.checkpoint_path, map_location=self.device, weights_only=True)
-        if isinstance(state, dict) and "state_dict" in state:
-            state = state["state_dict"]
-        missing, unexpected = model.load_state_dict(state, strict=False)
-        if missing or unexpected:
-            logger.warning(
-                "Checkpoint mismatch — missing=%s unexpected=%s", missing[:4], unexpected[:4]
-            )
+        cache_dir = os.path.join(os.path.dirname(self.checkpoint_path), "xrv")
+        model = build_model(cache_dir=cache_dir)
+
+        payload = torch.load(self.checkpoint_path, map_location="cpu", weights_only=False)
+        state = payload["state_dict"] if isinstance(payload, dict) and "state_dict" in payload else payload
+        if isinstance(payload, dict):
+            self.checkpoint_epoch = payload.get("epoch")
+            self.checkpoint_kind = payload.get("kind")
+            classes = payload.get("classes")
+            if classes and tuple(classes) != FINDINGS:
+                raise RuntimeError(
+                    f"Checkpoint class order {classes} does not match the serving "
+                    f"order {list(FINDINGS)}; refusing to serve misaligned outputs."
+                )
+        model.load_state_dict(state, strict=True)
         model.eval().to(self.device)
         self.model = model
         self.load_time_ms = (time.perf_counter() - started) * 1000.0
-        logger.info("Z-Net loaded in %.0f ms on %s", self.load_time_ms, self.device)
+        logger.info(
+            "XRV-16 loaded in %.0f ms on %s (epoch %s, %s)",
+            self.load_time_ms,
+            self.device,
+            self.checkpoint_epoch,
+            self.checkpoint_kind,
+        )
 
     def unload(self) -> None:
         self.model = None
@@ -97,21 +121,11 @@ class LungClassificationPipeline:
     # ── inference ──────────────────────────────────────────────────────────
 
     def _preprocess(self, image: Image.Image) -> torch.Tensor:
-        image = image.convert("RGB")
-        width, height = image.size
-        scale = 256.0 / min(width, height)
-        resized = image.resize(
-            (max(256, int(round(width * scale))), max(256, int(round(height * scale)))),
-            Image.BILINEAR,
-        )
-        left = (resized.width - 224) // 2
-        top = (resized.height - 224) // 2
-        cropped = resized.crop((left, top, left + 224, top + 224))
-        array = np.asarray(cropped, dtype=np.float32) / 255.0
-        array = (array - np.array(self.mean, dtype=np.float32)) / np.array(
-            self.std, dtype=np.float32
-        )
-        tensor = torch.from_numpy(array.transpose(2, 0, 1)).unsqueeze(0)
+        """Grayscale 224x224, scaled to XRV's [-1024, 1024] — nothing else."""
+        gray = image.convert("L").resize((INPUT_SIZE, INPUT_SIZE), Image.BILINEAR)
+        array = np.asarray(gray, dtype=np.float32) / 255.0
+        array = array * 2048.0 - 1024.0
+        tensor = torch.from_numpy(array).unsqueeze(0).unsqueeze(0)
         return tensor.to(self.device)
 
     def predict(self, image: Image.Image) -> dict[str, Any]:
@@ -136,23 +150,27 @@ class LungClassificationPipeline:
         ]
         top_index = int(ranked[0])
 
-        # Grad-CAM for the leading finding — the same map the UI renders.
         with GradCAM(self.model) as cam_gen:
-            cam = cam_gen.generate(tensor.clone().requires_grad_(True), top_index)
-        rgb = np.asarray(image.convert("RGB").resize((224, 224)), dtype=np.uint8)
+            cam = cam_gen.generate(tensor.clone(), top_index)
+        rgb = np.asarray(image.convert("RGB").resize((INPUT_SIZE, INPUT_SIZE)), dtype=np.uint8)
         overlay = overlay_cam_on_image(rgb, cam, alpha=0.42)
         buffer = io.BytesIO()
         Image.fromarray(overlay).save(buffer, format="PNG", optimize=True)
         gradcam_base64 = base64.b64encode(buffer.getvalue()).decode("ascii")
+
+        thresholds = self.thresholds or [DEFAULT_THRESHOLD] * len(FINDINGS)
+        positives = [bool(probabilities[i] >= thresholds[i]) for i in range(len(FINDINGS))]
 
         bbox = cam_to_bbox(cam, threshold=0.6)
         return {
             "top_finding": FINDINGS[top_index],
             "confidence": float(probabilities[top_index]),
             "probabilities": [float(p) for p in probabilities],
+            "thresholds": [float(t) for t in thresholds],
+            "positives": positives,
             "top5": top5,
             "gradcam_base64": gradcam_base64,
-            "gradcam_grid": [224, 224],
+            "gradcam_grid": [INPUT_SIZE, INPUT_SIZE],
             "bbox": list(bbox) if bbox else None,
             "inference_ms": (time.perf_counter() - started) * 1000.0,
             "model_tag": MODEL_TAG,
@@ -170,6 +188,9 @@ class LungClassificationPipeline:
             "path": self.checkpoint_path,
             "size_mb": round(stat.st_size / (1024 * 1024), 1),
             "modified": time.strftime("%Y-%m-%d %H:%M", time.localtime(stat.st_mtime)),
+            "epoch": self.checkpoint_epoch,
+            "kind": self.checkpoint_kind,
+            "thresholds_calibrated": self.thresholds is not None,
         }
 
 

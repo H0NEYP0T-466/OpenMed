@@ -1,7 +1,7 @@
-"""Lung classification API — Z-Net on NIH ChestX-ray14.
+"""Lung classification API — XRV DenseNet-121 fine-tune, 16 classes.
 
 Endpoints (mounted at /api/lungs):
-  POST /classify      multipart image -> 14 probabilities + Grad-CAM overlay
+  POST /classify      multipart image -> 16 probabilities + Grad-CAM overlay
   GET  /health        checkpoint presence and residency
   GET  /model-info    label space and training metadata
   POST /warmup        load the model into memory (called when the section opens)
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-DEFAULT_CHECKPOINT = "lung_best_model.pth"
+DEFAULT_CHECKPOINT = "xrv_best.pth"
 MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
 ALLOWED_MAGIC = (b"\xff\xd8\xff", b"\x89PNG", b"RIFF")
@@ -54,6 +54,8 @@ class ClassificationResponse(BaseModel):
     top_finding: str
     confidence: float
     probabilities: list[float]
+    thresholds: list[float]
+    positives: list[bool]
     top5: list[Top5Entry]
     gradcam_base64: str
     gradcam_grid: list[int]
@@ -92,8 +94,8 @@ async def _get_pipeline() -> LungClassificationPipeline:
             pipeline = LungClassificationPipeline(path)
             await asyncio.to_thread(pipeline.load)
         except Exception as exc:  # noqa: BLE001 - surfaced to the client
-            _pipeline_error = f"Failed to load Z-Net: {exc}"
-            logger.exception("Z-Net load failed")
+            _pipeline_error = f"Failed to load the XRV classifier: {exc}"
+            logger.exception("XRV classifier load failed")
             raise HTTPException(status_code=503, detail=_pipeline_error) from exc
         _pipeline = pipeline
         _pipeline_error = None
@@ -123,7 +125,7 @@ async def warmup_lung_classifier() -> dict[str, Any]:
     pipeline = await _get_pipeline()
     return {
         "status": "ok",
-        "message": "Z-Net lung classifier loaded.",
+        "message": "XRV-16 lung classifier loaded.",
         "device": str(pipeline.device),
     }
 
@@ -134,7 +136,7 @@ async def unload_lung_classifier() -> dict[str, Any]:
     if _pipeline is not None:
         _pipeline.unload()
         _pipeline = None
-    return {"status": "ok", "message": "Z-Net lung classifier unloaded. Memory freed."}
+    return {"status": "ok", "message": "XRV-16 lung classifier unloaded. Memory freed."}
 
 
 @router.post("/classify", response_model=ClassificationResponse)
@@ -156,7 +158,7 @@ async def get_model_info() -> ModelInfoResponse:
     return ModelInfoResponse(
         model_tag=MODEL_TAG,
         findings=list(FINDINGS),
-        paper="Ahmad et al., Diagnostics 2023, 13(22), 3462",
+        paper="TorchXRayVision (Cohen et al. 2022) fine-tuned on NIH ChestX-ray14 + COVID-19 Radiography + TB Chest Radiography",
         input_size=224,
         checkpoint=pipeline.checkpoint_info(),
     )

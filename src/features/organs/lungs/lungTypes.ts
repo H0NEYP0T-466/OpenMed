@@ -8,6 +8,8 @@ export interface LungClassificationResult {
   readonly top_finding: string
   readonly confidence: number
   readonly probabilities: number[]
+  readonly thresholds: number[]
+  readonly positives: boolean[]
   readonly top5: LungTop5Entry[]
   readonly gradcam_base64: string
   readonly gradcam_grid: number[]

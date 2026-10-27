@@ -121,6 +121,8 @@ export const LungsClassificationWorkspace: React.FC = () => {
     return NIH_FINDINGS.map((finding, index) => ({
       finding,
       probability: result.probabilities[index] ?? 0,
+      threshold: result.thresholds?.[index] ?? 0.5,
+      positive: result.positives?.[index] ?? false,
     })).sort((a, b) => b.probability - a.probability)
   }, [result])
 
@@ -130,16 +132,16 @@ export const LungsClassificationWorkspace: React.FC = () => {
     <section className="lungs-workspace">
       <DiagnosticThinkingHUD
         isVisible={isAnalyzing}
-        classCountLabel="14 findings"
+        classCountLabel="16 findings"
         task="classification"
       />
 
       <header className="lw-head">
         <div>
           <p className="lw-eyebrow">Thoracic radiograph · multi-label</p>
-          <h2 className="lw-title">Z-Net · ChestX-ray14</h2>
+          <h2 className="lw-title">XRV-16 · ChestX-ray14 + COVID + TB</h2>
           <p className="lw-sub">
-            {modelInfo?.paper ?? 'Ahmad et al., Diagnostics 2023'} · 224 px · 14 findings
+            {modelInfo?.paper ?? 'TorchXRayVision DenseNet-121 fine-tune'} · 224 px · 16 findings
           </p>
         </div>
         <div className="lw-status">
@@ -186,7 +188,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
           />
           <p className="lw-prompt-title">Drop Chest Radiograph or Browse File</p>
           <p className="lw-prompt-note">
-            JPEG · PNG · WebP — 12 MB max. Inference runs locally on the Z-Net
+            JPEG · PNG · WebP — 12 MB max. Inference runs locally on the XRV-16
             checkpoint; nothing is uploaded anywhere else.
           </p>
           <span className="lw-browse">Browse Local Drive</span>
@@ -215,7 +217,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
                 onClick={() => void run()}
                 disabled={isAnalyzing}
               >
-                {isAnalyzing ? 'Evaluating 14 findings…' : 'Run Z-Net Differential'}
+                {isAnalyzing ? 'Evaluating 16 findings…' : 'Run XRV-16 Differential'}
               </button>
               <button
                 type="button"
@@ -259,11 +261,14 @@ export const LungsClassificationWorkspace: React.FC = () => {
               </div>
 
               <div className="lw-all">
-                <p className="lw-eyebrow">All 14 labels</p>
+                <p className="lw-eyebrow">All 16 labels</p>
                 <ul>
                   {ranked.map((entry) => (
-                    <li key={entry.finding}>
-                      <span>{formatFinding(entry.finding)}</span>
+                    <li key={entry.finding} className={entry.positive ? 'is-positive' : undefined}>
+                      <span>
+                        {formatFinding(entry.finding)}
+                        {entry.positive && <span className="lw-flag">above cut</span>}
+                      </span>
                       <span className="lw-value">{percent(entry.probability)}</span>
                     </li>
                   ))}

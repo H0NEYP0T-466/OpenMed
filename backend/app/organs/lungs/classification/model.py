@@ -1,25 +1,21 @@
-"""Z-Net for 14-label chest radiograph classification (Ahmad et al., Diagnostics 2023).
+"""XRV DenseNet-121 fine-tune — 16-class chest radiograph classifier.
 
-Architecture, verbatim from the paper (Section 3, Figure 1):
+The checkpoint is a TorchXRayVision ``densenet121-res224-all`` backbone whose
+classification head was replaced by ``Dropout(0.3) + Linear(1024, 16)`` and
+fine-tuned on the combined NIH + COVID + TB corpus.
 
-    DenseNet-121 backbone (ImageNet weights)
-      -> delete the fully-connected / classification layers
-      -> transition layer   : 1x1 conv, S x S x D activations (D = 224)
-      -> prediction layer   : 1x1 conv, S x S x C class logits
-      -> global pooling     : LogSumExp over the spatial grid
-      -> loss               : weighted binary cross-entropy
+Input convention is XRV's, not ImageNet's: one grayscale channel scaled to
+[-1024, 1024]. Feeding RGB or ImageNet-normalised tensors produces confident
+nonsense — the features are meaningless outside that range.
 
-The transition x prediction product is the paper's class activation map
-(Eq. 3), used there for bounding-box localisation. This module exposes that
-map directly (`forward(..., return_maps=True)`) and also provides a classical
-Grad-CAM over the last dense block, which is what the serving UI renders.
-
-Keep `ZNet` numerically identical to the copy inside `lung_kaggle.py`; the
-Kaggle script is self-contained so it can be uploaded as a single file.
+Grad-CAM hooks ``features.norm5`` with a *forward* hook and asks autograd for
+the gradient. A backward hook there crashes: ``features2`` applies an in-place
+ReLU to that very output, and PyTorch forbids modifying a hook-owned view.
 """
 
 from __future__ import annotations
 
+import logging
 from typing import Optional
 
 import cv2
@@ -28,8 +24,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-MODEL_TAG = "znet_densenet121_224"
+logger = logging.getLogger(__name__)
 
+# Order must match the checkpoint's class list exactly — the head's output
+# index maps straight onto this tuple.
 FINDINGS: tuple[str, ...] = (
     "Atelectasis",
     "Cardiomegaly",
@@ -45,97 +43,52 @@ FINDINGS: tuple[str, ...] = (
     "Fibrosis",
     "Pleural_Thickening",
     "Hernia",
+    "COVID",
+    "TB",
 )
+FINDING_INDEX = {name: index for index, name in enumerate(FINDINGS)}
+N_FINDINGS = len(FINDINGS)
 
-NIH_FINDINGS = FINDINGS  # historical alias
-FINDING_INDEX = {name: i for i, name in enumerate(FINDINGS)}
+XRV_WEIGHTS = "densenet121-res224-all"
+INPUT_SIZE = 224
+XRV_MIN = -1024.0
+XRV_MAX = 1024.0
+MODEL_TAG = "xrv-densenet121-16"
 
-
-# Paper Table 4 / text, for the per-class comparison chart in training artefacts.
-PAPER_AUC: dict[str, float] = {
-    "Atelectasis": 0.8200,
-    "Cardiomegaly": 0.8725,
-    "Effusion": 0.8800,
-    "Infiltration": 0.7220,
-    "Mass": 0.8406,
-    "Pneumonia": 0.7500,
-    "Pneumothorax": 0.8980,
-    "Hernia": 0.7600,
-}
-PAPER_MEAN_AUC = 0.858
+# The 14 NIH findings are reported separately from the two added classes: the
+# group mean is the number comparable with published ChestX-ray14 baselines.
+NIH_FINDINGS = FINDINGS[:14]
 
 
-class ZNet(nn.Module):
-    """DenseNet-121 with the paper's transition/prediction head and LSE pooling."""
+def build_model(cache_dir: Optional[str] = None) -> nn.Module:
+    """DenseNet-121 with the 16-class head, ready for ``load_state_dict``.
 
-    def __init__(
-        self,
-        num_classes: int = 14,
-        pretrained: bool = True,
-        transition_dim: int = 224,
-        dropout: float = 0.0,
-    ) -> None:
-        super().__init__()
-        from torchvision.models import DenseNet121_Weights, densenet121
+    The TorchXRayVision module is returned unwrapped so the checkpoint's key
+    names (``features.*``, ``classifier.1.*``) line up without remapping.
+    """
+    import torchxrayvision as xrv
 
-        backbone = densenet121(
-            weights=DenseNet121_Weights.IMAGENET1K_V1 if pretrained else None
-        )
-        self.features = backbone.features  # (B, 1024, H/32, W/32)
-        self.transition = nn.Conv2d(1024, transition_dim, kernel_size=1)
-        self.prediction = nn.Conv2d(transition_dim, num_classes, kernel_size=1)
-        self.dropout = nn.Dropout(dropout) if dropout > 0 else nn.Identity()
-        self.num_classes = num_classes
-
-        for module in (self.transition, self.prediction):
-            nn.init.kaiming_normal_(module.weight, mode="fan_out", nonlinearity="relu")
-            nn.init.zeros_(module.bias)
-
-    def forward(
-        self, x: torch.Tensor, return_maps: bool = False
-    ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
-        fmap = F.relu(self.features(x))
-        transition = F.relu(self.transition(fmap))          # B, D, S, S
-        class_maps = self.prediction(transition)            # B, C, S, S
-        logits = torch.logsumexp(
-            class_maps.flatten(2), dim=2
-        )                                                   # B, C  (LSE pooling)
-        logits = self.dropout(logits)
-        if return_maps:
-            return logits, class_maps
-        return logits
-
-    @torch.no_grad()
-    def class_activation(self, x: torch.Tensor, class_index: int) -> np.ndarray:
-        """Paper CAM: prediction-layer response for one class, normalised to [0, 1]."""
-        _, class_maps = self.forward(x, return_maps=True)
-        cam = class_maps[0, int(class_index)].float().cpu().numpy()
-        cam = cam - float(cam.min())
-        peak = float(cam.max())
-        if peak > 0:
-            cam /= peak
-        return cam
+    model = xrv.models.DenseNet(weights=XRV_WEIGHTS, cache_dir=cache_dir)
+    in_features = int(model.classifier.in_features)
+    model.classifier = nn.Sequential(nn.Dropout(0.3), nn.Linear(in_features, N_FINDINGS))
+    # forward() must return raw logits: op_threshs would apply sigmoid plus
+    # operating-point normalisation, which drags every posterior toward 0.5.
+    model.op_threshs = None
+    model.apply_sigmoid = False
+    return model
 
 
 class GradCAM:
-    """Gradient-weighted CAM over the final dense block (serving visualisation)."""
+    """Grad-CAM on XRV's final normalisation layer."""
 
-    def __init__(self, model: ZNet) -> None:
+    def __init__(self, model: nn.Module) -> None:
         self.model = model
         self.activations: Optional[torch.Tensor] = None
-        self.gradients: Optional[torch.Tensor] = None
-        self._handles: list = []
-        target = model.features.norm5
-        self._handles = [
-            target.register_forward_hook(self._save_activation),
-            target.register_full_backward_hook(self._save_gradient),
-        ]
+        target = getattr(model.features, "norm5", model.features)
+        self._handles = [target.register_forward_hook(self._save_activation)]
 
     def _save_activation(self, module, inputs, output) -> None:
         self.activations = output
-
-    def _save_gradient(self, module, grad_input, grad_output) -> None:
-        self.gradients = grad_output[0]
 
     def remove_hooks(self) -> None:
         for handle in self._handles:
@@ -151,30 +104,29 @@ class GradCAM:
     def generate(self, tensor: torch.Tensor, class_index: int) -> np.ndarray:
         if tensor.dim() != 4 or tensor.shape[0] != 1:
             raise ValueError("GradCAM expects a single-image batch")
-        if not tensor.requires_grad:
-            tensor.requires_grad_(True)
         was_training = self.model.training
         self.model.eval()
         self.activations = None
-        self.gradients = None
         try:
-            logits = self.model(tensor)
             self.model.zero_grad(set_to_none=True)
-            logits[0, int(class_index)].backward()
-            if self.activations is None or self.gradients is None:
-                raise RuntimeError("Grad-CAM hooks captured nothing")
-            weights = self.gradients.mean(dim=(2, 3), keepdim=True)
-            cam = torch.relu((weights * self.activations).sum(dim=1))
-            cam = cam.squeeze(0).detach().float().cpu().numpy()
+            if not tensor.requires_grad:
+                tensor = tensor.clone().requires_grad_(True)
+            logits = self.model(tensor)
+            if self.activations is None:
+                raise RuntimeError("Grad-CAM forward hook captured no activation")
+            gradients = torch.autograd.grad(logits[0, int(class_index)], self.activations)[0]
+            weights = gradients.mean(dim=(2, 3), keepdim=True)
+            cam = torch.relu((weights * F.relu(self.activations)).sum(dim=1)).squeeze(0)
+            cam = cam.detach().float().cpu().numpy()
             cam -= float(cam.min())
             peak = float(cam.max())
             if peak > 0:
                 cam /= peak
             return cam
         finally:
+            self.model.zero_grad(set_to_none=True)
             if was_training:
                 self.model.train()
-            self.model.zero_grad(set_to_none=True)
 
 
 def overlay_cam_on_image(image_rgb: np.ndarray, cam: np.ndarray, alpha: float = 0.4) -> np.ndarray:
@@ -205,3 +157,20 @@ def cam_to_bbox(cam: np.ndarray, threshold: float = 0.6) -> tuple[int, int, int,
     rows = np.where(mask.any(axis=1))[0]
     cols = np.where(mask.any(axis=0))[0]
     return int(cols[0]), int(rows[0]), int(cols[-1]), int(rows[-1])
+
+
+__all__ = [
+    "FINDINGS",
+    "FINDING_INDEX",
+    "NIH_FINDINGS",
+    "N_FINDINGS",
+    "MODEL_TAG",
+    "INPUT_SIZE",
+    "XRV_MIN",
+    "XRV_MAX",
+    "XRV_WEIGHTS",
+    "build_model",
+    "GradCAM",
+    "overlay_cam_on_image",
+    "cam_to_bbox",
+]

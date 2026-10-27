@@ -281,3 +281,23 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* A finding the calibrated threshold calls positive. The percentage alone is
+   a rank; the flag is the decision. */
+.lw-all li.is-positive {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.lw-flag {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  vertical-align: middle;
+}

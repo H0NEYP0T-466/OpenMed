@@ -18,9 +18,11 @@ export const NIH_FINDINGS = [
   'Fibrosis',
   'Pleural_Thickening',
   'Hernia',
+  'COVID',
+  'TB',
 ] as const
 
-/** Run Z-Net on one chest radiograph — POST /api/lungs/classify. */
+/** Run the XRV 16-class classifier — POST /api/lungs/classify. */
 export const classifyLungScan = async (file: File): Promise<LungClassificationResult> => {
   const form = new FormData()
   form.append('file', file)
