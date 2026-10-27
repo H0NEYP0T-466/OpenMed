@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppShell } from '../../components/common/AppShell'
 import { LiteMedSAMTab } from './tabs/LiteMedSAMTab'
-import { TorchXRayVisionTab } from './tabs/TorchXRayVisionTab'
 import type { LabInstrument } from './types'
 import './ExperimentalLabPage.css'
 
@@ -20,13 +19,6 @@ const INSTRUMENTS: readonly LabInstrument[] = [
     romanNumeral: 'I',
     description: 'Mark the lesion. The mark is the prompt.',
     component: LiteMedSAMTab,
-  },
-  {
-    id: 'torchxrayvision',
-    title: 'SOTA Baseline',
-    romanNumeral: 'II',
-    description: 'TorchXRayVision DenseNet-121 · 18 pathologies.',
-    component: TorchXRayVisionTab,
   },
 ]
 
@@ -48,13 +40,12 @@ export const ExperimentalLabPage: React.FC = () => {
         <header className="lab-head">
           <span className="lab-eyebrow mono">L · Experimental Laboratory</span>
           <h1 className="lab-title serif">
-            Two instruments, one bench<span className="dot">.</span>
+            One instrument, one bench<span className="dot">.</span>
           </h1>
           <p className="lab-lead">
             Nothing here is part of the product yet. Each instrument runs one model against one
             question, loads only while its tab is open, and releases its memory the moment you
-            leave. Mark a lesion yourself, or hand the scan to a model trained on four hospital
-            systems and see what it scores.
+            leave. Mark a lesion yourself.
           </p>
         </header>
 
@@ -81,8 +72,9 @@ export const ExperimentalLabPage: React.FC = () => {
         </div>
 
         <footer className="lab-foot mono">
-          Instrument {active.romanNumeral} of {INSTRUMENTS.length} · models load on tab select and
-          unload on exit.
+          Instrument {active.romanNumeral}
+          {INSTRUMENTS.length > 1 ? ` of ${INSTRUMENTS.length}` : ''} · models load on tab select
+          and unload on exit.
         </footer>
       </div>
     </AppShell>
