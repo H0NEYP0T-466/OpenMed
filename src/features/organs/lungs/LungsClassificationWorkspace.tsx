@@ -7,6 +7,8 @@ import {
   getLungModelInfo,
 } from './lungsApi'
 import type { LungClassificationResult, LungHealthStatus, LungModelInfo } from './lungTypes'
+import { LUNG_SPECIMEN_PRESETS } from './lungSpecimenPresets'
+import type { LungSpecimenPreset } from './lungSpecimenPresets'
 import './LungsClassificationWorkspace.css'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -24,6 +26,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
   const [showHeatmap, setShowHeatmap] = useState(false)
   const [health, setHealth] = useState<LungHealthStatus | null>(null)
   const [modelInfo, setModelInfo] = useState<LungModelInfo | null>(null)
+  const [selectedPlate, setSelectedPlate] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const objectUrlRef = useRef<string | null>(null)
@@ -71,6 +74,22 @@ export const LungsClassificationWorkspace: React.FC = () => {
     setShowHeatmap(false)
   }, [])
 
+  const loadPreset = useCallback(
+    async (preset: LungSpecimenPreset) => {
+      if (isAnalyzing) return
+      try {
+        const response = await fetch(preset.path)
+        if (!response.ok) throw new Error(`${response.status}`)
+        const blob = await response.blob()
+        mountFile(new File([blob], `${preset.name}.png`, { type: blob.type || 'image/png' }))
+        setSelectedPlate(preset.plate)
+      } catch {
+        setError(`Unable to load the ${preset.name} plate.`)
+      }
+    },
+    [isAnalyzing, mountFile],
+  )
+
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const selected = event.target.files?.[0]
@@ -99,6 +118,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
     setResult(null)
     setError(null)
     setShowHeatmap(false)
+    setSelectedPlate(null)
   }, [])
 
   const run = useCallback(async () => {
@@ -166,6 +186,35 @@ export const LungsClassificationWorkspace: React.FC = () => {
           </button>
         </div>
       )}
+
+
+      {/* Curated specimen rack — one plate per class in the 16-class space */}
+      <div className="lung-rack">
+        <div className="lung-rack-head">
+          <span className="lung-rack-title">Curated Specimen Plates</span>
+          <span className="lung-rack-sub">One labelled radiograph per class · click to mount</span>
+        </div>
+        <div className="lung-rack-strip">
+          {LUNG_SPECIMEN_PRESETS.map((preset) => (
+            <button
+              key={preset.plate}
+              type="button"
+              className={`lung-cassette ${selectedPlate === preset.plate ? 'is-active' : ''}`}
+              onClick={() => void loadPreset(preset)}
+              title={`${preset.name} — ${preset.subtitle}`}
+            >
+              <span className="lung-cassette-thumb">
+                <img src={preset.path} alt={preset.name} loading="lazy" decoding="async" />
+              </span>
+              <span className="lung-cassette-body">
+                <span className="lung-cassette-plate">{preset.plate}</span>
+                <span className="lung-cassette-name">{preset.name}</span>
+                <span className="lung-cassette-site">{preset.site}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {!previewUrl ? (
         <div

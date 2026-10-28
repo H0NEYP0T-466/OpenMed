@@ -119,25 +119,25 @@ HEAD_LR = 1e-3
 WEIGHT_DECAY = 0.02
 GRAD_CLIP = 1.0
 
-EXPECTED_SPLIT_COUNTS = {"train": 81_797, "val": 8_612, "test": 26_027}
+EXPECTED_SPLIT_COUNTS = {"train": 91_537, "val": 13_001, "test": 25_590}
 
 EXPECTED_POS_WEIGHT = {
-    "Atelectasis": 3.08,
-    "Cardiomegaly": 7.08,
-    "Effusion": 3.01,
-    "Infiltration": 2.30,
-    "Mass": 4.49,
-    "Nodule": 4.18,
-    "Pneumonia": 9.89,
-    "Pneumothorax": 5.63,
-    "Consolidation": 5.41,
-    "Edema": 7.82,
-    "Emphysema": 7.75,
-    "Fibrosis": 8.33,
-    "Pleural_Thickening": 6.11,
-    "Hernia": 24.43,
-    "COVID": 5.22,
-    "TB": 11.83,
+    "Atelectasis": 2.93,
+    "Cardiomegaly": 6.15,
+    "Effusion": 2.72,
+    "Infiltration": 2.15,
+    "Mass": 4.25,
+    "Nodule": 4.07,
+    "Pneumonia": 8.79,
+    "Pneumothorax": 4.47,
+    "Consolidation": 4.78,
+    "Edema": 6.81,
+    "Emphysema": 6.42,
+    "Fibrosis": 7.93,
+    "Pleural_Thickening": 5.66,
+    "Hernia": 21.52,
+    "COVID": 5.83,
+    "TB": 12.89,
 }
 
 _RESAMPLE = Image.Resampling.LANCZOS
@@ -501,36 +501,24 @@ def stage_images(
 
         target.parent.mkdir(parents=True, exist_ok=True)
         tmp = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
-        resized = False
         try:
-            copy_plain_png = False
+            # Every image takes this exact path — no byte-copy shortcut, no
+            # convert-only branch. A 224x224 PNG that skips the resampler
+            # carries a different high-frequency signature from one that went
+            # through it, and if that shortcut correlates with a label (it did:
+            # all NIH vs all TB/COVID) the model learns the resampler instead
+            # of the disease.
             with Image.open(source) as image:
-                copy_plain_png = (
-                    image.mode == "L"
-                    and image.size == (INPUT_SIZE, INPUT_SIZE)
-                    and source.suffix.lower() == ".png"
-                )
-                if not copy_plain_png:
-                    converted = image.convert("L")
-                    if converted.size != (INPUT_SIZE, INPUT_SIZE):
-                        converted = converted.resize(
-                            (INPUT_SIZE, INPUT_SIZE), _RESAMPLE
-                        )
-                        resized = True
-                    converted.save(tmp, format="PNG", compress_level=3)
-            if copy_plain_png:
-                shutil.copyfile(source, tmp)
+                image.convert("L").resize(
+                    (INPUT_SIZE, INPUT_SIZE), _RESAMPLE
+                ).save(tmp, format="PNG", compress_level=3)
             os.replace(tmp, target)
         except Exception as exc:  # noqa: BLE001 - reported in aggregate
             with contextlib.suppress(OSError):
                 tmp.unlink(missing_ok=True)
             return "error", False, f"{source}: {type(exc).__name__}: {exc}"
 
-        if resized:
-            return "resized", True, None
-        if copy_plain_png:
-            return "copied", False, None
-        return "converted", False, None
+        return "resized", True, None
 
     summary = {
         "total": len(records),
@@ -599,14 +587,14 @@ def stage_images(
         summary["skipped"],
         (time.time() - started) / 60.0,
     )
-    # Only meaningful on a cold cache: a warm cache re-encodes nothing, so
-    # `resized` is legitimately 0 and the count proves nothing.
-    if summary["newly_staged"] > 0 and summary["resized"] != 4_316:
-        logger.warning(
-            "Resized %d of %d newly staged images; the contract expects 4,316 "
-            "COVID/TB files (NIH should already be 224x224).",
-            summary["resized"],
-            summary["newly_staged"],
+    # Contract: on a cold cache every newly staged image went through the
+    # resampler. If any took a different path, the preprocessing signature is
+    # back and the run is not comparable to the one it replaces.
+    if summary["newly_staged"] > 0 and summary["resized"] != summary["newly_staged"]:
+        raise RuntimeError(
+            f"Staging preprocessing is not uniform: {summary['resized']} resized of "
+            f"{summary['newly_staged']} newly staged. Every image must take "
+            "convert('L').resize((224,224), LANCZOS)."
         )
     return summary
 
@@ -614,6 +602,31 @@ def stage_images(
 # ─────────────────────────────────────────────────────────────────────────────
 # Dataset / transforms
 # ─────────────────────────────────────────────────────────────────────────────
+
+
+class RandomDownscaleUpscale:
+    """Resample to a random fraction of 224, then back.
+
+    A native-224 source and a 512-px source that was downsampled to 224 carry
+    different high-frequency content. No code path can undo that, but this
+    augmentation makes every source pass through the same lossy round trip at
+    a random factor, so bandwidth stops being a stable cue.
+    """
+
+    def __init__(self, min_scale: float = 0.5, max_scale: float = 1.0,
+                 size: int = INPUT_SIZE) -> None:
+        self.min_scale = min_scale
+        self.max_scale = max_scale
+        self.size = size
+
+    def __call__(self, image):
+        factor = random.uniform(self.min_scale, self.max_scale)
+        if factor >= 0.999:
+            return image
+        side = max(16, int(round(self.size * factor)))
+        return image.resize((side, side), Image.BILINEAR).resize(
+            (self.size, self.size), Image.BILINEAR
+        )
 
 
 class ScaleToXRV:
@@ -633,6 +646,10 @@ def build_transforms(train: bool) -> transforms.Compose:
                     degrees=10, translate=(0.1, 0.1), scale=(0.9, 1.1)
                 ),
                 transforms.ColorJitter(brightness=0.2, contrast=0.2),
+                transforms.RandomApply(
+                    [transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.5))], p=0.3
+                ),
+                RandomDownscaleUpscale(0.5, 1.0),
                 transforms.ToTensor(),
                 ScaleToXRV(),
                 # value=0.0 = mid-grey: a neutral occlusion inside XRV's range
@@ -772,7 +789,42 @@ def update_ema_state(
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def compute_metrics(probs: np.ndarray, targets: np.ndarray) -> dict[str, Any]:
+def _source_auc(
+    probs: np.ndarray,
+    targets: np.ndarray,
+    sources: np.ndarray,
+    class_index: int,
+    positive_sources: set[str],
+    negative_sources: set[str],
+) -> Optional[dict[str, Any]]:
+    """AUC restricted to one collection: positives and negatives from the same
+    acquisition. This is the only TB/COVID number that measures disease rather
+    than source recognition."""
+    keep = np.isin(sources, list(positive_sources | negative_sources))
+    keep &= targets[:, class_index] != -1.0
+    if not keep.any():
+        return None
+    y = targets[keep, class_index].astype(np.int64)
+    p = probs[keep, class_index]
+    positives = int(y.sum())
+    negatives = int(len(y) - positives)
+    if positives < 2 or negatives < 2:
+        return {"auc": None, "positives": positives, "negatives": negatives,
+                "note": "insufficient support"}
+    return {
+        "auc": float(roc_auc_score(y, p)),
+        "positives": positives,
+        "negatives": negatives,
+        "positive_sources": sorted(positive_sources),
+        "negative_sources": sorted(negative_sources),
+    }
+
+
+def compute_metrics(
+    probs: np.ndarray,
+    targets: np.ndarray,
+    sources: Optional[np.ndarray] = None,
+) -> dict[str, Any]:
     per_class: dict[str, Any] = {}
     all_aucs: list[Optional[float]] = []
 
@@ -836,8 +888,18 @@ def compute_metrics(probs: np.ndarray, targets: np.ndarray) -> dict[str, Any]:
         [entry["sensitivity_at_0.5"] for entry in per_class.values()]
     )
 
+    within_source: dict[str, Any] = {}
+    if sources is not None:
+        within_source["TB"] = _source_auc(
+            probs, targets, sources, CLASS_TO_INDEX["TB"], {"tb"}, {"tb_normal"}
+        )
+        within_source["COVID"] = _source_auc(
+            probs, targets, sources, CLASS_TO_INDEX["COVID"], {"covid"}, {"covid_normal"}
+        )
+
     return {
         "per_class": per_class,
+        "within_source": within_source,
         "group_mean_auc": group_means,
         "monitored_score": monitored if monitored is not None else 0.0,
         "mean_auc_all_16": mean_auc_all_16,
@@ -1189,6 +1251,9 @@ def evaluate(
     running_masked = 0
     probabilities: list[np.ndarray] = []
     targets_all: list[np.ndarray] = []
+    sources_all: list[np.ndarray] = []
+    records = getattr(loader.dataset, "records", None)
+    seen = 0
     max_steps = limit_batches if limit_batches > 0 else len(loader)
 
     for step, (images, targets) in enumerate(_progress(loader, f"[{tag}]"), start=1):
@@ -1202,12 +1267,17 @@ def evaluate(
         running_masked += int(mask_count.item())
         probabilities.append(torch.sigmoid(logits).float().cpu().numpy())
         targets_all.append(targets.numpy())
+        if records is not None:
+            batch_sources = [r.source for r in records[seen : seen + len(targets)]]
+            sources_all.append(np.asarray(batch_sources, dtype=object))
+        seen += len(targets)
 
     if not probabilities:
         raise RuntimeError(f"No batches evaluated for {tag}")
     probs = np.concatenate(probabilities, axis=0)
     targets_np = np.concatenate(targets_all, axis=0)
-    metrics = compute_metrics(probs, targets_np)
+    sources_np = np.concatenate(sources_all, axis=0) if sources_all else None
+    metrics = compute_metrics(probs, targets_np, sources_np)
     mean_loss = running_loss / max(running_masked, 1)
     return mean_loss, metrics, probs, targets_np
 
@@ -1476,7 +1546,13 @@ def main() -> int:
             "negatives": {name: int(v) for name, v in zip(CLASSES, negatives, strict=True)},
             "train_rows": train_rows,
         },
-        "staging": staging,
+        "staging": {
+            **staging,
+            "policy": (
+                "convert('L').resize((224,224), LANCZOS) for every image; no "
+                "byte-copy shortcut, no convert-only branch"
+            ),
+        },
         "model": {
             "weights": XRV_WEIGHTS,
             "cache_dir": str(xrv_cache),
@@ -1523,6 +1599,8 @@ def main() -> int:
                 "RandomHorizontalFlip(0.5)",
                 "RandomAffine(degrees=10, translate=(0.1,0.1), scale=(0.9,1.1))",
                 "ColorJitter(brightness=0.2, contrast=0.2)",
+                "GaussianBlur(3, sigma 0.1-1.5) p=0.3",
+                "RandomDownscaleUpscale(0.5-1.0) -> 224",
                 "ToTensor",
                 "scale to [-1024,1024]",
                 "RandomErasing(0.2)",
@@ -1827,6 +1905,26 @@ def main() -> int:
             entry["positives"],
             entry["negatives"],
         )
+    within = test_metrics.get("within_source") or {}
+    for name in ("TB", "COVID"):
+        entry = within.get(name) or {}
+        if entry.get("auc") is not None:
+            logger.info(
+                "TEST within-source %-5s | AUC %.4f | pos %d neg %d | %s vs %s",
+                name,
+                entry["auc"],
+                entry["positives"],
+                entry["negatives"],
+                "+".join(entry.get("positive_sources", [])),
+                "+".join(entry.get("negative_sources", [])),
+            )
+        else:
+            logger.warning(
+                "TEST within-source %-5s | not computable (%s)",
+                name,
+                (entry or {}).get("note", "no rows from that collection"),
+            )
+
     if test_metrics["skipped_auc_classes"]:
         logger.warning(
             "Test AUC skipped (fewer than 2 distinct labels): %s",
