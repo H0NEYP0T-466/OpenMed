@@ -576,3 +576,8 @@
   font-size: 11px;
   color: var(--ink-soft);
 }
+
+/* Mask mode is not a click surface — the uploaded mask is the whole prompt. */
+.lab-seg-image.is-inert {
+  cursor: default;
+}

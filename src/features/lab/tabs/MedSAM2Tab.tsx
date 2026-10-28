@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RomanSection } from '../../../components/common/RomanSection'
 import { SPECIMEN_PRESETS } from '../../organs/brain/specimenPresets'
 import type { SpecimenPreset } from '../../organs/brain/specimenPresets'
-import { ThinkingOrb } from '../../../components/common/ThinkingOrb/ThinkingOrb'
+import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import { PromptableSegmentation } from '../PromptableSegmentation'
 import { listLabModels, loadLabModel, unloadLabModel } from '../labApi'
 import type { LabModelCard } from '../labApi'
@@ -92,12 +92,8 @@ export const MedSAM2Tab: React.FC = () => {
 
   return (
     <>
-      {loadingModel && (
-        <div className="lab-loading" role="status">
-          <ThinkingOrb mode="connecting" size={20} theme="coral" />
-          <span>Loading MedSAM2 weights — 149 MB, ~3 s on CPU.</span>
-        </div>
-      )}
+      {/* Same overlay as the brain and lungs workspaces: one loading language. */}
+      <DiagnosticThinkingHUD isVisible={loadingModel} task="segmentation" />
 
       {unavailable && (
         <div className="lab-upload-error" role="status">

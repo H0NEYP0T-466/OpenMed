@@ -112,6 +112,17 @@ class MedSAM2Adapter(LabAdapter):
         return self._predictor is not None
 
     @staticmethod
+    def _mask_bbox(mask_png: bytes, width: int, height: int) -> Optional[tuple[int, int, int, int]]:
+        """Bounding box of the foreground in a mask prompt, in image pixels."""
+        with Image.open(io.BytesIO(mask_png)) as handle:
+            mask = np.asarray(handle.convert("L").resize((width, height), Image.BILINEAR))
+        rows = np.where(mask.max(axis=1) > 32)[0]
+        cols = np.where(mask.max(axis=0) > 32)[0]
+        if rows.size == 0 or cols.size == 0:
+            return None
+        return (int(cols[0]), int(rows[0]), int(cols[-1]) + 1, int(rows[-1]) + 1)
+
+    @staticmethod
     def _mask_logits(mask_png: bytes, target_hw: tuple[int, int]) -> np.ndarray:
         """Binary mask PNG → logits on the decoder's own grid.
 
@@ -160,6 +171,12 @@ class MedSAM2Adapter(LabAdapter):
             mask_input = self._mask_logits(
                 prompt.mask_png, (int(embed.shape[-2]) * 4, int(embed.shape[-1]) * 4)
             )
+            if box is None and not points:
+                # A dense prompt alone is not a supported combination: with no
+                # sparse token the decoder returns an empty mask. The mask's own
+                # bounding box supplies the anchor, so "mask only" still means
+                # "start from this mask".
+                box = self._mask_bbox(prompt.mask_png, width, height)
 
         masks, scores, _logits = self._predictor.predict(
             point_coords=point_coords,

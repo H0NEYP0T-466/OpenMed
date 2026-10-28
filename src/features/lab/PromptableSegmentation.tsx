@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { DiagnosticThinkingHUD } from '../../components/common/ThinkingOrb'
-import { ThinkingOrb } from '../../components/common/ThinkingOrb/ThinkingOrb'
 import { predictLabMask } from './labApi'
 import type { LabBox, LabMaskResult, LabPoint } from './labApi'
 
@@ -113,7 +112,11 @@ export const PromptableSegmentation: React.FC<Props> = ({
     if (disabledReason || loadingModel) return
     if (!ensureNatural()) return
 
-    if (mode !== 'box') {
+    // Mask mode takes no clicks: the uploaded mask *is* the prompt. Mixing a
+    // stray click into it silently changes what the user asked for.
+    if (mode === 'mask') return
+
+    if (mode === 'points') {
       const point = toImageSpace(event)
       setPoints((previous) => [...previous, { x: point.x, y: point.y, positive: !event.shiftKey }])
       setResult(null)
@@ -220,14 +223,7 @@ export const PromptableSegmentation: React.FC<Props> = ({
   if (!file || !previewUrl) {
     return (
       <div className="lab-idle">
-        {loadingModel ? (
-          <span className="lab-idle-loading">
-            <ThinkingOrb mode="connecting" size={22} theme="coral" />
-            Loading {modelId} weights…
-          </span>
-        ) : (
-          'Pick a specimen above, or upload a scan, to begin.'
-        )}
+        {loadingModel ? 'Loading weights…' : 'Pick a specimen above, or upload a scan, to begin.'}
       </div>
     )
   }
@@ -242,7 +238,7 @@ export const PromptableSegmentation: React.FC<Props> = ({
             ref={imageRef}
             src={result && !showMask ? asDataUrl(result.overlay_base64) : previewUrl}
             alt="Prompt image"
-            className="lab-seg-image"
+            className={`lab-seg-image ${mode === 'mask' ? 'is-inert' : ''}`}
             onLoad={(event) => {
               const img = event.currentTarget
               setNatural({ w: img.naturalWidth, h: img.naturalHeight })
@@ -260,11 +256,6 @@ export const PromptableSegmentation: React.FC<Props> = ({
               style={{ left: `${(point.x / natural.w) * 100}%`, top: `${(point.y / natural.h) * 100}%` }}
             />
           ))}
-          {loadingModel && (
-            <span className="lab-seg-overlay">
-              <ThinkingOrb mode="connecting" size={30} theme="coral" />
-            </span>
-          )}
         </div>
 
         <div className="lab-seg-toolbar">
@@ -291,7 +282,7 @@ export const PromptableSegmentation: React.FC<Props> = ({
           <span className="lab-seg-hint">
             {mode === 'box' && 'Drag a rectangle around the lesion.'}
             {mode === 'points' && 'Click the lesion · shift-click background · then Run.'}
-            {mode === 'mask' && (maskFile ? 'Mask loaded · add correction clicks · then Run.' : 'Choose a mask PNG to start from.')}
+            {mode === 'mask' && (maskFile ? 'Mask loaded · press Run. The image is not clickable here.' : 'Choose a mask PNG to start from.')}
           </span>
         </div>
       </div>
@@ -331,7 +322,7 @@ export const PromptableSegmentation: React.FC<Props> = ({
             </div>
           )}
 
-          {mode !== 'box' && (
+          {mode === 'points' && (
             <p className="lab-seg-count">
               {points.length} point{points.length === 1 ? '' : 's'}
               {points.some((p) => !p.positive) && ` · ${points.filter((p) => !p.positive).length} negative`}
