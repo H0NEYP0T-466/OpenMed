@@ -189,10 +189,11 @@ brain/
 │   │   ├── train_mednext.py  Kaggle training entrypoint
 │   │   ├── pipeline.py       Serving
 │   │   ├── results/          Four run directories (config, history, epochs, hygiene)
+│   │   │   └── figures/      Learning curves + run comparison, plotted from epochs.csv
 │   │   └── checkpoints/      mednext_brain_seg.pth
 │   ├── experimental_lab/     LiteMedSAM: model, pipeline, weights
 │   ├── logs/                 Dataset audits, dropped-file manifests
-│   └── visuals/              5 training figures
+│   └── visuals/              LiteMedSAM training figures (5)
 └── utils/
     ├── dataset_integrity_report.py   SHA-256 / pHash auditor
     └── sequence_tagger.py            MobileNetV3 T1/T1C+/T2 tagger for unlabelled scans
@@ -332,36 +333,20 @@ All four on the same combined corpus, same seed, same loss (BCE + Dice). The onl
 
 **Where it is weak:** OpenMed Dice 0.663 vs BTSC 0.757. The OpenMed volumes are harder — different acquisition, smaller lesions — and the gap has been stable across all four runs, so it is data, not tuning.
 
-### 📊 Segmentation figures
+### 📊 MedNeXt figures
 
-**Learning curves** — loss and Dice per epoch for the 512 px run. Validation is plotted on its EMA weights, which is what the checkpoint stores.
+Generated from `results/*/epochs.csv` — the run directories ship the raw curves, not images, so these are plotted from the same numbers the tables above were read from.
+
+**The shipped run, epoch by epoch** — loss on the left, Dice per source in the middle, IoU on the right. The best composite lands at epoch 19; after that validation Dice drifts down while training loss keeps falling, which is the point where the run is done.
 
 <p align="center">
-  <img src="segmentation/visuals/01_learning_curves.png" width="760" alt="Segmentation learning curves">
+  <img src="segmentation/mednext/results/figures/01_mednext_learning_curves.png" width="880" alt="MedNeXt learning curves, 512 px run">
 </p>
 
-**Schedule** — 2-epoch linear warmup into cosine decay. The flat middle explains the patience setting: across epochs 10–29 validation Dice spans only **0.6786–0.6866**, a range of 0.008, so a short patience stops the run before the tail.
+**Four runs side by side** — best composite and the Dice at that epoch. The first three sit inside 0.0035 of each other; the 512 px run is the only one that separates.
 
 <p align="center">
-  <img src="segmentation/visuals/02_lr_schedule.png" width="760" alt="Learning rate schedule">
-</p>
-
-**Per-case spread** — test Dice across cases. The mean is 0.6866; the distribution is what that number hides, and the left tail is the part a clinician would notice.
-
-<p align="center">
-  <img src="segmentation/visuals/03_test_distributions.png" width="760" alt="Per-case Dice distribution">
-</p>
-
-**Calibration** — IoU against predicted confidence. A perfectly calibrated head lies on the diagonal; points below it mean the model is more confident than it is accurate. This is why the served output reports Dice rather than a probability.
-
-<p align="center">
-  <img src="segmentation/visuals/04_iou_head_calibration.png" width="760" alt="IoU versus predicted confidence">
-</p>
-
-**Run over run** — the four configurations side by side. Resolution is the only line that separates from the cluster.
-
-<p align="center">
-  <img src="segmentation/visuals/05_baseline_vs_finetuned.png" width="760" alt="Baseline versus fine-tuned comparison">
+  <img src="segmentation/mednext/results/figures/02_mednext_run_comparison.png" width="720" alt="MedNeXt run comparison">
 </p>
 
 ### Assistive — LiteMedSAM
@@ -369,6 +354,38 @@ All four on the same combined corpus, same seed, same loss (BCE + Dice). The onl
 TinyViT-256 encoder, 38 MB, box-prompted only. Trained weights accept points and dense masks at the architecture level but were never trained on them — a dense prompt returns an empty prediction. The lab exposes boxes only, for that reason.
 
 This is a **lab instrument**, not part of the diagnostic path: it shows what a promptable model does with a user-drawn box, next to the trained segmenter.
+
+**Why its Dice is higher than MedNeXt's** — 0.88 against 0.69 — is the box. The prompt tells the model where the lesion is, so it is solving a narrower problem than a segmenter that must find it first. The two numbers are not comparable.
+
+**Training curves** — loss, validation Dice per source, and HD95 in pixels. The best epoch is 11; HD95 sits around 9 px, meaning the 95th-percentile boundary error is roughly nine pixels at the model's working resolution.
+
+<p align="center">
+  <img src="segmentation/visuals/01_learning_curves.png" width="880" alt="LiteMedSAM learning curves">
+</p>
+
+**Schedule** — warmup into cosine, the same shape the MedNeXt trainer uses.
+
+<p align="center">
+  <img src="segmentation/visuals/02_lr_schedule.png" width="760" alt="LiteMedSAM learning rate schedule">
+</p>
+
+**Per-case spread** — test Dice distribution across cases.
+
+<p align="center">
+  <img src="segmentation/visuals/03_test_distributions.png" width="760" alt="LiteMedSAM per-case Dice distribution">
+</p>
+
+**Calibration** — IoU against predicted confidence. Points below the diagonal mean the model is more confident than it is accurate.
+
+<p align="center">
+  <img src="segmentation/visuals/04_iou_head_calibration.png" width="760" alt="LiteMedSAM IoU versus confidence">
+</p>
+
+**Pretrained versus fine-tuned** — the bar chart carries its own caveat: the grey bars are the pretrained baseline measured on **validation**, the coral bars are the fine-tuned model measured on **test**. Not the same split, so the comparison is indicative, not a controlled one. Fine-tuning moved BTSC from 0.887 to 0.882 (slightly down) and OpenMed from 0.805 to 0.867 (up 6 points) — which is the case for fine-tuning: the model was already good on BTSC and learned the harder source.
+
+<p align="center">
+  <img src="segmentation/visuals/05_baseline_vs_finetuned.png" width="820" alt="LiteMedSAM pretrained versus fine-tuned">
+</p>
 
 ### What the numbers cost
 
