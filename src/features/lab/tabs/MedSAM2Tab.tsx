@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RomanSection } from '../../../components/common/RomanSection'
 import { SPECIMEN_PRESETS } from '../../organs/brain/specimenPresets'
 import type { SpecimenPreset } from '../../organs/brain/specimenPresets'
-import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
+import { ThinkingOrbOverlay } from '../../../components/common/ThinkingOrb/ThinkingOrbOverlay'
 import { PromptableSegmentation } from '../PromptableSegmentation'
 import { listLabModels, loadLabModel, unloadLabModel } from '../labApi'
 import type { LabModelCard } from '../labApi'
@@ -92,8 +92,13 @@ export const MedSAM2Tab: React.FC = () => {
 
   return (
     <>
-      {/* Same overlay as the brain and lungs workspaces: one loading language. */}
-      <DiagnosticThinkingHUD isVisible={loadingModel} task="segmentation" />
+      {/* Borderless orb, no card — the same screen that appears while the
+          brain and lungs organ models warm up. */}
+      <ThinkingOrbOverlay
+        isVisible={loadingModel}
+        label="Loading MedSAM2…"
+        size={210}
+      />
 
       {unavailable && (
         <div className="lab-upload-error" role="status">
