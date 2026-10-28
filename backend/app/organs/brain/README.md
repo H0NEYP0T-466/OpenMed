@@ -82,6 +82,16 @@ Two models and one assistive tool, served by one FastAPI router:
 
 Classification runs on 11,128 images across 9 classes; segmentation on the combined OpenMed + BTSC corpora. Every number above comes from a held-out split with source-scan grouping — see [Experiments](#-experiments) for what that cost and what the earlier, higher numbers actually measured.
 
+### Where to look first
+
+| You have | Read |
+|---|---|
+| **Two minutes** | the table above, then [What the numbers cost](#what-the-numbers-cost) — four decisions, four alternatives rejected |
+| **Ten minutes** | [Experiments](#-experiments): why 42 classes became 9, and the 0.97 that was leakage |
+| **An hour** | the [Invariants](#-invariants), then every figure — each one has the failure mode it is meant to expose |
+
+The single most important line in this document: **test top-1 was 0.97 under the old split and 0.727 under a leak-free one.** Everything else here follows from choosing the second number.
+
 ---
 
 ## 🚀 Installation
@@ -241,20 +251,71 @@ Recipe: stochastic depth 0.15, MixUp 0.1 / CutMix 0.2 with `mixup_prob 0.3`, cla
 
 **Why 9 classes and not 42:** the sequence dimension was the least reliable label in the corpus (4,000 rows carry machine-assigned T1/T1C+/T2), and it cost 5 points of top-1 while adding nothing the product used. Collapsing to tumour type removed the weakest label and the weakest axis at once.
 
-**Figures** — `classification/visuals/`
+**Per-class test performance** — 1,696 held-out slices
 
-| File | Shows |
-|---|---|
-| `accuracy_curves.png` | train/val accuracy per epoch |
-| `loss_curves.png` | train/val loss, raw vs EMA |
-| `confusion_matrix.png` | 9×9 test confusion |
-| `roc_curves.png` | per-class ROC |
-| `pr_curves.png` | per-class precision-recall |
-| `class_distribution.png` | class balance across splits |
-| `gradcam_samples.png` | 8 attributed slices |
-| `sample_predictions.png` | prediction grid with confidence |
-| `classification_report.txt` | per-class precision/recall/F1 |
-| `split_manifest.csv` | every image → split assignment |
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| Normal | 0.9842 | 0.9483 | **0.9659** | 329 |
+| Pituitary | 0.9551 | 1.0000 | **0.9770** | 255 |
+| Meningothelial Tumors | 0.9881 | 0.9121 | 0.9486 | 273 |
+| Gliomas | 0.9658 | 0.9216 | 0.9431 | 306 |
+| Mesenchymal (Non-Meningothelial) | 0.8900 | 0.9368 | 0.9128 | 95 |
+| Schwannoma | 0.8581 | 0.8986 | 0.8779 | 148 |
+| Mixed Neuronal / Neuronal-Glial | 0.8182 | 0.9065 | 0.8601 | 139 |
+| Medulloblastoma | 0.8174 | 0.8704 | 0.8430 | 108 |
+| Germ Cell Tumors | 0.7955 | 0.8140 | 0.8046 | 43 |
+| **macro avg** | **0.8969** | **0.9120** | **0.9037** | 1,696 |
+| **weighted avg** | **0.9318** | **0.9287** | **0.9294** | 1,696 |
+
+Germ Cell Tumors is the weakest class at 43 test slices — the smallest support and the widest anatomical spread (pineal, suprasellar, basal ganglia). Normal and Pituitary, the two classes added from the old project, are the two strongest; that answers the question the merge raised.
+
+---
+
+### 📊 Classification figures
+
+**Accuracy and loss, per epoch** — the gap between the two lines is the only overfitting signal that matters here.
+
+<p align="center">
+  <img src="classification/visuals/accuracy_curves.png" width="760" alt="Train and validation accuracy per epoch">
+</p>
+<p align="center">
+  <img src="classification/visuals/loss_curves.png" width="760" alt="Train and validation loss, raw vs EMA">
+</p>
+
+**Where the errors go** — a 9×9 confusion matrix over the 1,696 test slices. Read the diagonal first; every off-diagonal cell is a case the product would send for a second opinion.
+
+<p align="center">
+  <img src="classification/visuals/confusion_matrix.png" width="640" alt="9x9 test confusion matrix">
+</p>
+
+**Per-class discrimination** — ROC and precision-recall, one curve per class. PR is the honest view under imbalance: Germ Cell Tumors and Medulloblastoma sit lowest.
+
+<p align="center">
+  <img src="classification/visuals/roc_curves.png" width="760" alt="Per-class ROC curves">
+</p>
+<p align="center">
+  <img src="classification/visuals/pr_curves.png" width="760" alt="Per-class precision-recall curves">
+</p>
+
+**Class balance across the three splits** — 9 classes, 11,128 images. The grouping rule keeps proportions close without ever splitting a source scan.
+
+<p align="center">
+  <img src="classification/visuals/class_distribution.png" width="760" alt="Class distribution across train, val and test">
+</p>
+
+**What the model looks at** — Grad-CAM over eight test slices, one per class. The heat sits on the lesion, not on the skull or the scanner artefact.
+
+<p align="center">
+  <img src="classification/visuals/gradcam_samples.png" width="820" alt="Grad-CAM attribution for eight samples">
+</p>
+
+**Prediction grid** — predicted class, confidence and ground truth per panel. Read this one for the failure cases, not the successes.
+
+<p align="center">
+  <img src="classification/visuals/sample_predictions.png" width="820" alt="Prediction grid with confidence and ground truth">
+</p>
+
+Machine-readable companions in the same folder: `classification_report.txt` (the table above), `metrics.json` (run config and headline numbers) and `split_manifest.csv` (every image → split, 11,128 rows).
 
 ### Segmentation — four MedNeXt runs
 
@@ -271,15 +332,37 @@ All four on the same combined corpus, same seed, same loss (BCE + Dice). The onl
 
 **Where it is weak:** OpenMed Dice 0.663 vs BTSC 0.757. The OpenMed volumes are harder — different acquisition, smaller lesions — and the gap has been stable across all four runs, so it is data, not tuning.
 
-**Figures** — `segmentation/visuals/`
+### 📊 Segmentation figures
 
-| File | Shows |
-|---|---|
-| `01_learning_curves.png` | loss and Dice per epoch |
-| `02_lr_schedule.png` | warmup + cosine |
-| `03_test_distributions.png` | per-case Dice spread |
-| `04_iou_head_calibration.png` | IoU vs predicted confidence |
-| `05_baseline_vs_finetuned.png` | run-over-run comparison |
+**Learning curves** — loss and Dice per epoch for the 512 px run. Validation is plotted on its EMA weights, which is what the checkpoint stores.
+
+<p align="center">
+  <img src="segmentation/visuals/01_learning_curves.png" width="760" alt="Segmentation learning curves">
+</p>
+
+**Schedule** — 2-epoch linear warmup into cosine decay. The flat middle explains the patience setting: across epochs 10–29 validation Dice spans only **0.6786–0.6866**, a range of 0.008, so a short patience stops the run before the tail.
+
+<p align="center">
+  <img src="segmentation/visuals/02_lr_schedule.png" width="760" alt="Learning rate schedule">
+</p>
+
+**Per-case spread** — test Dice across cases. The mean is 0.6866; the distribution is what that number hides, and the left tail is the part a clinician would notice.
+
+<p align="center">
+  <img src="segmentation/visuals/03_test_distributions.png" width="760" alt="Per-case Dice distribution">
+</p>
+
+**Calibration** — IoU against predicted confidence. A perfectly calibrated head lies on the diagonal; points below it mean the model is more confident than it is accurate. This is why the served output reports Dice rather than a probability.
+
+<p align="center">
+  <img src="segmentation/visuals/04_iou_head_calibration.png" width="760" alt="IoU versus predicted confidence">
+</p>
+
+**Run over run** — the four configurations side by side. Resolution is the only line that separates from the cluster.
+
+<p align="center">
+  <img src="segmentation/visuals/05_baseline_vs_finetuned.png" width="760" alt="Baseline versus fine-tuned comparison">
+</p>
 
 ### Assistive — LiteMedSAM
 
