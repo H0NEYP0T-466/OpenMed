@@ -23,6 +23,7 @@ from app.organs.brain.segmentation.experimental_lab.router import router as brai
 from app.organs.brain.segmentation.experimental_lab.prepare_weights import default_checkpoint_path as seg_checkpoint_path
 from app.organs.brain.segmentation.mednext.router import router as mednext_router
 from app.organs.lungs.classification.router import router as lungs_router
+from app.experimental.router import router as lab_router
 from app.organs.brain.segmentation.mednext.router import segmentation_checkpoint_path as mednext_checkpoint_path
 
 # ── Logging Setup ─────────────────────────────────────────────────────────
@@ -119,6 +120,7 @@ app.include_router(brain_router, prefix="/api/brain", tags=["Brain"])
 app.include_router(brain_seg_router, prefix="/api/brain", tags=["Brain Segmentation"])
 app.include_router(mednext_router, prefix="/api/brain", tags=["Brain MedNeXt Segmentation"])
 app.include_router(lungs_router, prefix="/api/lungs", tags=["Lungs"])
+app.include_router(lab_router, prefix="/api/experimental", tags=["Experimental Lab"])
 
 
 @app.get("/")

@@ -57,3 +57,7 @@ tmp/
 **/projec_dustbin/**
 projec_dustbin/
 
+
+# Experimental lab — third-party code and weights are fetched, not committed.
+app/experimental/medsam2/_vendor/
+experimental/medsam2/weights/*.pt

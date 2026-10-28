@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppShell } from '../../components/common/AppShell'
 import { LiteMedSAMTab } from './tabs/LiteMedSAMTab'
+import { MedSAM2Tab } from './tabs/MedSAM2Tab'
 import type { LabInstrument } from './types'
 import './ExperimentalLabPage.css'
 
@@ -19,6 +20,13 @@ const INSTRUMENTS: readonly LabInstrument[] = [
     romanNumeral: 'I',
     description: 'Mark the lesion. The mark is the prompt.',
     component: LiteMedSAMTab,
+  },
+  {
+    id: 'medsam2',
+    title: 'MedSAM2',
+    romanNumeral: 'II',
+    description: 'Box-prompted medical segmentation · inference only.',
+    component: MedSAM2Tab,
   },
 ]
 
@@ -40,7 +48,7 @@ export const ExperimentalLabPage: React.FC = () => {
         <header className="lab-head">
           <span className="lab-eyebrow mono">L · Experimental Laboratory</span>
           <h1 className="lab-title serif">
-            One instrument, one bench<span className="dot">.</span>
+            Two instruments, one bench<span className="dot">.</span>
           </h1>
           <p className="lab-lead">
             Nothing here is part of the product yet. Each instrument runs one model against one
