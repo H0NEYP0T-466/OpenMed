@@ -1,0 +1,149 @@
+{
+  "checkpoint": "/home/honeypot/Projects/FAST_API/OpenMed/backend/app/organs/lungs/classification/checkpoints/xrv_best.pth",
+  "checkpoint_kind": "ema best",
+  "seed": 42,
+  "per_group": 250,
+  "split": "test",
+  "sources": {
+    "nih": {
+      "COVID": {
+        "n": 250,
+        "mean": 0.0014,
+        "median": 0.0,
+        "p90": 0.0004,
+        "frac_above_0_5": 0.0,
+        "frac_above_0_9": 0.0
+      },
+      "TB": {
+        "n": 250,
+        "mean": 0.0002,
+        "median": 0.0,
+        "p90": 0.0,
+        "frac_above_0_5": 0.0,
+        "frac_above_0_9": 0.0
+      }
+    },
+    "covid": {
+      "COVID": {
+        "n": 250,
+        "mean": 0.86,
+        "median": 0.9979,
+        "p90": 1.0,
+        "frac_above_0_5": 0.872,
+        "frac_above_0_9": 0.772
+      },
+      "TB": {
+        "n": 250,
+        "mean": 0.3058,
+        "median": 0.1058,
+        "p90": 0.9621,
+        "frac_above_0_5": 0.292,
+        "frac_above_0_9": 0.16
+      }
+    },
+    "covid_normal": {
+      "COVID": {
+        "n": 250,
+        "mean": 0.0021,
+        "median": 0.0,
+        "p90": 0.0006,
+        "frac_above_0_5": 0.0,
+        "frac_above_0_9": 0.0
+      },
+      "TB": {
+        "n": 250,
+        "mean": 0.0,
+        "median": 0.0,
+        "p90": 0.0,
+        "frac_above_0_5": 0.0,
+        "frac_above_0_9": 0.0
+      }
+    },
+    "tb": {
+      "COVID": {
+        "n": 140,
+        "mean": 0.7412,
+        "median": 0.9811,
+        "p90": 1.0,
+        "frac_above_0_5": 0.7286,
+        "frac_above_0_9": 0.6214
+      },
+      "TB": {
+        "n": 140,
+        "mean": 0.9666,
+        "median": 1.0,
+        "p90": 1.0,
+        "frac_above_0_5": 0.9786,
+        "frac_above_0_9": 0.9429
+      }
+    },
+    "tb_normal": {
+      "COVID": {
+        "n": 250,
+        "mean": 0.0005,
+        "median": 0.0,
+        "p90": 0.0001,
+        "frac_above_0_5": 0.0,
+        "frac_above_0_9": 0.0
+      },
+      "TB": {
+        "n": 250,
+        "mean": 0.0,
+        "median": 0.0,
+        "p90": 0.0,
+        "frac_above_0_5": 0.0,
+        "frac_above_0_9": 0.0
+      }
+    }
+  },
+  "controls": {
+    "TB_head_on_nih": {
+      "n": 250,
+      "mean": 0.0002,
+      "median": 0.0,
+      "p90": 0.0,
+      "frac_above_0_5": 0.0,
+      "frac_above_0_9": 0.0
+    },
+    "TB_head_on_covid": {
+      "n": 250,
+      "mean": 0.3058,
+      "median": 0.1058,
+      "p90": 0.9621,
+      "frac_above_0_5": 0.292,
+      "frac_above_0_9": 0.16
+    },
+    "TB_head_on_covid_normal": {
+      "n": 250,
+      "mean": 0.0,
+      "median": 0.0,
+      "p90": 0.0,
+      "frac_above_0_5": 0.0,
+      "frac_above_0_9": 0.0
+    },
+    "COVID_head_on_nih": {
+      "n": 250,
+      "mean": 0.0014,
+      "median": 0.0,
+      "p90": 0.0004,
+      "frac_above_0_5": 0.0,
+      "frac_above_0_9": 0.0
+    },
+    "COVID_head_on_tb": {
+      "n": 140,
+      "mean": 0.7412,
+      "median": 0.9811,
+      "p90": 1.0,
+      "frac_above_0_5": 0.7286,
+      "frac_above_0_9": 0.6214
+    },
+    "COVID_head_on_tb_normal": {
+      "n": 250,
+      "mean": 0.0005,
+      "median": 0.0,
+      "p90": 0.0001,
+      "frac_above_0_5": 0.0,
+      "frac_above_0_9": 0.0
+    }
+  }
+}

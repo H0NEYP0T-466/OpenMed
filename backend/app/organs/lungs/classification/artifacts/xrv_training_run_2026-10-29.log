@@ -1,0 +1,1481 @@
+og Message
+6.3s	1	0.00s - Debugger warning: It seems that frozen modules are being used, which may
+6.3s	2	0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+6.3s	3	0.00s - to python to disable frozen modules.
+6.3s	4	0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+6.9s	5	0.00s - Debugger warning: It seems that frozen modules are being used, which may
+6.9s	6	0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+6.9s	7	0.00s - to python to disable frozen modules.
+6.9s	8	0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.0s	9	Cloning into 'OpenMed'...
+8.6s	10	remote: Enumerating objects: 1653, done.[K
+8.6s	11	remote: Counting objects:   0% (1/390)[K
+remote: Counting objects:   1% (4/390)[K
+remote: Counting objects:   2% (8/390)[K
+remote: Counting objects:   3% (12/390)[K
+remote: Counting objects:   4% (16/390)[K
+remote: Counting objects:   5% (20/390)[K
+remote: Counting objects:   6% (24/390)[K
+remote: Counting objects:   7% (28/390)[K
+remote: Counting objects:   8% (32/390)[K
+remote: Counting objects:   9% (36/390)[K
+remote: Counting objects:  10% (39/390)[K
+remote: Counting objects:  11% (43/390)[K
+remote: Counting objects:  12% (47/390)[K
+remote: Counting objects:  13% (51/390)[K
+remote: Counting objects:  14% (55/390)[K
+remote: Counting objects:  15% (59/390)[K
+remote: Counting objects:  16% (63/390)[K
+remote: Counting objects:  17% (67/390)[K
+remote: Counting objects:  18% (71/390)[K
+remote: Counting objects:  19% (75/390)[K
+remote: Counting objects:  20% (78/390)[K
+remote: Counting objects:  21% (82/390)[K
+remote: Counting objects:  22% (86/390)[K
+remote: Counting objects:  23% (90/390)[K
+remote: Counting objects:  24% (94/390)[K
+remote: Counting objects:  25% (98/390)[K
+remote: Counting objects:  26% (102/390)[K
+remote: Counting objects:  27% (106/390)[K
+remote: Counting objects:  28% (110/390)[K
+remote: Counting objects:  29% (114/390)[K
+remote: Counting objects:  30% (117/390)[K
+remote: Counting objects:  31% (121/390)[K
+remote: Counting objects:  32% (125/390)[K
+remote: Counting objects:  33% (129/390)[K
+remote: Counting objects:  34% (133/390)[K
+remote: Counting objects:  35% (137/390)[K
+remote: Counting objects:  36% (141/390)[K
+remote: Counting objects:  37% (145/390)[K
+remote: Counting objects:  38% (149/390)[K
+remote: Counting objects:  39% (153/390)[K
+remote: Counting objects:  40% (156/390)[K
+remote: Counting objects:  41% (160/390)[K
+remote: Counting objects:  42% (164/390)[K
+remote: Counting objects:  43% (168/390)[K
+remote: Counting objects:  44% (172/390)[K
+remote: Counting objects:  45% (176/390)[K
+remote: Counting objects:  46% (180/390)[K
+remote: Counting objects:  47% (184/390)[K
+remote: Counting objects:  48% (188/390)[K
+remote: Counting objects:  49% (192/390)[K
+remote: Counting objects:  50% (195/390)[K
+remote: Counting objects:  51% (199/390)[K
+remote: Counting objects:  52% (203/390)[K
+remote: Counting objects:  53% (207/390)[K
+remote: Counting objects:  54% (211/390)[K
+remote: Counting objects:  55% (215/390)[K
+remote: Counting objects:  56% (219/390)[K
+remote: Counting objects:  57% (223/390)[K
+remote: Counting objects:  58% (227/390)[K
+remote: Counting objects:  59% (231/390)[K
+remote: Counting objects:  60% (234/390)[K
+remote: Counting objects:  61% (238/390)[K
+remote: Counting objects:  62% (242/390)[K
+remote: Counting objects:  63% (246/390)[K
+remote: Counting objects:  64% (250/390)[K
+remote: Counting objects:  65% (254/390)[K
+remote: Counting objects:  66% (258/390)[K
+remote: Counting objects:  67% (262/390)[K
+remote: Counting objects:  68% (266/390)[K
+remote: Counting objects:  69% (270/390)[K
+remote: Counting objects:  70% (273/390)[K
+remote: Counting objects:  71% (277/390)[K
+remote: Counting objects:  72% (281/390)[K
+remote: Counting objects:  73% (285/390)[K
+remote: Counting objects:  74% (289/390)[K
+remote: Counting objects:  75% (293/390)[K
+remote: Counting objects:  76% (297/390)[K
+remote: Counting objects:  77% (301/390)[K
+remote: Counting objects:  78% (305/390)[K
+remote: Counting objects:  79% (309/390)[K
+remote: Counting objects:  80% (312/390)[K
+remote: Counting objects:  81% (316/390)[K
+remote: Counting objects:  82% (320/390)[K
+remote: Counting objects:  83% (324/390)[K
+remote: Counting objects:  84% (328/390)[K
+remote: Counting objects:  85% (332/390)[K
+remote: Counting objects:  86% (336/390)[K
+remote: Counting objects:  87% (340/390)[K
+remote: Counting objects:  88% (344/390)[K
+remote: Counting objects:  89% (348/390)[K
+remote: Counting objects:  90% (351/390)[K
+remote: Counting objects:  91% (355/390)[K
+remote: Counting objects:  92% (359/390)[K
+remote: Counting objects:  93% (363/390)[K
+remote: Counting objects:  94% (367/390)[K
+remote: Counting objects:  95% (371/390)[K
+remote: Counting objects:  96% (375/390)[K
+remote: Counting objects:  97% (379/390)[K
+remote: Counting objects:  98% (383/390)[K
+remote: Counting objects:  99% (387/390)[K
+remote: Counting objects: 100% (390/390)[K
+remote: Counting objects: 100% (390/390), done.[K
+8.6s	12	remote: Compressing objects:   0% (1/279)[K
+remote: Compressing objects:   1% (3/279)[K
+remote: Compressing objects:   2% (6/279)[K
+remote: Compressing objects:   3% (9/279)[K
+remote: Compressing objects:   4% (12/279)[K
+remote: Compressing objects:   5% (14/279)[K
+remote: Compressing objects:   6% (17/279)[K
+remote: Compressing objects:   7% (20/279)[K
+remote: Compressing objects:   8% (23/279)[K
+remote: Compressing objects:   9% (26/279)[K
+remote: Compressing objects:  10% (28/279)[K
+remote: Compressing objects:  11% (31/279)[K
+remote: Compressing objects:  12% (34/279)[K
+remote: Compressing objects:  13% (37/279)[K
+remote: Compressing objects:  14% (40/279)[K
+remote: Compressing objects:  15% (42/279)[K
+remote: Compressing objects:  16% (45/279)[K
+remote: Compressing objects:  17% (48/279)[K
+remote: Compressing objects:  18% (51/279)[K
+remote: Compressing objects:  19% (54/279)[K
+remote: Compressing objects:  20% (56/279)[K
+remote: Compressing objects:  21% (59/279)[K
+remote: Compressing objects:  22% (62/279)[K
+remote: Compressing objects:  23% (65/279)[K
+remote: Compressing objects:  24% (67/279)[K
+remote: Compressing objects:  25% (70/279)[K
+remote: Compressing objects:  26% (73/279)[K
+remote: Compressing objects:  27% (76/279)[K
+remote: Compressing objects:  28% (79/279)[K
+remote: Compressing objects:  29% (81/279)[K
+remote: Compressing objects:  30% (84/279)[K
+remote: Compressing objects:  31% (87/279)[K
+remote: Compressing objects:  32% (90/279)[K
+remote: Compressing objects:  33% (93/279)[K
+remote: Compressing objects:  34% (95/279)[K
+remote: Compressing objects:  35% (98/279)[K
+remote: Compressing objects:  36% (101/279)[K
+remote: Compressing objects:  37% (104/279)[K
+remote: Compressing objects:  38% (107/279)[K
+remote: Compressing objects:  39% (109/279)[K
+remote: Compressing objects:  40% (112/279)[K
+remote: Compressing objects:  41% (115/279)[K
+remote: Compressing objects:  42% (118/279)[K
+remote: Compressing objects:  43% (120/279)[K
+remote: Compressing objects:  44% (123/279)[K
+remote: Compressing objects:  45% (126/279)[K
+remote: Compressing objects:  46% (129/279)[K
+remote: Compressing objects:  47% (132/279)[K
+remote: Compressing objects:  48% (134/279)[K
+remote: Compressing objects:  49% (137/279)[K
+remote: Compressing objects:  50% (140/279)[K
+remote: Compressing objects:  51% (143/279)[K
+remote: Compressing objects:  52% (146/279)[K
+remote: Compressing objects:  53% (148/279)[K
+remote: Compressing objects:  54% (151/279)[K
+remote: Compressing objects:  55% (154/279)[K
+remote: Compressing objects:  56% (157/279)[K
+remote: Compressing objects:  57% (160/279)[K
+remote: Compressing objects:  58% (162/279)[K
+remote: Compressing objects:  59% (165/279)[K
+remote: Compressing objects:  60% (168/279)[K
+remote: Compressing objects:  61% (171/279)[K
+remote: Compressing objects:  62% (173/279)[K
+remote: Compressing objects:  63% (176/279)[K
+remote: Compressing objects:  64% (179/279)[K
+remote: Compressing objects:  65% (182/279)[K
+remote: Compressing objects:  66% (185/279)[K
+remote: Compressing objects:  67% (187/279)[K
+remote: Compressing objects:  68% (190/279)[K
+remote: Compressing objects:  69% (193/279)[K
+remote: Compressing objects:  70% (196/279)[K
+remote: Compressing objects:  71% (199/279)[K
+remote: Compressing objects:  72% (201/279)[K
+remote: Compressing objects:  73% (204/279)[K
+remote: Compressing objects:  74% (207/279)[K
+remote: Compressing objects:  75% (210/279)[K
+remote: Compressing objects:  76% (213/279)[K
+remote: Compressing objects:  77% (215/279)[K
+remote: Compressing objects:  78% (218/279)[K
+remote: Compressing objects:  79% (221/279)[K
+remote: Compressing objects:  80% (224/279)[K
+remote: Compressing objects:  81% (226/279)[K
+remote: Compressing objects:  82% (229/279)[K
+remote: Compressing objects:  83% (232/279)[K
+remote: Compressing objects:  84% (235/279)[K
+remote: Compressing objects:  85% (238/279)[K
+remote: Compressing objects:  86% (240/279)[K
+remote: Compressing objects:  87% (243/279)[K
+remote: Compressing objects:  88% (246/279)[K
+remote: Compressing objects:  89% (249/279)[K
+remote: Compressing objects:  90% (252/279)[K
+remote: Compressing objects:  91% (254/279)[K
+remote: Compressing objects:  92% (257/279)[K
+remote: Compressing objects:  93% (260/279)[K
+remote: Compressing objects:  94% (263/279)[K
+remote: Compressing objects:  95% (266/279)[K
+remote: Compressing objects:  96% (268/279)[K
+remote: Compressing objects:  97% (271/279)[K
+remote: Compressing objects:  98% (274/279)[K
+remote: Compressing objects:  99% (277/279)[K
+remote: Compressing objects: 100% (279/279)[K
+remote: Compressing objects: 100% (279/279), done.[K
+10.8s	13	Receiving objects:   0% (1/1653)
+Receiving objects:   1% (17/1653)
+Receiving objects:   2% (34/1653)
+Receiving objects:   3% (50/1653)
+Receiving objects:   4% (67/1653)
+Receiving objects:   5% (83/1653)
+Receiving objects:   6% (100/1653)
+Receiving objects:   7% (116/1653)
+Receiving objects:   8% (133/1653)
+Receiving objects:   9% (149/1653)
+Receiving objects:  10% (166/1653)
+Receiving objects:  11% (182/1653)
+Receiving objects:  12% (199/1653)
+Receiving objects:  13% (215/1653)
+Receiving objects:  14% (232/1653)
+Receiving objects:  15% (248/1653)
+Receiving objects:  16% (265/1653)
+Receiving objects:  17% (282/1653)
+Receiving objects:  18% (298/1653)
+Receiving objects:  19% (315/1653)
+Receiving objects:  20% (331/1653)
+Receiving objects:  21% (348/1653)
+Receiving objects:  22% (364/1653)
+Receiving objects:  23% (381/1653)
+Receiving objects:  24% (397/1653)
+Receiving objects:  25% (414/1653)
+Receiving objects:  26% (430/1653)
+Receiving objects:  27% (447/1653)
+Receiving objects:  28% (463/1653)
+Receiving objects:  29% (480/1653)
+Receiving objects:  30% (496/1653)
+Receiving objects:  31% (513/1653)
+Receiving objects:  32% (529/1653)
+Receiving objects:  33% (546/1653)
+Receiving objects:  34% (563/1653)
+Receiving objects:  35% (579/1653)
+Receiving objects:  36% (596/1653)
+Receiving objects:  37% (612/1653)
+Receiving objects:  38% (629/1653)
+Receiving objects:  39% (645/1653)
+Receiving objects:  40% (662/1653)
+Receiving objects:  41% (678/1653)
+Receiving objects:  42% (695/1653)
+Receiving objects:  43% (711/1653)
+Receiving objects:  44% (728/1653)
+Receiving objects:  45% (744/1653)
+Receiving objects:  46% (761/1653)
+Receiving objects:  47% (777/1653)
+Receiving objects:  48% (794/1653)
+Receiving objects:  49% (810/1653)
+Receiving objects:  50% (827/1653)
+Receiving objects:  51% (844/1653)
+Receiving objects:  52% (860/1653)
+Receiving objects:  53% (877/1653)
+Receiving objects:  54% (893/1653)
+Receiving objects:  55% (910/1653)
+Receiving objects:  56% (926/1653)
+Receiving objects:  57% (943/1653)
+Receiving objects:  58% (959/1653)
+Receiving objects:  59% (976/1653)
+Receiving objects:  60% (992/1653)
+Receiving objects:  61% (1009/1653)
+Receiving objects:  62% (1025/1653), 26.63 MiB | 53.23 MiB/s
+Receiving objects:  62% (1038/1653), 52.91 MiB | 52.90 MiB/s
+Receiving objects:  63% (1042/1653), 52.91 MiB | 52.90 MiB/s
+Receiving objects:  64% (1058/1653), 52.91 MiB | 52.90 MiB/s
+Receiving objects:  65% (1075/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  66% (1091/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  67% (1108/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  68% (1125/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  69% (1141/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  70% (1158/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  71% (1174/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  72% (1191/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  73% (1207/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  74% (1224/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  75% (1240/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  76% (1257/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  77% (1273/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  78% (1290/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  79% (1306/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  80% (1323/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  81% (1339/1653), 81.21 MiB | 54.14 MiB/s
+Receiving objects:  81% (1342/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  82% (1356/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  83% (1372/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  84% (1389/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  85% (1406/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  86% (1422/1653), 111.82 MiB | 55.91 MiB/s
+remote: Total 1653 (delta 206), reused 268 (delta 108), pack-reused 1263 (from 2)[K
+10.8s	14	Receiving objects:  87% (1439/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  88% (1455/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  89% (1472/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  90% (1488/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  91% (1505/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  92% (1521/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  93% (1538/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  94% (1554/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  95% (1571/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  96% (1587/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  97% (1604/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  98% (1620/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects:  99% (1637/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects: 100% (1653/1653), 111.82 MiB | 55.91 MiB/s
+Receiving objects: 100% (1653/1653), 122.72 MiB | 55.98 MiB/s, done.
+10.9s	15	Resolving deltas:   0% (0/790)
+Resolving deltas:   1% (8/790)
+Resolving deltas:   2% (16/790)
+Resolving deltas:   3% (25/790)
+Resolving deltas:   4% (32/790)
+Resolving deltas:   5% (40/790)
+Resolving deltas:   6% (48/790)
+Resolving deltas:   7% (56/790)
+Resolving deltas:   8% (64/790)
+Resolving deltas:   9% (72/790)
+Resolving deltas:  10% (79/790)
+Resolving deltas:  11% (87/790)
+Resolving deltas:  12% (95/790)
+Resolving deltas:  13% (103/790)
+Resolving deltas:  14% (111/790)
+Resolving deltas:  15% (119/790)
+Resolving deltas:  16% (127/790)
+Resolving deltas:  17% (135/790)
+Resolving deltas:  18% (143/790)
+Resolving deltas:  19% (151/790)
+Resolving deltas:  20% (158/790)
+Resolving deltas:  21% (166/790)
+Resolving deltas:  22% (174/790)
+Resolving deltas:  23% (182/790)
+Resolving deltas:  24% (190/790)
+Resolving deltas:  25% (198/790)
+Resolving deltas:  26% (206/790)
+Resolving deltas:  27% (214/790)
+Resolving deltas:  28% (222/790)
+Resolving deltas:  29% (231/790)
+Resolving deltas:  30% (237/790)
+Resolving deltas:  31% (245/790)
+Resolving deltas:  32% (253/790)
+Resolving deltas:  33% (261/790)
+Resolving deltas:  34% (269/790)
+Resolving deltas:  35% (277/790)
+Resolving deltas:  36% (285/790)
+Resolving deltas:  37% (293/790)
+Resolving deltas:  38% (301/790)
+Resolving deltas:  39% (309/790)
+Resolving deltas:  40% (316/790)
+Resolving deltas:  41% (324/790)
+Resolving deltas:  42% (332/790)
+Resolving deltas:  43% (340/790)
+Resolving deltas:  44% (348/790)
+Resolving deltas:  45% (356/790)
+Resolving deltas:  46% (364/790)
+Resolving deltas:  47% (372/790)
+Resolving deltas:  48% (380/790)
+Resolving deltas:  49% (388/790)
+Resolving deltas:  50% (395/790)
+Resolving deltas:  51% (403/790)
+Resolving deltas:  52% (411/790)
+Resolving deltas:  53% (419/790)
+Resolving deltas:  54% (428/790)
+Resolving deltas:  55% (435/790)
+Resolving deltas:  56% (443/790)
+Resolving deltas:  57% (451/790)
+Resolving deltas:  58% (459/790)
+Resolving deltas:  59% (467/790)
+Resolving deltas:  60% (474/790)
+Resolving deltas:  61% (482/790)
+Resolving deltas:  62% (490/790)
+Resolving deltas:  63% (498/790)
+Resolving deltas:  64% (506/790)
+Resolving deltas:  65% (514/790)
+Resolving deltas:  66% (522/790)
+Resolving deltas:  67% (530/790)
+Resolving deltas:  68% (538/790)
+Resolving deltas:  69% (546/790)
+Resolving deltas:  70% (553/790)
+Resolving deltas:  71% (561/790)
+Resolving deltas:  72% (569/790)
+Resolving deltas:  73% (577/790)
+Resolving deltas:  74% (585/790)
+Resolving deltas:  75% (593/790)
+Resolving deltas:  76% (601/790)
+Resolving deltas:  77% (609/790)
+Resolving deltas:  78% (617/790)
+Resolving deltas:  79% (625/790)
+Resolving deltas:  80% (632/790)
+Resolving deltas:  81% (640/790)
+Resolving deltas:  82% (648/790)
+Resolving deltas:  83% (656/790)
+Resolving deltas:  84% (664/790)
+Resolving deltas:  85% (672/790)
+Resolving deltas:  86% (680/790)
+Resolving deltas:  87% (688/790)
+Resolving deltas:  88% (696/790)
+Resolving deltas:  89% (704/790)
+Resolving deltas:  90% (711/790)
+Resolving deltas:  91% (719/790)
+Resolving deltas:  92% (727/790)
+Resolving deltas:  93% (736/790)
+Resolving deltas:  94% (743/790)
+Resolving deltas:  95% (751/790)
+Resolving deltas:  96% (759/790)
+Resolving deltas:  97% (767/790)
+Resolving deltas:  98% (775/790)
+Resolving deltas:  99% (783/790)
+Resolving deltas: 100% (790/790)
+Resolving deltas: 100% (790/790), done.
+329.0s	16	130128
+30737.5s	17	Downloading weights...
+30737.5s	18	If this fails you can run `wget https://github.com/mlmed/torchxrayvision/releases/download/v1/nih-pc-chex-mimic_ch-google-openi-kaggle-densenet121-d121-tw-lr001-rot45-tr15-sc15-seed0-best.pt -O /tmp/xrv/nih-pc-chex-mimic_ch-google-openi-kaggle-densenet121-d121-tw-lr001-rot45-tr15-sc15-seed0-best.pt`
+30737.5s	19	
+[█.................................................]
+[███...............................................]
+[█████.............................................]
+[███████...........................................]
+[█████████.........................................]
+[███████████.......................................]
+[████████████......................................]
+[██████████████....................................]
+[████████████████..................................]
+[██████████████████................................]
+[████████████████████..............................]
+[██████████████████████............................]
+[████████████████████████..........................]
+[█████████████████████████.........................]
+[███████████████████████████.......................]
+[█████████████████████████████.....................]
+[███████████████████████████████...................]
+[█████████████████████████████████.................]
+[███████████████████████████████████...............]
+[████████████████████████████████████..............]
+[██████████████████████████████████████............]
+[████████████████████████████████████████..........]
+[██████████████████████████████████████████........]
+[████████████████████████████████████████████......]
+[██████████████████████████████████████████████....]
+[████████████████████████████████████████████████..]
+[█████████████████████████████████████████████████.]
+[██████████████████████████████████████████████████]
+30737.5s	20	[12:10:29] [INFO] ========================================================================
+30737.5s	21	[12:10:29] [INFO]   Lung XRV fine-tune | device=Tesla T4 | seed=42
+30737.5s	22	[12:10:29] [INFO]   data_root=/tmp/data
+30737.5s	23	[12:10:29] [INFO]   output_dir=/kaggle/working | stage_dir=/tmp/lungs224
+30737.5s	24	[12:10:29] [INFO]   epochs=100 | batch=32 | patience=15 | limit_batches=0
+30737.5s	25	[12:10:29] [INFO] ========================================================================
+30737.5s	26	[12:10:29] [INFO] labels.csv: /tmp/data/labels.csv
+30737.5s	27	[12:10:34] [INFO] Loaded 130128 label rows from /tmp/data/labels.csv
+30737.5s	28	[12:10:35] [INFO] Split audit | train 91537 / 21638 patients | val 13001 / 3150 patients | test 25590 / 6017 patients
+30737.5s	29	[12:10:35] [INFO] Leakage audit | cross-split images: 0 | cross-split NIH patient prefixes: 0
+30737.5s	30	[12:10:36] [INFO] pos_weight[c] = sqrt(neg_c / pos_c) on TRAIN rows where label != -1
+30737.5s	31	[12:10:36] [INFO]   Atelectasis           2.93   (expected  2.93)
+30737.5s	32	[12:10:36] [INFO]   Cardiomegaly          6.15   (expected  6.15)
+30737.5s	33	[12:10:36] [INFO]   Effusion              2.72   (expected  2.72)
+30737.5s	34	[12:10:36] [INFO]   Infiltration          2.15   (expected  2.15)
+30737.5s	35	[12:10:36] [INFO]   Mass                  4.25   (expected  4.25)
+30737.5s	36	[12:10:36] [INFO]   Nodule                4.07   (expected  4.07)
+30737.5s	37	[12:10:36] [INFO]   Pneumonia             8.79   (expected  8.79)
+30737.5s	38	[12:10:36] [INFO]   Pneumothorax          4.47   (expected  4.47)
+30737.5s	39	[12:10:36] [INFO]   Consolidation         4.78   (expected  4.78)
+30737.5s	40	[12:10:36] [INFO]   Edema                 6.81   (expected  6.81)
+30737.5s	41	[12:10:36] [INFO]   Emphysema             6.42   (expected  6.42)
+30737.5s	42	[12:10:36] [INFO]   Fibrosis              7.93   (expected  7.93)
+30737.5s	43	[12:10:36] [INFO]   Pleural_Thickening    5.66   (expected  5.66)
+30737.5s	44	[12:10:36] [INFO]   Hernia               21.52   (expected 21.52)
+30737.5s	45	[12:10:36] [INFO]   COVID                 5.83   (expected  5.83)
+30737.5s	46	[12:10:36] [INFO]   TB                   12.89   (expected 12.89)
+30737.5s	47	[12:10:36] [INFO] pos_weight matches the expected vector (max |delta| = 0.0046)
+30737.5s	48	[12:10:36] [INFO] TRAIN rows: 91537 | positives per class: {'Atelectasis': 8238, 'Cardiomegaly': 2034, 'Effusion': 9385, 'Infiltration': 14058, 'Mass': 4138, 'Nodule': 4503, 'Pneumonia': 1008, 'Pneumothorax': 3757, 'Consolidation': 3304, 'Edema': 1667, 'Emphysema': 1871, 'Fibrosis': 1235, 'Pleural_Thickening': 2393, 'Hernia': 170, 'COVID': 2532, 'TB': 490}
+30737.5s	49	[12:10:43] [INFO] Staging: 0/130128 already in /tmp/lungs224 | 130128 to encode (Kaggle wipes /tmp between sessions, so a resume may re-stage everything before the first batch)
+30737.5s	50	[12:11:12] [INFO]   staged 10000/130128 | 352 files/s | ETA 5.7 min | new 10000 skipped 0 resized 10000
+30737.5s	51	[12:11:38] [INFO]   staged 20000/130128 | 368 files/s | ETA 5.0 min | new 20000 skipped 0 resized 20000
+30737.5s	52	[12:12:03] [INFO]   staged 30000/130128 | 375 files/s | ETA 4.4 min | new 30000 skipped 0 resized 30000
+30737.5s	53	[12:12:29] [INFO]   staged 40000/130128 | 378 files/s | ETA 4.0 min | new 40000 skipped 0 resized 40000
+30737.5s	54	[12:12:55] [INFO]   staged 50000/130128 | 380 files/s | ETA 3.5 min | new 50000 skipped 0 resized 50000
+30737.5s	55	[12:13:21] [INFO]   staged 60000/130128 | 380 files/s | ETA 3.1 min | new 60000 skipped 0 resized 60000
+30737.5s	56	[12:13:47] [INFO]   staged 70000/130128 | 380 files/s | ETA 2.6 min | new 70000 skipped 0 resized 70000
+30737.5s	57	[12:14:14] [INFO]   staged 80000/130128 | 381 files/s | ETA 2.2 min | new 80000 skipped 0 resized 80000
+30737.5s	58	[12:14:40] [INFO]   staged 90000/130128 | 381 files/s | ETA 1.8 min | new 90000 skipped 0 resized 90000
+30737.5s	59	[12:15:06] [INFO]   staged 100000/130128 | 381 files/s | ETA 1.3 min | new 100000 skipped 0 resized 100000
+30737.5s	60	[12:15:32] [INFO]   staged 110000/130128 | 381 files/s | ETA 0.9 min | new 110000 skipped 0 resized 110000
+30737.5s	61	[12:16:22] [INFO]   staged 120000/130128 | 354 files/s | ETA 0.5 min | new 120000 skipped 0 resized 120000
+30737.5s	62	[12:16:55] [INFO]   staged 130000/130128 | 350 files/s | ETA 0.0 min | new 130000 skipped 0 resized 130000
+30737.5s	63	[12:16:56] [INFO]   staged 130128/130128 | 350 files/s | ETA 0.0 min | new 130128 skipped 0 resized 130128
+30737.5s	64	[12:16:57] [INFO] Staging complete | 130128 total | 130128 new (0 copied, 0 converted, 130128 resized) | 0 skipped | 6.2 min
+30737.5s	65	[12:16:57] [INFO] Loading XRV densenet121-res224-all (cache: /tmp/xrv)
+30737.5s	66	[12:16:58] [INFO] Model ready | classifier 1024 -> 16 | trainable params 6.96M
+30737.5s	67	[12:17:10] [INFO]   epoch 001 step 1/2860 | loss 0.7366 | lr backbone 3.50e-08 / head 3.50e-07 | 0.1 it/s
+30737.5s	68	[12:18:30] [INFO]   epoch 001 step 500/2860 | loss 0.6528 | lr backbone 8.76e-06 / head 8.76e-05 | 5.5 it/s
+30737.5s	69	[12:19:52] [INFO]   epoch 001 step 1000/2860 | loss 0.4374 | lr backbone 1.75e-05 / head 1.75e-04 | 5.7 it/s
+30737.5s	70	[12:21:14] [INFO]   epoch 001 step 1500/2860 | loss 0.4195 | lr backbone 2.62e-05 / head 2.62e-04 | 5.9 it/s
+30737.5s	71	[12:22:36] [INFO]   epoch 001 step 2000/2860 | loss 0.4914 | lr backbone 3.50e-05 / head 3.50e-04 | 5.9 it/s
+30737.5s	72	[12:23:59] [INFO]   epoch 001 step 2500/2860 | loss 0.3643 | lr backbone 4.37e-05 / head 4.37e-04 | 5.9 it/s
+30737.5s	73	[12:24:58] [INFO]   epoch 001 step 2860/2860 | loss 0.4184 | lr backbone 5.00e-05 / head 5.00e-04 | 6.0 it/s
+30737.5s	74	[12:26:19] [INFO] Epoch 001/100 | train 0.4957 | val raw 0.3839 AUC 0.8701 | EMA 0.5376 AUC 0.8126 | groups raw [findings 0.7858 COVID 0.8681 TB 0.9566] | monitored 0.8701 (raw) | lr 5.00e-04 | best 0.8701 @1 | 561s
+30737.5s	75	[12:26:20] [INFO]   epoch 002 step 1/2860 | loss 0.5547 | lr backbone 5.00e-05 / head 5.00e-04 | 1.5 it/s
+30737.5s	76	[12:27:42] [INFO]   epoch 002 step 500/2860 | loss 0.4594 | lr backbone 5.88e-05 / head 5.88e-04 | 6.0 it/s
+30737.5s	77	[12:29:05] [INFO]   epoch 002 step 1000/2860 | loss 0.4530 | lr backbone 6.75e-05 / head 6.75e-04 | 6.0 it/s
+30737.5s	78	[12:30:27] [INFO]   epoch 002 step 1500/2860 | loss 0.4877 | lr backbone 7.62e-05 / head 7.62e-04 | 6.0 it/s
+30737.5s	79	[12:31:50] [INFO]   epoch 002 step 2000/2860 | loss 0.3098 | lr backbone 8.50e-05 / head 8.50e-04 | 6.0 it/s
+30737.5s	80	[12:33:13] [INFO]   epoch 002 step 2500/2860 | loss 0.2916 | lr backbone 9.37e-05 / head 9.37e-04 | 6.0 it/s
+30737.5s	81	[12:34:12] [INFO]   epoch 002 step 2860/2860 | loss 0.4097 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	82	[12:35:31] [INFO] Epoch 002/100 | train 0.4057 | val raw 0.3643 AUC 0.9124 | EMA 0.4138 AUC 0.8741 | groups raw [findings 0.7963 COVID 0.9494 TB 0.9917] | monitored 0.9124 (raw) | lr 1.00e-03 | best 0.9124 @2 | 552s
+30737.5s	83	[12:35:32] [INFO]   epoch 003 step 1/2860 | loss 0.3547 | lr backbone 1.00e-04 / head 1.00e-03 | 1.7 it/s
+30737.5s	84	[12:36:55] [INFO]   epoch 003 step 500/2860 | loss 0.4418 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	85	[12:38:17] [INFO]   epoch 003 step 1000/2860 | loss 0.5269 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	86	[12:39:40] [INFO]   epoch 003 step 1500/2860 | loss 0.4154 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	87	[12:41:03] [INFO]   epoch 003 step 2000/2860 | loss 0.3972 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	88	[12:42:25] [INFO]   epoch 003 step 2500/2860 | loss 0.4097 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	89	[12:43:25] [INFO]   epoch 003 step 2860/2860 | loss 0.4702 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	90	[12:44:44] [INFO] Epoch 003/100 | train 0.3863 | val raw 0.3511 AUC 0.9260 | EMA 0.3718 AUC 0.9011 | groups raw [findings 0.8070 COVID 0.9746 TB 0.9964] | monitored 0.9260 (raw) | lr 1.00e-03 | best 0.9260 @3 | 553s
+30737.5s	91	[12:44:45] [INFO]   epoch 004 step 1/2860 | loss 0.4517 | lr backbone 1.00e-04 / head 1.00e-03 | 1.6 it/s
+30737.5s	92	[12:46:07] [INFO]   epoch 004 step 500/2860 | loss 0.5195 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	93	[12:47:30] [INFO]   epoch 004 step 1000/2860 | loss 0.3797 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	94	[12:48:52] [INFO]   epoch 004 step 1500/2860 | loss 0.2201 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	95	[12:50:15] [INFO]   epoch 004 step 2000/2860 | loss 0.7688 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	96	[12:51:38] [INFO]   epoch 004 step 2500/2860 | loss 0.3580 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	97	[12:52:37] [INFO]   epoch 004 step 2860/2860 | loss 0.3826 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	98	[12:53:56] [INFO] Epoch 004/100 | train 0.3772 | val raw 0.3463 AUC 0.9310 | EMA 0.3563 AUC 0.9159 | groups raw [findings 0.8143 COVID 0.9835 TB 0.9952] | monitored 0.9310 (raw) | lr 9.99e-04 | best 0.9310 @4 | 552s
+30737.5s	99	[12:53:57] [INFO]   epoch 005 step 1/2860 | loss 0.5002 | lr backbone 9.99e-05 / head 9.99e-04 | 1.6 it/s
+30737.5s	100	[12:55:19] [INFO]   epoch 005 step 500/2860 | loss 0.4704 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	101	[12:56:42] [INFO]   epoch 005 step 1000/2860 | loss 0.2958 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	102	[12:58:05] [INFO]   epoch 005 step 1500/2860 | loss 0.3543 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	103	[12:59:28] [INFO]   epoch 005 step 2000/2860 | loss 0.5311 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	104	[13:00:50] [INFO]   epoch 005 step 2500/2860 | loss 0.4752 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	105	[13:01:50] [INFO]   epoch 005 step 2860/2860 | loss 0.5844 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	106	[13:03:09] [INFO] Epoch 005/100 | train 0.3713 | val raw 0.3406 AUC 0.9334 | EMA 0.3486 AUC 0.9252 | groups raw [findings 0.8153 COVID 0.9883 TB 0.9967] | monitored 0.9334 (raw) | lr 9.98e-04 | best 0.9334 @5 | 553s
+30737.5s	107	[13:03:10] [INFO]   epoch 006 step 1/2860 | loss 0.4421 | lr backbone 9.98e-05 / head 9.98e-04 | 1.5 it/s
+30737.5s	108	[13:04:32] [INFO]   epoch 006 step 500/2860 | loss 0.2989 | lr backbone 9.97e-05 / head 9.97e-04 | 6.0 it/s
+30737.5s	109	[13:05:55] [INFO]   epoch 006 step 1000/2860 | loss 0.3078 | lr backbone 9.97e-05 / head 9.97e-04 | 6.0 it/s
+30737.5s	110	[13:07:18] [INFO]   epoch 006 step 1500/2860 | loss 0.2516 | lr backbone 9.97e-05 / head 9.97e-04 | 6.0 it/s
+30737.5s	111	[13:08:40] [INFO]   epoch 006 step 2000/2860 | loss 0.4532 | lr backbone 9.97e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	112	[13:10:03] [INFO]   epoch 006 step 2500/2860 | loss 0.4812 | lr backbone 9.96e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	113	[13:11:02] [INFO]   epoch 006 step 2860/2860 | loss 0.5100 | lr backbone 9.96e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	114	[13:12:22] [INFO] Epoch 006/100 | train 0.3673 | val raw 0.3375 AUC 0.9354 | EMA 0.3429 AUC 0.9311 | groups raw [findings 0.8164 COVID 0.9931 TB 0.9968] | monitored 0.9354 (raw) | lr 9.96e-04 | best 0.9354 @6 | 553s
+30737.5s	115	[13:12:22] [INFO]   epoch 007 step 1/2860 | loss 0.6191 | lr backbone 9.96e-05 / head 9.96e-04 | 1.7 it/s
+30737.5s	116	[13:13:45] [INFO]   epoch 007 step 500/2860 | loss 0.3692 | lr backbone 9.96e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	117	[13:15:08] [INFO]   epoch 007 step 1000/2860 | loss 0.4769 | lr backbone 9.95e-05 / head 9.95e-04 | 6.0 it/s
+30737.5s	118	[13:16:31] [INFO]   epoch 007 step 1500/2860 | loss 0.3071 | lr backbone 9.95e-05 / head 9.95e-04 | 6.0 it/s
+30737.5s	119	[13:17:53] [INFO]   epoch 007 step 2000/2860 | loss 0.3782 | lr backbone 9.94e-05 / head 9.94e-04 | 6.0 it/s
+30737.5s	120	[13:19:16] [INFO]   epoch 007 step 2500/2860 | loss 0.3386 | lr backbone 9.94e-05 / head 9.94e-04 | 6.0 it/s
+30737.5s	121	[13:20:15] [INFO]   epoch 007 step 2860/2860 | loss 0.2986 | lr backbone 9.94e-05 / head 9.94e-04 | 6.0 it/s
+30737.5s	122	[13:21:35] [INFO] Epoch 007/100 | train 0.3628 | val raw 0.3366 AUC 0.9373 | EMA 0.3391 AUC 0.9345 | groups raw [findings 0.8193 COVID 0.9942 TB 0.9985] | monitored 0.9373 (raw) | lr 9.94e-04 | best 0.9373 @7 | 553s
+30737.5s	123	[13:21:35] [INFO]   epoch 008 step 1/2860 | loss 0.4478 | lr backbone 9.94e-05 / head 9.94e-04 | 1.5 it/s
+30737.5s	124	[13:22:58] [INFO]   epoch 008 step 500/2860 | loss 0.3158 | lr backbone 9.93e-05 / head 9.93e-04 | 6.0 it/s
+30737.5s	125	[13:24:21] [INFO]   epoch 008 step 1000/2860 | loss 0.3382 | lr backbone 9.93e-05 / head 9.93e-04 | 6.0 it/s
+30737.5s	126	[13:25:43] [INFO]   epoch 008 step 1500/2860 | loss 0.2680 | lr backbone 9.92e-05 / head 9.92e-04 | 6.0 it/s
+30737.5s	127	[13:27:06] [INFO]   epoch 008 step 2000/2860 | loss 0.2767 | lr backbone 9.92e-05 / head 9.92e-04 | 6.0 it/s
+30737.5s	128	[13:28:29] [INFO]   epoch 008 step 2500/2860 | loss 0.4051 | lr backbone 9.91e-05 / head 9.91e-04 | 6.0 it/s
+30737.5s	129	[13:29:29] [INFO]   epoch 008 step 2860/2860 | loss 0.4229 | lr backbone 9.91e-05 / head 9.91e-04 | 6.0 it/s
+30737.5s	130	[13:30:48] [INFO] Epoch 008/100 | train 0.3598 | val raw 0.3361 AUC 0.9384 | EMA 0.3365 AUC 0.9368 | groups raw [findings 0.8214 COVID 0.9946 TB 0.9992] | monitored 0.9384 (raw) | lr 9.91e-04 | best 0.9384 @8 | 553s
+30737.5s	131	[13:30:48] [INFO]   epoch 009 step 1/2860 | loss 0.4114 | lr backbone 9.91e-05 / head 9.91e-04 | 1.7 it/s
+30737.5s	132	[13:32:11] [INFO]   epoch 009 step 500/2860 | loss 0.3308 | lr backbone 9.90e-05 / head 9.90e-04 | 6.0 it/s
+30737.5s	133	[13:33:34] [INFO]   epoch 009 step 1000/2860 | loss 0.3943 | lr backbone 9.90e-05 / head 9.90e-04 | 6.0 it/s
+30737.5s	134	[13:34:57] [INFO]   epoch 009 step 1500/2860 | loss 0.1989 | lr backbone 9.89e-05 / head 9.89e-04 | 6.0 it/s
+30737.5s	135	[13:36:20] [INFO]   epoch 009 step 2000/2860 | loss 0.3439 | lr backbone 9.89e-05 / head 9.89e-04 | 6.0 it/s
+30737.5s	136	[13:37:42] [INFO]   epoch 009 step 2500/2860 | loss 0.3741 | lr backbone 9.88e-05 / head 9.88e-04 | 6.0 it/s
+30737.5s	137	[13:38:42] [INFO]   epoch 009 step 2860/2860 | loss 0.4522 | lr backbone 9.88e-05 / head 9.87e-04 | 6.0 it/s
+30737.5s	138	[13:40:01] [INFO] Epoch 009/100 | train 0.3577 | val raw 0.3374 AUC 0.9361 | EMA 0.3331 AUC 0.9384 | groups raw [findings 0.8210 COVID 0.9888 TB 0.9985] | monitored 0.9384 (ema) | lr 9.87e-04 | best 0.9384 @9 | 553s
+30737.5s	139	[13:40:02] [INFO]   epoch 010 step 1/2860 | loss 0.3898 | lr backbone 9.88e-05 / head 9.87e-04 | 1.6 it/s
+30737.5s	140	[13:41:24] [INFO]   epoch 010 step 500/2860 | loss 0.4050 | lr backbone 9.87e-05 / head 9.87e-04 | 6.0 it/s
+30737.5s	141	[13:42:47] [INFO]   epoch 010 step 1000/2860 | loss 0.4188 | lr backbone 9.86e-05 / head 9.86e-04 | 6.0 it/s
+30737.5s	142	[13:44:10] [INFO]   epoch 010 step 1500/2860 | loss 0.2384 | lr backbone 9.86e-05 / head 9.86e-04 | 6.0 it/s
+30737.5s	143	[13:45:33] [INFO]   epoch 010 step 2000/2860 | loss 0.4327 | lr backbone 9.85e-05 / head 9.85e-04 | 6.0 it/s
+30737.5s	144	[13:46:56] [INFO]   epoch 010 step 2500/2860 | loss 0.3625 | lr backbone 9.84e-05 / head 9.84e-04 | 6.0 it/s
+30737.5s	145	[13:47:55] [INFO]   epoch 010 step 2860/2860 | loss 0.3395 | lr backbone 9.84e-05 / head 9.84e-04 | 6.0 it/s
+30737.5s	146	[13:49:15] [INFO] Epoch 010/100 | train 0.3547 | val raw 0.3299 AUC 0.9404 | EMA 0.3307 AUC 0.9395 | groups raw [findings 0.8260 COVID 0.9959 TB 0.9994] | monitored 0.9404 (raw) | lr 9.84e-04 | best 0.9404 @10 | 554s
+30737.5s	147	[13:49:15] [INFO]   epoch 011 step 1/2860 | loss 0.4022 | lr backbone 9.84e-05 / head 9.84e-04 | 1.5 it/s
+30737.5s	148	[13:50:38] [INFO]   epoch 011 step 500/2860 | loss 0.2890 | lr backbone 9.83e-05 / head 9.83e-04 | 6.0 it/s
+30737.5s	149	[13:52:01] [INFO]   epoch 011 step 1000/2860 | loss 0.2586 | lr backbone 9.82e-05 / head 9.82e-04 | 6.0 it/s
+30737.5s	150	[13:53:24] [INFO]   epoch 011 step 1500/2860 | loss 0.3219 | lr backbone 9.82e-05 / head 9.81e-04 | 6.0 it/s
+30737.5s	151	[13:54:46] [INFO]   epoch 011 step 2000/2860 | loss 0.3063 | lr backbone 9.81e-05 / head 9.81e-04 | 6.0 it/s
+30737.5s	152	[13:56:09] [INFO]   epoch 011 step 2500/2860 | loss 0.3471 | lr backbone 9.80e-05 / head 9.80e-04 | 6.0 it/s
+30737.5s	153	[13:57:09] [INFO]   epoch 011 step 2860/2860 | loss 0.4915 | lr backbone 9.80e-05 / head 9.79e-04 | 6.0 it/s
+30737.5s	154	[13:58:28] [INFO] Epoch 011/100 | train 0.3527 | val raw 0.3322 AUC 0.9398 | EMA 0.3289 AUC 0.9404 | groups raw [findings 0.8253 COVID 0.9962 TB 0.9980] | monitored 0.9404 (ema) | lr 9.79e-04 | best 0.9404 @11 | 554s
+30737.5s	155	[13:58:29] [INFO]   epoch 012 step 1/2860 | loss 0.2656 | lr backbone 9.80e-05 / head 9.79e-04 | 1.7 it/s
+30737.5s	156	[13:59:52] [INFO]   epoch 012 step 500/2860 | loss 0.2966 | lr backbone 9.79e-05 / head 9.79e-04 | 6.0 it/s
+30737.5s	157	[14:01:14] [INFO]   epoch 012 step 1000/2860 | loss 0.4096 | lr backbone 9.78e-05 / head 9.78e-04 | 6.0 it/s
+30737.5s	158	[14:02:37] [INFO]   epoch 012 step 1500/2860 | loss 0.3702 | lr backbone 9.77e-05 / head 9.77e-04 | 6.0 it/s
+30737.5s	159	[14:04:00] [INFO]   epoch 012 step 2000/2860 | loss 0.3580 | lr backbone 9.76e-05 / head 9.76e-04 | 6.0 it/s
+30737.5s	160	[14:05:23] [INFO]   epoch 012 step 2500/2860 | loss 0.4065 | lr backbone 9.75e-05 / head 9.75e-04 | 6.0 it/s
+30737.5s	161	[14:06:22] [INFO]   epoch 012 step 2860/2860 | loss 0.3561 | lr backbone 9.75e-05 / head 9.75e-04 | 6.0 it/s
+30737.5s	162	[14:07:42] [INFO] Epoch 012/100 | train 0.3506 | val raw 0.3280 AUC 0.9402 | EMA 0.3267 AUC 0.9412 | groups raw [findings 0.8250 COVID 0.9965 TB 0.9992] | monitored 0.9412 (ema) | lr 9.75e-04 | best 0.9412 @12 | 553s
+30737.5s	163	[14:07:42] [INFO]   epoch 013 step 1/2860 | loss 0.2568 | lr backbone 9.75e-05 / head 9.75e-04 | 1.6 it/s
+30737.5s	164	[14:09:05] [INFO]   epoch 013 step 500/2860 | loss 0.3095 | lr backbone 9.74e-05 / head 9.74e-04 | 6.0 it/s
+30737.5s	165	[14:10:28] [INFO]   epoch 013 step 1000/2860 | loss 0.2593 | lr backbone 9.73e-05 / head 9.73e-04 | 6.0 it/s
+30737.5s	166	[14:11:50] [INFO]   epoch 013 step 1500/2860 | loss 0.4561 | lr backbone 9.72e-05 / head 9.72e-04 | 6.0 it/s
+30737.5s	167	[14:13:13] [INFO]   epoch 013 step 2000/2860 | loss 0.3510 | lr backbone 9.71e-05 / head 9.71e-04 | 6.0 it/s
+30737.5s	168	[14:14:36] [INFO]   epoch 013 step 2500/2860 | loss 0.4127 | lr backbone 9.70e-05 / head 9.70e-04 | 6.0 it/s
+30737.5s	169	[14:15:36] [INFO]   epoch 013 step 2860/2860 | loss 0.3103 | lr backbone 9.70e-05 / head 9.69e-04 | 6.0 it/s
+30737.5s	170	[14:16:55] [INFO] Epoch 013/100 | train 0.3493 | val raw 0.3290 AUC 0.9406 | EMA 0.3253 AUC 0.9416 | groups raw [findings 0.8276 COVID 0.9960 TB 0.9981] | monitored 0.9416 (ema) | lr 9.69e-04 | best 0.9416 @13 | 554s
+30737.5s	171	[14:16:56] [INFO]   epoch 014 step 1/2860 | loss 0.3121 | lr backbone 9.70e-05 / head 9.69e-04 | 1.7 it/s
+30737.5s	172	[14:18:19] [INFO]   epoch 014 step 500/2860 | loss 0.3028 | lr backbone 9.69e-05 / head 9.68e-04 | 6.0 it/s
+30737.5s	173	[14:19:41] [INFO]   epoch 014 step 1000/2860 | loss 0.7766 | lr backbone 9.68e-05 / head 9.67e-04 | 6.0 it/s
+30737.5s	174	[14:21:04] [INFO]   epoch 014 step 1500/2860 | loss 0.3502 | lr backbone 9.67e-05 / head 9.66e-04 | 6.0 it/s
+30737.5s	175	[14:22:27] [INFO]   epoch 014 step 2000/2860 | loss 0.2713 | lr backbone 9.66e-05 / head 9.65e-04 | 6.0 it/s
+30737.5s	176	[14:23:50] [INFO]   epoch 014 step 2500/2860 | loss 0.4777 | lr backbone 9.65e-05 / head 9.64e-04 | 6.0 it/s
+30737.5s	177	[14:24:50] [INFO]   epoch 014 step 2860/2860 | loss 0.3147 | lr backbone 9.64e-05 / head 9.63e-04 | 6.0 it/s
+30737.5s	178	[14:26:09] [INFO] Epoch 014/100 | train 0.3468 | val raw 0.3296 AUC 0.9420 | EMA 0.3235 AUC 0.9422 | groups raw [findings 0.8299 COVID 0.9977 TB 0.9983] | monitored 0.9422 (ema) | lr 9.63e-04 | best 0.9422 @14 | 554s
+30737.5s	179	[14:26:09] [INFO]   epoch 015 step 1/2860 | loss 0.4119 | lr backbone 9.64e-05 / head 9.63e-04 | 1.7 it/s
+30737.5s	180	[14:27:32] [INFO]   epoch 015 step 500/2860 | loss 0.3129 | lr backbone 9.63e-05 / head 9.62e-04 | 6.0 it/s
+30737.5s	181	[14:28:55] [INFO]   epoch 015 step 1000/2860 | loss 0.4737 | lr backbone 9.62e-05 / head 9.61e-04 | 6.0 it/s
+30737.5s	182	[14:30:18] [INFO]   epoch 015 step 1500/2860 | loss 0.2376 | lr backbone 9.61e-05 / head 9.60e-04 | 6.0 it/s
+30737.5s	183	[14:31:41] [INFO]   epoch 015 step 2000/2860 | loss 0.4209 | lr backbone 9.60e-05 / head 9.59e-04 | 6.0 it/s
+30737.5s	184	[14:33:04] [INFO]   epoch 015 step 2500/2860 | loss 0.3068 | lr backbone 9.58e-05 / head 9.58e-04 | 6.0 it/s
+30737.5s	185	[14:34:04] [INFO]   epoch 015 step 2860/2860 | loss 0.3452 | lr backbone 9.58e-05 / head 9.57e-04 | 6.0 it/s
+30737.5s	186	[14:35:23] [INFO] Epoch 015/100 | train 0.3457 | val raw 0.3247 AUC 0.9416 | EMA 0.3225 AUC 0.9427 | groups raw [findings 0.8281 COVID 0.9969 TB 0.9997] | monitored 0.9427 (ema) | lr 9.57e-04 | best 0.9427 @15 | 554s
+30737.5s	187	[14:35:23] [INFO]   epoch 016 step 1/2860 | loss 0.2465 | lr backbone 9.58e-05 / head 9.57e-04 | 1.8 it/s
+30737.5s	188	[14:36:46] [INFO]   epoch 016 step 500/2860 | loss 0.3594 | lr backbone 9.57e-05 / head 9.56e-04 | 6.0 it/s
+30737.5s	189	[14:38:09] [INFO]   epoch 016 step 1000/2860 | loss 0.4468 | lr backbone 9.55e-05 / head 9.55e-04 | 6.0 it/s
+30737.5s	190	[14:39:32] [INFO]   epoch 016 step 1500/2860 | loss 0.2838 | lr backbone 9.54e-05 / head 9.54e-04 | 6.0 it/s
+30737.5s	191	[14:40:55] [INFO]   epoch 016 step 2000/2860 | loss 0.4206 | lr backbone 9.53e-05 / head 9.53e-04 | 6.0 it/s
+30737.5s	192	[14:42:18] [INFO]   epoch 016 step 2500/2860 | loss 0.4925 | lr backbone 9.52e-05 / head 9.51e-04 | 6.0 it/s
+30737.5s	193	[14:43:17] [INFO]   epoch 016 step 2860/2860 | loss 0.2311 | lr backbone 9.51e-05 / head 9.51e-04 | 6.0 it/s
+30737.5s	194	[14:44:36] [INFO] Epoch 016/100 | train 0.3440 | val raw 0.3265 AUC 0.9422 | EMA 0.3218 AUC 0.9428 | groups raw [findings 0.8299 COVID 0.9973 TB 0.9995] | monitored 0.9428 (ema) | lr 9.51e-04 | best 0.9428 @16 | 554s
+30737.5s	195	[14:44:37] [INFO]   epoch 017 step 1/2860 | loss 0.4298 | lr backbone 9.51e-05 / head 9.51e-04 | 1.6 it/s
+30737.5s	196	[14:46:00] [INFO]   epoch 017 step 500/2860 | loss 0.2676 | lr backbone 9.50e-05 / head 9.49e-04 | 6.0 it/s
+30737.5s	197	[14:47:23] [INFO]   epoch 017 step 1000/2860 | loss 0.4772 | lr backbone 9.49e-05 / head 9.48e-04 | 6.0 it/s
+30737.5s	198	[14:48:46] [INFO]   epoch 017 step 1500/2860 | loss 0.2775 | lr backbone 9.47e-05 / head 9.47e-04 | 6.0 it/s
+30737.5s	199	[14:50:09] [INFO]   epoch 017 step 2000/2860 | loss 0.3119 | lr backbone 9.46e-05 / head 9.46e-04 | 6.0 it/s
+30737.5s	200	[14:51:32] [INFO]   epoch 017 step 2500/2860 | loss 0.2701 | lr backbone 9.45e-05 / head 9.44e-04 | 6.0 it/s
+30737.5s	201	[14:52:32] [INFO]   epoch 017 step 2860/2860 | loss 0.3624 | lr backbone 9.44e-05 / head 9.43e-04 | 6.0 it/s
+30737.5s	202	[14:53:51] [INFO] Epoch 017/100 | train 0.3420 | val raw 0.3257 AUC 0.9416 | EMA 0.3213 AUC 0.9429 | groups raw [findings 0.8287 COVID 0.9973 TB 0.9989] | monitored 0.9429 (ema) | lr 9.43e-04 | best 0.9429 @17 | 554s
+30737.5s	203	[14:53:51] [INFO]   epoch 018 step 1/2860 | loss 0.2747 | lr backbone 9.44e-05 / head 9.43e-04 | 1.6 it/s
+30737.5s	204	[14:55:14] [INFO]   epoch 018 step 500/2860 | loss 0.2949 | lr backbone 9.43e-05 / head 9.42e-04 | 6.0 it/s
+30737.5s	205	[14:56:37] [INFO]   epoch 018 step 1000/2860 | loss 0.3778 | lr backbone 9.41e-05 / head 9.41e-04 | 6.0 it/s
+30737.5s	206	[14:58:00] [INFO]   epoch 018 step 1500/2860 | loss 0.2531 | lr backbone 9.40e-05 / head 9.39e-04 | 6.0 it/s
+30737.5s	207	[14:59:23] [INFO]   epoch 018 step 2000/2860 | loss 0.3792 | lr backbone 9.39e-05 / head 9.38e-04 | 6.0 it/s
+30737.5s	208	[15:00:46] [INFO]   epoch 018 step 2500/2860 | loss 0.2873 | lr backbone 9.37e-05 / head 9.37e-04 | 6.0 it/s
+30737.5s	209	[15:01:46] [INFO]   epoch 018 step 2860/2860 | loss 0.4169 | lr backbone 9.36e-05 / head 9.36e-04 | 6.0 it/s
+30737.5s	210	[15:03:05] [INFO] Epoch 018/100 | train 0.3408 | val raw 0.3290 AUC 0.9419 | EMA 0.3203 AUC 0.9431 | groups raw [findings 0.8294 COVID 0.9980 TB 0.9983] | monitored 0.9431 (ema) | lr 9.36e-04 | best 0.9431 @18 | 554s
+30737.5s	211	[15:03:06] [INFO]   epoch 019 step 1/2860 | loss 0.2222 | lr backbone 9.36e-05 / head 9.36e-04 | 1.6 it/s
+30737.5s	212	[15:04:28] [INFO]   epoch 019 step 500/2860 | loss 0.2695 | lr backbone 9.35e-05 / head 9.34e-04 | 6.0 it/s
+30737.5s	213	[15:05:51] [INFO]   epoch 019 step 1000/2860 | loss 0.3684 | lr backbone 9.34e-05 / head 9.33e-04 | 6.0 it/s
+30737.5s	214	[15:07:14] [INFO]   epoch 019 step 1500/2860 | loss 0.3552 | lr backbone 9.32e-05 / head 9.32e-04 | 6.0 it/s
+30737.5s	215	[15:08:37] [INFO]   epoch 019 step 2000/2860 | loss 0.2110 | lr backbone 9.31e-05 / head 9.30e-04 | 6.0 it/s
+30737.5s	216	[15:10:00] [INFO]   epoch 019 step 2500/2860 | loss 0.2390 | lr backbone 9.29e-05 / head 9.29e-04 | 6.0 it/s
+30737.5s	217	[15:11:00] [INFO]   epoch 019 step 2860/2860 | loss 0.3548 | lr backbone 9.28e-05 / head 9.28e-04 | 6.0 it/s
+30737.5s	218	[15:12:19] [INFO] Epoch 019/100 | train 0.3390 | val raw 0.3270 AUC 0.9416 | EMA 0.3197 AUC 0.9433 | groups raw [findings 0.8285 COVID 0.9967 TB 0.9996] | monitored 0.9433 (ema) | lr 9.28e-04 | best 0.9433 @19 | 554s
+30737.5s	219	[15:12:20] [INFO]   epoch 020 step 1/2860 | loss 0.2494 | lr backbone 9.28e-05 / head 9.28e-04 | 1.5 it/s
+30737.5s	220	[15:13:43] [INFO]   epoch 020 step 500/2860 | loss 0.4000 | lr backbone 9.27e-05 / head 9.26e-04 | 6.0 it/s
+30737.5s	221	[15:15:06] [INFO]   epoch 020 step 1000/2860 | loss 0.4375 | lr backbone 9.25e-05 / head 9.25e-04 | 6.0 it/s
+30737.5s	222	[15:16:29] [INFO]   epoch 020 step 1500/2860 | loss 0.2957 | lr backbone 9.24e-05 / head 9.23e-04 | 6.0 it/s
+30737.5s	223	[15:17:52] [INFO]   epoch 020 step 2000/2860 | loss 0.3852 | lr backbone 9.22e-05 / head 9.22e-04 | 6.0 it/s
+30737.5s	224	[15:19:15] [INFO]   epoch 020 step 2500/2860 | loss 0.2927 | lr backbone 9.21e-05 / head 9.20e-04 | 6.0 it/s
+30737.5s	225	[15:20:15] [INFO]   epoch 020 step 2860/2860 | loss 0.3809 | lr backbone 9.20e-05 / head 9.19e-04 | 6.0 it/s
+30737.5s	226	[15:21:34] [INFO] Epoch 020/100 | train 0.3376 | val raw 0.3267 AUC 0.9416 | EMA 0.3192 AUC 0.9435 | groups raw [findings 0.8293 COVID 0.9977 TB 0.9979] | monitored 0.9435 (ema) | lr 9.19e-04 | best 0.9435 @20 | 555s
+30737.5s	227	[15:21:35] [INFO]   epoch 021 step 1/2860 | loss 0.3907 | lr backbone 9.20e-05 / head 9.19e-04 | 1.7 it/s
+30737.5s	228	[15:22:58] [INFO]   epoch 021 step 500/2860 | loss 0.2556 | lr backbone 9.18e-05 / head 9.18e-04 | 6.0 it/s
+30737.5s	229	[15:24:21] [INFO]   epoch 021 step 1000/2860 | loss 0.2977 | lr backbone 9.17e-05 / head 9.16e-04 | 6.0 it/s
+30737.5s	230	[15:25:44] [INFO]   epoch 021 step 1500/2860 | loss 0.4129 | lr backbone 9.15e-05 / head 9.14e-04 | 6.0 it/s
+30737.5s	231	[15:27:07] [INFO]   epoch 021 step 2000/2860 | loss 0.2704 | lr backbone 9.14e-05 / head 9.13e-04 | 6.0 it/s
+30737.5s	232	[15:28:30] [INFO]   epoch 021 step 2500/2860 | loss 0.2474 | lr backbone 9.12e-05 / head 9.11e-04 | 6.0 it/s
+30737.5s	233	[15:29:29] [INFO]   epoch 021 step 2860/2860 | loss 0.2697 | lr backbone 9.11e-05 / head 9.10e-04 | 6.0 it/s
+30737.5s	234	[15:30:49] [INFO] Epoch 021/100 | train 0.3363 | val raw 0.3209 AUC 0.9424 | EMA 0.3199 AUC 0.9435 | groups raw [findings 0.8300 COVID 0.9974 TB 0.9996] | monitored 0.9435 (ema) | lr 9.10e-04 | best 0.9435 @20 | 555s
+30737.5s	235	[15:30:49] [INFO]   epoch 022 step 1/2860 | loss 0.3191 | lr backbone 9.11e-05 / head 9.10e-04 | 1.5 it/s
+30737.5s	236	[15:32:12] [INFO]   epoch 022 step 500/2860 | loss 0.4143 | lr backbone 9.09e-05 / head 9.09e-04 | 6.0 it/s
+30737.5s	237	[15:33:35] [INFO]   epoch 022 step 1000/2860 | loss 0.2837 | lr backbone 9.08e-05 / head 9.07e-04 | 6.0 it/s
+30737.5s	238	[15:34:58] [INFO]   epoch 022 step 1500/2860 | loss 0.2695 | lr backbone 9.06e-05 / head 9.05e-04 | 6.0 it/s
+30737.5s	239	[15:36:21] [INFO]   epoch 022 step 2000/2860 | loss 0.2569 | lr backbone 9.05e-05 / head 9.04e-04 | 6.0 it/s
+30737.5s	240	[15:37:44] [INFO]   epoch 022 step 2500/2860 | loss 0.3315 | lr backbone 9.03e-05 / head 9.02e-04 | 6.0 it/s
+30737.5s	241	[15:38:43] [INFO]   epoch 022 step 2860/2860 | loss 0.3115 | lr backbone 9.02e-05 / head 9.01e-04 | 6.0 it/s
+30737.5s	242	[15:40:02] [INFO] Epoch 022/100 | train 0.3350 | val raw 0.3266 AUC 0.9415 | EMA 0.3193 AUC 0.9437 | groups raw [findings 0.8299 COVID 0.9979 TB 0.9969] | monitored 0.9437 (ema) | lr 9.01e-04 | best 0.9437 @22 | 554s
+30737.5s	243	[15:40:03] [INFO]   epoch 023 step 1/2860 | loss 0.3257 | lr backbone 9.02e-05 / head 9.01e-04 | 1.5 it/s
+30737.5s	244	[15:41:26] [INFO]   epoch 023 step 500/2860 | loss 0.3220 | lr backbone 9.00e-05 / head 8.99e-04 | 6.0 it/s
+30737.5s	245	[15:42:49] [INFO]   epoch 023 step 1000/2860 | loss 0.4145 | lr backbone 8.98e-05 / head 8.97e-04 | 6.0 it/s
+30737.5s	246	[15:44:12] [INFO]   epoch 023 step 1500/2860 | loss 0.2872 | lr backbone 8.97e-05 / head 8.96e-04 | 6.0 it/s
+30737.5s	247	[15:45:35] [INFO]   epoch 023 step 2000/2860 | loss 0.3276 | lr backbone 8.95e-05 / head 8.94e-04 | 6.0 it/s
+30737.5s	248	[15:46:58] [INFO]   epoch 023 step 2500/2860 | loss 0.2736 | lr backbone 8.93e-05 / head 8.92e-04 | 6.0 it/s
+30737.5s	249	[15:47:57] [INFO]   epoch 023 step 2860/2860 | loss 0.3381 | lr backbone 8.92e-05 / head 8.91e-04 | 6.0 it/s
+30737.5s	250	[15:49:17] [INFO] Epoch 023/100 | train 0.3335 | val raw 0.3240 AUC 0.9431 | EMA 0.3191 AUC 0.9439 | groups raw [findings 0.8319 COVID 0.9981 TB 0.9992] | monitored 0.9439 (ema) | lr 8.91e-04 | best 0.9439 @23 | 554s
+30737.5s	251	[15:49:17] [INFO]   epoch 024 step 1/2860 | loss 0.2914 | lr backbone 8.92e-05 / head 8.91e-04 | 1.6 it/s
+30737.5s	252	[15:50:40] [INFO]   epoch 024 step 500/2860 | loss 0.3695 | lr backbone 8.90e-05 / head 8.89e-04 | 6.0 it/s
+30737.5s	253	[15:52:03] [INFO]   epoch 024 step 1000/2860 | loss 0.3811 | lr backbone 8.89e-05 / head 8.88e-04 | 6.0 it/s
+30737.5s	254	[15:53:26] [INFO]   epoch 024 step 1500/2860 | loss 0.2665 | lr backbone 8.87e-05 / head 8.86e-04 | 6.0 it/s
+30737.5s	255	[15:54:49] [INFO]   epoch 024 step 2000/2860 | loss 0.3405 | lr backbone 8.85e-05 / head 8.84e-04 | 6.0 it/s
+30737.5s	256	[15:56:12] [INFO]   epoch 024 step 2500/2860 | loss 0.4543 | lr backbone 8.83e-05 / head 8.82e-04 | 6.0 it/s
+30737.5s	257	[15:57:12] [INFO]   epoch 024 step 2860/2860 | loss 0.3650 | lr backbone 8.82e-05 / head 8.81e-04 | 6.0 it/s
+30737.5s	258	[15:58:31] [INFO] Epoch 024/100 | train 0.3316 | val raw 0.3240 AUC 0.9438 | EMA 0.3180 AUC 0.9443 | groups raw [findings 0.8331 COVID 0.9986 TB 0.9997] | monitored 0.9443 (ema) | lr 8.81e-04 | best 0.9443 @24 | 554s
+30737.5s	259	[15:58:31] [INFO]   epoch 025 step 1/2860 | loss 0.2362 | lr backbone 8.82e-05 / head 8.81e-04 | 1.8 it/s
+30737.5s	260	[15:59:54] [INFO]   epoch 025 step 500/2860 | loss 0.4133 | lr backbone 8.80e-05 / head 8.79e-04 | 6.0 it/s
+30737.5s	261	[16:01:17] [INFO]   epoch 025 step 1000/2860 | loss 0.3079 | lr backbone 8.78e-05 / head 8.77e-04 | 6.0 it/s
+30737.5s	262	[16:02:40] [INFO]   epoch 025 step 1500/2860 | loss 0.3092 | lr backbone 8.76e-05 / head 8.75e-04 | 6.0 it/s
+30737.5s	263	[16:04:03] [INFO]   epoch 025 step 2000/2860 | loss 0.3172 | lr backbone 8.75e-05 / head 8.73e-04 | 6.0 it/s
+30737.5s	264	[16:05:26] [INFO]   epoch 025 step 2500/2860 | loss 0.2610 | lr backbone 8.73e-05 / head 8.72e-04 | 6.0 it/s
+30737.5s	265	[16:06:25] [INFO]   epoch 025 step 2860/2860 | loss 0.2772 | lr backbone 8.71e-05 / head 8.70e-04 | 6.0 it/s
+30737.5s	266	[16:07:45] [INFO] Epoch 025/100 | train 0.3309 | val raw 0.3197 AUC 0.9437 | EMA 0.3177 AUC 0.9445 | groups raw [findings 0.8335 COVID 0.9986 TB 0.9991] | monitored 0.9445 (ema) | lr 8.70e-04 | best 0.9445 @25 | 554s
+30737.5s	267	[16:07:46] [INFO]   epoch 026 step 1/2860 | loss 0.2902 | lr backbone 8.71e-05 / head 8.70e-04 | 1.5 it/s
+30737.5s	268	[16:09:08] [INFO]   epoch 026 step 500/2860 | loss 0.3985 | lr backbone 8.70e-05 / head 8.68e-04 | 6.0 it/s
+30737.5s	269	[16:10:31] [INFO]   epoch 026 step 1000/2860 | loss 0.2800 | lr backbone 8.68e-05 / head 8.66e-04 | 6.0 it/s
+30737.5s	270	[16:11:54] [INFO]   epoch 026 step 1500/2860 | loss 0.2534 | lr backbone 8.66e-05 / head 8.65e-04 | 6.0 it/s
+30737.5s	271	[16:13:17] [INFO]   epoch 026 step 2000/2860 | loss 0.3362 | lr backbone 8.64e-05 / head 8.63e-04 | 6.0 it/s
+30737.5s	272	[16:14:40] [INFO]   epoch 026 step 2500/2860 | loss 0.3601 | lr backbone 8.62e-05 / head 8.61e-04 | 6.0 it/s
+30737.5s	273	[16:15:39] [INFO]   epoch 026 step 2860/2860 | loss 0.4533 | lr backbone 8.61e-05 / head 8.59e-04 | 6.0 it/s
+30737.5s	274	[16:16:58] [INFO] Epoch 026/100 | train 0.3300 | val raw 0.3194 AUC 0.9436 | EMA 0.3179 AUC 0.9446 | groups raw [findings 0.8339 COVID 0.9978 TB 0.9991] | monitored 0.9446 (ema) | lr 8.59e-04 | best 0.9446 @26 | 554s
+30737.5s	275	[16:16:59] [INFO]   epoch 027 step 1/2860 | loss 0.3984 | lr backbone 8.61e-05 / head 8.59e-04 | 1.6 it/s
+30737.5s	276	[16:18:22] [INFO]   epoch 027 step 500/2860 | loss 0.3064 | lr backbone 8.59e-05 / head 8.57e-04 | 6.0 it/s
+30737.5s	277	[16:19:45] [INFO]   epoch 027 step 1000/2860 | loss 0.2804 | lr backbone 8.57e-05 / head 8.55e-04 | 6.0 it/s
+30737.5s	278	[16:21:08] [INFO]   epoch 027 step 1500/2860 | loss 0.4398 | lr backbone 8.55e-05 / head 8.53e-04 | 6.0 it/s
+30737.5s	279	[16:22:30] [INFO]   epoch 027 step 2000/2860 | loss 0.3767 | lr backbone 8.53e-05 / head 8.51e-04 | 6.0 it/s
+30737.5s	280	[16:23:53] [INFO]   epoch 027 step 2500/2860 | loss 0.2768 | lr backbone 8.51e-05 / head 8.49e-04 | 6.0 it/s
+30737.5s	281	[16:24:53] [INFO]   epoch 027 step 2860/2860 | loss 0.3242 | lr backbone 8.49e-05 / head 8.48e-04 | 6.0 it/s
+30737.5s	282	[16:26:12] [INFO] Epoch 027/100 | train 0.3279 | val raw 0.3237 AUC 0.9432 | EMA 0.3179 AUC 0.9446 | groups raw [findings 0.8325 COVID 0.9974 TB 0.9996] | monitored 0.9446 (ema) | lr 8.48e-04 | best 0.9446 @27 | 554s
+30737.5s	283	[16:26:13] [INFO]   epoch 028 step 1/2860 | loss 0.4565 | lr backbone 8.49e-05 / head 8.48e-04 | 1.6 it/s
+30737.5s	284	[16:27:36] [INFO]   epoch 028 step 500/2860 | loss 0.4221 | lr backbone 8.47e-05 / head 8.46e-04 | 6.0 it/s
+30737.5s	285	[16:28:59] [INFO]   epoch 028 step 1000/2860 | loss 0.2699 | lr backbone 8.45e-05 / head 8.44e-04 | 6.0 it/s
+30737.5s	286	[16:30:21] [INFO]   epoch 028 step 1500/2860 | loss 0.3688 | lr backbone 8.43e-05 / head 8.42e-04 | 6.0 it/s
+30737.5s	287	[16:31:44] [INFO]   epoch 028 step 2000/2860 | loss 0.4542 | lr backbone 8.41e-05 / head 8.40e-04 | 6.0 it/s
+30737.5s	288	[16:33:07] [INFO]   epoch 028 step 2500/2860 | loss 0.3244 | lr backbone 8.39e-05 / head 8.38e-04 | 6.0 it/s
+30737.5s	289	[16:34:07] [INFO]   epoch 028 step 2860/2860 | loss 0.2159 | lr backbone 8.38e-05 / head 8.36e-04 | 6.0 it/s
+30737.5s	290	[16:35:26] [INFO] Epoch 028/100 | train 0.3273 | val raw 0.3213 AUC 0.9436 | EMA 0.3176 AUC 0.9446 | groups raw [findings 0.8334 COVID 0.9980 TB 0.9993] | monitored 0.9446 (ema) | lr 8.36e-04 | best 0.9446 @27 | 554s
+30737.5s	291	[16:35:27] [INFO]   epoch 029 step 1/2860 | loss 0.3785 | lr backbone 8.38e-05 / head 8.36e-04 | 1.6 it/s
+30737.5s	292	[16:36:49] [INFO]   epoch 029 step 500/2860 | loss 0.2726 | lr backbone 8.36e-05 / head 8.34e-04 | 6.0 it/s
+30737.5s	293	[16:38:12] [INFO]   epoch 029 step 1000/2860 | loss 0.2875 | lr backbone 8.34e-05 / head 8.32e-04 | 6.0 it/s
+30737.5s	294	[16:39:35] [INFO]   epoch 029 step 1500/2860 | loss 0.2607 | lr backbone 8.32e-05 / head 8.30e-04 | 6.0 it/s
+30737.5s	295	[16:40:58] [INFO]   epoch 029 step 2000/2860 | loss 0.2729 | lr backbone 8.29e-05 / head 8.28e-04 | 6.0 it/s
+30737.5s	296	[16:42:21] [INFO]   epoch 029 step 2500/2860 | loss 0.3240 | lr backbone 8.27e-05 / head 8.26e-04 | 6.0 it/s
+30737.5s	297	[16:43:20] [INFO]   epoch 029 step 2860/2860 | loss 0.3033 | lr backbone 8.26e-05 / head 8.24e-04 | 6.0 it/s
+30737.5s	298	[16:44:39] [INFO] Epoch 029/100 | train 0.3257 | val raw 0.3184 AUC 0.9438 | EMA 0.3175 AUC 0.9446 | groups raw [findings 0.8331 COVID 0.9988 TB 0.9995] | monitored 0.9446 (ema) | lr 8.24e-04 | best 0.9446 @27 | 553s
+30737.5s	299	[16:44:40] [INFO]   epoch 030 step 1/2860 | loss 0.3051 | lr backbone 8.26e-05 / head 8.24e-04 | 1.7 it/s
+30737.5s	300	[16:46:03] [INFO]   epoch 030 step 500/2860 | loss 0.4606 | lr backbone 8.24e-05 / head 8.22e-04 | 6.0 it/s
+30737.5s	301	[16:47:26] [INFO]   epoch 030 step 1000/2860 | loss 0.2695 | lr backbone 8.22e-05 / head 8.20e-04 | 6.0 it/s
+30737.5s	302	[16:48:48] [INFO]   epoch 030 step 1500/2860 | loss 0.2311 | lr backbone 8.19e-05 / head 8.18e-04 | 6.0 it/s
+30737.5s	303	[16:50:11] [INFO]   epoch 030 step 2000/2860 | loss 0.5351 | lr backbone 8.17e-05 / head 8.16e-04 | 6.0 it/s
+30737.5s	304	[16:51:34] [INFO]   epoch 030 step 2500/2860 | loss 0.2883 | lr backbone 8.15e-05 / head 8.14e-04 | 6.0 it/s
+30737.5s	305	[16:52:34] [INFO]   epoch 030 step 2860/2860 | loss 0.3679 | lr backbone 8.14e-05 / head 8.12e-04 | 6.0 it/s
+30737.5s	306	[16:53:53] [INFO] Epoch 030/100 | train 0.3253 | val raw 0.3209 AUC 0.9443 | EMA 0.3174 AUC 0.9447 | groups raw [findings 0.8345 COVID 0.9989 TB 0.9996] | monitored 0.9447 (ema) | lr 8.12e-04 | best 0.9447 @30 | 554s
+30737.5s	307	[16:53:54] [INFO]   epoch 031 step 1/2860 | loss 0.4192 | lr backbone 8.14e-05 / head 8.12e-04 | 1.6 it/s
+30737.5s	308	[16:55:16] [INFO]   epoch 031 step 500/2860 | loss 0.4071 | lr backbone 8.11e-05 / head 8.10e-04 | 6.0 it/s
+30737.5s	309	[16:56:39] [INFO]   epoch 031 step 1000/2860 | loss 0.3198 | lr backbone 8.09e-05 / head 8.08e-04 | 6.0 it/s
+30737.5s	310	[16:58:02] [INFO]   epoch 031 step 1500/2860 | loss 0.4036 | lr backbone 8.07e-05 / head 8.05e-04 | 6.0 it/s
+30737.5s	311	[16:59:25] [INFO]   epoch 031 step 2000/2860 | loss 0.2886 | lr backbone 8.05e-05 / head 8.03e-04 | 6.0 it/s
+30737.5s	312	[17:00:48] [INFO]   epoch 031 step 2500/2860 | loss 0.2109 | lr backbone 8.03e-05 / head 8.01e-04 | 6.0 it/s
+30737.5s	313	[17:01:48] [INFO]   epoch 031 step 2860/2860 | loss 0.2424 | lr backbone 8.01e-05 / head 7.99e-04 | 6.0 it/s
+30737.5s	314	[17:03:07] [INFO] Epoch 031/100 | train 0.3240 | val raw 0.3215 AUC 0.9432 | EMA 0.3165 AUC 0.9449 | groups raw [findings 0.8314 COVID 0.9986 TB 0.9995] | monitored 0.9449 (ema) | lr 7.99e-04 | best 0.9449 @31 | 554s
+30737.5s	315	[17:03:07] [INFO]   epoch 032 step 1/2860 | loss 0.2765 | lr backbone 8.01e-05 / head 7.99e-04 | 1.7 it/s
+30737.5s	316	[17:04:30] [INFO]   epoch 032 step 500/2860 | loss 0.2103 | lr backbone 7.99e-05 / head 7.97e-04 | 6.0 it/s
+30737.5s	317	[17:05:53] [INFO]   epoch 032 step 1000/2860 | loss 0.3457 | lr backbone 7.97e-05 / head 7.95e-04 | 6.0 it/s
+30737.5s	318	[17:07:16] [INFO]   epoch 032 step 1500/2860 | loss 0.3258 | lr backbone 7.94e-05 / head 7.92e-04 | 6.0 it/s
+30737.5s	319	[17:08:39] [INFO]   epoch 032 step 2000/2860 | loss 0.3599 | lr backbone 7.92e-05 / head 7.90e-04 | 6.0 it/s
+30737.5s	320	[17:10:02] [INFO]   epoch 032 step 2500/2860 | loss 0.1939 | lr backbone 7.90e-05 / head 7.88e-04 | 6.0 it/s
+30737.5s	321	[17:11:01] [INFO]   epoch 032 step 2860/2860 | loss 0.2576 | lr backbone 7.88e-05 / head 7.86e-04 | 6.0 it/s
+30737.5s	322	[17:12:20] [INFO] Epoch 032/100 | train 0.3233 | val raw 0.3250 AUC 0.9434 | EMA 0.3163 AUC 0.9449 | groups raw [findings 0.8336 COVID 0.9973 TB 0.9993] | monitored 0.9449 (ema) | lr 7.86e-04 | best 0.9449 @32 | 554s
+30737.5s	323	[17:12:21] [INFO]   epoch 033 step 1/2860 | loss 0.3942 | lr backbone 7.88e-05 / head 7.86e-04 | 1.5 it/s
+30737.5s	324	[17:13:44] [INFO]   epoch 033 step 500/2860 | loss 0.2924 | lr backbone 7.86e-05 / head 7.84e-04 | 6.0 it/s
+30737.5s	325	[17:15:07] [INFO]   epoch 033 step 1000/2860 | loss 0.3085 | lr backbone 7.84e-05 / head 7.82e-04 | 6.0 it/s
+30737.5s	326	[17:16:30] [INFO]   epoch 033 step 1500/2860 | loss 0.2573 | lr backbone 7.81e-05 / head 7.79e-04 | 6.0 it/s
+30737.5s	327	[17:17:53] [INFO]   epoch 033 step 2000/2860 | loss 0.2573 | lr backbone 7.79e-05 / head 7.77e-04 | 6.0 it/s
+30737.5s	328	[17:19:16] [INFO]   epoch 033 step 2500/2860 | loss 0.3553 | lr backbone 7.77e-05 / head 7.75e-04 | 6.0 it/s
+30737.5s	329	[17:20:15] [INFO]   epoch 033 step 2860/2860 | loss 0.4248 | lr backbone 7.75e-05 / head 7.73e-04 | 6.0 it/s
+30737.5s	330	[17:21:34] [INFO] Epoch 033/100 | train 0.3214 | val raw 0.3220 AUC 0.9440 | EMA 0.3166 AUC 0.9449 | groups raw [findings 0.8348 COVID 0.9981 TB 0.9992] | monitored 0.9449 (ema) | lr 7.73e-04 | best 0.9449 @32 | 554s
+30737.5s	331	[17:21:35] [INFO]   epoch 034 step 1/2860 | loss 0.2712 | lr backbone 7.75e-05 / head 7.73e-04 | 1.6 it/s
+30737.5s	332	[17:22:58] [INFO]   epoch 034 step 500/2860 | loss 0.2937 | lr backbone 7.73e-05 / head 7.71e-04 | 6.0 it/s
+30737.5s	333	[17:24:21] [INFO]   epoch 034 step 1000/2860 | loss 0.5762 | lr backbone 7.70e-05 / head 7.68e-04 | 6.0 it/s
+30737.5s	334	[17:25:44] [INFO]   epoch 034 step 1500/2860 | loss 0.3380 | lr backbone 7.68e-05 / head 7.66e-04 | 6.0 it/s
+30737.5s	335	[17:27:07] [INFO]   epoch 034 step 2000/2860 | loss 0.2181 | lr backbone 7.66e-05 / head 7.64e-04 | 6.0 it/s
+30737.5s	336	[17:28:29] [INFO]   epoch 034 step 2500/2860 | loss 0.3889 | lr backbone 7.63e-05 / head 7.61e-04 | 6.0 it/s
+30737.5s	337	[17:29:29] [INFO]   epoch 034 step 2860/2860 | loss 0.2809 | lr backbone 7.62e-05 / head 7.59e-04 | 6.0 it/s
+30737.5s	338	[17:30:48] [INFO] Epoch 034/100 | train 0.3214 | val raw 0.3221 AUC 0.9428 | EMA 0.3171 AUC 0.9449 | groups raw [findings 0.8312 COVID 0.9982 TB 0.9989] | monitored 0.9449 (ema) | lr 7.59e-04 | best 0.9449 @32 | 554s
+30737.5s	339	[17:30:49] [INFO]   epoch 035 step 1/2860 | loss 0.3479 | lr backbone 7.62e-05 / head 7.59e-04 | 1.6 it/s
+30737.5s	340	[17:32:12] [INFO]   epoch 035 step 500/2860 | loss 0.3649 | lr backbone 7.59e-05 / head 7.57e-04 | 6.0 it/s
+30737.5s	341	[17:33:35] [INFO]   epoch 035 step 1000/2860 | loss 0.2419 | lr backbone 7.57e-05 / head 7.55e-04 | 6.0 it/s
+30737.5s	342	[17:34:58] [INFO]   epoch 035 step 1500/2860 | loss 0.3933 | lr backbone 7.54e-05 / head 7.52e-04 | 6.0 it/s
+30737.5s	343	[17:36:21] [INFO]   epoch 035 step 2000/2860 | loss 0.3476 | lr backbone 7.52e-05 / head 7.50e-04 | 6.0 it/s
+30737.5s	344	[17:37:43] [INFO]   epoch 035 step 2500/2860 | loss 0.2966 | lr backbone 7.50e-05 / head 7.47e-04 | 6.0 it/s
+30737.5s	345	[17:38:43] [INFO]   epoch 035 step 2860/2860 | loss 0.3101 | lr backbone 7.48e-05 / head 7.46e-04 | 6.0 it/s
+30737.5s	346	[17:40:02] [INFO] Epoch 035/100 | train 0.3195 | val raw 0.3258 AUC 0.9434 | EMA 0.3179 AUC 0.9448 | groups raw [findings 0.8316 COVID 0.9988 TB 0.9997] | monitored 0.9448 (ema) | lr 7.46e-04 | best 0.9449 @32 | 554s
+30737.5s	347	[17:40:03] [INFO]   epoch 036 step 1/2860 | loss 0.4425 | lr backbone 7.48e-05 / head 7.46e-04 | 1.6 it/s
+30737.5s	348	[17:41:26] [INFO]   epoch 036 step 500/2860 | loss 0.3105 | lr backbone 7.45e-05 / head 7.43e-04 | 6.0 it/s
+30737.5s	349	[17:42:49] [INFO]   epoch 036 step 1000/2860 | loss 0.3856 | lr backbone 7.43e-05 / head 7.41e-04 | 6.0 it/s
+30737.5s	350	[17:44:12] [INFO]   epoch 036 step 1500/2860 | loss 0.3339 | lr backbone 7.41e-05 / head 7.38e-04 | 6.0 it/s
+30737.5s	351	[17:45:34] [INFO]   epoch 036 step 2000/2860 | loss 0.3462 | lr backbone 7.38e-05 / head 7.36e-04 | 6.0 it/s
+30737.5s	352	[17:46:57] [INFO]   epoch 036 step 2500/2860 | loss 0.3742 | lr backbone 7.36e-05 / head 7.33e-04 | 6.0 it/s
+30737.5s	353	[17:47:57] [INFO]   epoch 036 step 2860/2860 | loss 0.2377 | lr backbone 7.34e-05 / head 7.32e-04 | 6.0 it/s
+30737.5s	354	[17:49:16] [INFO] Epoch 036/100 | train 0.3188 | val raw 0.3204 AUC 0.9437 | EMA 0.3180 AUC 0.9448 | groups raw [findings 0.8336 COVID 0.9989 TB 0.9987] | monitored 0.9448 (ema) | lr 7.32e-04 | best 0.9449 @32 | 553s
+30737.5s	355	[17:49:16] [INFO]   epoch 037 step 1/2860 | loss 0.3544 | lr backbone 7.34e-05 / head 7.32e-04 | 1.6 it/s
+30737.5s	356	[17:50:39] [INFO]   epoch 037 step 500/2860 | loss 0.2037 | lr backbone 7.31e-05 / head 7.29e-04 | 6.0 it/s
+30737.5s	357	[17:52:02] [INFO]   epoch 037 step 1000/2860 | loss 0.2685 | lr backbone 7.29e-05 / head 7.27e-04 | 6.0 it/s
+30737.5s	358	[17:53:25] [INFO]   epoch 037 step 1500/2860 | loss 0.2876 | lr backbone 7.27e-05 / head 7.24e-04 | 6.0 it/s
+30737.5s	359	[17:54:47] [INFO]   epoch 037 step 2000/2860 | loss 0.3836 | lr backbone 7.24e-05 / head 7.22e-04 | 6.0 it/s
+30737.5s	360	[17:56:10] [INFO]   epoch 037 step 2500/2860 | loss 0.2705 | lr backbone 7.22e-05 / head 7.19e-04 | 6.0 it/s
+30737.5s	361	[17:57:10] [INFO]   epoch 037 step 2860/2860 | loss 0.3353 | lr backbone 7.20e-05 / head 7.17e-04 | 6.0 it/s
+30737.5s	362	[17:58:29] [INFO] Epoch 037/100 | train 0.3175 | val raw 0.3255 AUC 0.9435 | EMA 0.3188 AUC 0.9447 | groups raw [findings 0.8329 COVID 0.9985 TB 0.9992] | monitored 0.9447 (ema) | lr 7.17e-04 | best 0.9449 @32 | 553s
+30737.5s	363	[17:58:30] [INFO]   epoch 038 step 1/2860 | loss 0.2471 | lr backbone 7.20e-05 / head 7.17e-04 | 1.6 it/s
+30737.5s	364	[17:59:52] [INFO]   epoch 038 step 500/2860 | loss 0.2426 | lr backbone 7.17e-05 / head 7.15e-04 | 6.0 it/s
+30737.5s	365	[18:01:15] [INFO]   epoch 038 step 1000/2860 | loss 0.5097 | lr backbone 7.15e-05 / head 7.12e-04 | 6.0 it/s
+30737.5s	366	[18:02:38] [INFO]   epoch 038 step 1500/2860 | loss 0.4404 | lr backbone 7.12e-05 / head 7.10e-04 | 6.0 it/s
+30737.5s	367	[18:04:01] [INFO]   epoch 038 step 2000/2860 | loss 0.4046 | lr backbone 7.10e-05 / head 7.07e-04 | 6.0 it/s
+30737.5s	368	[18:05:24] [INFO]   epoch 038 step 2500/2860 | loss 0.3181 | lr backbone 7.07e-05 / head 7.05e-04 | 6.0 it/s
+30737.5s	369	[18:06:23] [INFO]   epoch 038 step 2860/2860 | loss 0.3609 | lr backbone 7.05e-05 / head 7.03e-04 | 6.0 it/s
+30737.5s	370	[18:07:43] [INFO] Epoch 038/100 | train 0.3161 | val raw 0.3234 AUC 0.9434 | EMA 0.3194 AUC 0.9447 | groups raw [findings 0.8329 COVID 0.9990 TB 0.9983] | monitored 0.9447 (ema) | lr 7.03e-04 | best 0.9449 @32 | 554s
+30737.5s	371	[18:07:43] [INFO]   epoch 039 step 1/2860 | loss 0.3331 | lr backbone 7.05e-05 / head 7.03e-04 | 1.5 it/s
+30737.5s	372	[18:09:06] [INFO]   epoch 039 step 500/2860 | loss 0.3670 | lr backbone 7.03e-05 / head 7.00e-04 | 6.0 it/s
+30737.5s	373	[18:10:29] [INFO]   epoch 039 step 1000/2860 | loss 0.4602 | lr backbone 7.00e-05 / head 6.98e-04 | 6.0 it/s
+30737.5s	374	[18:11:52] [INFO]   epoch 039 step 1500/2860 | loss 0.4449 | lr backbone 6.98e-05 / head 6.95e-04 | 6.0 it/s
+30737.5s	375	[18:13:15] [INFO]   epoch 039 step 2000/2860 | loss 0.5064 | lr backbone 6.95e-05 / head 6.92e-04 | 6.0 it/s
+30737.5s	376	[18:14:38] [INFO]   epoch 039 step 2500/2860 | loss 0.3030 | lr backbone 6.93e-05 / head 6.90e-04 | 6.0 it/s
+30737.5s	377	[18:15:37] [INFO]   epoch 039 step 2860/2860 | loss 0.2684 | lr backbone 6.91e-05 / head 6.88e-04 | 6.0 it/s
+30737.5s	378	[18:16:57] [INFO] Epoch 039/100 | train 0.3155 | val raw 0.3248 AUC 0.9443 | EMA 0.3192 AUC 0.9449 | groups raw [findings 0.8342 COVID 0.9992 TB 0.9995] | monitored 0.9449 (ema) | lr 6.88e-04 | best 0.9449 @39 | 554s
+30737.5s	379	[18:16:57] [INFO]   epoch 040 step 1/2860 | loss 0.2997 | lr backbone 6.91e-05 / head 6.88e-04 | 1.6 it/s
+30737.5s	380	[18:18:20] [INFO]   epoch 040 step 500/2860 | loss 0.1911 | lr backbone 6.88e-05 / head 6.85e-04 | 6.0 it/s
+30737.5s	381	[18:19:43] [INFO]   epoch 040 step 1000/2860 | loss 0.2474 | lr backbone 6.86e-05 / head 6.83e-04 | 6.0 it/s
+30737.5s	382	[18:21:06] [INFO]   epoch 040 step 1500/2860 | loss 0.2695 | lr backbone 6.83e-05 / head 6.80e-04 | 6.0 it/s
+30737.5s	383	[18:22:28] [INFO]   epoch 040 step 2000/2860 | loss 0.2396 | lr backbone 6.80e-05 / head 6.78e-04 | 6.0 it/s
+30737.5s	384	[18:23:51] [INFO]   epoch 040 step 2500/2860 | loss 0.2969 | lr backbone 6.78e-05 / head 6.75e-04 | 6.0 it/s
+30737.5s	385	[18:24:51] [INFO]   epoch 040 step 2860/2860 | loss 0.3755 | lr backbone 6.76e-05 / head 6.73e-04 | 6.0 it/s
+30737.5s	386	[18:26:10] [INFO] Epoch 040/100 | train 0.3141 | val raw 0.3271 AUC 0.9440 | EMA 0.3204 AUC 0.9448 | groups raw [findings 0.8338 COVID 0.9991 TB 0.9991] | monitored 0.9448 (ema) | lr 6.73e-04 | best 0.9449 @39 | 553s
+30737.5s	387	[18:26:11] [INFO]   epoch 041 step 1/2860 | loss 0.3933 | lr backbone 6.76e-05 / head 6.73e-04 | 1.6 it/s
+30737.5s	388	[18:27:33] [INFO]   epoch 041 step 500/2860 | loss 0.4887 | lr backbone 6.73e-05 / head 6.70e-04 | 6.0 it/s
+30737.5s	389	[18:28:56] [INFO]   epoch 041 step 1000/2860 | loss 0.2203 | lr backbone 6.71e-05 / head 6.68e-04 | 6.0 it/s
+30737.5s	390	[18:30:19] [INFO]   epoch 041 step 1500/2860 | loss 0.2888 | lr backbone 6.68e-05 / head 6.65e-04 | 6.0 it/s
+30737.5s	391	[18:31:42] [INFO]   epoch 041 step 2000/2860 | loss 0.4037 | lr backbone 6.65e-05 / head 6.62e-04 | 6.0 it/s
+30737.5s	392	[18:33:05] [INFO]   epoch 041 step 2500/2860 | loss 0.2199 | lr backbone 6.63e-05 / head 6.60e-04 | 6.0 it/s
+30737.5s	393	[18:34:04] [INFO]   epoch 041 step 2860/2860 | loss 0.2674 | lr backbone 6.61e-05 / head 6.58e-04 | 6.0 it/s
+30737.5s	394	[18:35:23] [INFO] Epoch 041/100 | train 0.3130 | val raw 0.3253 AUC 0.9436 | EMA 0.3209 AUC 0.9447 | groups raw [findings 0.8321 COVID 0.9991 TB 0.9997] | monitored 0.9447 (ema) | lr 6.58e-04 | best 0.9449 @39 | 553s
+30737.5s	395	[18:35:24] [INFO]   epoch 042 step 1/2860 | loss 0.4163 | lr backbone 6.61e-05 / head 6.58e-04 | 1.6 it/s
+30737.5s	396	[18:36:47] [INFO]   epoch 042 step 500/2860 | loss 0.2878 | lr backbone 6.58e-05 / head 6.55e-04 | 6.0 it/s
+30737.5s	397	[18:38:09] [INFO]   epoch 042 step 1000/2860 | loss 0.3271 | lr backbone 6.56e-05 / head 6.53e-04 | 6.0 it/s
+30737.5s	398	[18:39:32] [INFO]   epoch 042 step 1500/2860 | loss 0.2936 | lr backbone 6.53e-05 / head 6.50e-04 | 6.0 it/s
+30737.5s	399	[18:40:55] [INFO]   epoch 042 step 2000/2860 | loss 0.2674 | lr backbone 6.50e-05 / head 6.47e-04 | 6.0 it/s
+30737.5s	400	[18:42:18] [INFO]   epoch 042 step 2500/2860 | loss 0.2527 | lr backbone 6.48e-05 / head 6.45e-04 | 6.0 it/s
+30737.5s	401	[18:43:18] [INFO]   epoch 042 step 2860/2860 | loss 0.3540 | lr backbone 6.46e-05 / head 6.43e-04 | 6.0 it/s
+30737.5s	402	[18:44:37] [INFO] Epoch 042/100 | train 0.3118 | val raw 0.3291 AUC 0.9430 | EMA 0.3216 AUC 0.9446 | groups raw [findings 0.8336 COVID 0.9990 TB 0.9964] | monitored 0.9446 (ema) | lr 6.43e-04 | best 0.9449 @39 | 554s
+30737.5s	403	[18:44:37] [INFO]   epoch 043 step 1/2860 | loss 0.2371 | lr backbone 6.46e-05 / head 6.43e-04 | 1.7 it/s
+30737.5s	404	[18:46:00] [INFO]   epoch 043 step 500/2860 | loss 0.2075 | lr backbone 6.43e-05 / head 6.40e-04 | 6.0 it/s
+30737.5s	405	[18:47:23] [INFO]   epoch 043 step 1000/2860 | loss 0.2547 | lr backbone 6.41e-05 / head 6.37e-04 | 6.0 it/s
+30737.5s	406	[18:48:46] [INFO]   epoch 043 step 1500/2860 | loss 0.2847 | lr backbone 6.38e-05 / head 6.35e-04 | 6.0 it/s
+30737.5s	407	[18:50:09] [INFO]   epoch 043 step 2000/2860 | loss 0.2690 | lr backbone 6.35e-05 / head 6.32e-04 | 6.0 it/s
+30737.5s	408	[18:51:32] [INFO]   epoch 043 step 2500/2860 | loss 0.2303 | lr backbone 6.32e-05 / head 6.29e-04 | 6.0 it/s
+30737.5s	409	[18:52:31] [INFO]   epoch 043 step 2860/2860 | loss 0.2780 | lr backbone 6.31e-05 / head 6.27e-04 | 6.0 it/s
+30737.5s	410	[18:53:51] [INFO] Epoch 043/100 | train 0.3114 | val raw 0.3240 AUC 0.9444 | EMA 0.3216 AUC 0.9446 | groups raw [findings 0.8356 COVID 0.9991 TB 0.9986] | monitored 0.9446 (ema) | lr 6.27e-04 | best 0.9449 @39 | 554s
+30737.5s	411	[18:53:51] [INFO]   epoch 044 step 1/2860 | loss 0.2158 | lr backbone 6.31e-05 / head 6.27e-04 | 1.6 it/s
+30737.5s	412	[18:55:14] [INFO]   epoch 044 step 500/2860 | loss 0.4420 | lr backbone 6.28e-05 / head 6.24e-04 | 6.0 it/s
+30737.5s	413	[18:56:37] [INFO]   epoch 044 step 1000/2860 | loss 0.4282 | lr backbone 6.25e-05 / head 6.22e-04 | 6.0 it/s
+30737.5s	414	[18:58:00] [INFO]   epoch 044 step 1500/2860 | loss 0.4341 | lr backbone 6.22e-05 / head 6.19e-04 | 6.0 it/s
+30737.5s	415	[18:59:23] [INFO]   epoch 044 step 2000/2860 | loss 0.2273 | lr backbone 6.20e-05 / head 6.16e-04 | 6.0 it/s
+30737.5s	416	[19:00:46] [INFO]   epoch 044 step 2500/2860 | loss 0.3488 | lr backbone 6.17e-05 / head 6.14e-04 | 6.0 it/s
+30737.5s	417	[19:01:45] [INFO]   epoch 044 step 2860/2860 | loss 0.3088 | lr backbone 6.15e-05 / head 6.12e-04 | 6.0 it/s
+30737.5s	418	[19:03:04] [INFO] Epoch 044/100 | train 0.3108 | val raw 0.3238 AUC 0.9438 | EMA 0.3213 AUC 0.9446 | groups raw [findings 0.8341 COVID 0.9992 TB 0.9981] | monitored 0.9446 (ema) | lr 6.12e-04 | best 0.9449 @39 | 554s
+30737.5s	419	[19:03:05] [INFO]   epoch 045 step 1/2860 | loss 0.3248 | lr backbone 6.15e-05 / head 6.12e-04 | 1.8 it/s
+30737.5s	420	[19:04:28] [INFO]   epoch 045 step 500/2860 | loss 0.3239 | lr backbone 6.12e-05 / head 6.09e-04 | 6.0 it/s
+30737.5s	421	[19:05:51] [INFO]   epoch 045 step 1000/2860 | loss 0.2803 | lr backbone 6.10e-05 / head 6.06e-04 | 6.0 it/s
+30737.5s	422	[19:07:14] [INFO]   epoch 045 step 1500/2860 | loss 0.3143 | lr backbone 6.07e-05 / head 6.03e-04 | 6.0 it/s
+30737.5s	423	[19:08:37] [INFO]   epoch 045 step 2000/2860 | loss 0.3390 | lr backbone 6.04e-05 / head 6.01e-04 | 6.0 it/s
+30737.5s	424	[19:10:00] [INFO]   epoch 045 step 2500/2860 | loss 0.2124 | lr backbone 6.02e-05 / head 5.98e-04 | 6.0 it/s
+30737.5s	425	[19:10:59] [INFO]   epoch 045 step 2860/2860 | loss 0.3845 | lr backbone 6.00e-05 / head 5.96e-04 | 6.0 it/s
+30737.5s	426	[19:12:19] [INFO] Epoch 045/100 | train 0.3092 | val raw 0.3262 AUC 0.9429 | EMA 0.3220 AUC 0.9445 | groups raw [findings 0.8320 COVID 0.9989 TB 0.9979] | monitored 0.9445 (ema) | lr 5.96e-04 | best 0.9449 @39 | 554s
+30737.5s	427	[19:12:19] [INFO]   epoch 046 step 1/2860 | loss 0.2777 | lr backbone 6.00e-05 / head 5.96e-04 | 1.6 it/s
+30737.5s	428	[19:13:42] [INFO]   epoch 046 step 500/2860 | loss 0.2863 | lr backbone 5.97e-05 / head 5.93e-04 | 6.0 it/s
+30737.5s	429	[19:15:05] [INFO]   epoch 046 step 1000/2860 | loss 0.3347 | lr backbone 5.94e-05 / head 5.90e-04 | 6.0 it/s
+30737.5s	430	[19:16:28] [INFO]   epoch 046 step 1500/2860 | loss 0.3217 | lr backbone 5.91e-05 / head 5.88e-04 | 6.0 it/s
+30737.5s	431	[19:17:51] [INFO]   epoch 046 step 2000/2860 | loss 0.3072 | lr backbone 5.89e-05 / head 5.85e-04 | 6.0 it/s
+30737.5s	432	[19:19:14] [INFO]   epoch 046 step 2500/2860 | loss 0.3247 | lr backbone 5.86e-05 / head 5.82e-04 | 6.0 it/s
+30737.5s	433	[19:20:14] [INFO]   epoch 046 step 2860/2860 | loss 0.2261 | lr backbone 5.84e-05 / head 5.80e-04 | 6.0 it/s
+30737.5s	434	[19:21:33] [INFO] Epoch 046/100 | train 0.3086 | val raw 0.3301 AUC 0.9415 | EMA 0.3223 AUC 0.9443 | groups raw [findings 0.8303 COVID 0.9991 TB 0.9951] | monitored 0.9443 (ema) | lr 5.80e-04 | best 0.9449 @39 | 554s
+30737.5s	435	[19:21:33] [INFO]   epoch 047 step 1/2860 | loss 0.3798 | lr backbone 5.84e-05 / head 5.80e-04 | 1.8 it/s
+30737.5s	436	[19:22:56] [INFO]   epoch 047 step 500/2860 | loss 0.2318 | lr backbone 5.81e-05 / head 5.77e-04 | 6.0 it/s
+30737.5s	437	[19:24:19] [INFO]   epoch 047 step 1000/2860 | loss 0.2788 | lr backbone 5.79e-05 / head 5.75e-04 | 6.0 it/s
+30737.5s	438	[19:25:42] [INFO]   epoch 047 step 1500/2860 | loss 0.3284 | lr backbone 5.76e-05 / head 5.72e-04 | 6.0 it/s
+30737.5s	439	[19:27:05] [INFO]   epoch 047 step 2000/2860 | loss 0.4742 | lr backbone 5.73e-05 / head 5.69e-04 | 6.0 it/s
+30737.5s	440	[19:28:28] [INFO]   epoch 047 step 2500/2860 | loss 0.3765 | lr backbone 5.70e-05 / head 5.66e-04 | 6.0 it/s
+30737.5s	441	[19:29:27] [INFO]   epoch 047 step 2860/2860 | loss 0.4061 | lr backbone 5.68e-05 / head 5.64e-04 | 6.0 it/s
+30737.5s	442	[19:30:46] [INFO] Epoch 047/100 | train 0.3072 | val raw 0.3255 AUC 0.9420 | EMA 0.3223 AUC 0.9442 | groups raw [findings 0.8323 COVID 0.9991 TB 0.9946] | monitored 0.9442 (ema) | lr 5.64e-04 | best 0.9449 @39 | 554s
+30737.5s	443	[19:30:47] [INFO]   epoch 048 step 1/2860 | loss 0.2070 | lr backbone 5.68e-05 / head 5.64e-04 | 1.6 it/s
+30737.5s	444	[19:32:10] [INFO]   epoch 048 step 500/2860 | loss 0.2628 | lr backbone 5.66e-05 / head 5.62e-04 | 6.0 it/s
+30737.5s	445	[19:33:33] [INFO]   epoch 048 step 1000/2860 | loss 0.1317 | lr backbone 5.63e-05 / head 5.59e-04 | 6.0 it/s
+30737.5s	446	[19:34:56] [INFO]   epoch 048 step 1500/2860 | loss 0.2331 | lr backbone 5.60e-05 / head 5.56e-04 | 6.0 it/s
+30737.5s	447	[19:36:18] [INFO]   epoch 048 step 2000/2860 | loss 0.2987 | lr backbone 5.57e-05 / head 5.53e-04 | 6.0 it/s
+30737.5s	448	[19:37:41] [INFO]   epoch 048 step 2500/2860 | loss 0.2440 | lr backbone 5.55e-05 / head 5.50e-04 | 6.0 it/s
+30737.5s	449	[19:38:41] [INFO]   epoch 048 step 2860/2860 | loss 0.3554 | lr backbone 5.53e-05 / head 5.48e-04 | 6.0 it/s
+30737.5s	450	[19:40:00] [INFO] Epoch 048/100 | train 0.3062 | val raw 0.3291 AUC 0.9411 | EMA 0.3228 AUC 0.9440 | groups raw [findings 0.8280 COVID 0.9989 TB 0.9965] | monitored 0.9440 (ema) | lr 5.48e-04 | best 0.9449 @39 | 554s
+30737.5s	451	[19:40:01] [INFO]   epoch 049 step 1/2860 | loss 0.3432 | lr backbone 5.53e-05 / head 5.48e-04 | 1.6 it/s
+30737.5s	452	[19:41:24] [INFO]   epoch 049 step 500/2860 | loss 0.3379 | lr backbone 5.50e-05 / head 5.46e-04 | 6.0 it/s
+30737.5s	453	[19:42:47] [INFO]   epoch 049 step 1000/2860 | loss 0.2503 | lr backbone 5.47e-05 / head 5.43e-04 | 6.0 it/s
+30737.5s	454	[19:44:10] [INFO]   epoch 049 step 1500/2860 | loss 0.2160 | lr backbone 5.44e-05 / head 5.40e-04 | 6.0 it/s
+30737.5s	455	[19:45:33] [INFO]   epoch 049 step 2000/2860 | loss 0.4126 | lr backbone 5.41e-05 / head 5.37e-04 | 6.0 it/s
+30737.5s	456	[19:46:56] [INFO]   epoch 049 step 2500/2860 | loss 0.4571 | lr backbone 5.39e-05 / head 5.35e-04 | 6.0 it/s
+30737.5s	457	[19:47:55] [INFO]   epoch 049 step 2860/2860 | loss 0.3158 | lr backbone 5.37e-05 / head 5.33e-04 | 6.0 it/s
+30737.5s	458	[19:49:15] [INFO] Epoch 049/100 | train 0.3049 | val raw 0.3272 AUC 0.9430 | EMA 0.3231 AUC 0.9439 | groups raw [findings 0.8308 COVID 0.9992 TB 0.9990] | monitored 0.9439 (ema) | lr 5.33e-04 | best 0.9449 @39 | 554s
+30737.5s	459	[19:49:15] [INFO]   epoch 050 step 1/2860 | loss 0.3328 | lr backbone 5.37e-05 / head 5.32e-04 | 1.5 it/s
+30737.5s	460	[19:50:38] [INFO]   epoch 050 step 500/2860 | loss 0.2503 | lr backbone 5.34e-05 / head 5.30e-04 | 6.0 it/s
+30737.5s	461	[19:52:01] [INFO]   epoch 050 step 1000/2860 | loss 0.3770 | lr backbone 5.31e-05 / head 5.27e-04 | 6.0 it/s
+30737.5s	462	[19:53:24] [INFO]   epoch 050 step 1500/2860 | loss 0.2135 | lr backbone 5.28e-05 / head 5.24e-04 | 6.0 it/s
+30737.5s	463	[19:54:47] [INFO]   epoch 050 step 2000/2860 | loss 0.3939 | lr backbone 5.26e-05 / head 5.21e-04 | 6.0 it/s
+30737.5s	464	[19:56:10] [INFO]   epoch 050 step 2500/2860 | loss 0.3724 | lr backbone 5.23e-05 / head 5.19e-04 | 6.0 it/s
+30737.5s	465	[19:57:10] [INFO]   epoch 050 step 2860/2860 | loss 0.2279 | lr backbone 5.21e-05 / head 5.17e-04 | 6.0 it/s
+30737.5s	466	[19:58:29] [INFO] Epoch 050/100 | train 0.3043 | val raw 0.3280 AUC 0.9427 | EMA 0.3235 AUC 0.9437 | groups raw [findings 0.8310 COVID 0.9992 TB 0.9979] | monitored 0.9437 (ema) | lr 5.17e-04 | best 0.9449 @39 | 554s
+30737.5s	467	[19:58:30] [INFO]   epoch 051 step 1/2860 | loss 0.2718 | lr backbone 5.21e-05 / head 5.17e-04 | 1.6 it/s
+30737.5s	468	[19:59:53] [INFO]   epoch 051 step 500/2860 | loss 0.2717 | lr backbone 5.18e-05 / head 5.14e-04 | 6.0 it/s
+30737.5s	469	[20:01:16] [INFO]   epoch 051 step 1000/2860 | loss 0.1993 | lr backbone 5.15e-05 / head 5.11e-04 | 6.0 it/s
+30737.5s	470	[20:02:39] [INFO]   epoch 051 step 1500/2860 | loss 0.5208 | lr backbone 5.13e-05 / head 5.08e-04 | 6.0 it/s
+30737.5s	471	[20:04:02] [INFO]   epoch 051 step 2000/2860 | loss 0.4394 | lr backbone 5.10e-05 / head 5.05e-04 | 6.0 it/s
+30737.5s	472	[20:05:25] [INFO]   epoch 051 step 2500/2860 | loss 0.2203 | lr backbone 5.07e-05 / head 5.03e-04 | 6.0 it/s
+30737.5s	473	[20:06:25] [INFO]   epoch 051 step 2860/2860 | loss 0.1694 | lr backbone 5.05e-05 / head 5.00e-04 | 6.0 it/s
+30737.5s	474	[20:07:44] [INFO] Epoch 051/100 | train 0.3023 | val raw 0.3259 AUC 0.9411 | EMA 0.3241 AUC 0.9437 | groups raw [findings 0.8306 COVID 0.9992 TB 0.9937] | monitored 0.9437 (ema) | lr 5.00e-04 | best 0.9449 @39 | 555s
+30737.5s	475	[20:07:44] [INFO]   epoch 052 step 1/2860 | loss 0.2433 | lr backbone 5.05e-05 / head 5.00e-04 | 1.7 it/s
+30737.5s	476	[20:09:07] [INFO]   epoch 052 step 500/2860 | loss 0.2919 | lr backbone 5.02e-05 / head 4.98e-04 | 6.0 it/s
+30737.5s	477	[20:10:30] [INFO]   epoch 052 step 1000/2860 | loss 0.3900 | lr backbone 4.99e-05 / head 4.95e-04 | 6.0 it/s
+30737.5s	478	[20:11:53] [INFO]   epoch 052 step 1500/2860 | loss 0.3443 | lr backbone 4.97e-05 / head 4.92e-04 | 6.0 it/s
+30737.5s	479	[20:13:16] [INFO]   epoch 052 step 2000/2860 | loss 0.2819 | lr backbone 4.94e-05 / head 4.89e-04 | 6.0 it/s
+30737.5s	480	[20:14:40] [INFO]   epoch 052 step 2500/2860 | loss 0.2558 | lr backbone 4.91e-05 / head 4.87e-04 | 6.0 it/s
+30737.5s	481	[20:15:39] [INFO]   epoch 052 step 2860/2860 | loss 0.2939 | lr backbone 4.89e-05 / head 4.84e-04 | 6.0 it/s
+30737.5s	482	[20:16:59] [INFO] Epoch 052/100 | train 0.3026 | val raw 0.3268 AUC 0.9428 | EMA 0.3249 AUC 0.9434 | groups raw [findings 0.8318 COVID 0.9989 TB 0.9976] | monitored 0.9434 (ema) | lr 4.84e-04 | best 0.9449 @39 | 555s
+30737.5s	483	[20:16:59] [INFO]   epoch 053 step 1/2860 | loss 0.2358 | lr backbone 4.89e-05 / head 4.84e-04 | 1.5 it/s
+30737.5s	484	[20:18:22] [INFO]   epoch 053 step 500/2860 | loss 0.4119 | lr backbone 4.86e-05 / head 4.82e-04 | 6.0 it/s
+30737.5s	485	[20:19:45] [INFO]   epoch 053 step 1000/2860 | loss 0.2525 | lr backbone 4.84e-05 / head 4.79e-04 | 6.0 it/s
+30737.5s	486	[20:21:08] [INFO]   epoch 053 step 1500/2860 | loss 0.2326 | lr backbone 4.81e-05 / head 4.76e-04 | 6.0 it/s
+30737.5s	487	[20:22:31] [INFO]   epoch 053 step 2000/2860 | loss 0.3285 | lr backbone 4.78e-05 / head 4.73e-04 | 6.0 it/s
+30737.5s	488	[20:23:54] [INFO]   epoch 053 step 2500/2860 | loss 0.2026 | lr backbone 4.75e-05 / head 4.71e-04 | 6.0 it/s
+30737.5s	489	[20:24:54] [INFO]   epoch 053 step 2860/2860 | loss 0.2625 | lr backbone 4.73e-05 / head 4.68e-04 | 6.0 it/s
+30737.5s	490	[20:26:14] [INFO] Epoch 053/100 | train 0.3014 | val raw 0.3335 AUC 0.9421 | EMA 0.3258 AUC 0.9433 | groups raw [findings 0.8297 COVID 0.9990 TB 0.9978] | monitored 0.9433 (ema) | lr 4.68e-04 | best 0.9449 @39 | 555s
+30737.5s	491	[20:26:14] [INFO]   epoch 054 step 1/2860 | loss 0.2755 | lr backbone 4.73e-05 / head 4.68e-04 | 1.6 it/s
+30737.5s	492	[20:27:37] [INFO]   epoch 054 step 500/2860 | loss 0.2835 | lr backbone 4.71e-05 / head 4.66e-04 | 6.0 it/s
+30737.5s	493	[20:29:00] [INFO]   epoch 054 step 1000/2860 | loss 0.3545 | lr backbone 4.68e-05 / head 4.63e-04 | 6.0 it/s
+30737.5s	494	[20:30:23] [INFO]   epoch 054 step 1500/2860 | loss 0.3516 | lr backbone 4.65e-05 / head 4.60e-04 | 6.0 it/s
+30737.5s	495	[20:31:46] [INFO]   epoch 054 step 2000/2860 | loss 0.2814 | lr backbone 4.62e-05 / head 4.57e-04 | 6.0 it/s
+30737.5s	496	[20:33:09] [INFO]   epoch 054 step 2500/2860 | loss 0.2791 | lr backbone 4.59e-05 / head 4.55e-04 | 6.0 it/s
+30737.5s	497	[20:34:09] [INFO]   epoch 054 step 2860/2860 | loss 0.3969 | lr backbone 4.57e-05 / head 4.53e-04 | 6.0 it/s
+30737.5s	498	[20:35:28] [INFO] Epoch 054/100 | train 0.3000 | val raw 0.3319 AUC 0.9429 | EMA 0.3266 AUC 0.9432 | groups raw [findings 0.8320 COVID 0.9989 TB 0.9979] | monitored 0.9432 (ema) | lr 4.53e-04 | best 0.9449 @39 | 555s
+30737.5s	499	[20:35:28] [INFO] Early stopping at epoch 54 (patience 15 on monitored AUC).
+30737.5s	500	[20:36:47] [INFO] TEST | best epoch 39 (ema) | loss 0.3387 | mean AUC 16 0.8499 | findings 0.8286 | COVID 0.9976 | TB 0.9999 | monitored 0.9420
+30737.5s	501	[20:36:47] [INFO] TEST specificity@0.5 | macro 0.9624 | micro 0.9644 | sensitivity macro 0.4255 | accuracy 0.9381
+30737.5s	502	[20:36:47] [INFO] TEST per-class AUC / sensitivity@0.5 / specificity@0.5 / support:
+30737.5s	503	[20:36:47] [INFO]   Atelectasis          AUC 0.8007 | sens 0.4202 | spec 0.9041 | n+=2294 n-=19695
+30737.5s	504	[20:36:47] [INFO]   Cardiomegaly         AUC 0.9144 | sens 0.4959 | spec 0.9709 | n+=486 n-=21503
+30737.5s	505	[20:36:47] [INFO]   Effusion             AUC 0.8775 | sens 0.6732 | spec 0.8793 | n+=2711 n-=19278
+30737.5s	506	[20:36:47] [INFO]   Infiltration         AUC 0.7077 | sens 0.3215 | spec 0.9041 | n+=4040 n-=17949
+30737.5s	507	[20:36:47] [INFO]   Mass                 AUC 0.8525 | sens 0.4280 | spec 0.9590 | n+=1091 n-=20898
+30737.5s	508	[20:36:47] [INFO]   Nodule               AUC 0.7361 | sens 0.1699 | spec 0.9791 | n+=1224 n-=20765
+30737.5s	509	[20:36:47] [INFO]   Pneumonia            AUC 0.7545 | sens 0.0496 | spec 0.9928 | n+=262 n-=21727
+30737.5s	510	[20:36:47] [INFO]   Pneumothorax         AUC 0.8566 | sens 0.3615 | spec 0.9561 | n+=1076 n-=20913
+30737.5s	511	[20:36:47] [INFO]   Consolidation        AUC 0.8049 | sens 0.2282 | spec 0.9524 | n+=929 n-=21060
+30737.5s	512	[20:36:47] [INFO]   Edema                AUC 0.8907 | sens 0.3800 | spec 0.9627 | n+=421 n-=21568
+30737.5s	513	[20:36:47] [INFO]   Emphysema            AUC 0.8944 | sens 0.3868 | spec 0.9782 | n+=424 n-=21565
+30737.5s	514	[20:36:47] [INFO]   Fibrosis             AUC 0.7959 | sens 0.1404 | spec 0.9881 | n+=292 n-=21697
+30737.5s	515	[20:36:47] [INFO]   Pleural_Thickening   AUC 0.7813 | sens 0.2073 | spec 0.9758 | n+=709 n-=21280
+30737.5s	516	[20:36:47] [INFO]   Hernia               AUC 0.9335 | sens 0.6923 | spec 0.9973 | n+=39 n-=21950
+30737.5s	517	[20:36:47] [INFO]   COVID                AUC 0.9976 | sens 0.8741 | spec 0.9993 | n+=723 n-=24027
+30737.5s	518	[20:36:47] [INFO]   TB                   AUC 0.9999 | sens 0.9786 | spec 1.0000 | n+=140 n-=22689
+30737.5s	519	[20:36:47] [INFO] TEST within-source TB    | AUC 1.0000 | pos 140 neg 700 | tb vs tb_normal
+30737.5s	520	[20:36:47] [INFO] TEST within-source COVID | AUC 0.9953 | pos 723 neg 2038 | covid vs covid_normal
+30737.5s	521	[20:36:57] [INFO] ========================================================================
+30737.5s	522	[20:36:57] [INFO]   Run complete
+30737.5s	523	[20:36:57] [INFO]   best       : /kaggle/working/checkpoints/best.pth (epoch 39, ema)
+30737.5s	524	[20:36:57] [INFO]   metrics    : /kaggle/working/artifacts/metrics.json
+30737.5s	525	[20:36:57] [INFO]   zip        : /kaggle/working/lung_xrv_results.zip (96.4 MB)
+30737.5s	526	[20:36:57] [INFO]   test AUC   : mean16 0.8499 | findings 0.8286 | COVID 0.9976 | TB 0.9999 | spec@0.5 0.9624
+30737.5s	527	[20:36:57] [INFO]   artifacts  : training_log.csv, artifacts/training_curves.png, artifacts/per_class_auc.png, artifacts/roc_curves.png, artifacts/gradcam_grid.png, artifacts/metrics.json, checkpoints/best.pth, checkpoints/last.pth, lung_xrv_results.zip
+30737.5s	528	[20:36:57] [INFO] ========================================================================
+30737.5s	529	
+30737.5s	530	[12:10:29] [INFO] ========================================================================
+30737.5s	531	[12:10:29] [INFO]   Lung XRV fine-tune | device=Tesla T4 | seed=42
+30737.5s	532	[12:10:29] [INFO]   data_root=/tmp/data
+30737.5s	533	[12:10:29] [INFO]   output_dir=/kaggle/working | stage_dir=/tmp/lungs224
+30737.5s	534	[12:10:29] [INFO]   epochs=100 | batch=32 | patience=15 | limit_batches=0
+30737.5s	535	[12:10:29] [INFO] ========================================================================
+30737.5s	536	[12:10:29] [INFO] labels.csv: /tmp/data/labels.csv
+30737.5s	537	[12:10:34] [INFO] Loaded 130128 label rows from /tmp/data/labels.csv
+30737.5s	538	[12:10:35] [INFO] Split audit | train 91537 / 21638 patients | val 13001 / 3150 patients | test 25590 / 6017 patients
+30737.5s	539	[12:10:35] [INFO] Leakage audit | cross-split images: 0 | cross-split NIH patient prefixes: 0
+30737.5s	540	[12:10:36] [INFO] pos_weight[c] = sqrt(neg_c / pos_c) on TRAIN rows where label != -1
+30737.5s	541	[12:10:36] [INFO]   Atelectasis           2.93   (expected  2.93)
+30737.5s	542	[12:10:36] [INFO]   Cardiomegaly          6.15   (expected  6.15)
+30737.5s	543	[12:10:36] [INFO]   Effusion              2.72   (expected  2.72)
+30737.5s	544	[12:10:36] [INFO]   Infiltration          2.15   (expected  2.15)
+30737.5s	545	[12:10:36] [INFO]   Mass                  4.25   (expected  4.25)
+30737.5s	546	[12:10:36] [INFO]   Nodule                4.07   (expected  4.07)
+30737.5s	547	[12:10:36] [INFO]   Pneumonia             8.79   (expected  8.79)
+30737.5s	548	[12:10:36] [INFO]   Pneumothorax          4.47   (expected  4.47)
+30737.5s	549	[12:10:36] [INFO]   Consolidation         4.78   (expected  4.78)
+30737.5s	550	[12:10:36] [INFO]   Edema                 6.81   (expected  6.81)
+30737.5s	551	[12:10:36] [INFO]   Emphysema             6.42   (expected  6.42)
+30737.5s	552	[12:10:36] [INFO]   Fibrosis              7.93   (expected  7.93)
+30737.5s	553	[12:10:36] [INFO]   Pleural_Thickening    5.66   (expected  5.66)
+30737.5s	554	[12:10:36] [INFO]   Hernia               21.52   (expected 21.52)
+30737.5s	555	[12:10:36] [INFO]   COVID                 5.83   (expected  5.83)
+30737.5s	556	[12:10:36] [INFO]   TB                   12.89   (expected 12.89)
+30737.5s	557	[12:10:36] [INFO] pos_weight matches the expected vector (max |delta| = 0.0046)
+30737.5s	558	[12:10:36] [INFO] TRAIN rows: 91537 | positives per class: {'Atelectasis': 8238, 'Cardiomegaly': 2034, 'Effusion': 9385, 'Infiltration': 14058, 'Mass': 4138, 'Nodule': 4503, 'Pneumonia': 1008, 'Pneumothorax': 3757, 'Consolidation': 3304, 'Edema': 1667, 'Emphysema': 1871, 'Fibrosis': 1235, 'Pleural_Thickening': 2393, 'Hernia': 170, 'COVID': 2532, 'TB': 490}
+30737.5s	559	[12:10:43] [INFO] Staging: 0/130128 already in /tmp/lungs224 | 130128 to encode (Kaggle wipes /tmp between sessions, so a resume may re-stage everything before the first batch)
+30737.5s	560	[12:11:12] [INFO]   staged 10000/130128 | 352 files/s | ETA 5.7 min | new 10000 skipped 0 resized 10000
+30737.5s	561	[12:11:38] [INFO]   staged 20000/130128 | 368 files/s | ETA 5.0 min | new 20000 skipped 0 resized 20000
+30737.5s	562	[12:12:03] [INFO]   staged 30000/130128 | 375 files/s | ETA 4.4 min | new 30000 skipped 0 resized 30000
+30737.5s	563	[12:12:29] [INFO]   staged 40000/130128 | 378 files/s | ETA 4.0 min | new 40000 skipped 0 resized 40000
+30737.5s	564	[12:12:55] [INFO]   staged 50000/130128 | 380 files/s | ETA 3.5 min | new 50000 skipped 0 resized 50000
+30737.5s	565	[12:13:21] [INFO]   staged 60000/130128 | 380 files/s | ETA 3.1 min | new 60000 skipped 0 resized 60000
+30737.5s	566	[12:13:47] [INFO]   staged 70000/130128 | 380 files/s | ETA 2.6 min | new 70000 skipped 0 resized 70000
+30737.5s	567	[12:14:14] [INFO]   staged 80000/130128 | 381 files/s | ETA 2.2 min | new 80000 skipped 0 resized 80000
+30737.5s	568	[12:14:40] [INFO]   staged 90000/130128 | 381 files/s | ETA 1.8 min | new 90000 skipped 0 resized 90000
+30737.5s	569	[12:15:06] [INFO]   staged 100000/130128 | 381 files/s | ETA 1.3 min | new 100000 skipped 0 resized 100000
+30737.5s	570	[12:15:32] [INFO]   staged 110000/130128 | 381 files/s | ETA 0.9 min | new 110000 skipped 0 resized 110000
+30737.5s	571	[12:16:22] [INFO]   staged 120000/130128 | 354 files/s | ETA 0.5 min | new 120000 skipped 0 resized 120000
+30737.5s	572	[12:16:55] [INFO]   staged 130000/130128 | 350 files/s | ETA 0.0 min | new 130000 skipped 0 resized 130000
+30737.5s	573	[12:16:56] [INFO]   staged 130128/130128 | 350 files/s | ETA 0.0 min | new 130128 skipped 0 resized 130128
+30737.5s	574	[12:16:57] [INFO] Staging complete | 130128 total | 130128 new (0 copied, 0 converted, 130128 resized) | 0 skipped | 6.2 min
+30737.5s	575	[12:16:57] [INFO] Loading XRV densenet121-res224-all (cache: /tmp/xrv)
+30737.5s	576	[12:16:58] [INFO] Model ready | classifier 1024 -> 16 | trainable params 6.96M
+30737.5s	577	[12:17:10] [INFO]   epoch 001 step 1/2860 | loss 0.7366 | lr backbone 3.50e-08 / head 3.50e-07 | 0.1 it/s
+30737.5s	578	[12:18:30] [INFO]   epoch 001 step 500/2860 | loss 0.6528 | lr backbone 8.76e-06 / head 8.76e-05 | 5.5 it/s
+30737.5s	579	[12:19:52] [INFO]   epoch 001 step 1000/2860 | loss 0.4374 | lr backbone 1.75e-05 / head 1.75e-04 | 5.7 it/s
+30737.5s	580	[12:21:14] [INFO]   epoch 001 step 1500/2860 | loss 0.4195 | lr backbone 2.62e-05 / head 2.62e-04 | 5.9 it/s
+30737.5s	581	[12:22:36] [INFO]   epoch 001 step 2000/2860 | loss 0.4914 | lr backbone 3.50e-05 / head 3.50e-04 | 5.9 it/s
+30737.5s	582	[12:23:59] [INFO]   epoch 001 step 2500/2860 | loss 0.3643 | lr backbone 4.37e-05 / head 4.37e-04 | 5.9 it/s
+30737.5s	583	[12:24:58] [INFO]   epoch 001 step 2860/2860 | loss 0.4184 | lr backbone 5.00e-05 / head 5.00e-04 | 6.0 it/s
+30737.5s	584	[12:26:19] [INFO] Epoch 001/100 | train 0.4957 | val raw 0.3839 AUC 0.8701 | EMA 0.5376 AUC 0.8126 | groups raw [findings 0.7858 COVID 0.8681 TB 0.9566] | monitored 0.8701 (raw) | lr 5.00e-04 | best 0.8701 @1 | 561s
+30737.5s	585	[12:26:20] [INFO]   epoch 002 step 1/2860 | loss 0.5547 | lr backbone 5.00e-05 / head 5.00e-04 | 1.5 it/s
+30737.5s	586	[12:27:42] [INFO]   epoch 002 step 500/2860 | loss 0.4594 | lr backbone 5.88e-05 / head 5.88e-04 | 6.0 it/s
+30737.5s	587	[12:29:05] [INFO]   epoch 002 step 1000/2860 | loss 0.4530 | lr backbone 6.75e-05 / head 6.75e-04 | 6.0 it/s
+30737.5s	588	[12:30:27] [INFO]   epoch 002 step 1500/2860 | loss 0.4877 | lr backbone 7.62e-05 / head 7.62e-04 | 6.0 it/s
+30737.5s	589	[12:31:50] [INFO]   epoch 002 step 2000/2860 | loss 0.3098 | lr backbone 8.50e-05 / head 8.50e-04 | 6.0 it/s
+30737.5s	590	[12:33:13] [INFO]   epoch 002 step 2500/2860 | loss 0.2916 | lr backbone 9.37e-05 / head 9.37e-04 | 6.0 it/s
+30737.5s	591	[12:34:12] [INFO]   epoch 002 step 2860/2860 | loss 0.4097 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	592	[12:35:31] [INFO] Epoch 002/100 | train 0.4057 | val raw 0.3643 AUC 0.9124 | EMA 0.4138 AUC 0.8741 | groups raw [findings 0.7963 COVID 0.9494 TB 0.9917] | monitored 0.9124 (raw) | lr 1.00e-03 | best 0.9124 @2 | 552s
+30737.5s	593	[12:35:32] [INFO]   epoch 003 step 1/2860 | loss 0.3547 | lr backbone 1.00e-04 / head 1.00e-03 | 1.7 it/s
+30737.5s	594	[12:36:55] [INFO]   epoch 003 step 500/2860 | loss 0.4418 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	595	[12:38:17] [INFO]   epoch 003 step 1000/2860 | loss 0.5269 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	596	[12:39:40] [INFO]   epoch 003 step 1500/2860 | loss 0.4154 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	597	[12:41:03] [INFO]   epoch 003 step 2000/2860 | loss 0.3972 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	598	[12:42:25] [INFO]   epoch 003 step 2500/2860 | loss 0.4097 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	599	[12:43:25] [INFO]   epoch 003 step 2860/2860 | loss 0.4702 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	600	[12:44:44] [INFO] Epoch 003/100 | train 0.3863 | val raw 0.3511 AUC 0.9260 | EMA 0.3718 AUC 0.9011 | groups raw [findings 0.8070 COVID 0.9746 TB 0.9964] | monitored 0.9260 (raw) | lr 1.00e-03 | best 0.9260 @3 | 553s
+30737.5s	601	[12:44:45] [INFO]   epoch 004 step 1/2860 | loss 0.4517 | lr backbone 1.00e-04 / head 1.00e-03 | 1.6 it/s
+30737.5s	602	[12:46:07] [INFO]   epoch 004 step 500/2860 | loss 0.5195 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	603	[12:47:30] [INFO]   epoch 004 step 1000/2860 | loss 0.3797 | lr backbone 1.00e-04 / head 1.00e-03 | 6.0 it/s
+30737.5s	604	[12:48:52] [INFO]   epoch 004 step 1500/2860 | loss 0.2201 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	605	[12:50:15] [INFO]   epoch 004 step 2000/2860 | loss 0.7688 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	606	[12:51:38] [INFO]   epoch 004 step 2500/2860 | loss 0.3580 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	607	[12:52:37] [INFO]   epoch 004 step 2860/2860 | loss 0.3826 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	608	[12:53:56] [INFO] Epoch 004/100 | train 0.3772 | val raw 0.3463 AUC 0.9310 | EMA 0.3563 AUC 0.9159 | groups raw [findings 0.8143 COVID 0.9835 TB 0.9952] | monitored 0.9310 (raw) | lr 9.99e-04 | best 0.9310 @4 | 552s
+30737.5s	609	[12:53:57] [INFO]   epoch 005 step 1/2860 | loss 0.5002 | lr backbone 9.99e-05 / head 9.99e-04 | 1.6 it/s
+30737.5s	610	[12:55:19] [INFO]   epoch 005 step 500/2860 | loss 0.4704 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	611	[12:56:42] [INFO]   epoch 005 step 1000/2860 | loss 0.2958 | lr backbone 9.99e-05 / head 9.99e-04 | 6.0 it/s
+30737.5s	612	[12:58:05] [INFO]   epoch 005 step 1500/2860 | loss 0.3543 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	613	[12:59:28] [INFO]   epoch 005 step 2000/2860 | loss 0.5311 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	614	[13:00:50] [INFO]   epoch 005 step 2500/2860 | loss 0.4752 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	615	[13:01:50] [INFO]   epoch 005 step 2860/2860 | loss 0.5844 | lr backbone 9.98e-05 / head 9.98e-04 | 6.0 it/s
+30737.5s	616	[13:03:09] [INFO] Epoch 005/100 | train 0.3713 | val raw 0.3406 AUC 0.9334 | EMA 0.3486 AUC 0.9252 | groups raw [findings 0.8153 COVID 0.9883 TB 0.9967] | monitored 0.9334 (raw) | lr 9.98e-04 | best 0.9334 @5 | 553s
+30737.5s	617	[13:03:10] [INFO]   epoch 006 step 1/2860 | loss 0.4421 | lr backbone 9.98e-05 / head 9.98e-04 | 1.5 it/s
+30737.5s	618	[13:04:32] [INFO]   epoch 006 step 500/2860 | loss 0.2989 | lr backbone 9.97e-05 / head 9.97e-04 | 6.0 it/s
+30737.5s	619	[13:05:55] [INFO]   epoch 006 step 1000/2860 | loss 0.3078 | lr backbone 9.97e-05 / head 9.97e-04 | 6.0 it/s
+30737.5s	620	[13:07:18] [INFO]   epoch 006 step 1500/2860 | loss 0.2516 | lr backbone 9.97e-05 / head 9.97e-04 | 6.0 it/s
+30737.5s	621	[13:08:40] [INFO]   epoch 006 step 2000/2860 | loss 0.4532 | lr backbone 9.97e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	622	[13:10:03] [INFO]   epoch 006 step 2500/2860 | loss 0.4812 | lr backbone 9.96e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	623	[13:11:02] [INFO]   epoch 006 step 2860/2860 | loss 0.5100 | lr backbone 9.96e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	624	[13:12:22] [INFO] Epoch 006/100 | train 0.3673 | val raw 0.3375 AUC 0.9354 | EMA 0.3429 AUC 0.9311 | groups raw [findings 0.8164 COVID 0.9931 TB 0.9968] | monitored 0.9354 (raw) | lr 9.96e-04 | best 0.9354 @6 | 553s
+30737.5s	625	[13:12:22] [INFO]   epoch 007 step 1/2860 | loss 0.6191 | lr backbone 9.96e-05 / head 9.96e-04 | 1.7 it/s
+30737.5s	626	[13:13:45] [INFO]   epoch 007 step 500/2860 | loss 0.3692 | lr backbone 9.96e-05 / head 9.96e-04 | 6.0 it/s
+30737.5s	627	[13:15:08] [INFO]   epoch 007 step 1000/2860 | loss 0.4769 | lr backbone 9.95e-05 / head 9.95e-04 | 6.0 it/s
+30737.5s	628	[13:16:31] [INFO]   epoch 007 step 1500/2860 | loss 0.3071 | lr backbone 9.95e-05 / head 9.95e-04 | 6.0 it/s
+30737.5s	629	[13:17:53] [INFO]   epoch 007 step 2000/2860 | loss 0.3782 | lr backbone 9.94e-05 / head 9.94e-04 | 6.0 it/s
+30737.5s	630	[13:19:16] [INFO]   epoch 007 step 2500/2860 | loss 0.3386 | lr backbone 9.94e-05 / head 9.94e-04 | 6.0 it/s
+30737.5s	631	[13:20:15] [INFO]   epoch 007 step 2860/2860 | loss 0.2986 | lr backbone 9.94e-05 / head 9.94e-04 | 6.0 it/s
+30737.5s	632	[13:21:35] [INFO] Epoch 007/100 | train 0.3628 | val raw 0.3366 AUC 0.9373 | EMA 0.3391 AUC 0.9345 | groups raw [findings 0.8193 COVID 0.9942 TB 0.9985] | monitored 0.9373 (raw) | lr 9.94e-04 | best 0.9373 @7 | 553s
+30737.5s	633	[13:21:35] [INFO]   epoch 008 step 1/2860 | loss 0.4478 | lr backbone 9.94e-05 / head 9.94e-04 | 1.5 it/s
+30737.5s	634	[13:22:58] [INFO]   epoch 008 step 500/2860 | loss 0.3158 | lr backbone 9.93e-05 / head 9.93e-04 | 6.0 it/s
+30737.5s	635	[13:24:21] [INFO]   epoch 008 step 1000/2860 | loss 0.3382 | lr backbone 9.93e-05 / head 9.93e-04 | 6.0 it/s
+30737.5s	636	[13:25:43] [INFO]   epoch 008 step 1500/2860 | loss 0.2680 | lr backbone 9.92e-05 / head 9.92e-04 | 6.0 it/s
+30737.5s	637	[13:27:06] [INFO]   epoch 008 step 2000/2860 | loss 0.2767 | lr backbone 9.92e-05 / head 9.92e-04 | 6.0 it/s
+30737.5s	638	[13:28:29] [INFO]   epoch 008 step 2500/2860 | loss 0.4051 | lr backbone 9.91e-05 / head 9.91e-04 | 6.0 it/s
+30737.5s	639	[13:29:29] [INFO]   epoch 008 step 2860/2860 | loss 0.4229 | lr backbone 9.91e-05 / head 9.91e-04 | 6.0 it/s
+30737.5s	640	[13:30:48] [INFO] Epoch 008/100 | train 0.3598 | val raw 0.3361 AUC 0.9384 | EMA 0.3365 AUC 0.9368 | groups raw [findings 0.8214 COVID 0.9946 TB 0.9992] | monitored 0.9384 (raw) | lr 9.91e-04 | best 0.9384 @8 | 553s
+30737.5s	641	[13:30:48] [INFO]   epoch 009 step 1/2860 | loss 0.4114 | lr backbone 9.91e-05 / head 9.91e-04 | 1.7 it/s
+30737.5s	642	[13:32:11] [INFO]   epoch 009 step 500/2860 | loss 0.3308 | lr backbone 9.90e-05 / head 9.90e-04 | 6.0 it/s
+30737.5s	643	[13:33:34] [INFO]   epoch 009 step 1000/2860 | loss 0.3943 | lr backbone 9.90e-05 / head 9.90e-04 | 6.0 it/s
+30737.5s	644	[13:34:57] [INFO]   epoch 009 step 1500/2860 | loss 0.1989 | lr backbone 9.89e-05 / head 9.89e-04 | 6.0 it/s
+30737.5s	645	[13:36:20] [INFO]   epoch 009 step 2000/2860 | loss 0.3439 | lr backbone 9.89e-05 / head 9.89e-04 | 6.0 it/s
+30737.5s	646	[13:37:42] [INFO]   epoch 009 step 2500/2860 | loss 0.3741 | lr backbone 9.88e-05 / head 9.88e-04 | 6.0 it/s
+30737.5s	647	[13:38:42] [INFO]   epoch 009 step 2860/2860 | loss 0.4522 | lr backbone 9.88e-05 / head 9.87e-04 | 6.0 it/s
+30737.5s	648	[13:40:01] [INFO] Epoch 009/100 | train 0.3577 | val raw 0.3374 AUC 0.9361 | EMA 0.3331 AUC 0.9384 | groups raw [findings 0.8210 COVID 0.9888 TB 0.9985] | monitored 0.9384 (ema) | lr 9.87e-04 | best 0.9384 @9 | 553s
+30737.5s	649	[13:40:02] [INFO]   epoch 010 step 1/2860 | loss 0.3898 | lr backbone 9.88e-05 / head 9.87e-04 | 1.6 it/s
+30737.5s	650	[13:41:24] [INFO]   epoch 010 step 500/2860 | loss 0.4050 | lr backbone 9.87e-05 / head 9.87e-04 | 6.0 it/s
+30737.5s	651	[13:42:47] [INFO]   epoch 010 step 1000/2860 | loss 0.4188 | lr backbone 9.86e-05 / head 9.86e-04 | 6.0 it/s
+30737.5s	652	[13:44:10] [INFO]   epoch 010 step 1500/2860 | loss 0.2384 | lr backbone 9.86e-05 / head 9.86e-04 | 6.0 it/s
+30737.5s	653	[13:45:33] [INFO]   epoch 010 step 2000/2860 | loss 0.4327 | lr backbone 9.85e-05 / head 9.85e-04 | 6.0 it/s
+30737.5s	654	[13:46:56] [INFO]   epoch 010 step 2500/2860 | loss 0.3625 | lr backbone 9.84e-05 / head 9.84e-04 | 6.0 it/s
+30737.5s	655	[13:47:55] [INFO]   epoch 010 step 2860/2860 | loss 0.3395 | lr backbone 9.84e-05 / head 9.84e-04 | 6.0 it/s
+30737.5s	656	[13:49:15] [INFO] Epoch 010/100 | train 0.3547 | val raw 0.3299 AUC 0.9404 | EMA 0.3307 AUC 0.9395 | groups raw [findings 0.8260 COVID 0.9959 TB 0.9994] | monitored 0.9404 (raw) | lr 9.84e-04 | best 0.9404 @10 | 554s
+30737.5s	657	[13:49:15] [INFO]   epoch 011 step 1/2860 | loss 0.4022 | lr backbone 9.84e-05 / head 9.84e-04 | 1.5 it/s
+30737.5s	658	[13:50:38] [INFO]   epoch 011 step 500/2860 | loss 0.2890 | lr backbone 9.83e-05 / head 9.83e-04 | 6.0 it/s
+30737.5s	659	[13:52:01] [INFO]   epoch 011 step 1000/2860 | loss 0.2586 | lr backbone 9.82e-05 / head 9.82e-04 | 6.0 it/s
+30737.5s	660	[13:53:24] [INFO]   epoch 011 step 1500/2860 | loss 0.3219 | lr backbone 9.82e-05 / head 9.81e-04 | 6.0 it/s
+30737.5s	661	[13:54:46] [INFO]   epoch 011 step 2000/2860 | loss 0.3063 | lr backbone 9.81e-05 / head 9.81e-04 | 6.0 it/s
+30737.5s	662	[13:56:09] [INFO]   epoch 011 step 2500/2860 | loss 0.3471 | lr backbone 9.80e-05 / head 9.80e-04 | 6.0 it/s
+30737.5s	663	[13:57:09] [INFO]   epoch 011 step 2860/2860 | loss 0.4915 | lr backbone 9.80e-05 / head 9.79e-04 | 6.0 it/s
+30737.5s	664	[13:58:28] [INFO] Epoch 011/100 | train 0.3527 | val raw 0.3322 AUC 0.9398 | EMA 0.3289 AUC 0.9404 | groups raw [findings 0.8253 COVID 0.9962 TB 0.9980] | monitored 0.9404 (ema) | lr 9.79e-04 | best 0.9404 @11 | 554s
+30737.5s	665	[13:58:29] [INFO]   epoch 012 step 1/2860 | loss 0.2656 | lr backbone 9.80e-05 / head 9.79e-04 | 1.7 it/s
+30737.5s	666	[13:59:52] [INFO]   epoch 012 step 500/2860 | loss 0.2966 | lr backbone 9.79e-05 / head 9.79e-04 | 6.0 it/s
+30737.5s	667	[14:01:14] [INFO]   epoch 012 step 1000/2860 | loss 0.4096 | lr backbone 9.78e-05 / head 9.78e-04 | 6.0 it/s
+30737.5s	668	[14:02:37] [INFO]   epoch 012 step 1500/2860 | loss 0.3702 | lr backbone 9.77e-05 / head 9.77e-04 | 6.0 it/s
+30737.5s	669	[14:04:00] [INFO]   epoch 012 step 2000/2860 | loss 0.3580 | lr backbone 9.76e-05 / head 9.76e-04 | 6.0 it/s
+30737.5s	670	[14:05:23] [INFO]   epoch 012 step 2500/2860 | loss 0.4065 | lr backbone 9.75e-05 / head 9.75e-04 | 6.0 it/s
+30737.5s	671	[14:06:22] [INFO]   epoch 012 step 2860/2860 | loss 0.3561 | lr backbone 9.75e-05 / head 9.75e-04 | 6.0 it/s
+30737.5s	672	[14:07:42] [INFO] Epoch 012/100 | train 0.3506 | val raw 0.3280 AUC 0.9402 | EMA 0.3267 AUC 0.9412 | groups raw [findings 0.8250 COVID 0.9965 TB 0.9992] | monitored 0.9412 (ema) | lr 9.75e-04 | best 0.9412 @12 | 553s
+30737.5s	673	[14:07:42] [INFO]   epoch 013 step 1/2860 | loss 0.2568 | lr backbone 9.75e-05 / head 9.75e-04 | 1.6 it/s
+30737.5s	674	[14:09:05] [INFO]   epoch 013 step 500/2860 | loss 0.3095 | lr backbone 9.74e-05 / head 9.74e-04 | 6.0 it/s
+30737.5s	675	[14:10:28] [INFO]   epoch 013 step 1000/2860 | loss 0.2593 | lr backbone 9.73e-05 / head 9.73e-04 | 6.0 it/s
+30737.5s	676	[14:11:50] [INFO]   epoch 013 step 1500/2860 | loss 0.4561 | lr backbone 9.72e-05 / head 9.72e-04 | 6.0 it/s
+30737.5s	677	[14:13:13] [INFO]   epoch 013 step 2000/2860 | loss 0.3510 | lr backbone 9.71e-05 / head 9.71e-04 | 6.0 it/s
+30737.5s	678	[14:14:36] [INFO]   epoch 013 step 2500/2860 | loss 0.4127 | lr backbone 9.70e-05 / head 9.70e-04 | 6.0 it/s
+30737.5s	679	[14:15:36] [INFO]   epoch 013 step 2860/2860 | loss 0.3103 | lr backbone 9.70e-05 / head 9.69e-04 | 6.0 it/s
+30737.5s	680	[14:16:55] [INFO] Epoch 013/100 | train 0.3493 | val raw 0.3290 AUC 0.9406 | EMA 0.3253 AUC 0.9416 | groups raw [findings 0.8276 COVID 0.9960 TB 0.9981] | monitored 0.9416 (ema) | lr 9.69e-04 | best 0.9416 @13 | 554s
+30737.5s	681	[14:16:56] [INFO]   epoch 014 step 1/2860 | loss 0.3121 | lr backbone 9.70e-05 / head 9.69e-04 | 1.7 it/s
+30737.5s	682	[14:18:19] [INFO]   epoch 014 step 500/2860 | loss 0.3028 | lr backbone 9.69e-05 / head 9.68e-04 | 6.0 it/s
+30737.5s	683	[14:19:41] [INFO]   epoch 014 step 1000/2860 | loss 0.7766 | lr backbone 9.68e-05 / head 9.67e-04 | 6.0 it/s
+30737.5s	684	[14:21:04] [INFO]   epoch 014 step 1500/2860 | loss 0.3502 | lr backbone 9.67e-05 / head 9.66e-04 | 6.0 it/s
+30737.5s	685	[14:22:27] [INFO]   epoch 014 step 2000/2860 | loss 0.2713 | lr backbone 9.66e-05 / head 9.65e-04 | 6.0 it/s
+30737.5s	686	[14:23:50] [INFO]   epoch 014 step 2500/2860 | loss 0.4777 | lr backbone 9.65e-05 / head 9.64e-04 | 6.0 it/s
+30737.5s	687	[14:24:50] [INFO]   epoch 014 step 2860/2860 | loss 0.3147 | lr backbone 9.64e-05 / head 9.63e-04 | 6.0 it/s
+30737.5s	688	[14:26:09] [INFO] Epoch 014/100 | train 0.3468 | val raw 0.3296 AUC 0.9420 | EMA 0.3235 AUC 0.9422 | groups raw [findings 0.8299 COVID 0.9977 TB 0.9983] | monitored 0.9422 (ema) | lr 9.63e-04 | best 0.9422 @14 | 554s
+30737.5s	689	[14:26:09] [INFO]   epoch 015 step 1/2860 | loss 0.4119 | lr backbone 9.64e-05 / head 9.63e-04 | 1.7 it/s
+30737.5s	690	[14:27:32] [INFO]   epoch 015 step 500/2860 | loss 0.3129 | lr backbone 9.63e-05 / head 9.62e-04 | 6.0 it/s
+30737.5s	691	[14:28:55] [INFO]   epoch 015 step 1000/2860 | loss 0.4737 | lr backbone 9.62e-05 / head 9.61e-04 | 6.0 it/s
+30737.5s	692	[14:30:18] [INFO]   epoch 015 step 1500/2860 | loss 0.2376 | lr backbone 9.61e-05 / head 9.60e-04 | 6.0 it/s
+30737.5s	693	[14:31:41] [INFO]   epoch 015 step 2000/2860 | loss 0.4209 | lr backbone 9.60e-05 / head 9.59e-04 | 6.0 it/s
+30737.5s	694	[14:33:04] [INFO]   epoch 015 step 2500/2860 | loss 0.3068 | lr backbone 9.58e-05 / head 9.58e-04 | 6.0 it/s
+30737.5s	695	[14:34:04] [INFO]   epoch 015 step 2860/2860 | loss 0.3452 | lr backbone 9.58e-05 / head 9.57e-04 | 6.0 it/s
+30737.5s	696	[14:35:23] [INFO] Epoch 015/100 | train 0.3457 | val raw 0.3247 AUC 0.9416 | EMA 0.3225 AUC 0.9427 | groups raw [findings 0.8281 COVID 0.9969 TB 0.9997] | monitored 0.9427 (ema) | lr 9.57e-04 | best 0.9427 @15 | 554s
+30737.5s	697	[14:35:23] [INFO]   epoch 016 step 1/2860 | loss 0.2465 | lr backbone 9.58e-05 / head 9.57e-04 | 1.8 it/s
+30737.5s	698	[14:36:46] [INFO]   epoch 016 step 500/2860 | loss 0.3594 | lr backbone 9.57e-05 / head 9.56e-04 | 6.0 it/s
+30737.5s	699	[14:38:09] [INFO]   epoch 016 step 1000/2860 | loss 0.4468 | lr backbone 9.55e-05 / head 9.55e-04 | 6.0 it/s
+30737.5s	700	[14:39:32] [INFO]   epoch 016 step 1500/2860 | loss 0.2838 | lr backbone 9.54e-05 / head 9.54e-04 | 6.0 it/s
+30737.5s	701	[14:40:55] [INFO]   epoch 016 step 2000/2860 | loss 0.4206 | lr backbone 9.53e-05 / head 9.53e-04 | 6.0 it/s
+30737.5s	702	[14:42:18] [INFO]   epoch 016 step 2500/2860 | loss 0.4925 | lr backbone 9.52e-05 / head 9.51e-04 | 6.0 it/s
+30737.5s	703	[14:43:17] [INFO]   epoch 016 step 2860/2860 | loss 0.2311 | lr backbone 9.51e-05 / head 9.51e-04 | 6.0 it/s
+30737.5s	704	[14:44:36] [INFO] Epoch 016/100 | train 0.3440 | val raw 0.3265 AUC 0.9422 | EMA 0.3218 AUC 0.9428 | groups raw [findings 0.8299 COVID 0.9973 TB 0.9995] | monitored 0.9428 (ema) | lr 9.51e-04 | best 0.9428 @16 | 554s
+30737.5s	705	[14:44:37] [INFO]   epoch 017 step 1/2860 | loss 0.4298 | lr backbone 9.51e-05 / head 9.51e-04 | 1.6 it/s
+30737.5s	706	[14:46:00] [INFO]   epoch 017 step 500/2860 | loss 0.2676 | lr backbone 9.50e-05 / head 9.49e-04 | 6.0 it/s
+30737.5s	707	[14:47:23] [INFO]   epoch 017 step 1000/2860 | loss 0.4772 | lr backbone 9.49e-05 / head 9.48e-04 | 6.0 it/s
+30737.5s	708	[14:48:46] [INFO]   epoch 017 step 1500/2860 | loss 0.2775 | lr backbone 9.47e-05 / head 9.47e-04 | 6.0 it/s
+30737.5s	709	[14:50:09] [INFO]   epoch 017 step 2000/2860 | loss 0.3119 | lr backbone 9.46e-05 / head 9.46e-04 | 6.0 it/s
+30737.5s	710	[14:51:32] [INFO]   epoch 017 step 2500/2860 | loss 0.2701 | lr backbone 9.45e-05 / head 9.44e-04 | 6.0 it/s
+30737.5s	711	[14:52:32] [INFO]   epoch 017 step 2860/2860 | loss 0.3624 | lr backbone 9.44e-05 / head 9.43e-04 | 6.0 it/s
+30737.5s	712	[14:53:51] [INFO] Epoch 017/100 | train 0.3420 | val raw 0.3257 AUC 0.9416 | EMA 0.3213 AUC 0.9429 | groups raw [findings 0.8287 COVID 0.9973 TB 0.9989] | monitored 0.9429 (ema) | lr 9.43e-04 | best 0.9429 @17 | 554s
+30737.5s	713	[14:53:51] [INFO]   epoch 018 step 1/2860 | loss 0.2747 | lr backbone 9.44e-05 / head 9.43e-04 | 1.6 it/s
+30737.5s	714	[14:55:14] [INFO]   epoch 018 step 500/2860 | loss 0.2949 | lr backbone 9.43e-05 / head 9.42e-04 | 6.0 it/s
+30737.5s	715	[14:56:37] [INFO]   epoch 018 step 1000/2860 | loss 0.3778 | lr backbone 9.41e-05 / head 9.41e-04 | 6.0 it/s
+30737.5s	716	[14:58:00] [INFO]   epoch 018 step 1500/2860 | loss 0.2531 | lr backbone 9.40e-05 / head 9.39e-04 | 6.0 it/s
+30737.5s	717	[14:59:23] [INFO]   epoch 018 step 2000/2860 | loss 0.3792 | lr backbone 9.39e-05 / head 9.38e-04 | 6.0 it/s
+30737.5s	718	[15:00:46] [INFO]   epoch 018 step 2500/2860 | loss 0.2873 | lr backbone 9.37e-05 / head 9.37e-04 | 6.0 it/s
+30737.5s	719	[15:01:46] [INFO]   epoch 018 step 2860/2860 | loss 0.4169 | lr backbone 9.36e-05 / head 9.36e-04 | 6.0 it/s
+30737.5s	720	[15:03:05] [INFO] Epoch 018/100 | train 0.3408 | val raw 0.3290 AUC 0.9419 | EMA 0.3203 AUC 0.9431 | groups raw [findings 0.8294 COVID 0.9980 TB 0.9983] | monitored 0.9431 (ema) | lr 9.36e-04 | best 0.9431 @18 | 554s
+30737.5s	721	[15:03:06] [INFO]   epoch 019 step 1/2860 | loss 0.2222 | lr backbone 9.36e-05 / head 9.36e-04 | 1.6 it/s
+30737.5s	722	[15:04:28] [INFO]   epoch 019 step 500/2860 | loss 0.2695 | lr backbone 9.35e-05 / head 9.34e-04 | 6.0 it/s
+30737.5s	723	[15:05:51] [INFO]   epoch 019 step 1000/2860 | loss 0.3684 | lr backbone 9.34e-05 / head 9.33e-04 | 6.0 it/s
+30737.5s	724	[15:07:14] [INFO]   epoch 019 step 1500/2860 | loss 0.3552 | lr backbone 9.32e-05 / head 9.32e-04 | 6.0 it/s
+30737.5s	725	[15:08:37] [INFO]   epoch 019 step 2000/2860 | loss 0.2110 | lr backbone 9.31e-05 / head 9.30e-04 | 6.0 it/s
+30737.5s	726	[15:10:00] [INFO]   epoch 019 step 2500/2860 | loss 0.2390 | lr backbone 9.29e-05 / head 9.29e-04 | 6.0 it/s
+30737.5s	727	[15:11:00] [INFO]   epoch 019 step 2860/2860 | loss 0.3548 | lr backbone 9.28e-05 / head 9.28e-04 | 6.0 it/s
+30737.5s	728	[15:12:19] [INFO] Epoch 019/100 | train 0.3390 | val raw 0.3270 AUC 0.9416 | EMA 0.3197 AUC 0.9433 | groups raw [findings 0.8285 COVID 0.9967 TB 0.9996] | monitored 0.9433 (ema) | lr 9.28e-04 | best 0.9433 @19 | 554s
+30737.5s	729	[15:12:20] [INFO]   epoch 020 step 1/2860 | loss 0.2494 | lr backbone 9.28e-05 / head 9.28e-04 | 1.5 it/s
+30737.5s	730	[15:13:43] [INFO]   epoch 020 step 500/2860 | loss 0.4000 | lr backbone 9.27e-05 / head 9.26e-04 | 6.0 it/s
+30737.5s	731	[15:15:06] [INFO]   epoch 020 step 1000/2860 | loss 0.4375 | lr backbone 9.25e-05 / head 9.25e-04 | 6.0 it/s
+30737.5s	732	[15:16:29] [INFO]   epoch 020 step 1500/2860 | loss 0.2957 | lr backbone 9.24e-05 / head 9.23e-04 | 6.0 it/s
+30737.5s	733	[15:17:52] [INFO]   epoch 020 step 2000/2860 | loss 0.3852 | lr backbone 9.22e-05 / head 9.22e-04 | 6.0 it/s
+30737.5s	734	[15:19:15] [INFO]   epoch 020 step 2500/2860 | loss 0.2927 | lr backbone 9.21e-05 / head 9.20e-04 | 6.0 it/s
+30737.5s	735	[15:20:15] [INFO]   epoch 020 step 2860/2860 | loss 0.3809 | lr backbone 9.20e-05 / head 9.19e-04 | 6.0 it/s
+30737.5s	736	[15:21:34] [INFO] Epoch 020/100 | train 0.3376 | val raw 0.3267 AUC 0.9416 | EMA 0.3192 AUC 0.9435 | groups raw [findings 0.8293 COVID 0.9977 TB 0.9979] | monitored 0.9435 (ema) | lr 9.19e-04 | best 0.9435 @20 | 555s
+30737.5s	737	[15:21:35] [INFO]   epoch 021 step 1/2860 | loss 0.3907 | lr backbone 9.20e-05 / head 9.19e-04 | 1.7 it/s
+30737.5s	738	[15:22:58] [INFO]   epoch 021 step 500/2860 | loss 0.2556 | lr backbone 9.18e-05 / head 9.18e-04 | 6.0 it/s
+30737.5s	739	[15:24:21] [INFO]   epoch 021 step 1000/2860 | loss 0.2977 | lr backbone 9.17e-05 / head 9.16e-04 | 6.0 it/s
+30737.5s	740	[15:25:44] [INFO]   epoch 021 step 1500/2860 | loss 0.4129 | lr backbone 9.15e-05 / head 9.14e-04 | 6.0 it/s
+30737.5s	741	[15:27:07] [INFO]   epoch 021 step 2000/2860 | loss 0.2704 | lr backbone 9.14e-05 / head 9.13e-04 | 6.0 it/s
+30737.5s	742	[15:28:30] [INFO]   epoch 021 step 2500/2860 | loss 0.2474 | lr backbone 9.12e-05 / head 9.11e-04 | 6.0 it/s
+30737.5s	743	[15:29:29] [INFO]   epoch 021 step 2860/2860 | loss 0.2697 | lr backbone 9.11e-05 / head 9.10e-04 | 6.0 it/s
+30737.5s	744	[15:30:49] [INFO] Epoch 021/100 | train 0.3363 | val raw 0.3209 AUC 0.9424 | EMA 0.3199 AUC 0.9435 | groups raw [findings 0.8300 COVID 0.9974 TB 0.9996] | monitored 0.9435 (ema) | lr 9.10e-04 | best 0.9435 @20 | 555s
+30737.5s	745	[15:30:49] [INFO]   epoch 022 step 1/2860 | loss 0.3191 | lr backbone 9.11e-05 / head 9.10e-04 | 1.5 it/s
+30737.5s	746	[15:32:12] [INFO]   epoch 022 step 500/2860 | loss 0.4143 | lr backbone 9.09e-05 / head 9.09e-04 | 6.0 it/s
+30737.5s	747	[15:33:35] [INFO]   epoch 022 step 1000/2860 | loss 0.2837 | lr backbone 9.08e-05 / head 9.07e-04 | 6.0 it/s
+30737.5s	748	[15:34:58] [INFO]   epoch 022 step 1500/2860 | loss 0.2695 | lr backbone 9.06e-05 / head 9.05e-04 | 6.0 it/s
+30737.5s	749	[15:36:21] [INFO]   epoch 022 step 2000/2860 | loss 0.2569 | lr backbone 9.05e-05 / head 9.04e-04 | 6.0 it/s
+30737.5s	750	[15:37:44] [INFO]   epoch 022 step 2500/2860 | loss 0.3315 | lr backbone 9.03e-05 / head 9.02e-04 | 6.0 it/s
+30737.5s	751	[15:38:43] [INFO]   epoch 022 step 2860/2860 | loss 0.3115 | lr backbone 9.02e-05 / head 9.01e-04 | 6.0 it/s
+30737.5s	752	[15:40:02] [INFO] Epoch 022/100 | train 0.3350 | val raw 0.3266 AUC 0.9415 | EMA 0.3193 AUC 0.9437 | groups raw [findings 0.8299 COVID 0.9979 TB 0.9969] | monitored 0.9437 (ema) | lr 9.01e-04 | best 0.9437 @22 | 554s
+30737.5s	753	[15:40:03] [INFO]   epoch 023 step 1/2860 | loss 0.3257 | lr backbone 9.02e-05 / head 9.01e-04 | 1.5 it/s
+30737.5s	754	[15:41:26] [INFO]   epoch 023 step 500/2860 | loss 0.3220 | lr backbone 9.00e-05 / head 8.99e-04 | 6.0 it/s
+30737.5s	755	[15:42:49] [INFO]   epoch 023 step 1000/2860 | loss 0.4145 | lr backbone 8.98e-05 / head 8.97e-04 | 6.0 it/s
+30737.5s	756	[15:44:12] [INFO]   epoch 023 step 1500/2860 | loss 0.2872 | lr backbone 8.97e-05 / head 8.96e-04 | 6.0 it/s
+30737.5s	757	[15:45:35] [INFO]   epoch 023 step 2000/2860 | loss 0.3276 | lr backbone 8.95e-05 / head 8.94e-04 | 6.0 it/s
+30737.5s	758	[15:46:58] [INFO]   epoch 023 step 2500/2860 | loss 0.2736 | lr backbone 8.93e-05 / head 8.92e-04 | 6.0 it/s
+30737.5s	759	[15:47:57] [INFO]   epoch 023 step 2860/2860 | loss 0.3381 | lr backbone 8.92e-05 / head 8.91e-04 | 6.0 it/s
+30737.5s	760	[15:49:17] [INFO] Epoch 023/100 | train 0.3335 | val raw 0.3240 AUC 0.9431 | EMA 0.3191 AUC 0.9439 | groups raw [findings 0.8319 COVID 0.9981 TB 0.9992] | monitored 0.9439 (ema) | lr 8.91e-04 | best 0.9439 @23 | 554s
+30737.5s	761	[15:49:17] [INFO]   epoch 024 step 1/2860 | loss 0.2914 | lr backbone 8.92e-05 / head 8.91e-04 | 1.6 it/s
+30737.5s	762	[15:50:40] [INFO]   epoch 024 step 500/2860 | loss 0.3695 | lr backbone 8.90e-05 / head 8.89e-04 | 6.0 it/s
+30737.5s	763	[15:52:03] [INFO]   epoch 024 step 1000/2860 | loss 0.3811 | lr backbone 8.89e-05 / head 8.88e-04 | 6.0 it/s
+30737.5s	764	[15:53:26] [INFO]   epoch 024 step 1500/2860 | loss 0.2665 | lr backbone 8.87e-05 / head 8.86e-04 | 6.0 it/s
+30737.5s	765	[15:54:49] [INFO]   epoch 024 step 2000/2860 | loss 0.3405 | lr backbone 8.85e-05 / head 8.84e-04 | 6.0 it/s
+30737.5s	766	[15:56:12] [INFO]   epoch 024 step 2500/2860 | loss 0.4543 | lr backbone 8.83e-05 / head 8.82e-04 | 6.0 it/s
+30737.5s	767	[15:57:12] [INFO]   epoch 024 step 2860/2860 | loss 0.3650 | lr backbone 8.82e-05 / head 8.81e-04 | 6.0 it/s
+30737.5s	768	[15:58:31] [INFO] Epoch 024/100 | train 0.3316 | val raw 0.3240 AUC 0.9438 | EMA 0.3180 AUC 0.9443 | groups raw [findings 0.8331 COVID 0.9986 TB 0.9997] | monitored 0.9443 (ema) | lr 8.81e-04 | best 0.9443 @24 | 554s
+30737.5s	769	[15:58:31] [INFO]   epoch 025 step 1/2860 | loss 0.2362 | lr backbone 8.82e-05 / head 8.81e-04 | 1.8 it/s
+30737.5s	770	[15:59:54] [INFO]   epoch 025 step 500/2860 | loss 0.4133 | lr backbone 8.80e-05 / head 8.79e-04 | 6.0 it/s
+30737.5s	771	[16:01:17] [INFO]   epoch 025 step 1000/2860 | loss 0.3079 | lr backbone 8.78e-05 / head 8.77e-04 | 6.0 it/s
+30737.5s	772	[16:02:40] [INFO]   epoch 025 step 1500/2860 | loss 0.3092 | lr backbone 8.76e-05 / head 8.75e-04 | 6.0 it/s
+30737.5s	773	[16:04:03] [INFO]   epoch 025 step 2000/2860 | loss 0.3172 | lr backbone 8.75e-05 / head 8.73e-04 | 6.0 it/s
+30737.5s	774	[16:05:26] [INFO]   epoch 025 step 2500/2860 | loss 0.2610 | lr backbone 8.73e-05 / head 8.72e-04 | 6.0 it/s
+30737.5s	775	[16:06:25] [INFO]   epoch 025 step 2860/2860 | loss 0.2772 | lr backbone 8.71e-05 / head 8.70e-04 | 6.0 it/s
+30737.5s	776	[16:07:45] [INFO] Epoch 025/100 | train 0.3309 | val raw 0.3197 AUC 0.9437 | EMA 0.3177 AUC 0.9445 | groups raw [findings 0.8335 COVID 0.9986 TB 0.9991] | monitored 0.9445 (ema) | lr 8.70e-04 | best 0.9445 @25 | 554s
+30737.5s	777	[16:07:46] [INFO]   epoch 026 step 1/2860 | loss 0.2902 | lr backbone 8.71e-05 / head 8.70e-04 | 1.5 it/s
+30737.5s	778	[16:09:08] [INFO]   epoch 026 step 500/2860 | loss 0.3985 | lr backbone 8.70e-05 / head 8.68e-04 | 6.0 it/s
+30737.5s	779	[16:10:31] [INFO]   epoch 026 step 1000/2860 | loss 0.2800 | lr backbone 8.68e-05 / head 8.66e-04 | 6.0 it/s
+30737.5s	780	[16:11:54] [INFO]   epoch 026 step 1500/2860 | loss 0.2534 | lr backbone 8.66e-05 / head 8.65e-04 | 6.0 it/s
+30737.5s	781	[16:13:17] [INFO]   epoch 026 step 2000/2860 | loss 0.3362 | lr backbone 8.64e-05 / head 8.63e-04 | 6.0 it/s
+30737.5s	782	[16:14:40] [INFO]   epoch 026 step 2500/2860 | loss 0.3601 | lr backbone 8.62e-05 / head 8.61e-04 | 6.0 it/s
+30737.5s	783	[16:15:39] [INFO]   epoch 026 step 2860/2860 | loss 0.4533 | lr backbone 8.61e-05 / head 8.59e-04 | 6.0 it/s
+30737.5s	784	[16:16:58] [INFO] Epoch 026/100 | train 0.3300 | val raw 0.3194 AUC 0.9436 | EMA 0.3179 AUC 0.9446 | groups raw [findings 0.8339 COVID 0.9978 TB 0.9991] | monitored 0.9446 (ema) | lr 8.59e-04 | best 0.9446 @26 | 554s
+30737.5s	785	[16:16:59] [INFO]   epoch 027 step 1/2860 | loss 0.3984 | lr backbone 8.61e-05 / head 8.59e-04 | 1.6 it/s
+30737.5s	786	[16:18:22] [INFO]   epoch 027 step 500/2860 | loss 0.3064 | lr backbone 8.59e-05 / head 8.57e-04 | 6.0 it/s
+30737.5s	787	[16:19:45] [INFO]   epoch 027 step 1000/2860 | loss 0.2804 | lr backbone 8.57e-05 / head 8.55e-04 | 6.0 it/s
+30737.5s	788	[16:21:08] [INFO]   epoch 027 step 1500/2860 | loss 0.4398 | lr backbone 8.55e-05 / head 8.53e-04 | 6.0 it/s
+30737.5s	789	[16:22:30] [INFO]   epoch 027 step 2000/2860 | loss 0.3767 | lr backbone 8.53e-05 / head 8.51e-04 | 6.0 it/s
+30737.5s	790	[16:23:53] [INFO]   epoch 027 step 2500/2860 | loss 0.2768 | lr backbone 8.51e-05 / head 8.49e-04 | 6.0 it/s
+30737.5s	791	[16:24:53] [INFO]   epoch 027 step 2860/2860 | loss 0.3242 | lr backbone 8.49e-05 / head 8.48e-04 | 6.0 it/s
+30737.5s	792	[16:26:12] [INFO] Epoch 027/100 | train 0.3279 | val raw 0.3237 AUC 0.9432 | EMA 0.3179 AUC 0.9446 | groups raw [findings 0.8325 COVID 0.9974 TB 0.9996] | monitored 0.9446 (ema) | lr 8.48e-04 | best 0.9446 @27 | 554s
+30737.5s	793	[16:26:13] [INFO]   epoch 028 step 1/2860 | loss 0.4565 | lr backbone 8.49e-05 / head 8.48e-04 | 1.6 it/s
+30737.5s	794	[16:27:36] [INFO]   epoch 028 step 500/2860 | loss 0.4221 | lr backbone 8.47e-05 / head 8.46e-04 | 6.0 it/s
+30737.5s	795	[16:28:59] [INFO]   epoch 028 step 1000/2860 | loss 0.2699 | lr backbone 8.45e-05 / head 8.44e-04 | 6.0 it/s
+30737.5s	796	[16:30:21] [INFO]   epoch 028 step 1500/2860 | loss 0.3688 | lr backbone 8.43e-05 / head 8.42e-04 | 6.0 it/s
+30737.5s	797	[16:31:44] [INFO]   epoch 028 step 2000/2860 | loss 0.4542 | lr backbone 8.41e-05 / head 8.40e-04 | 6.0 it/s
+30737.5s	798	[16:33:07] [INFO]   epoch 028 step 2500/2860 | loss 0.3244 | lr backbone 8.39e-05 / head 8.38e-04 | 6.0 it/s
+30737.5s	799	[16:34:07] [INFO]   epoch 028 step 2860/2860 | loss 0.2159 | lr backbone 8.38e-05 / head 8.36e-04 | 6.0 it/s
+30737.5s	800	[16:35:26] [INFO] Epoch 028/100 | train 0.3273 | val raw 0.3213 AUC 0.9436 | EMA 0.3176 AUC 0.9446 | groups raw [findings 0.8334 COVID 0.9980 TB 0.9993] | monitored 0.9446 (ema) | lr 8.36e-04 | best 0.9446 @27 | 554s
+30737.5s	801	[16:35:27] [INFO]   epoch 029 step 1/2860 | loss 0.3785 | lr backbone 8.38e-05 / head 8.36e-04 | 1.6 it/s
+30737.5s	802	[16:36:49] [INFO]   epoch 029 step 500/2860 | loss 0.2726 | lr backbone 8.36e-05 / head 8.34e-04 | 6.0 it/s
+30737.5s	803	[16:38:12] [INFO]   epoch 029 step 1000/2860 | loss 0.2875 | lr backbone 8.34e-05 / head 8.32e-04 | 6.0 it/s
+30737.5s	804	[16:39:35] [INFO]   epoch 029 step 1500/2860 | loss 0.2607 | lr backbone 8.32e-05 / head 8.30e-04 | 6.0 it/s
+30737.5s	805	[16:40:58] [INFO]   epoch 029 step 2000/2860 | loss 0.2729 | lr backbone 8.29e-05 / head 8.28e-04 | 6.0 it/s
+30737.5s	806	[16:42:21] [INFO]   epoch 029 step 2500/2860 | loss 0.3240 | lr backbone 8.27e-05 / head 8.26e-04 | 6.0 it/s
+30737.5s	807	[16:43:20] [INFO]   epoch 029 step 2860/2860 | loss 0.3033 | lr backbone 8.26e-05 / head 8.24e-04 | 6.0 it/s
+30737.5s	808	[16:44:39] [INFO] Epoch 029/100 | train 0.3257 | val raw 0.3184 AUC 0.9438 | EMA 0.3175 AUC 0.9446 | groups raw [findings 0.8331 COVID 0.9988 TB 0.9995] | monitored 0.9446 (ema) | lr 8.24e-04 | best 0.9446 @27 | 553s
+30737.5s	809	[16:44:40] [INFO]   epoch 030 step 1/2860 | loss 0.3051 | lr backbone 8.26e-05 / head 8.24e-04 | 1.7 it/s
+30737.5s	810	[16:46:03] [INFO]   epoch 030 step 500/2860 | loss 0.4606 | lr backbone 8.24e-05 / head 8.22e-04 | 6.0 it/s
+30737.5s	811	[16:47:26] [INFO]   epoch 030 step 1000/2860 | loss 0.2695 | lr backbone 8.22e-05 / head 8.20e-04 | 6.0 it/s
+30737.5s	812	[16:48:48] [INFO]   epoch 030 step 1500/2860 | loss 0.2311 | lr backbone 8.19e-05 / head 8.18e-04 | 6.0 it/s
+30737.5s	813	[16:50:11] [INFO]   epoch 030 step 2000/2860 | loss 0.5351 | lr backbone 8.17e-05 / head 8.16e-04 | 6.0 it/s
+30737.5s	814	[16:51:34] [INFO]   epoch 030 step 2500/2860 | loss 0.2883 | lr backbone 8.15e-05 / head 8.14e-04 | 6.0 it/s
+30737.5s	815	[16:52:34] [INFO]   epoch 030 step 2860/2860 | loss 0.3679 | lr backbone 8.14e-05 / head 8.12e-04 | 6.0 it/s
+30737.5s	816	[16:53:53] [INFO] Epoch 030/100 | train 0.3253 | val raw 0.3209 AUC 0.9443 | EMA 0.3174 AUC 0.9447 | groups raw [findings 0.8345 COVID 0.9989 TB 0.9996] | monitored 0.9447 (ema) | lr 8.12e-04 | best 0.9447 @30 | 554s
+30737.5s	817	[16:53:54] [INFO]   epoch 031 step 1/2860 | loss 0.4192 | lr backbone 8.14e-05 / head 8.12e-04 | 1.6 it/s
+30737.5s	818	[16:55:16] [INFO]   epoch 031 step 500/2860 | loss 0.4071 | lr backbone 8.11e-05 / head 8.10e-04 | 6.0 it/s
+30737.5s	819	[16:56:39] [INFO]   epoch 031 step 1000/2860 | loss 0.3198 | lr backbone 8.09e-05 / head 8.08e-04 | 6.0 it/s
+30737.5s	820	[16:58:02] [INFO]   epoch 031 step 1500/2860 | loss 0.4036 | lr backbone 8.07e-05 / head 8.05e-04 | 6.0 it/s
+30737.5s	821	[16:59:25] [INFO]   epoch 031 step 2000/2860 | loss 0.2886 | lr backbone 8.05e-05 / head 8.03e-04 | 6.0 it/s
+30737.5s	822	[17:00:48] [INFO]   epoch 031 step 2500/2860 | loss 0.2109 | lr backbone 8.03e-05 / head 8.01e-04 | 6.0 it/s
+30737.5s	823	[17:01:48] [INFO]   epoch 031 step 2860/2860 | loss 0.2424 | lr backbone 8.01e-05 / head 7.99e-04 | 6.0 it/s
+30737.5s	824	[17:03:07] [INFO] Epoch 031/100 | train 0.3240 | val raw 0.3215 AUC 0.9432 | EMA 0.3165 AUC 0.9449 | groups raw [findings 0.8314 COVID 0.9986 TB 0.9995] | monitored 0.9449 (ema) | lr 7.99e-04 | best 0.9449 @31 | 554s
+30737.5s	825	[17:03:07] [INFO]   epoch 032 step 1/2860 | loss 0.2765 | lr backbone 8.01e-05 / head 7.99e-04 | 1.7 it/s
+30737.5s	826	[17:04:30] [INFO]   epoch 032 step 500/2860 | loss 0.2103 | lr backbone 7.99e-05 / head 7.97e-04 | 6.0 it/s
+30737.5s	827	[17:05:53] [INFO]   epoch 032 step 1000/2860 | loss 0.3457 | lr backbone 7.97e-05 / head 7.95e-04 | 6.0 it/s
+30737.5s	828	[17:07:16] [INFO]   epoch 032 step 1500/2860 | loss 0.3258 | lr backbone 7.94e-05 / head 7.92e-04 | 6.0 it/s
+30737.5s	829	[17:08:39] [INFO]   epoch 032 step 2000/2860 | loss 0.3599 | lr backbone 7.92e-05 / head 7.90e-04 | 6.0 it/s
+30737.5s	830	[17:10:02] [INFO]   epoch 032 step 2500/2860 | loss 0.1939 | lr backbone 7.90e-05 / head 7.88e-04 | 6.0 it/s
+30737.5s	831	[17:11:01] [INFO]   epoch 032 step 2860/2860 | loss 0.2576 | lr backbone 7.88e-05 / head 7.86e-04 | 6.0 it/s
+30737.5s	832	[17:12:20] [INFO] Epoch 032/100 | train 0.3233 | val raw 0.3250 AUC 0.9434 | EMA 0.3163 AUC 0.9449 | groups raw [findings 0.8336 COVID 0.9973 TB 0.9993] | monitored 0.9449 (ema) | lr 7.86e-04 | best 0.9449 @32 | 554s
+30737.5s	833	[17:12:21] [INFO]   epoch 033 step 1/2860 | loss 0.3942 | lr backbone 7.88e-05 / head 7.86e-04 | 1.5 it/s
+30737.5s	834	[17:13:44] [INFO]   epoch 033 step 500/2860 | loss 0.2924 | lr backbone 7.86e-05 / head 7.84e-04 | 6.0 it/s
+30737.5s	835	[17:15:07] [INFO]   epoch 033 step 1000/2860 | loss 0.3085 | lr backbone 7.84e-05 / head 7.82e-04 | 6.0 it/s
+30737.5s	836	[17:16:30] [INFO]   epoch 033 step 1500/2860 | loss 0.2573 | lr backbone 7.81e-05 / head 7.79e-04 | 6.0 it/s
+30737.5s	837	[17:17:53] [INFO]   epoch 033 step 2000/2860 | loss 0.2573 | lr backbone 7.79e-05 / head 7.77e-04 | 6.0 it/s
+30737.5s	838	[17:19:16] [INFO]   epoch 033 step 2500/2860 | loss 0.3553 | lr backbone 7.77e-05 / head 7.75e-04 | 6.0 it/s
+30737.5s	839	[17:20:15] [INFO]   epoch 033 step 2860/2860 | loss 0.4248 | lr backbone 7.75e-05 / head 7.73e-04 | 6.0 it/s
+30737.5s	840	[17:21:34] [INFO] Epoch 033/100 | train 0.3214 | val raw 0.3220 AUC 0.9440 | EMA 0.3166 AUC 0.9449 | groups raw [findings 0.8348 COVID 0.9981 TB 0.9992] | monitored 0.9449 (ema) | lr 7.73e-04 | best 0.9449 @32 | 554s
+30737.5s	841	[17:21:35] [INFO]   epoch 034 step 1/2860 | loss 0.2712 | lr backbone 7.75e-05 / head 7.73e-04 | 1.6 it/s
+30737.5s	842	[17:22:58] [INFO]   epoch 034 step 500/2860 | loss 0.2937 | lr backbone 7.73e-05 / head 7.71e-04 | 6.0 it/s
+30737.5s	843	[17:24:21] [INFO]   epoch 034 step 1000/2860 | loss 0.5762 | lr backbone 7.70e-05 / head 7.68e-04 | 6.0 it/s
+30737.5s	844	[17:25:44] [INFO]   epoch 034 step 1500/2860 | loss 0.3380 | lr backbone 7.68e-05 / head 7.66e-04 | 6.0 it/s
+30737.5s	845	[17:27:07] [INFO]   epoch 034 step 2000/2860 | loss 0.2181 | lr backbone 7.66e-05 / head 7.64e-04 | 6.0 it/s
+30737.5s	846	[17:28:29] [INFO]   epoch 034 step 2500/2860 | loss 0.3889 | lr backbone 7.63e-05 / head 7.61e-04 | 6.0 it/s
+30737.5s	847	[17:29:29] [INFO]   epoch 034 step 2860/2860 | loss 0.2809 | lr backbone 7.62e-05 / head 7.59e-04 | 6.0 it/s
+30737.5s	848	[17:30:48] [INFO] Epoch 034/100 | train 0.3214 | val raw 0.3221 AUC 0.9428 | EMA 0.3171 AUC 0.9449 | groups raw [findings 0.8312 COVID 0.9982 TB 0.9989] | monitored 0.9449 (ema) | lr 7.59e-04 | best 0.9449 @32 | 554s
+30737.5s	849	[17:30:49] [INFO]   epoch 035 step 1/2860 | loss 0.3479 | lr backbone 7.62e-05 / head 7.59e-04 | 1.6 it/s
+30737.5s	850	[17:32:12] [INFO]   epoch 035 step 500/2860 | loss 0.3649 | lr backbone 7.59e-05 / head 7.57e-04 | 6.0 it/s
+30737.5s	851	[17:33:35] [INFO]   epoch 035 step 1000/2860 | loss 0.2419 | lr backbone 7.57e-05 / head 7.55e-04 | 6.0 it/s
+30737.5s	852	[17:34:58] [INFO]   epoch 035 step 1500/2860 | loss 0.3933 | lr backbone 7.54e-05 / head 7.52e-04 | 6.0 it/s
+30737.5s	853	[17:36:21] [INFO]   epoch 035 step 2000/2860 | loss 0.3476 | lr backbone 7.52e-05 / head 7.50e-04 | 6.0 it/s
+30737.5s	854	[17:37:43] [INFO]   epoch 035 step 2500/2860 | loss 0.2966 | lr backbone 7.50e-05 / head 7.47e-04 | 6.0 it/s
+30737.5s	855	[17:38:43] [INFO]   epoch 035 step 2860/2860 | loss 0.3101 | lr backbone 7.48e-05 / head 7.46e-04 | 6.0 it/s
+30737.5s	856	[17:40:02] [INFO] Epoch 035/100 | train 0.3195 | val raw 0.3258 AUC 0.9434 | EMA 0.3179 AUC 0.9448 | groups raw [findings 0.8316 COVID 0.9988 TB 0.9997] | monitored 0.9448 (ema) | lr 7.46e-04 | best 0.9449 @32 | 554s
+30737.5s	857	[17:40:03] [INFO]   epoch 036 step 1/2860 | loss 0.4425 | lr backbone 7.48e-05 / head 7.46e-04 | 1.6 it/s
+30737.5s	858	[17:41:26] [INFO]   epoch 036 step 500/2860 | loss 0.3105 | lr backbone 7.45e-05 / head 7.43e-04 | 6.0 it/s
+30737.5s	859	[17:42:49] [INFO]   epoch 036 step 1000/2860 | loss 0.3856 | lr backbone 7.43e-05 / head 7.41e-04 | 6.0 it/s
+30737.5s	860	[17:44:12] [INFO]   epoch 036 step 1500/2860 | loss 0.3339 | lr backbone 7.41e-05 / head 7.38e-04 | 6.0 it/s
+30737.5s	861	[17:45:34] [INFO]   epoch 036 step 2000/2860 | loss 0.3462 | lr backbone 7.38e-05 / head 7.36e-04 | 6.0 it/s
+30737.5s	862	[17:46:57] [INFO]   epoch 036 step 2500/2860 | loss 0.3742 | lr backbone 7.36e-05 / head 7.33e-04 | 6.0 it/s
+30737.5s	863	[17:47:57] [INFO]   epoch 036 step 2860/2860 | loss 0.2377 | lr backbone 7.34e-05 / head 7.32e-04 | 6.0 it/s
+30737.5s	864	[17:49:16] [INFO] Epoch 036/100 | train 0.3188 | val raw 0.3204 AUC 0.9437 | EMA 0.3180 AUC 0.9448 | groups raw [findings 0.8336 COVID 0.9989 TB 0.9987] | monitored 0.9448 (ema) | lr 7.32e-04 | best 0.9449 @32 | 553s
+30737.5s	865	[17:49:16] [INFO]   epoch 037 step 1/2860 | loss 0.3544 | lr backbone 7.34e-05 / head 7.32e-04 | 1.6 it/s
+30737.5s	866	[17:50:39] [INFO]   epoch 037 step 500/2860 | loss 0.2037 | lr backbone 7.31e-05 / head 7.29e-04 | 6.0 it/s
+30737.5s	867	[17:52:02] [INFO]   epoch 037 step 1000/2860 | loss 0.2685 | lr backbone 7.29e-05 / head 7.27e-04 | 6.0 it/s
+30737.5s	868	[17:53:25] [INFO]   epoch 037 step 1500/2860 | loss 0.2876 | lr backbone 7.27e-05 / head 7.24e-04 | 6.0 it/s
+30737.5s	869	[17:54:47] [INFO]   epoch 037 step 2000/2860 | loss 0.3836 | lr backbone 7.24e-05 / head 7.22e-04 | 6.0 it/s
+30737.5s	870	[17:56:10] [INFO]   epoch 037 step 2500/2860 | loss 0.2705 | lr backbone 7.22e-05 / head 7.19e-04 | 6.0 it/s
+30737.5s	871	[17:57:10] [INFO]   epoch 037 step 2860/2860 | loss 0.3353 | lr backbone 7.20e-05 / head 7.17e-04 | 6.0 it/s
+30737.5s	872	[17:58:29] [INFO] Epoch 037/100 | train 0.3175 | val raw 0.3255 AUC 0.9435 | EMA 0.3188 AUC 0.9447 | groups raw [findings 0.8329 COVID 0.9985 TB 0.9992] | monitored 0.9447 (ema) | lr 7.17e-04 | best 0.9449 @32 | 553s
+30737.5s	873	[17:58:30] [INFO]   epoch 038 step 1/2860 | loss 0.2471 | lr backbone 7.20e-05 / head 7.17e-04 | 1.6 it/s
+30737.5s	874	[17:59:52] [INFO]   epoch 038 step 500/2860 | loss 0.2426 | lr backbone 7.17e-05 / head 7.15e-04 | 6.0 it/s
+30737.5s	875	[18:01:15] [INFO]   epoch 038 step 1000/2860 | loss 0.5097 | lr backbone 7.15e-05 / head 7.12e-04 | 6.0 it/s
+30737.5s	876	[18:02:38] [INFO]   epoch 038 step 1500/2860 | loss 0.4404 | lr backbone 7.12e-05 / head 7.10e-04 | 6.0 it/s
+30737.5s	877	[18:04:01] [INFO]   epoch 038 step 2000/2860 | loss 0.4046 | lr backbone 7.10e-05 / head 7.07e-04 | 6.0 it/s
+30737.5s	878	[18:05:24] [INFO]   epoch 038 step 2500/2860 | loss 0.3181 | lr backbone 7.07e-05 / head 7.05e-04 | 6.0 it/s
+30737.5s	879	[18:06:23] [INFO]   epoch 038 step 2860/2860 | loss 0.3609 | lr backbone 7.05e-05 / head 7.03e-04 | 6.0 it/s
+30737.5s	880	[18:07:43] [INFO] Epoch 038/100 | train 0.3161 | val raw 0.3234 AUC 0.9434 | EMA 0.3194 AUC 0.9447 | groups raw [findings 0.8329 COVID 0.9990 TB 0.9983] | monitored 0.9447 (ema) | lr 7.03e-04 | best 0.9449 @32 | 554s
+30737.5s	881	[18:07:43] [INFO]   epoch 039 step 1/2860 | loss 0.3331 | lr backbone 7.05e-05 / head 7.03e-04 | 1.5 it/s
+30737.5s	882	[18:09:06] [INFO]   epoch 039 step 500/2860 | loss 0.3670 | lr backbone 7.03e-05 / head 7.00e-04 | 6.0 it/s
+30737.5s	883	[18:10:29] [INFO]   epoch 039 step 1000/2860 | loss 0.4602 | lr backbone 7.00e-05 / head 6.98e-04 | 6.0 it/s
+30737.5s	884	[18:11:52] [INFO]   epoch 039 step 1500/2860 | loss 0.4449 | lr backbone 6.98e-05 / head 6.95e-04 | 6.0 it/s
+30737.5s	885	[18:13:15] [INFO]   epoch 039 step 2000/2860 | loss 0.5064 | lr backbone 6.95e-05 / head 6.92e-04 | 6.0 it/s
+30737.5s	886	[18:14:38] [INFO]   epoch 039 step 2500/2860 | loss 0.3030 | lr backbone 6.93e-05 / head 6.90e-04 | 6.0 it/s
+30737.5s	887	[18:15:37] [INFO]   epoch 039 step 2860/2860 | loss 0.2684 | lr backbone 6.91e-05 / head 6.88e-04 | 6.0 it/s
+30737.5s	888	[18:16:57] [INFO] Epoch 039/100 | train 0.3155 | val raw 0.3248 AUC 0.9443 | EMA 0.3192 AUC 0.9449 | groups raw [findings 0.8342 COVID 0.9992 TB 0.9995] | monitored 0.9449 (ema) | lr 6.88e-04 | best 0.9449 @39 | 554s
+30737.5s	889	[18:16:57] [INFO]   epoch 040 step 1/2860 | loss 0.2997 | lr backbone 6.91e-05 / head 6.88e-04 | 1.6 it/s
+30737.5s	890	[18:18:20] [INFO]   epoch 040 step 500/2860 | loss 0.1911 | lr backbone 6.88e-05 / head 6.85e-04 | 6.0 it/s
+30737.5s	891	[18:19:43] [INFO]   epoch 040 step 1000/2860 | loss 0.2474 | lr backbone 6.86e-05 / head 6.83e-04 | 6.0 it/s
+30737.5s	892	[18:21:06] [INFO]   epoch 040 step 1500/2860 | loss 0.2695 | lr backbone 6.83e-05 / head 6.80e-04 | 6.0 it/s
+30737.5s	893	[18:22:28] [INFO]   epoch 040 step 2000/2860 | loss 0.2396 | lr backbone 6.80e-05 / head 6.78e-04 | 6.0 it/s
+30737.5s	894	[18:23:51] [INFO]   epoch 040 step 2500/2860 | loss 0.2969 | lr backbone 6.78e-05 / head 6.75e-04 | 6.0 it/s
+30737.5s	895	[18:24:51] [INFO]   epoch 040 step 2860/2860 | loss 0.3755 | lr backbone 6.76e-05 / head 6.73e-04 | 6.0 it/s
+30737.5s	896	[18:26:10] [INFO] Epoch 040/100 | train 0.3141 | val raw 0.3271 AUC 0.9440 | EMA 0.3204 AUC 0.9448 | groups raw [findings 0.8338 COVID 0.9991 TB 0.9991] | monitored 0.9448 (ema) | lr 6.73e-04 | best 0.9449 @39 | 553s
+30737.5s	897	[18:26:11] [INFO]   epoch 041 step 1/2860 | loss 0.3933 | lr backbone 6.76e-05 / head 6.73e-04 | 1.6 it/s
+30737.5s	898	[18:27:33] [INFO]   epoch 041 step 500/2860 | loss 0.4887 | lr backbone 6.73e-05 / head 6.70e-04 | 6.0 it/s
+30737.5s	899	[18:28:56] [INFO]   epoch 041 step 1000/2860 | loss 0.2203 | lr backbone 6.71e-05 / head 6.68e-04 | 6.0 it/s
+30737.5s	900	[18:30:19] [INFO]   epoch 041 step 1500/2860 | loss 0.2888 | lr backbone 6.68e-05 / head 6.65e-04 | 6.0 it/s
+30737.5s	901	[18:31:42] [INFO]   epoch 041 step 2000/2860 | loss 0.4037 | lr backbone 6.65e-05 / head 6.62e-04 | 6.0 it/s
+30737.5s	902	[18:33:05] [INFO]   epoch 041 step 2500/2860 | loss 0.2199 | lr backbone 6.63e-05 / head 6.60e-04 | 6.0 it/s
+30737.5s	903	[18:34:04] [INFO]   epoch 041 step 2860/2860 | loss 0.2674 | lr backbone 6.61e-05 / head 6.58e-04 | 6.0 it/s
+30737.5s	904	[18:35:23] [INFO] Epoch 041/100 | train 0.3130 | val raw 0.3253 AUC 0.9436 | EMA 0.3209 AUC 0.9447 | groups raw [findings 0.8321 COVID 0.9991 TB 0.9997] | monitored 0.9447 (ema) | lr 6.58e-04 | best 0.9449 @39 | 553s
+30737.5s	905	[18:35:24] [INFO]   epoch 042 step 1/2860 | loss 0.4163 | lr backbone 6.61e-05 / head 6.58e-04 | 1.6 it/s
+30737.5s	906	[18:36:47] [INFO]   epoch 042 step 500/2860 | loss 0.2878 | lr backbone 6.58e-05 / head 6.55e-04 | 6.0 it/s
+30737.5s	907	[18:38:09] [INFO]   epoch 042 step 1000/2860 | loss 0.3271 | lr backbone 6.56e-05 / head 6.53e-04 | 6.0 it/s
+30737.5s	908	[18:39:32] [INFO]   epoch 042 step 1500/2860 | loss 0.2936 | lr backbone 6.53e-05 / head 6.50e-04 | 6.0 it/s
+30737.5s	909	[18:40:55] [INFO]   epoch 042 step 2000/2860 | loss 0.2674 | lr backbone 6.50e-05 / head 6.47e-04 | 6.0 it/s
+30737.5s	910	[18:42:18] [INFO]   epoch 042 step 2500/2860 | loss 0.2527 | lr backbone 6.48e-05 / head 6.45e-04 | 6.0 it/s
+30737.5s	911	[18:43:18] [INFO]   epoch 042 step 2860/2860 | loss 0.3540 | lr backbone 6.46e-05 / head 6.43e-04 | 6.0 it/s
+30737.5s	912	[18:44:37] [INFO] Epoch 042/100 | train 0.3118 | val raw 0.3291 AUC 0.9430 | EMA 0.3216 AUC 0.9446 | groups raw [findings 0.8336 COVID 0.9990 TB 0.9964] | monitored 0.9446 (ema) | lr 6.43e-04 | best 0.9449 @39 | 554s
+30737.5s	913	[18:44:37] [INFO]   epoch 043 step 1/2860 | loss 0.2371 | lr backbone 6.46e-05 / head 6.43e-04 | 1.7 it/s
+30737.5s	914	[18:46:00] [INFO]   epoch 043 step 500/2860 | loss 0.2075 | lr backbone 6.43e-05 / head 6.40e-04 | 6.0 it/s
+30737.5s	915	[18:47:23] [INFO]   epoch 043 step 1000/2860 | loss 0.2547 | lr backbone 6.41e-05 / head 6.37e-04 | 6.0 it/s
+30737.5s	916	[18:48:46] [INFO]   epoch 043 step 1500/2860 | loss 0.2847 | lr backbone 6.38e-05 / head 6.35e-04 | 6.0 it/s
+30737.5s	917	[18:50:09] [INFO]   epoch 043 step 2000/2860 | loss 0.2690 | lr backbone 6.35e-05 / head 6.32e-04 | 6.0 it/s
+30737.5s	918	[18:51:32] [INFO]   epoch 043 step 2500/2860 | loss 0.2303 | lr backbone 6.32e-05 / head 6.29e-04 | 6.0 it/s
+30737.5s	919	[18:52:31] [INFO]   epoch 043 step 2860/2860 | loss 0.2780 | lr backbone 6.31e-05 / head 6.27e-04 | 6.0 it/s
+30737.5s	920	[18:53:51] [INFO] Epoch 043/100 | train 0.3114 | val raw 0.3240 AUC 0.9444 | EMA 0.3216 AUC 0.9446 | groups raw [findings 0.8356 COVID 0.9991 TB 0.9986] | monitored 0.9446 (ema) | lr 6.27e-04 | best 0.9449 @39 | 554s
+30737.5s	921	[18:53:51] [INFO]   epoch 044 step 1/2860 | loss 0.2158 | lr backbone 6.31e-05 / head 6.27e-04 | 1.6 it/s
+30737.5s	922	[18:55:14] [INFO]   epoch 044 step 500/2860 | loss 0.4420 | lr backbone 6.28e-05 / head 6.24e-04 | 6.0 it/s
+30737.5s	923	[18:56:37] [INFO]   epoch 044 step 1000/2860 | loss 0.4282 | lr backbone 6.25e-05 / head 6.22e-04 | 6.0 it/s
+30737.5s	924	[18:58:00] [INFO]   epoch 044 step 1500/2860 | loss 0.4341 | lr backbone 6.22e-05 / head 6.19e-04 | 6.0 it/s
+30737.5s	925	[18:59:23] [INFO]   epoch 044 step 2000/2860 | loss 0.2273 | lr backbone 6.20e-05 / head 6.16e-04 | 6.0 it/s
+30737.5s	926	[19:00:46] [INFO]   epoch 044 step 2500/2860 | loss 0.3488 | lr backbone 6.17e-05 / head 6.14e-04 | 6.0 it/s
+30737.5s	927	[19:01:45] [INFO]   epoch 044 step 2860/2860 | loss 0.3088 | lr backbone 6.15e-05 / head 6.12e-04 | 6.0 it/s
+30737.5s	928	[19:03:04] [INFO] Epoch 044/100 | train 0.3108 | val raw 0.3238 AUC 0.9438 | EMA 0.3213 AUC 0.9446 | groups raw [findings 0.8341 COVID 0.9992 TB 0.9981] | monitored 0.9446 (ema) | lr 6.12e-04 | best 0.9449 @39 | 554s
+30737.5s	929	[19:03:05] [INFO]   epoch 045 step 1/2860 | loss 0.3248 | lr backbone 6.15e-05 / head 6.12e-04 | 1.8 it/s
+30737.5s	930	[19:04:28] [INFO]   epoch 045 step 500/2860 | loss 0.3239 | lr backbone 6.12e-05 / head 6.09e-04 | 6.0 it/s
+30737.5s	931	[19:05:51] [INFO]   epoch 045 step 1000/2860 | loss 0.2803 | lr backbone 6.10e-05 / head 6.06e-04 | 6.0 it/s
+30737.5s	932	[19:07:14] [INFO]   epoch 045 step 1500/2860 | loss 0.3143 | lr backbone 6.07e-05 / head 6.03e-04 | 6.0 it/s
+30737.5s	933	[19:08:37] [INFO]   epoch 045 step 2000/2860 | loss 0.3390 | lr backbone 6.04e-05 / head 6.01e-04 | 6.0 it/s
+30737.5s	934	[19:10:00] [INFO]   epoch 045 step 2500/2860 | loss 0.2124 | lr backbone 6.02e-05 / head 5.98e-04 | 6.0 it/s
+30737.5s	935	[19:10:59] [INFO]   epoch 045 step 2860/2860 | loss 0.3845 | lr backbone 6.00e-05 / head 5.96e-04 | 6.0 it/s
+30737.5s	936	[19:12:19] [INFO] Epoch 045/100 | train 0.3092 | val raw 0.3262 AUC 0.9429 | EMA 0.3220 AUC 0.9445 | groups raw [findings 0.8320 COVID 0.9989 TB 0.9979] | monitored 0.9445 (ema) | lr 5.96e-04 | best 0.9449 @39 | 554s
+30737.5s	937	[19:12:19] [INFO]   epoch 046 step 1/2860 | loss 0.2777 | lr backbone 6.00e-05 / head 5.96e-04 | 1.6 it/s
+30737.5s	938	[19:13:42] [INFO]   epoch 046 step 500/2860 | loss 0.2863 | lr backbone 5.97e-05 / head 5.93e-04 | 6.0 it/s
+30737.5s	939	[19:15:05] [INFO]   epoch 046 step 1000/2860 | loss 0.3347 | lr backbone 5.94e-05 / head 5.90e-04 | 6.0 it/s
+30737.5s	940	[19:16:28] [INFO]   epoch 046 step 1500/2860 | loss 0.3217 | lr backbone 5.91e-05 / head 5.88e-04 | 6.0 it/s
+30737.5s	941	[19:17:51] [INFO]   epoch 046 step 2000/2860 | loss 0.3072 | lr backbone 5.89e-05 / head 5.85e-04 | 6.0 it/s
+30737.5s	942	[19:19:14] [INFO]   epoch 046 step 2500/2860 | loss 0.3247 | lr backbone 5.86e-05 / head 5.82e-04 | 6.0 it/s
+30737.5s	943	[19:20:14] [INFO]   epoch 046 step 2860/2860 | loss 0.2261 | lr backbone 5.84e-05 / head 5.80e-04 | 6.0 it/s
+30737.5s	944	[19:21:33] [INFO] Epoch 046/100 | train 0.3086 | val raw 0.3301 AUC 0.9415 | EMA 0.3223 AUC 0.9443 | groups raw [findings 0.8303 COVID 0.9991 TB 0.9951] | monitored 0.9443 (ema) | lr 5.80e-04 | best 0.9449 @39 | 554s
+30737.5s	945	[19:21:33] [INFO]   epoch 047 step 1/2860 | loss 0.3798 | lr backbone 5.84e-05 / head 5.80e-04 | 1.8 it/s
+30737.5s	946	[19:22:56] [INFO]   epoch 047 step 500/2860 | loss 0.2318 | lr backbone 5.81e-05 / head 5.77e-04 | 6.0 it/s
+30737.5s	947	[19:24:19] [INFO]   epoch 047 step 1000/2860 | loss 0.2788 | lr backbone 5.79e-05 / head 5.75e-04 | 6.0 it/s
+30737.5s	948	[19:25:42] [INFO]   epoch 047 step 1500/2860 | loss 0.3284 | lr backbone 5.76e-05 / head 5.72e-04 | 6.0 it/s
+30737.5s	949	[19:27:05] [INFO]   epoch 047 step 2000/2860 | loss 0.4742 | lr backbone 5.73e-05 / head 5.69e-04 | 6.0 it/s
+30737.5s	950	[19:28:28] [INFO]   epoch 047 step 2500/2860 | loss 0.3765 | lr backbone 5.70e-05 / head 5.66e-04 | 6.0 it/s
+30737.5s	951	[19:29:27] [INFO]   epoch 047 step 2860/2860 | loss 0.4061 | lr backbone 5.68e-05 / head 5.64e-04 | 6.0 it/s
+30737.5s	952	[19:30:46] [INFO] Epoch 047/100 | train 0.3072 | val raw 0.3255 AUC 0.9420 | EMA 0.3223 AUC 0.9442 | groups raw [findings 0.8323 COVID 0.9991 TB 0.9946] | monitored 0.9442 (ema) | lr 5.64e-04 | best 0.9449 @39 | 554s
+30737.5s	953	[19:30:47] [INFO]   epoch 048 step 1/2860 | loss 0.2070 | lr backbone 5.68e-05 / head 5.64e-04 | 1.6 it/s
+30737.5s	954	[19:32:10] [INFO]   epoch 048 step 500/2860 | loss 0.2628 | lr backbone 5.66e-05 / head 5.62e-04 | 6.0 it/s
+30737.5s	955	[19:33:33] [INFO]   epoch 048 step 1000/2860 | loss 0.1317 | lr backbone 5.63e-05 / head 5.59e-04 | 6.0 it/s
+30737.5s	956	[19:34:56] [INFO]   epoch 048 step 1500/2860 | loss 0.2331 | lr backbone 5.60e-05 / head 5.56e-04 | 6.0 it/s
+30737.5s	957	[19:36:18] [INFO]   epoch 048 step 2000/2860 | loss 0.2987 | lr backbone 5.57e-05 / head 5.53e-04 | 6.0 it/s
+30737.5s	958	[19:37:41] [INFO]   epoch 048 step 2500/2860 | loss 0.2440 | lr backbone 5.55e-05 / head 5.50e-04 | 6.0 it/s
+30737.5s	959	[19:38:41] [INFO]   epoch 048 step 2860/2860 | loss 0.3554 | lr backbone 5.53e-05 / head 5.48e-04 | 6.0 it/s
+30737.5s	960	[19:40:00] [INFO] Epoch 048/100 | train 0.3062 | val raw 0.3291 AUC 0.9411 | EMA 0.3228 AUC 0.9440 | groups raw [findings 0.8280 COVID 0.9989 TB 0.9965] | monitored 0.9440 (ema) | lr 5.48e-04 | best 0.9449 @39 | 554s
+30737.5s	961	[19:40:01] [INFO]   epoch 049 step 1/2860 | loss 0.3432 | lr backbone 5.53e-05 / head 5.48e-04 | 1.6 it/s
+30737.5s	962	[19:41:24] [INFO]   epoch 049 step 500/2860 | loss 0.3379 | lr backbone 5.50e-05 / head 5.46e-04 | 6.0 it/s
+30737.5s	963	[19:42:47] [INFO]   epoch 049 step 1000/2860 | loss 0.2503 | lr backbone 5.47e-05 / head 5.43e-04 | 6.0 it/s
+30737.5s	964	[19:44:10] [INFO]   epoch 049 step 1500/2860 | loss 0.2160 | lr backbone 5.44e-05 / head 5.40e-04 | 6.0 it/s
+30737.5s	965	[19:45:33] [INFO]   epoch 049 step 2000/2860 | loss 0.4126 | lr backbone 5.41e-05 / head 5.37e-04 | 6.0 it/s
+30737.5s	966	[19:46:56] [INFO]   epoch 049 step 2500/2860 | loss 0.4571 | lr backbone 5.39e-05 / head 5.35e-04 | 6.0 it/s
+30737.5s	967	[19:47:55] [INFO]   epoch 049 step 2860/2860 | loss 0.3158 | lr backbone 5.37e-05 / head 5.33e-04 | 6.0 it/s
+30737.5s	968	[19:49:15] [INFO] Epoch 049/100 | train 0.3049 | val raw 0.3272 AUC 0.9430 | EMA 0.3231 AUC 0.9439 | groups raw [findings 0.8308 COVID 0.9992 TB 0.9990] | monitored 0.9439 (ema) | lr 5.33e-04 | best 0.9449 @39 | 554s
+30737.5s	969	[19:49:15] [INFO]   epoch 050 step 1/2860 | loss 0.3328 | lr backbone 5.37e-05 / head 5.32e-04 | 1.5 it/s
+30737.5s	970	[19:50:38] [INFO]   epoch 050 step 500/2860 | loss 0.2503 | lr backbone 5.34e-05 / head 5.30e-04 | 6.0 it/s
+30737.5s	971	[19:52:01] [INFO]   epoch 050 step 1000/2860 | loss 0.3770 | lr backbone 5.31e-05 / head 5.27e-04 | 6.0 it/s
+30737.5s	972	[19:53:24] [INFO]   epoch 050 step 1500/2860 | loss 0.2135 | lr backbone 5.28e-05 / head 5.24e-04 | 6.0 it/s
+30737.5s	973	[19:54:47] [INFO]   epoch 050 step 2000/2860 | loss 0.3939 | lr backbone 5.26e-05 / head 5.21e-04 | 6.0 it/s
+30737.5s	974	[19:56:10] [INFO]   epoch 050 step 2500/2860 | loss 0.3724 | lr backbone 5.23e-05 / head 5.19e-04 | 6.0 it/s
+30737.5s	975	[19:57:10] [INFO]   epoch 050 step 2860/2860 | loss 0.2279 | lr backbone 5.21e-05 / head 5.17e-04 | 6.0 it/s
+30737.5s	976	[19:58:29] [INFO] Epoch 050/100 | train 0.3043 | val raw 0.3280 AUC 0.9427 | EMA 0.3235 AUC 0.9437 | groups raw [findings 0.8310 COVID 0.9992 TB 0.9979] | monitored 0.9437 (ema) | lr 5.17e-04 | best 0.9449 @39 | 554s
+30737.5s	977	[19:58:30] [INFO]   epoch 051 step 1/2860 | loss 0.2718 | lr backbone 5.21e-05 / head 5.17e-04 | 1.6 it/s
+30737.5s	978	[19:59:53] [INFO]   epoch 051 step 500/2860 | loss 0.2717 | lr backbone 5.18e-05 / head 5.14e-04 | 6.0 it/s
+30737.5s	979	[20:01:16] [INFO]   epoch 051 step 1000/2860 | loss 0.1993 | lr backbone 5.15e-05 / head 5.11e-04 | 6.0 it/s
+30737.5s	980	[20:02:39] [INFO]   epoch 051 step 1500/2860 | loss 0.5208 | lr backbone 5.13e-05 / head 5.08e-04 | 6.0 it/s
+30737.5s	981	[20:04:02] [INFO]   epoch 051 step 2000/2860 | loss 0.4394 | lr backbone 5.10e-05 / head 5.05e-04 | 6.0 it/s
+30737.5s	982	[20:05:25] [INFO]   epoch 051 step 2500/2860 | loss 0.2203 | lr backbone 5.07e-05 / head 5.03e-04 | 6.0 it/s
+30737.5s	983	[20:06:25] [INFO]   epoch 051 step 2860/2860 | loss 0.1694 | lr backbone 5.05e-05 / head 5.00e-04 | 6.0 it/s
+30737.5s	984	[20:07:44] [INFO] Epoch 051/100 | train 0.3023 | val raw 0.3259 AUC 0.9411 | EMA 0.3241 AUC 0.9437 | groups raw [findings 0.8306 COVID 0.9992 TB 0.9937] | monitored 0.9437 (ema) | lr 5.00e-04 | best 0.9449 @39 | 555s
+30737.5s	985	[20:07:44] [INFO]   epoch 052 step 1/2860 | loss 0.2433 | lr backbone 5.05e-05 / head 5.00e-04 | 1.7 it/s
+30737.5s	986	[20:09:07] [INFO]   epoch 052 step 500/2860 | loss 0.2919 | lr backbone 5.02e-05 / head 4.98e-04 | 6.0 it/s
+30737.5s	987	[20:10:30] [INFO]   epoch 052 step 1000/2860 | loss 0.3900 | lr backbone 4.99e-05 / head 4.95e-04 | 6.0 it/s
+30737.5s	988	[20:11:53] [INFO]   epoch 052 step 1500/2860 | loss 0.3443 | lr backbone 4.97e-05 / head 4.92e-04 | 6.0 it/s
+30737.5s	989	[20:13:16] [INFO]   epoch 052 step 2000/2860 | loss 0.2819 | lr backbone 4.94e-05 / head 4.89e-04 | 6.0 it/s
+30737.5s	990	[20:14:40] [INFO]   epoch 052 step 2500/2860 | loss 0.2558 | lr backbone 4.91e-05 / head 4.87e-04 | 6.0 it/s
+30737.5s	991	[20:15:39] [INFO]   epoch 052 step 2860/2860 | loss 0.2939 | lr backbone 4.89e-05 / head 4.84e-04 | 6.0 it/s
+30737.5s	992	[20:16:59] [INFO] Epoch 052/100 | train 0.3026 | val raw 0.3268 AUC 0.9428 | EMA 0.3249 AUC 0.9434 | groups raw [findings 0.8318 COVID 0.9989 TB 0.9976] | monitored 0.9434 (ema) | lr 4.84e-04 | best 0.9449 @39 | 555s
+30737.5s	993	[20:16:59] [INFO]   epoch 053 step 1/2860 | loss 0.2358 | lr backbone 4.89e-05 / head 4.84e-04 | 1.5 it/s
+30737.5s	994	[20:18:22] [INFO]   epoch 053 step 500/2860 | loss 0.4119 | lr backbone 4.86e-05 / head 4.82e-04 | 6.0 it/s
+30737.5s	995	[20:19:45] [INFO]   epoch 053 step 1000/2860 | loss 0.2525 | lr backbone 4.84e-05 / head 4.79e-04 | 6.0 it/s
+30737.5s	996	[20:21:08] [INFO]   epoch 053 step 1500/2860 | loss 0.2326 | lr backbone 4.81e-05 / head 4.76e-04 | 6.0 it/s
+30737.5s	997	[20:22:31] [INFO]   epoch 053 step 2000/2860 | loss 0.3285 | lr backbone 4.78e-05 / head 4.73e-04 | 6.0 it/s
+30737.5s	998	[20:23:54] [INFO]   epoch 053 step 2500/2860 | loss 0.2026 | lr backbone 4.75e-05 / head 4.71e-04 | 6.0 it/s
+30737.5s	999	[20:24:54] [INFO]   epoch 053 step 2860/2860 | loss 0.2625 | lr backbone 4.73e-05 / head 4.68e-04 | 6.0 it/s
+30737.5s	1000	[20:26:14] [INFO] Epoch 053/100 | train 0.3014 | val raw 0.3335 AUC 0.9421 | EMA 0.3258 AUC 0.9433 | groups raw [findings 0.8297 COVID 0.9990 TB 0.9978] | monitored 0.9433 (ema) | lr 4.68e-04 | best 0.9449 @39 | 555s
+30737.5s	1001	[20:26:14] [INFO]   epoch 054 step 1/2860 | loss 0.2755 | lr backbone 4.73e-05 / head 4.68e-04 | 1.6 it/s
+30737.5s	1002	[20:27:37] [INFO]   epoch 054 step 500/2860 | loss 0.2835 | lr backbone 4.71e-05 / head 4.66e-04 | 6.0 it/s
+30737.5s	1003	[20:29:00] [INFO]   epoch 054 step 1000/2860 | loss 0.3545 | lr backbone 4.68e-05 / head 4.63e-04 | 6.0 it/s
+30737.5s	1004	[20:30:23] [INFO]   epoch 054 step 1500/2860 | loss 0.3516 | lr backbone 4.65e-05 / head 4.60e-04 | 6.0 it/s
+30737.5s	1005	[20:31:46] [INFO]   epoch 054 step 2000/2860 | loss 0.2814 | lr backbone 4.62e-05 / head 4.57e-04 | 6.0 it/s
+30737.5s	1006	[20:33:09] [INFO]   epoch 054 step 2500/2860 | loss 0.2791 | lr backbone 4.59e-05 / head 4.55e-04 | 6.0 it/s
+30737.5s	1007	[20:34:09] [INFO]   epoch 054 step 2860/2860 | loss 0.3969 | lr backbone 4.57e-05 / head 4.53e-04 | 6.0 it/s
+30737.5s	1008	[20:35:28] [INFO] Epoch 054/100 | train 0.3000 | val raw 0.3319 AUC 0.9429 | EMA 0.3266 AUC 0.9432 | groups raw [findings 0.8320 COVID 0.9989 TB 0.9979] | monitored 0.9432 (ema) | lr 4.53e-04 | best 0.9449 @39 | 555s
+30737.5s	1009	[20:35:28] [INFO] Early stopping at epoch 54 (patience 15 on monitored AUC).
+30737.5s	1010	[20:36:47] [INFO] TEST | best epoch 39 (ema) | loss 0.3387 | mean AUC 16 0.8499 | findings 0.8286 | COVID 0.9976 | TB 0.9999 | monitored 0.9420
+30737.5s	1011	[20:36:47] [INFO] TEST specificity@0.5 | macro 0.9624 | micro 0.9644 | sensitivity macro 0.4255 | accuracy 0.9381
+30737.5s	1012	[20:36:47] [INFO] TEST per-class AUC / sensitivity@0.5 / specificity@0.5 / support:
+30737.5s	1013	[20:36:47] [INFO]   Atelectasis          AUC 0.8007 | sens 0.4202 | spec 0.9041 | n+=2294 n-=19695
+30737.5s	1014	[20:36:47] [INFO]   Cardiomegaly         AUC 0.9144 | sens 0.4959 | spec 0.9709 | n+=486 n-=21503
+30737.5s	1015	[20:36:47] [INFO]   Effusion             AUC 0.8775 | sens 0.6732 | spec 0.8793 | n+=2711 n-=19278
+30737.5s	1016	[20:36:47] [INFO]   Infiltration         AUC 0.7077 | sens 0.3215 | spec 0.9041 | n+=4040 n-=17949
+30737.5s	1017	[20:36:47] [INFO]   Mass                 AUC 0.8525 | sens 0.4280 | spec 0.9590 | n+=1091 n-=20898
+30737.5s	1018	[20:36:47] [INFO]   Nodule               AUC 0.7361 | sens 0.1699 | spec 0.9791 | n+=1224 n-=20765
+30737.5s	1019	[20:36:47] [INFO]   Pneumonia            AUC 0.7545 | sens 0.0496 | spec 0.9928 | n+=262 n-=21727
+30737.5s	1020	[20:36:47] [INFO]   Pneumothorax         AUC 0.8566 | sens 0.3615 | spec 0.9561 | n+=1076 n-=20913
+30737.5s	1021	[20:36:47] [INFO]   Consolidation        AUC 0.8049 | sens 0.2282 | spec 0.9524 | n+=929 n-=21060
+30737.5s	1022	[20:36:47] [INFO]   Edema                AUC 0.8907 | sens 0.3800 | spec 0.9627 | n+=421 n-=21568
+30737.5s	1023	[20:36:47] [INFO]   Emphysema            AUC 0.8944 | sens 0.3868 | spec 0.9782 | n+=424 n-=21565
+30737.5s	1024	[20:36:47] [INFO]   Fibrosis             AUC 0.7959 | sens 0.1404 | spec 0.9881 | n+=292 n-=21697
+30737.5s	1025	[20:36:47] [INFO]   Pleural_Thickening   AUC 0.7813 | sens 0.2073 | spec 0.9758 | n+=709 n-=21280
+30737.5s	1026	[20:36:47] [INFO]   Hernia               AUC 0.9335 | sens 0.6923 | spec 0.9973 | n+=39 n-=21950
+30737.5s	1027	[20:36:47] [INFO]   COVID                AUC 0.9976 | sens 0.8741 | spec 0.9993 | n+=723 n-=24027
+30737.5s	1028	[20:36:47] [INFO]   TB                   AUC 0.9999 | sens 0.9786 | spec 1.0000 | n+=140 n-=22689
+30737.5s	1029	[20:36:47] [INFO] TEST within-source TB    | AUC 1.0000 | pos 140 neg 700 | tb vs tb_normal
+30737.5s	1030	[20:36:47] [INFO] TEST within-source COVID | AUC 0.9953 | pos 723 neg 2038 | covid vs covid_normal
+30737.5s	1031	[20:36:57] [INFO] ========================================================================
+30737.5s	1032	[20:36:57] [INFO]   Run complete
+30737.5s	1033	[20:36:57] [INFO]   best       : /kaggle/working/checkpoints/best.pth (epoch 39, ema)
+30737.5s	1034	[20:36:57] [INFO]   metrics    : /kaggle/working/artifacts/metrics.json
+30737.5s	1035	[20:36:57] [INFO]   zip        : /kaggle/working/lung_xrv_results.zip (96.4 MB)
+30737.5s	1036	[20:36:57] [INFO]   test AUC   : mean16 0.8499 | findings 0.8286 | COVID 0.9976 | TB 0.9999 | spec@0.5 0.9624
+30737.5s	1037	[20:36:57] [INFO]   artifacts  : training_log.csv, artifacts/training_curves.png, artifacts/per_class_auc.png, artifacts/roc_curves.png, artifacts/gradcam_grid.png, artifacts/metrics.json, checkpoints/best.pth, checkpoints/last.pth, lung_xrv_results.zip
+30737.5s	1038	[20:36:57] [INFO] ========================================================================
+30740.0s	1039	/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+30740.0s	1040	  cells[i][c] = re.sub('\\\\\|', '|', cell)
+30740.2s	1041	/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+30740.2s	1042	  text = re.sub(r'_', '\_', text) # Escape underscores in display text
+30740.9s	1043	[NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+30741.0s	1044	[NbConvertApp] Writing 71237 bytes to __notebook__.ipynb
+30743.4s	1045	[NbConvertApp] Converting notebook __notebook__.ipynb to html
+30743.9s	1046	[NbConvertApp] Writing 337359 bytes to __results__.html
