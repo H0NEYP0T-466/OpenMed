@@ -1,11 +1,17 @@
-"""Lung classification API — XRV DenseNet-121 fine-tune, 16 classes.
+"""Lung classification API — LungV2S (4-class) + stock XRV DenseNet-121 (18-label).
 
-Endpoints (mounted at /api/lungs):
-  POST /classify      multipart image -> 16 probabilities + Grad-CAM overlay
-  GET  /health        checkpoint presence and residency
-  GET  /model-info    label space and training metadata
-  POST /warmup        load the model into memory (called when the section opens)
-  POST /unload        release it (called when the section closes)
+Mounted at ``/api/lungs``.
+
+Endpoints
+    POST /classify      multipart image -> both models, per-model failure isolated
+    GET  /health        per-model residency and checkpoint presence
+    GET  /model-info    per-model tag, class list, input size, checkpoint metadata
+    POST /warmup        load the models into memory (called when the section opens)
+    POST /unload        release them (called when the section closes)
+
+Nothing is constructed or imported eagerly. Importing this module must not pull
+``torchxrayvision`` and must not touch a weight file; the health endpoint works
+on a cold process with no checkpoint on disk.
 """
 
 from __future__ import annotations
@@ -16,90 +22,76 @@ import logging
 import os
 from typing import Any, Literal, Optional
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Body, File, HTTPException, Query, UploadFile
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 
-from .model import FINDINGS, MODEL_TAG
-from .pipeline import LungClassificationPipeline
+from .pipeline import DualLungPipeline
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-DEFAULT_CHECKPOINT = "xrv_best.pth"
 MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
 ALLOWED_MAGIC = (b"\xff\xd8\xff", b"\x89PNG", b"RIFF")
 
-_pipeline: Optional[LungClassificationPipeline] = None
-_pipeline_error: Optional[str] = None
+_facade: Optional[DualLungPipeline] = None
+# One lock guards facade creation and every load, so two concurrent requests
+# cannot race two 100 MB weight loads into the same process.
 _load_lock = asyncio.Lock()
 
+ModelName = Literal["v2s", "xrv", "all"]
 
-def checkpoint_path() -> str:
-    configured = os.getenv("OPENMED_LUNGS_CHECKPOINT")
+
+def checkpoints_dir() -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "checkpoints")
+
+
+def v2s_checkpoint_path() -> str:
+    configured = os.getenv("OPENMED_LUNGS_V2S_CHECKPOINT")
     if configured:
         return os.path.expanduser(configured)
-    return os.path.join(os.path.dirname(__file__), "checkpoints", DEFAULT_CHECKPOINT)
+    return os.path.join(checkpoints_dir(), "lung_v2s_best.pth")
 
 
-class Top5Entry(BaseModel):
-    finding: str
-    probability: float
-    rank: int
+def xrv_cache_dir() -> str:
+    configured = os.getenv("OPENMED_LUNGS_XRV_CACHE")
+    if configured:
+        return os.path.expanduser(configured)
+    return os.path.join(checkpoints_dir(), "xrv")
 
 
-class ClassificationResponse(BaseModel):
-    top_finding: str
-    confidence: float
-    probabilities: list[float]
-    thresholds: list[float]
-    positives: list[bool]
-    top5: list[Top5Entry]
-    gradcam_base64: str
-    gradcam_grid: list[int]
-    bbox: Optional[list[int]] = None
-    inference_ms: float
-    model_tag: str
+def get_facade() -> DualLungPipeline:
+    """Return the process-wide facade, building the (weight-free) shell once."""
+    global _facade
+    if _facade is None:
+        _facade = DualLungPipeline(
+            v2s_checkpoint=v2s_checkpoint_path(),
+            xrv_cache_dir=xrv_cache_dir(),
+        )
+    return _facade
 
 
-class HealthResponse(BaseModel):
-    status: Literal["ok", "unavailable"]
-    model_loaded: bool
+class ModelSelection(BaseModel):
+    model: ModelName = "all"
+
+
+class ModelHealth(BaseModel):
+    loaded: bool
     checkpoint_present: bool
     detail: Optional[str] = None
 
 
+class HealthResponse(BaseModel):
+    status: Literal["ok", "degraded", "unavailable"]
+    v2s: ModelHealth
+    xrv: ModelHealth
+
+
 class ModelInfoResponse(BaseModel):
-    model_tag: str
-    findings: list[str]
-    paper: str
-    input_size: int
-    checkpoint: dict[str, Any]
-
-
-async def _get_pipeline() -> LungClassificationPipeline:
-    global _pipeline, _pipeline_error
-    if _pipeline is not None:
-        return _pipeline
-    async with _load_lock:
-        if _pipeline is not None:
-            return _pipeline
-        path = checkpoint_path()
-        if not os.path.isfile(path):
-            _pipeline_error = f"Checkpoint not found at {path}"
-            raise HTTPException(status_code=503, detail=_pipeline_error)
-        try:
-            pipeline = LungClassificationPipeline(path)
-            await asyncio.to_thread(pipeline.load)
-        except Exception as exc:  # noqa: BLE001 - surfaced to the client
-            _pipeline_error = f"Failed to load the XRV classifier: {exc}"
-            logger.exception("XRV classifier load failed")
-            raise HTTPException(status_code=503, detail=_pipeline_error) from exc
-        _pipeline = pipeline
-        _pipeline_error = None
-        return _pipeline
+    v2s: dict[str, Any]
+    xrv: dict[str, Any]
 
 
 def _validate_upload(file: UploadFile, payload: bytes) -> Image.Image:
@@ -120,63 +112,87 @@ def _validate_upload(file: UploadFile, payload: bytes) -> Image.Image:
     return image
 
 
-@router.post("/warmup")
-async def warmup_lung_classifier() -> dict[str, Any]:
-    pipeline = await _get_pipeline()
-    return {
-        "status": "ok",
-        "message": "XRV-16 lung classifier loaded.",
-        "device": str(pipeline.device),
-    }
+async def _load(which: str) -> dict[str, Optional[str]]:
+    """Load under the shared lock; the blocking work runs off the event loop."""
+    facade = get_facade()
+    async with _load_lock:
+        return await asyncio.to_thread(facade.load, which)
 
 
-@router.post("/unload")
-async def unload_lung_classifier() -> dict[str, Any]:
-    global _pipeline
-    if _pipeline is not None:
-        _pipeline.unload()
-        _pipeline = None
-    return {"status": "ok", "message": "XRV-16 lung classifier unloaded. Memory freed."}
-
-
-@router.post("/classify", response_model=ClassificationResponse)
-async def classify_lung_scan(file: UploadFile = File(...)) -> ClassificationResponse:
+@router.post("/classify")
+async def classify_lung_scan(
+    file: UploadFile = File(...),
+    include_xrv_detail: bool = Query(
+        False,
+        description="Include all 18 XRV scores and the XRV Grad-CAM (second, on-demand call).",
+    ),
+) -> dict[str, Any]:
     payload = await file.read()
     image = _validate_upload(file, payload)
-    pipeline = await _get_pipeline()
-    try:
-        result = await asyncio.to_thread(pipeline.predict, image)
-    except Exception as exc:  # noqa: BLE001
-        logger.exception("Lung inference failed")
-        raise HTTPException(status_code=500, detail=f"Inference failed: {exc}") from exc
-    return ClassificationResponse(**result)
 
+    facade = get_facade()
+    await _load("all")
 
-@router.get("/model-info", response_model=ModelInfoResponse)
-async def get_model_info() -> ModelInfoResponse:
-    pipeline = _pipeline or LungClassificationPipeline(checkpoint_path())
-    return ModelInfoResponse(
-        model_tag=MODEL_TAG,
-        findings=list(FINDINGS),
-        paper="TorchXRayVision (Cohen et al. 2022) fine-tuned on NIH ChestX-ray14 + COVID-19 Radiography + TB Chest Radiography",
-        input_size=224,
-        checkpoint=pipeline.checkpoint_info(),
-    )
+    result = await asyncio.to_thread(facade.classify, image, include_xrv_detail)
+
+    if result["v2s"] is None and result["xrv"] is None:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "Both lung models failed.",
+                "v2s": result["errors"]["v2s"],
+                "xrv": result["errors"]["xrv"],
+            },
+        )
+    return result
 
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
-    present = os.path.isfile(checkpoint_path())
-    if not present:
-        return HealthResponse(
-            status="unavailable",
-            model_loaded=False,
-            checkpoint_present=False,
-            detail=f"Checkpoint missing at {checkpoint_path()}",
+    # Reads file presence and in-memory flags only — never builds a model, so it
+    # answers on a cold process with an empty checkpoints directory.
+    return HealthResponse(**get_facade().health())
+
+
+@router.get("/model-info", response_model=ModelInfoResponse)
+async def get_model_info() -> ModelInfoResponse:
+    return ModelInfoResponse(**get_facade().model_info())
+
+
+@router.post("/warmup")
+async def warmup_lung_classifier(
+    payload: Optional[ModelSelection] = Body(default=None),
+) -> dict[str, Any]:
+    which = (payload or ModelSelection()).model
+    errors = await _load(which)
+    facade = get_facade()
+    loaded = {"v2s": facade.v2s.is_loaded, "xrv": facade.xrv.is_loaded}
+    failed = [name for name, error in errors.items() if error]
+    if failed and len(failed) == len(errors):
+        raise HTTPException(
+            status_code=503,
+            detail={"message": "No lung model could be loaded.", "errors": errors},
         )
-    return HealthResponse(
-        status="ok",
-        model_loaded=_pipeline is not None and _pipeline.is_loaded,
-        checkpoint_present=True,
-        detail=_pipeline_error,
-    )
+    return {
+        "status": "ok" if not failed else "partial",
+        "requested": which,
+        "loaded": loaded,
+        "errors": errors,
+        "device": str(facade.v2s.device),
+    }
+
+
+@router.post("/unload")
+async def unload_lung_classifier(
+    payload: Optional[ModelSelection] = Body(default=None),
+) -> dict[str, Any]:
+    which = (payload or ModelSelection()).model
+    facade = get_facade()
+    async with _load_lock:
+        unloaded = await asyncio.to_thread(facade.unload, which)
+    return {
+        "status": "ok",
+        "requested": which,
+        "unloaded": unloaded,
+        "message": "Lung models released; memory freed.",
+    }

@@ -37,3 +37,7 @@ tqdm>=4.66.0
 
 # Experimental lab instruments
 torchxrayvision>=1.2.0
+
+# Lungs V2S training + hygiene (perceptual hashing, Excel hygiene reports)
+imagehash>=4.3.1
+openpyxl>=3.1.2

@@ -1,4 +1,6 @@
-/* Z-Net lung classification workspace — same editorial language as the brain organ. */
+/* Lung workspace — LungV2S primary + XRV-18 adjunct.
+   Same editorial language as the brain organ: bone paper, ink hairlines,
+   warm serif display type, dark plates. */
 
 .lungs-workspace {
   display: flex;
@@ -6,6 +8,8 @@
   gap: 22px;
   padding: 8px 0 48px;
 }
+
+/* --- Masthead ------------------------------------------------------------ */
 
 .lw-head {
   display: flex;
@@ -39,12 +43,27 @@
 
 .lw-status {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--ink-mute, #8a8a8a);
   white-space: nowrap;
+}
+
+.lw-model-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lw-model-name {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #2a2620);
 }
 
 .lw-dot {
@@ -57,6 +76,8 @@
 .lw-dot.is-on {
   background: var(--accent, #c4552f);
 }
+
+/* --- Error banner -------------------------------------------------------- */
 
 .lw-error {
   display: flex;
@@ -76,6 +97,8 @@
   font-size: 13px;
   color: inherit;
 }
+
+/* --- Upload zone --------------------------------------------------------- */
 
 .lw-prompt {
   position: relative;
@@ -105,7 +128,7 @@
 
 .lw-prompt-note {
   margin: 0;
-  max-width: 46ch;
+  max-width: 52ch;
   font-size: 12px;
   line-height: 1.6;
   color: var(--ink-mute, #8a8a8a);
@@ -120,9 +143,11 @@
   padding-bottom: 2px;
 }
 
+/* --- Mounted plate + panel ----------------------------------------------- */
+
 .lw-mounted {
   display: grid;
-  grid-template-columns: minmax(280px, 460px) 1fr;
+  grid-template-columns: minmax(280px, 440px) 1fr;
   gap: 28px;
   align-items: start;
 }
@@ -139,19 +164,85 @@
   gap: 12px;
 }
 
+/* The media box is exactly the image box at every size, so the bbox
+   percentages, which are relative to the plate, land on the pixels they
+   describe. */
 .lw-plate-frame {
   position: relative;
+  width: 100%;
   border: 1px solid var(--line, #d8d2c6);
-  background: #0d0d0d;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
+  background: #0d0d0b;
+}
+
+.lw-plate-media {
+  position: relative;
+  display: block;
+  max-width: 100%;
 }
 
 .lw-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
   display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Four corner brackets — the mount marks of a light box. */
+.lw-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid var(--accent, #c4552f);
+  pointer-events: none;
+}
+
+.lw-corner.is-tl {
+  top: 8px;
+  left: 8px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.lw-corner.is-tr {
+  top: 8px;
+  right: 8px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+
+.lw-corner.is-bl {
+  bottom: 8px;
+  left: 8px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+}
+
+.lw-corner.is-br {
+  bottom: 8px;
+  right: 8px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+}
+
+/* Grad-CAM bounding box, positioned in percentages of the plate. */
+.lw-bbox {
+  position: absolute;
+  border: 1.5px solid var(--accent, #c4552f);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.lw-bbox-tag {
+  position: absolute;
+  top: -15px;
+  left: -1px;
+  padding: 1px 5px;
+  background: var(--accent, #c4552f);
+  color: #15140f;
+  font-family: var(--font-mono, monospace);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .lw-hud {
@@ -162,9 +253,56 @@
   font-family: var(--font-mono, monospace);
   font-size: 10px;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.86);
   text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
   pointer-events: none;
+}
+
+.lw-hud-name {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+}
+
+/* --- View toggle --------------------------------------------------------- */
+
+.lw-view-toggle {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid var(--line, #d8d2c6);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lw-view-btn {
+  padding: 7px 14px;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute, #5a5448);
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.lw-view-btn:hover:not(:disabled) {
+  background: var(--paper-warm, #ece4cf);
+  color: var(--ink, #15140f);
+}
+
+.lw-view-btn.is-active {
+  background: var(--ink, #15140f);
+  color: var(--paper, #efe7d2);
+}
+
+.lw-view-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .lw-controls {
@@ -183,19 +321,25 @@
   cursor: not-allowed;
 }
 
+/* --- Result panel -------------------------------------------------------- */
+
+.lw-panel {
+  border-left: 1px solid var(--line, #d8d2c6);
+  padding-left: 26px;
+  min-height: 160px;
+}
+
+@media (max-width: 900px) {
+  .lw-panel {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
 .lw-result {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  border-left: 1px solid var(--line, #d8d2c6);
-  padding-left: 26px;
-}
-
-@media (max-width: 900px) {
-  .lw-result {
-    border-left: 0;
-    padding-left: 0;
-  }
 }
 
 .lw-finding {
@@ -211,6 +355,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.lw-confidence-note {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mute, #8a8a8a);
+}
+
 .lw-meta {
   margin: 8px 0 0;
   font-family: var(--font-mono, monospace);
@@ -219,22 +370,46 @@
   color: var(--ink-mute, #8a8a8a);
 }
 
-.lw-top5 ol,
-.lw-all ul {
+.lw-classes ul,
+.lw-secondary ul,
+.lw-score-list {
   list-style: none;
   margin: 8px 0 0;
   padding: 0;
+}
+
+.lw-classes ul,
+.lw-secondary ul {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.lw-top5 li {
+.lw-classes li,
+.lw-secondary li,
+.lw-score-list li {
   display: grid;
   grid-template-columns: minmax(90px, 1fr) 2fr auto;
   align-items: center;
   gap: 10px;
   font-size: 13px;
+}
+
+.lw-class-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lw-classes li.is-top {
+  font-weight: 600;
+}
+
+.lw-classes li.is-top .lw-class-name::after {
+  content: ' ●';
+  font-size: 8px;
+  vertical-align: middle;
+  color: var(--accent, #c4552f);
 }
 
 .lw-bar {
@@ -258,19 +433,230 @@
   color: var(--ink-mute, #8a8a8a);
 }
 
-.lw-all ul {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 6px 18px;
+.lw-secondary {
+  border-top: 1px solid var(--line-soft, rgba(21, 20, 15, 0.1));
+  padding-top: 18px;
 }
 
-.lw-all li {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
+/* --- Degraded model ------------------------------------------------------ */
+
+.lw-model-error {
+  border-left: 2px solid var(--mustard, #e9b94a);
+  padding: 2px 0 2px 14px;
+}
+
+.lw-model-error-body {
+  margin: 4px 0 0;
   font-size: 12px;
-  border-bottom: 1px dotted var(--line, #d8d2c6);
-  padding-bottom: 4px;
+  line-height: 1.55;
+  color: var(--ink-mute, #5a5448);
+  overflow-wrap: anywhere;
+}
+
+/* --- Staged loading rail ------------------------------------------------- */
+
+.lw-stage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lw-stage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lw-stage {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.lw-stage-index {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint, #8b8676);
+}
+
+.lw-stage-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lw-stage-label {
+  font-family: var(--font-display, inherit);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--ink-mute, #5a5448);
+}
+
+.lw-stage-track {
+  position: relative;
+  display: block;
+  height: 2px;
+  background: var(--line-soft, rgba(21, 20, 15, 0.1));
+  overflow: hidden;
+}
+
+.lw-stage-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent, #c4552f);
+  transition: width 0.18s linear;
+}
+
+.lw-stage-fill.is-indeterminate {
+  width: 38%;
+  transition: none;
+  animation: lw-stage-sweep 1.15s ease-in-out infinite;
+}
+
+@keyframes lw-stage-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+.lw-stage-state {
+  min-width: 48px;
+  text-align: right;
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint, #8b8676);
+}
+
+.lw-stage.is-pending .lw-stage-label {
+  color: var(--ink-faint, #8b8676);
+}
+
+.lw-stage.is-active .lw-stage-label {
+  color: var(--ink, #15140f);
+}
+
+.lw-stage.is-done .lw-stage-fill {
+  background: var(--olive, #6e7448);
+}
+
+.lw-stage.is-done .lw-stage-state {
+  color: var(--olive, #6e7448);
+}
+
+/* --- Detailed XRV disclosure --------------------------------------------- */
+
+.lw-detail {
+  border-top: 1px solid var(--line-soft, rgba(21, 20, 15, 0.1));
+  padding-top: 12px;
+}
+
+.lw-disclosure {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lw-disclosure-title {
+  font-family: var(--font-display, inherit);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink, #15140f);
+}
+
+.lw-disclosure-hint {
+  margin-left: auto;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  color: var(--ink-faint, #8b8676);
+}
+
+.lw-disclosure-mark {
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--accent, #c4552f);
+}
+
+.lw-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 6px 0 4px;
+}
+
+.lw-detail-note {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: var(--ink-mute, #5a5448);
+}
+
+.lw-detail-fail {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.lw-score-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 7px 22px;
+}
+
+.lw-score-list li {
+  font-size: 12px;
+}
+
+.lw-detail-cam {
+  margin: 0;
+}
+
+.lw-detail-cam img {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  border: 1px solid var(--line, #d8d2c6);
+}
+
+.lw-detail-cam figcaption {
+  margin-top: 6px;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink-mute, #8a8a8a);
+}
+
+/* --- Idle ---------------------------------------------------------------- */
+
+.lw-idle {
+  padding: 18px 0;
+}
+
+.lw-idle-body {
+  margin: 0;
+  max-width: 48ch;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-mute, #5a5448);
 }
 
 /* Native file input: never rendered, only driven programmatically. */
@@ -282,30 +668,10 @@
   pointer-events: none;
 }
 
-/* A finding the calibrated threshold calls positive. The percentage alone is
-   a rank; the flag is the decision. */
-.lw-all li.is-positive {
-  color: var(--ink);
-  font-weight: 600;
-}
+/* --- Curated specimen rack ----------------------------------------------- */
 
-.lw-flag {
-  margin-left: 8px;
-  padding: 1px 6px;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent);
-  vertical-align: middle;
-}
-
-/* Curated specimen rack — one labelled plate per class. A filmstrip rather
-   than a grid: sixteen cards would push the lightbox off the fold. */
 .lung-rack {
-  margin-bottom: 18px;
+  margin-bottom: 4px;
 }
 
 .lung-rack-head {
@@ -353,10 +719,15 @@
   transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
 }
 
-.lung-cassette:hover {
+.lung-cassette:hover:not(:disabled) {
   border-color: var(--ink);
   background: var(--paper-warm);
   transform: translateY(-2px);
+}
+
+.lung-cassette:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .lung-cassette.is-active {
