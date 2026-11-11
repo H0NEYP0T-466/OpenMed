@@ -21,6 +21,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import shutil
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -796,6 +797,287 @@ def run_audit(
     return records, cluster_members, report
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Conflict resolution and cleaning
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def _infer_class(path: str, known_classes: Sequence[str] = CLASS_NAMES) -> str:
+    """Extract or match the class folder from an image path."""
+    parts = Path(path).parts
+    if parts and parts[0] in known_classes:
+        return parts[0]
+    for cls in known_classes:
+        if path.startswith(cls + "/") or path.startswith(cls + "\\"):
+            return cls
+    return ""
+
+
+def render_conflict_resolution_markdown(
+    dropped_exact_count: int,
+    relabeled_count: int,
+    dropped_tie_count: int,
+    dropped_near_single_count: int,
+    kept_count: int,
+    imbalance_ratio: Optional[float],
+) -> str:
+    """Markdown section summarizing the conflict resolution results."""
+    ratio_str = f"{imbalance_ratio:.4f}:1" if imbalance_ratio is not None else "n/a"
+    lines = [
+        "## Conflict resolution",
+        "",
+        f"- Exact duplicates dropped: **{dropped_exact_count}**",
+        f"- Cross-class conflicts relabeled (majority): **{relabeled_count}**",
+        f"- Cross-class conflict ties dropped: **{dropped_tie_count}**",
+        f"- Single-label near-duplicates collapsed: **{dropped_near_single_count}**",
+        f"- Kept images: **{kept_count}**",
+        f"- New imbalance ratio: **{ratio_str}**",
+    ]
+    return "\n".join(lines)
+
+
+def resolve_conflicts(
+    report_json_path: str | Path,
+    output_dir: str | Path,
+    collapse_single_label: bool = False,
+    apply: bool = False,
+    dataset_root: Optional[str | Path] = None,
+) -> dict[str, Any]:
+    """Clean exact duplicates, cross-class conflicts, and optional near-duplicates.
+
+    Reads ``report.json`` produced by ``run_audit`` / ``train_lungs_v2s.py --audit-only``
+    and executes three sequential operations:
+    1. Exact dedup: For every group in exact_duplicates, keeps the first path,
+       drops the rest as dropped_exact.
+    2. Consensus relabel: For every entry in cross_class_conflicts, picks the majority
+       class (most files). For files whose folder label != majority, records them as
+       relabeled with old_label/new_label. Ties drop the entire cluster under dropped_tie.
+    3. Optional single-label near-dup collapse (when collapse_single_label=True):
+       For every near-duplicate cluster whose files are all one class, keeps one representative
+       path, drops the rest as dropped_near_single. Clusters handled in step 2 are skipped.
+
+    Writes ``cleaned_manifest.json`` and appends a "## Conflict resolution" section to
+    ``report.md`` under ``output_dir``. If ``apply=True``, physically moves dropped files
+    to ``<output_dir>/dropped/`` and moves relabeled files to their new class folder.
+    """
+    report_path = Path(report_json_path)
+    with open(report_path, "r", encoding="utf-8") as handle:
+        report = json.load(handle)
+
+    # 1. Exact dedup
+    exact_data = report.get("exact_duplicates", {})
+    if isinstance(exact_data, list):
+        exact_groups = exact_data
+    elif isinstance(exact_data, dict):
+        exact_groups = exact_data.get("clusters") or exact_data.get("groups") or []
+    else:
+        exact_groups = []
+
+    dropped_exact: list[str] = []
+    dropped_exact_set: set[str] = set()
+
+    for group in exact_groups:
+        paths = group if isinstance(group, list) else group.get("paths", [])
+        if len(paths) > 1:
+            for p in paths[1:]:
+                dropped_exact.append(p)
+                dropped_exact_set.add(p)
+
+    # 2. Consensus relabel
+    conflicts = report.get("cross_class_conflicts", [])
+    dropped_tie: list[str] = []
+    dropped_tie_set: set[str] = set()
+    relabeled: list[dict[str, str]] = []
+    handled_clusters: set[int] = set()
+
+    for conf in conflicts:
+        cid = conf.get("cluster_id")
+        if cid is not None:
+            handled_clusters.add(cid)
+        by_class = conf.get("by_class", {})
+        if not by_class:
+            continue
+
+        counts = {cls: len(paths) for cls, paths in by_class.items()}
+        max_c = max(counts.values()) if counts else 0
+        top_classes = [cls for cls, c in counts.items() if c == max_c]
+
+        if len(top_classes) > 1:
+            for paths in by_class.values():
+                for p in paths:
+                    if p not in dropped_exact_set and p not in dropped_tie_set:
+                        dropped_tie.append(p)
+                        dropped_tie_set.add(p)
+        else:
+            majority_class = top_classes[0]
+            for old_cls, paths in by_class.items():
+                if old_cls != majority_class:
+                    for p in paths:
+                        if p not in dropped_exact_set:
+                            relabeled.append({
+                                "path": p,
+                                "old_label": old_cls,
+                                "new_label": majority_class,
+                            })
+
+    # 3. Optional single-label near-dup collapse
+    dropped_near_single: list[str] = []
+    dropped_near_set: set[str] = set()
+
+    if collapse_single_label:
+        near_data = report.get("near_duplicates", {})
+        if isinstance(near_data, list):
+            near_groups = near_data
+        elif isinstance(near_data, dict):
+            near_groups = (
+                near_data.get("clusters")
+                if isinstance(near_data.get("clusters"), list)
+                else near_data.get("examples", [])
+            )
+        else:
+            near_groups = []
+
+        for group in near_groups:
+            cid = group.get("cluster_id") if isinstance(group, dict) else None
+            if cid is not None and cid in handled_clusters:
+                continue
+            paths = group if isinstance(group, list) else group.get("paths", [])
+            if not paths:
+                continue
+
+            classes_in_group = set()
+            for p in paths:
+                cls = _infer_class(p, CLASS_NAMES)
+                if cls:
+                    classes_in_group.add(cls)
+            if isinstance(group, dict) and "classes" in group and group["classes"]:
+                classes_in_group.update(group["classes"])
+
+            if len(classes_in_group) == 1:
+                available = [
+                    p
+                    for p in paths
+                    if p not in dropped_exact_set and p not in dropped_tie_set
+                ]
+                if len(available) > 1:
+                    for p in available[1:]:
+                        if p not in dropped_near_set:
+                            dropped_near_single.append(p)
+                            dropped_near_set.add(p)
+
+    # Class counts recomputation
+    initial_counts = report.get("class_counts", {})
+    class_counts_after = {name: int(initial_counts.get(name, 0)) for name in CLASS_NAMES}
+
+    for p in dropped_exact:
+        cls = _infer_class(p, CLASS_NAMES)
+        if cls in class_counts_after:
+            class_counts_after[cls] -= 1
+
+    for p in dropped_tie:
+        cls = _infer_class(p, CLASS_NAMES)
+        if cls in class_counts_after:
+            class_counts_after[cls] -= 1
+
+    for p in dropped_near_single:
+        cls = _infer_class(p, CLASS_NAMES)
+        if cls in class_counts_after:
+            class_counts_after[cls] -= 1
+
+    for item in relabeled:
+        old_lbl = item["old_label"]
+        new_lbl = item["new_label"]
+        if old_lbl in class_counts_after:
+            class_counts_after[old_lbl] -= 1
+        if new_lbl in class_counts_after:
+            class_counts_after[new_lbl] += 1
+
+    total_dropped = len(dropped_exact) + len(dropped_tie) + len(dropped_near_single)
+    num_images = int(report.get("num_images", sum(initial_counts.values())))
+    kept_count = num_images - total_dropped
+
+    non_zero = [c for c in class_counts_after.values() if c > 0]
+    new_imbalance = (max(non_zero) / min(non_zero)) if non_zero and min(non_zero) > 0 else None
+
+    # Write cleaned_manifest.json
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = out_dir / "cleaned_manifest.json"
+    manifest: dict[str, Any] = {
+        "kept_count": kept_count,
+        "dropped_exact": dropped_exact,
+        "relabeled": relabeled,
+        "dropped_tie": dropped_tie,
+        "dropped_near_single": dropped_near_single,
+        "class_counts_after": class_counts_after,
+    }
+    with open(manifest_path, "w", encoding="utf-8") as handle:
+        json.dump(manifest, handle, indent=2)
+        handle.write("\n")
+
+    # Update or append report.md
+    md_section = render_conflict_resolution_markdown(
+        dropped_exact_count=len(dropped_exact),
+        relabeled_count=len(relabeled),
+        dropped_tie_count=len(dropped_tie),
+        dropped_near_single_count=len(dropped_near_single),
+        kept_count=kept_count,
+        imbalance_ratio=new_imbalance,
+    )
+    target_md = out_dir / "report.md"
+    if not target_md.is_file() and (report_path.parent / "report.md").is_file():
+        target_md = report_path.parent / "report.md"
+
+    if target_md.is_file():
+        existing = target_md.read_text(encoding="utf-8")
+        if "## Conflict resolution" in existing:
+            parts = existing.split("## Conflict resolution")
+            head = parts[0].rstrip()
+            rest = parts[1]
+            next_header_idx = -1
+            for line_idx, line in enumerate(rest.splitlines()):
+                if line.startswith("## ") and line_idx > 0:
+                    next_header_idx = rest.find(line)
+                    break
+            tail = rest[next_header_idx:] if next_header_idx != -1 else ""
+            target_md.write_text(f"{head}\n\n{md_section}\n{tail}".strip() + "\n", encoding="utf-8")
+        else:
+            with open(target_md, "a", encoding="utf-8") as handle:
+                handle.write("\n\n" + md_section + "\n")
+    else:
+        target_md.write_text(md_section + "\n", encoding="utf-8")
+
+    # Optional physical moves if apply=True
+    if apply:
+        root = Path(dataset_root or report.get("dataset_root", "."))
+        dropped_dir = out_dir / "dropped"
+        all_dropped = dropped_exact + dropped_tie + dropped_near_single
+        for p in all_dropped:
+            src = root / p if not Path(p).is_absolute() else Path(p)
+            if src.is_file():
+                dst = dropped_dir / p
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(src), str(dst))
+
+        for item in relabeled:
+            p = item["path"]
+            old_label = item["old_label"]
+            new_label = item["new_label"]
+            src = root / p if not Path(p).is_absolute() else Path(p)
+            if src.is_file():
+                parts = list(Path(p).parts)
+                if parts and parts[0] == old_label:
+                    parts[0] = new_label
+                    new_rel = Path(*parts)
+                else:
+                    new_rel = Path(p.replace(old_label, new_label, 1))
+                dst = root / new_rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(src), str(dst))
+
+    return manifest
+
+
 __all__ = [
     "HAS_IMAGEHASH",
     "ImageRecord",
@@ -807,7 +1089,9 @@ __all__ = [
     "hamming",
     "phash_file",
     "phash_of_image",
+    "render_conflict_resolution_markdown",
     "render_markdown",
+    "resolve_conflicts",
     "run_audit",
     "scan",
     "sha256_file",

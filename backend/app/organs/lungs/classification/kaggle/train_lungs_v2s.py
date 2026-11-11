@@ -207,6 +207,24 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="Run the hygiene audit on CPU and exit without training",
     )
+    parser.add_argument(
+        "--resolve-conflicts",
+        action="store_true",
+        default=False,
+        help="Resolve exact duplicates and cross-class conflicts before splitting",
+    )
+    parser.add_argument(
+        "--collapse-single-label",
+        action="store_true",
+        default=False,
+        help="Collapse single-label near-duplicate clusters to 1 representative image",
+    )
+    parser.add_argument(
+        "--apply-clean",
+        action="store_true",
+        default=False,
+        help="Physically move dropped/relabeled files on disk (default: False, manifest only)",
+    )
     resume_group = parser.add_mutually_exclusive_group()
     resume_group.add_argument(
         "--resume", dest="resume", action="store_true", default=True,
@@ -255,7 +273,12 @@ def _fmt(value: Optional[float], digits: int = 4) -> str:
 
 
 def prepare_data(
-    cfg: LungConfig, dataset_root: str, hygiene_dir: Path
+    cfg: LungConfig,
+    dataset_root: str,
+    hygiene_dir: Path,
+    resolve_conflicts: bool = False,
+    collapse_single_label: bool = False,
+    apply_clean: bool = False,
 ) -> tuple[list[hygiene.ImageRecord], dict[int, list[int]], Any, dict[str, Any]]:
     """Scan, cluster, split and audit. Returns records, clusters, plan, report."""
     LOGGER.info("Scanning %s", dataset_root)
@@ -278,6 +301,71 @@ def prepare_data(
         cluster_stats["clusters"],
         cluster_stats["largest_cluster"],
     )
+
+    if resolve_conflicts:
+        report_json = hygiene_dir / "report.json"
+        if not report_json.is_file():
+            LOGGER.warning(
+                "--resolve-conflicts requested but %s does not exist; skipping resolution",
+                report_json,
+            )
+        else:
+            LOGGER.info("Resolving conflicts using %s", report_json)
+            manifest = hygiene.resolve_conflicts(
+                report_json,
+                hygiene_dir,
+                collapse_single_label=collapse_single_label,
+                apply=apply_clean,
+                dataset_root=dataset_root,
+            )
+            dropped_paths = (
+                set(manifest.get("dropped_exact", []))
+                | set(manifest.get("dropped_tie", []))
+                | set(manifest.get("dropped_near_single", []))
+            )
+            relabel_map = {
+                item["path"]: item["new_label"]
+                for item in manifest.get("relabeled", [])
+            }
+            LOGGER.info(
+                "Cleaning pass: dropped_exact=%d dropped_tie=%d dropped_near=%d relabeled=%d kept=%d",
+                len(manifest.get("dropped_exact", [])),
+                len(manifest.get("dropped_tie", [])),
+                len(manifest.get("dropped_near_single", [])),
+                len(manifest.get("relabeled", [])),
+                manifest.get("kept_count", len(records) - len(dropped_paths)),
+            )
+
+            kept_records: list[hygiene.ImageRecord] = []
+            old_to_new_index: dict[int, int] = {}
+            for old_idx, record in enumerate(records):
+                if record.rel_path in dropped_paths or record.path in dropped_paths:
+                    continue
+                new_label = relabel_map.get(record.rel_path) or relabel_map.get(record.path)
+                if new_label is not None and new_label in CLASS_NAMES:
+                    record.class_name = new_label
+                    record.class_index = CLASS_NAMES.index(new_label)
+                old_to_new_index[old_idx] = len(kept_records)
+                kept_records.append(record)
+
+            records = kept_records
+
+            new_cluster_members: dict[int, list[int]] = {}
+            for cid, members in cluster_members.items():
+                new_members = [
+                    old_to_new_index[idx]
+                    for idx in members
+                    if idx in old_to_new_index
+                ]
+                if new_members:
+                    new_cluster_members[cid] = new_members
+            cluster_members = new_cluster_members
+
+            cluster_stats["readable"] = len(records)
+            cluster_stats["clusters"] = len(cluster_members)
+            cluster_stats["largest_cluster"] = max(
+                (len(m) for m in cluster_members.values()), default=0
+            )
 
     plan = grouped_stratified_split(
         records,
@@ -312,6 +400,21 @@ def prepare_data(
     )
     paths = hygiene.write_report(report, hygiene_dir)
     hygiene.write_records_csv(records, hygiene_dir / "report.csv", plan.split_of)
+    if (hygiene_dir / "cleaned_manifest.json").is_file():
+        with open(hygiene_dir / "cleaned_manifest.json", "r", encoding="utf-8") as f:
+            cmanifest = json.load(f)
+        non_zero = [c for c in cmanifest.get("class_counts_after", {}).values() if c > 0]
+        cratio = (max(non_zero) / min(non_zero)) if non_zero and min(non_zero) > 0 else None
+        md_sec = hygiene.render_conflict_resolution_markdown(
+            dropped_exact_count=len(cmanifest.get("dropped_exact", [])),
+            relabeled_count=len(cmanifest.get("relabeled", [])),
+            dropped_tie_count=len(cmanifest.get("dropped_tie", [])),
+            dropped_near_single_count=len(cmanifest.get("dropped_near_single", [])),
+            kept_count=cmanifest.get("kept_count", len(records)),
+            imbalance_ratio=cratio,
+        )
+        with open(paths["md"], "a", encoding="utf-8") as handle:
+            handle.write("\n\n" + md_sec + "\n")
     LOGGER.info("Hygiene report: %s", paths["json"])
     for line in hygiene.summary_lines(report):
         LOGGER.info("  %s", line)
@@ -857,7 +960,14 @@ def resolve_zip_path(run_dir: Path) -> Path:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def run_audit_only(cfg: LungConfig, dataset_root: str, hygiene_dir: Path) -> int:
+def run_audit_only(
+    cfg: LungConfig,
+    dataset_root: str,
+    hygiene_dir: Path,
+    resolve_conflicts: bool = False,
+    collapse_single_label: bool = False,
+    apply_clean: bool = False,
+) -> int:
     LOGGER.info("=" * 72)
     LOGGER.info("  LungV2S hygiene audit (no training)")
     LOGGER.info("  data_root=%s", dataset_root)
@@ -909,6 +1019,17 @@ def run_audit_only(cfg: LungConfig, dataset_root: str, hygiene_dir: Path) -> int
     paths = hygiene.write_report(report, hygiene_dir)
     hygiene.write_records_csv(records, hygiene_dir / "report.csv", split_of)
 
+    if resolve_conflicts:
+        report_json = hygiene_dir / "report.json"
+        if report_json.is_file():
+            hygiene.resolve_conflicts(
+                report_json,
+                hygiene_dir,
+                collapse_single_label=collapse_single_label,
+                apply=apply_clean,
+                dataset_root=dataset_root,
+            )
+
     LOGGER.info("-" * 72)
     for line in hygiene.summary_lines(report):
         LOGGER.info("  %s", line)
@@ -952,7 +1073,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     LOGGER.info("Dataset root: %s", dataset_root)
 
     if args.audit_only:
-        return run_audit_only(cfg, dataset_root, hygiene_dir)
+        return run_audit_only(
+            cfg,
+            dataset_root,
+            hygiene_dir,
+            resolve_conflicts=args.resolve_conflicts,
+            collapse_single_label=args.collapse_single_label,
+            apply_clean=args.apply_clean,
+        )
 
     import torch
     from timm.utils import ModelEmaV2
@@ -974,7 +1102,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     LOGGER.info("=" * 72)
 
     # ── data ────────────────────────────────────────────────────────────
-    records, cluster_members, plan, report = prepare_data(cfg, dataset_root, hygiene_dir)
+    records, cluster_members, plan, report = prepare_data(
+        cfg,
+        dataset_root,
+        hygiene_dir,
+        resolve_conflicts=args.resolve_conflicts,
+        collapse_single_label=args.collapse_single_label,
+        apply_clean=args.apply_clean,
+    )
 
     class_weight_vector = compute_class_weights(plan.train, records, NUM_CLASSES)
     LOGGER.info(
