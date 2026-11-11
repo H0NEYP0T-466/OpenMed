@@ -22,10 +22,47 @@ from typing import Any, Iterable, Optional, Sequence
 
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ImageOps
 from timm.data import create_transform
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
+
+# Pillow >= 10.3 validates 1 <= bits <= 8 in ImageOps.posterize.
+# timm's RandAugment with 'inc1' computes 4 - int((level / 10) * 4), which yields <= 0
+# whenever level >= 10 (common with minority_rand_augment m11 or m9 + mstd0.5).
+# Clamping bits to [1, 8] prevents ValueError in DataLoader worker processes.
+_orig_imageops_posterize = ImageOps.posterize
+
+
+def _safe_imageops_posterize(image: Image.Image, bits: int) -> Image.Image:
+    return _orig_imageops_posterize(image, max(1, min(8, int(bits))))
+
+
+ImageOps.posterize = _safe_imageops_posterize
+
+try:
+    from timm.data import auto_augment
+
+    _orig_timm_posterize = auto_augment.posterize
+
+    def _safe_timm_posterize(img: Image.Image, bits_to_keep: int, **kwargs: Any) -> Image.Image:
+        return _orig_timm_posterize(img, max(1, min(8, int(bits_to_keep))), **kwargs)
+
+    auto_augment.posterize = _safe_timm_posterize
+    auto_augment.NAME_TO_OP["Posterize"] = _safe_timm_posterize
+    auto_augment.NAME_TO_OP["PosterizeIncreasing"] = _safe_timm_posterize
+    auto_augment.NAME_TO_OP["PosterizeOriginal"] = _safe_timm_posterize
+
+    _orig_post_inc = auto_augment._posterize_increasing_level_to_arg
+
+    def _safe_post_inc(level: float, hparams: Any) -> tuple[int]:
+        res = _orig_post_inc(level, hparams)
+        return (max(1, min(8, int(res[0]))),)
+
+    auto_augment._posterize_increasing_level_to_arg = _safe_post_inc
+    auto_augment.LEVEL_TO_ARG["PosterizeIncreasing"] = _safe_post_inc
+except Exception:
+    pass
 
 try:  # package import: app.organs.lungs.classification.kaggle.dataset
     from . import hygiene

@@ -518,3 +518,24 @@ def test_split_manifest_covers_every_split_once() -> None:
     assert len(rows) == len(records)
     assert {row[5] for row in rows} == {"train", "val", "test"}
     assert all(row[0] and row[1] and row[2] for row in rows)
+
+
+def test_safe_posterize_and_minority_rand_augment() -> None:
+    from PIL import ImageOps
+
+    # 1. ImageOps.posterize with out-of-bounds bits does not throw ValueError
+    img = Image.new("RGB", (32, 32), (128, 128, 128))
+    for bits in [0, -1, -5, 9, 12]:
+        out = ImageOps.posterize(img, bits)
+        assert out.size == (32, 32)
+
+    # 2. Build transform with minority_rand_augment (m11 with mstd0.5)
+    cfg = LungConfig()
+    transform = lung_dataset.build_train_transform(
+        size=cfg.train_size,
+        cfg=cfg,
+        rand_augment=cfg.minority_rand_augment,
+    )
+    for _ in range(50):
+        t = transform(img)
+        assert t.shape == (3, cfg.train_size, cfg.train_size)

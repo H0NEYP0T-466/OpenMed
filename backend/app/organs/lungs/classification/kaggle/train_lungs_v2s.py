@@ -597,6 +597,26 @@ def compute_metrics(
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+def amp_autocast(enabled: bool, device_type: str = "cuda") -> Any:
+    """Device-agnostic AMP context compatible with torch >= 2.4 and older."""
+    import torch
+
+    try:
+        return torch.amp.autocast(device_type=device_type, enabled=enabled)
+    except (AttributeError, TypeError):
+        return torch.cuda.amp.autocast(enabled=enabled)
+
+
+def make_grad_scaler(enabled: bool, device_type: str = "cuda") -> Any:
+    """Device-agnostic GradScaler compatible with torch >= 2.4 and older."""
+    import torch
+
+    try:
+        return torch.amp.GradScaler(device_type, enabled=enabled)
+    except (AttributeError, TypeError):
+        return torch.cuda.amp.GradScaler(enabled=enabled)
+
+
 def train_one_epoch(
     model: Any,
     ema: Any,
@@ -624,7 +644,7 @@ def train_one_epoch(
         labels = labels.to(device, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
 
-        with torch.cuda.amp.autocast(enabled=use_amp):
+        with amp_autocast(enabled=use_amp):
             if mixup_fn is not None and images.size(0) > 1:
                 mixed, targets = mixup_fn(images, labels)
                 logits = model(mixed)
@@ -682,7 +702,7 @@ def evaluate(
         for images, labels, _ in loader:
             images = images.to(device, non_blocking=True)
             labels = labels.to(device, non_blocking=True)
-            with torch.cuda.amp.autocast(enabled=use_amp):
+            with amp_autocast(enabled=use_amp):
                 logits = model(images)
                 loss = criterion(logits, labels)
             running_loss += float(loss.item()) * images.size(0)
@@ -741,7 +761,7 @@ def predict_probs(
                 images = images.to(device, non_blocking=True)
                 if flip:
                     images = torch.flip(images, dims=[3])
-                with torch.cuda.amp.autocast(enabled=use_amp):
+                with amp_autocast(enabled=use_amp):
                     logits = model(images)
                 chunks.append(torch.softmax(logits.float(), dim=1).cpu().numpy())
                 label_chunks.append(labels.numpy())
@@ -1180,7 +1200,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     optimizer = build_optimizer(model, cfg)
     scheduler = build_scheduler(optimizer, cfg, steps_per_epoch)
-    scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
+    scaler = make_grad_scaler(enabled=use_amp)
     mixup_fn = build_mixup(cfg)
     ema: Optional[Any] = ModelEmaV2(model, decay=cfg.ema_decay)
 
