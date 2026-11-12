@@ -1,0 +1,1503 @@
+{
+  "kept_count": 20858,
+  "dropped_exact": [
+    "COVID/images/COVID-2810.png",
+    "COVID/images/COVID-2811.png",
+    "COVID/images/COVID-2812.png",
+    "COVID/images/COVID-2813.png",
+    "COVID/images/COVID-3141.png",
+    "COVID/images/COVID-3142.png",
+    "COVID/images/COVID-3143.png",
+    "COVID/images/COVID-3144.png",
+    "COVID/images/COVID-2716.png",
+    "COVID/images/COVID-2717.png",
+    "COVID/images/COVID-2718.png",
+    "COVID/images/COVID-2719.png",
+    "COVID/images/COVID-3374.png",
+    "COVID/images/COVID-3375.png",
+    "COVID/images/COVID-3376.png",
+    "COVID/images/COVID-2773.png",
+    "COVID/images/COVID-2774.png",
+    "COVID/images/COVID-2421.png",
+    "COVID/images/COVID-2805.png",
+    "Viral Pneumonia/images/Viral Pneumonia-75.png",
+    "COVID/images/COVID-3403.png",
+    "COVID/images/COVID-2667.png",
+    "Viral Pneumonia/images/Viral Pneumonia-295.png",
+    "COVID/images/COVID-2808.png",
+    "COVID/images/COVID-3489.png",
+    "COVID/images/COVID-2459.png",
+    "COVID/images/COVID-2493.png",
+    "Normal/images/Normal-818.png",
+    "Viral Pneumonia/images/Viral Pneumonia-1053.png",
+    "COVID/images/COVID-3223.png",
+    "COVID/images/COVID-2418.png",
+    "COVID/images/COVID-3599.png",
+    "COVID/images/COVID-280.png",
+    "COVID/images/COVID-3427.png",
+    "COVID/images/COVID-2678.png",
+    "COVID/images/COVID-3591.png",
+    "COVID/images/COVID-3574.png",
+    "COVID/images/COVID-3429.png",
+    "COVID/images/COVID-2942.png",
+    "COVID/images/COVID-52.png",
+    "COVID/images/COVID-3208.png",
+    "Viral Pneumonia/images/Viral Pneumonia-596.png",
+    "Viral Pneumonia/images/Viral Pneumonia-954.png",
+    "COVID/images/COVID-321.png",
+    "COVID/images/COVID-2423.png",
+    "Viral Pneumonia/images/Viral Pneumonia-250.png",
+    "Viral Pneumonia/images/Viral Pneumonia-118.png",
+    "COVID/images/COVID-2085.png",
+    "COVID/images/COVID-3516.png",
+    "COVID/images/COVID-139.png",
+    "COVID/images/COVID-3299.png",
+    "COVID/images/COVID-2823.png",
+    "COVID/images/COVID-21.png",
+    "COVID/images/COVID-3212.png"
+  ],
+  "relabeled": [
+    {
+      "path": "COVID/images/COVID-1075.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1077.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1164.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1191.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-129.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1293.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1457.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1537.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-157.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1647.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1812.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1858.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-186.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1878.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1915.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1927.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1934.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1958.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1969.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1973.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2002.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2004.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-202.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2031.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-212.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2133.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2142.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2156.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-223.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2247.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2267.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2268.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2303.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2316.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2386.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2424.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2446.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2470.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2481.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2490.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2636.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2658.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2731.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2779.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2804.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2862.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2863.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2887.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2900.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3027.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3033.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3034.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3037.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3069.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3092.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3102.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3104.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3130.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3152.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3184.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3199.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3206.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3218.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3244.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3249.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3270.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3288.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3312.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3345.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3353.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-336.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3368.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3383.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3395.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3410.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3421.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3434.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3488.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3543.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3545.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3550.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3612.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3616.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-396.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-406.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-416.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-580.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-648.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-657.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-700.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-749.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-752.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-861.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-870.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-89.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-917.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-931.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-942.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-110.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1158.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1168.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1211.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1427.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-147.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1540.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1581.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1712.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1839.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1842.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2150.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2219.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2233.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-225.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2296.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2312.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2330.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2426.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2455.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2528.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2838.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-3085.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-3175.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-3335.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-3663.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-3690.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4043.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4073.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-41.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4122.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4151.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-420.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4388.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4468.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4540.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4574.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4597.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-47.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4770.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4899.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5029.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5086.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5187.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-520.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5230.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5611.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-588.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-749.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-784.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-854.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-204.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4490.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5492.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5733.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-72.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Viral Pneumonia/images/Viral Pneumonia-517.png",
+      "old_label": "Viral Pneumonia",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Viral Pneumonia/images/Viral Pneumonia-762.png",
+      "old_label": "Viral Pneumonia",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Viral Pneumonia/images/Viral Pneumonia-435.png",
+      "old_label": "Viral Pneumonia",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Viral Pneumonia/images/Viral Pneumonia-1023.png",
+      "old_label": "Viral Pneumonia",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-837.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3016.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1072.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1535.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-3337.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4624.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5619.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-651.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1725.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2343.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-497.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-137.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-948.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-956.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Normal/images/Normal-6343.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-2333.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2849.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3589.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-364.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5571.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-4017.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "Normal/images/Normal-5836.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "COVID/images/COVID-2233.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-285.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2924.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2990.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3326.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-534.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3523.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Normal/images/Normal-3745.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-2110.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2601.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2945.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2946.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-2303.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5076.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Viral Pneumonia/images/Viral Pneumonia-694.png",
+      "old_label": "Viral Pneumonia",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2200.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-537.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2592.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Normal/images/Normal-8124.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-2627.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1992.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3257.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1006.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-5274.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "COVID"
+    },
+    {
+      "path": "Normal/images/Normal-8165.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "Normal/images/Normal-5324.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1895.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-4038.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4010.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-832.png",
+      "old_label": "Normal",
+      "new_label": "Viral Pneumonia"
+    },
+    {
+      "path": "COVID/images/COVID-1048.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Normal/images/Normal-6653.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "Normal/images/Normal-3023.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "COVID/images/COVID-1828.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-1856.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-1946.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Normal/images/Normal-1915.png",
+      "old_label": "Normal",
+      "new_label": "COVID"
+    },
+    {
+      "path": "COVID/images/COVID-2302.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-2304.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2530.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2531.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-2562.png",
+      "old_label": "COVID",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "COVID/images/COVID-2760.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-3335.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "COVID/images/COVID-557.png",
+      "old_label": "COVID",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-9530.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-1111.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-9882.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2396.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-6622.png",
+      "old_label": "Normal",
+      "new_label": "Lung_Opacity"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-2987.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4119.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4126.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Lung_Opacity/images/Lung_Opacity-4390.png",
+      "old_label": "Lung_Opacity",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Viral Pneumonia/images/Viral Pneumonia-1262.png",
+      "old_label": "Viral Pneumonia",
+      "new_label": "Normal"
+    },
+    {
+      "path": "Normal/images/Normal-556.png",
+      "old_label": "Normal",
+      "new_label": "Viral Pneumonia"
+    }
+  ],
+  "dropped_tie": [
+    "COVID/images/COVID-1016.png",
+    "COVID/images/COVID-152.png",
+    "COVID/images/COVID-2011.png",
+    "COVID/images/COVID-2740.png",
+    "COVID/images/COVID-3313.png",
+    "Normal/images/Normal-3324.png",
+    "Normal/images/Normal-3925.png",
+    "Normal/images/Normal-7999.png",
+    "Normal/images/Normal-8889.png",
+    "Normal/images/Normal-9561.png",
+    "COVID/images/COVID-232.png",
+    "COVID/images/COVID-32.png",
+    "COVID/images/COVID-345.png",
+    "COVID/images/COVID-428.png",
+    "Normal/images/Normal-2544.png",
+    "Normal/images/Normal-5563.png",
+    "Normal/images/Normal-8709.png",
+    "Normal/images/Normal-9731.png",
+    "COVID/images/COVID-2116.png",
+    "COVID/images/COVID-2561.png",
+    "COVID/images/COVID-3195.png",
+    "Normal/images/Normal-7260.png",
+    "Normal/images/Normal-8264.png",
+    "Normal/images/Normal-8793.png",
+    "COVID/images/COVID-1472.png",
+    "COVID/images/COVID-714.png",
+    "Normal/images/Normal-4230.png",
+    "Normal/images/Normal-7185.png",
+    "COVID/images/COVID-2367.png",
+    "COVID/images/COVID-900.png",
+    "Normal/images/Normal-2057.png",
+    "Normal/images/Normal-3052.png",
+    "COVID/images/COVID-2873.png",
+    "COVID/images/COVID-3262.png",
+    "Lung_Opacity/images/Lung_Opacity-1351.png",
+    "Lung_Opacity/images/Lung_Opacity-2646.png",
+    "COVID/images/COVID-2353.png",
+    "Lung_Opacity/images/Lung_Opacity-1206.png",
+    "Normal/images/Normal-6302.png",
+    "COVID/images/COVID-298.png",
+    "Lung_Opacity/images/Lung_Opacity-656.png",
+    "Normal/images/Normal-2155.png",
+    "COVID/images/COVID-3530.png",
+    "Lung_Opacity/images/Lung_Opacity-646.png",
+    "Normal/images/Normal-4260.png",
+    "COVID/images/COVID-1003.png",
+    "Normal/images/Normal-1766.png",
+    "COVID/images/COVID-1006.png",
+    "Normal/images/Normal-8045.png",
+    "COVID/images/COVID-1080.png",
+    "Normal/images/Normal-2188.png",
+    "COVID/images/COVID-1086.png",
+    "Normal/images/Normal-5763.png",
+    "COVID/images/COVID-1313.png",
+    "Lung_Opacity/images/Lung_Opacity-3053.png",
+    "COVID/images/COVID-1322.png",
+    "Normal/images/Normal-1865.png",
+    "COVID/images/COVID-1481.png",
+    "Lung_Opacity/images/Lung_Opacity-5608.png",
+    "COVID/images/COVID-1501.png",
+    "Lung_Opacity/images/Lung_Opacity-2739.png",
+    "COVID/images/COVID-1525.png",
+    "Lung_Opacity/images/Lung_Opacity-3413.png",
+    "COVID/images/COVID-1643.png",
+    "Normal/images/Normal-8650.png",
+    "COVID/images/COVID-1792.png",
+    "Normal/images/Normal-8814.png",
+    "COVID/images/COVID-1879.png",
+    "Normal/images/Normal-9502.png",
+    "COVID/images/COVID-1924.png",
+    "Normal/images/Normal-1434.png",
+    "COVID/images/COVID-1947.png",
+    "Normal/images/Normal-1432.png",
+    "COVID/images/COVID-2024.png",
+    "Normal/images/Normal-4655.png",
+    "COVID/images/COVID-2099.png",
+    "Normal/images/Normal-2153.png",
+    "COVID/images/COVID-2161.png",
+    "Lung_Opacity/images/Lung_Opacity-1687.png",
+    "COVID/images/COVID-2167.png",
+    "Normal/images/Normal-7888.png",
+    "COVID/images/COVID-2176.png",
+    "Lung_Opacity/images/Lung_Opacity-289.png",
+    "COVID/images/COVID-2229.png",
+    "Lung_Opacity/images/Lung_Opacity-4065.png",
+    "COVID/images/COVID-2340.png",
+    "Normal/images/Normal-7734.png",
+    "COVID/images/COVID-2406.png",
+    "Normal/images/Normal-7800.png",
+    "COVID/images/COVID-2483.png",
+    "Normal/images/Normal-5192.png",
+    "COVID/images/COVID-2484.png",
+    "Normal/images/Normal-3436.png",
+    "COVID/images/COVID-2546.png",
+    "Lung_Opacity/images/Lung_Opacity-3165.png",
+    "COVID/images/COVID-2571.png",
+    "Lung_Opacity/images/Lung_Opacity-303.png",
+    "COVID/images/COVID-2599.png",
+    "Normal/images/Normal-2871.png",
+    "COVID/images/COVID-2653.png",
+    "Normal/images/Normal-5674.png",
+    "COVID/images/COVID-268.png",
+    "Normal/images/Normal-2459.png",
+    "COVID/images/COVID-2732.png",
+    "Normal/images/Normal-8064.png",
+    "COVID/images/COVID-2791.png",
+    "Lung_Opacity/images/Lung_Opacity-1941.png",
+    "COVID/images/COVID-2818.png",
+    "Normal/images/Normal-9531.png",
+    "COVID/images/COVID-2930.png",
+    "Normal/images/Normal-2012.png",
+    "COVID/images/COVID-2951.png",
+    "Normal/images/Normal-7651.png",
+    "COVID/images/COVID-3161.png",
+    "Normal/images/Normal-7743.png",
+    "COVID/images/COVID-3200.png",
+    "Normal/images/Normal-4700.png",
+    "COVID/images/COVID-3238.png",
+    "Normal/images/Normal-2753.png",
+    "COVID/images/COVID-3256.png",
+    "Lung_Opacity/images/Lung_Opacity-2230.png",
+    "COVID/images/COVID-3273.png",
+    "Lung_Opacity/images/Lung_Opacity-4215.png",
+    "COVID/images/COVID-3302.png",
+    "Lung_Opacity/images/Lung_Opacity-1619.png",
+    "COVID/images/COVID-3306.png",
+    "Normal/images/Normal-6642.png",
+    "COVID/images/COVID-3359.png",
+    "Normal/images/Normal-6861.png",
+    "COVID/images/COVID-3417.png",
+    "Normal/images/Normal-5478.png",
+    "COVID/images/COVID-3468.png",
+    "Normal/images/Normal-8023.png",
+    "COVID/images/COVID-3474.png",
+    "Normal/images/Normal-4141.png",
+    "COVID/images/COVID-3490.png",
+    "Normal/images/Normal-9115.png",
+    "COVID/images/COVID-3492.png",
+    "Normal/images/Normal-7063.png",
+    "COVID/images/COVID-3505.png",
+    "Lung_Opacity/images/Lung_Opacity-5160.png",
+    "COVID/images/COVID-3587.png",
+    "Normal/images/Normal-3636.png",
+    "COVID/images/COVID-3593.png",
+    "Normal/images/Normal-8684.png",
+    "COVID/images/COVID-677.png",
+    "Normal/images/Normal-9629.png",
+    "COVID/images/COVID-787.png",
+    "Lung_Opacity/images/Lung_Opacity-144.png",
+    "COVID/images/COVID-795.png",
+    "Normal/images/Normal-1823.png",
+    "COVID/images/COVID-852.png",
+    "Lung_Opacity/images/Lung_Opacity-5287.png",
+    "COVID/images/COVID-869.png",
+    "Lung_Opacity/images/Lung_Opacity-832.png",
+    "COVID/images/COVID-883.png",
+    "Normal/images/Normal-2962.png",
+    "COVID/images/COVID-963.png",
+    "Normal/images/Normal-4052.png",
+    "Lung_Opacity/images/Lung_Opacity-1212.png",
+    "Normal/images/Normal-7225.png",
+    "Lung_Opacity/images/Lung_Opacity-1583.png",
+    "Normal/images/Normal-9217.png",
+    "Lung_Opacity/images/Lung_Opacity-1601.png",
+    "Normal/images/Normal-9159.png",
+    "Lung_Opacity/images/Lung_Opacity-1631.png",
+    "Normal/images/Normal-7958.png",
+    "Lung_Opacity/images/Lung_Opacity-1649.png",
+    "Normal/images/Normal-3587.png",
+    "Lung_Opacity/images/Lung_Opacity-1679.png",
+    "Normal/images/Normal-6715.png",
+    "Lung_Opacity/images/Lung_Opacity-1701.png",
+    "Normal/images/Normal-3232.png",
+    "Lung_Opacity/images/Lung_Opacity-171.png",
+    "Viral Pneumonia/images/Viral Pneumonia-322.png",
+    "Lung_Opacity/images/Lung_Opacity-1735.png",
+    "Normal/images/Normal-7129.png",
+    "Lung_Opacity/images/Lung_Opacity-1778.png",
+    "Normal/images/Normal-7332.png",
+    "Lung_Opacity/images/Lung_Opacity-1786.png",
+    "Normal/images/Normal-6102.png",
+    "Lung_Opacity/images/Lung_Opacity-1835.png",
+    "Normal/images/Normal-7890.png",
+    "Lung_Opacity/images/Lung_Opacity-1841.png",
+    "Normal/images/Normal-3969.png",
+    "Lung_Opacity/images/Lung_Opacity-1853.png",
+    "Normal/images/Normal-10078.png",
+    "Lung_Opacity/images/Lung_Opacity-206.png",
+    "Normal/images/Normal-5155.png",
+    "Lung_Opacity/images/Lung_Opacity-2063.png",
+    "Normal/images/Normal-4767.png",
+    "Lung_Opacity/images/Lung_Opacity-2256.png",
+    "Normal/images/Normal-9704.png",
+    "Lung_Opacity/images/Lung_Opacity-2269.png",
+    "Normal/images/Normal-8149.png",
+    "Lung_Opacity/images/Lung_Opacity-2415.png",
+    "Normal/images/Normal-4236.png",
+    "Lung_Opacity/images/Lung_Opacity-2506.png",
+    "Normal/images/Normal-8441.png",
+    "Lung_Opacity/images/Lung_Opacity-2673.png",
+    "Normal/images/Normal-7834.png",
+    "Lung_Opacity/images/Lung_Opacity-270.png",
+    "Normal/images/Normal-3500.png",
+    "Lung_Opacity/images/Lung_Opacity-2810.png",
+    "Normal/images/Normal-7539.png",
+    "Lung_Opacity/images/Lung_Opacity-2861.png",
+    "Normal/images/Normal-9891.png",
+    "Lung_Opacity/images/Lung_Opacity-3036.png",
+    "Normal/images/Normal-3451.png",
+    "Lung_Opacity/images/Lung_Opacity-3116.png",
+    "Normal/images/Normal-5453.png",
+    "Lung_Opacity/images/Lung_Opacity-4024.png",
+    "Normal/images/Normal-2495.png",
+    "Lung_Opacity/images/Lung_Opacity-4044.png",
+    "Normal/images/Normal-6232.png",
+    "Lung_Opacity/images/Lung_Opacity-4130.png",
+    "Normal/images/Normal-7978.png",
+    "Lung_Opacity/images/Lung_Opacity-4211.png",
+    "Viral Pneumonia/images/Viral Pneumonia-1101.png",
+    "Lung_Opacity/images/Lung_Opacity-4222.png",
+    "Normal/images/Normal-6619.png",
+    "Lung_Opacity/images/Lung_Opacity-4305.png",
+    "Normal/images/Normal-8773.png",
+    "Lung_Opacity/images/Lung_Opacity-4335.png",
+    "Normal/images/Normal-5878.png",
+    "Lung_Opacity/images/Lung_Opacity-4550.png",
+    "Normal/images/Normal-5785.png",
+    "Lung_Opacity/images/Lung_Opacity-4837.png",
+    "Normal/images/Normal-9201.png",
+    "Lung_Opacity/images/Lung_Opacity-4958.png",
+    "Normal/images/Normal-7159.png",
+    "Lung_Opacity/images/Lung_Opacity-5203.png",
+    "Normal/images/Normal-8513.png",
+    "Lung_Opacity/images/Lung_Opacity-5273.png",
+    "Normal/images/Normal-8525.png",
+    "Lung_Opacity/images/Lung_Opacity-5711.png",
+    "Normal/images/Normal-6256.png",
+    "Lung_Opacity/images/Lung_Opacity-653.png",
+    "Normal/images/Normal-4723.png",
+    "Lung_Opacity/images/Lung_Opacity-92.png",
+    "Normal/images/Normal-9606.png",
+    "Normal/images/Normal-1231.png",
+    "Viral Pneumonia/images/Viral Pneumonia-321.png",
+    "Normal/images/Normal-444.png",
+    "Viral Pneumonia/images/Viral Pneumonia-434.png",
+    "Normal/images/Normal-65.png",
+    "Viral Pneumonia/images/Viral Pneumonia-606.png",
+    "Normal/images/Normal-652.png",
+    "Viral Pneumonia/images/Viral Pneumonia-1026.png",
+    "Normal/images/Normal-760.png",
+    "Viral Pneumonia/images/Viral Pneumonia-400.png",
+    "Normal/images/Normal-913.png",
+    "Viral Pneumonia/images/Viral Pneumonia-1296.png"
+  ],
+  "dropped_near_single": [],
+  "class_counts_after": {
+    "COVID": 3365,
+    "Lung_Opacity": 5889,
+    "Normal": 10278,
+    "Viral Pneumonia": 1326
+  }
+}

@@ -32,6 +32,7 @@ from __future__ import annotations
 import base64
 import io
 import logging
+import math
 import os
 import threading
 import time
@@ -134,6 +135,7 @@ class V2SPipeline:
         self.model: Optional[torch.nn.Module] = None
         self.class_names: tuple[str, ...] = CLASS_NAMES
         self.infer_size: int = DEFAULT_INFER_SIZE
+        self.temperature: float = 1.0
         self.sidecar: dict[str, Any] = {}
         self.checkpoint_epoch: Optional[int] = None
         self.checkpoint_kind: Optional[str] = None
@@ -168,6 +170,16 @@ class V2SPipeline:
         sidecar = self._read_sidecar()
         class_names = tuple(sidecar["class_names"])
         infer_size = int(sidecar["infer_size"])
+        # Temperature scaling: the sidecar carries a scalar T fitted on the
+        # validation split (weighted loss + mixup + label smoothing leave the raw
+        # softmax badly calibrated). Dividing logits by T before softmax rescales
+        # confidence to match true accuracy without changing argmax. T=1.0 is a
+        # no-op for older sidecars that predate calibration.
+        temperature = float(sidecar.get("temperature", 1.0) or 1.0)
+        if not math.isfinite(temperature) or temperature <= 0.0:
+            raise ValueError(
+                f"Sidecar temperature must be a positive finite number, got {temperature!r}"
+            )
 
         model = build_v2s_model(num_classes=len(class_names), pretrained=False)
 
@@ -186,6 +198,7 @@ class V2SPipeline:
         self.sidecar = sidecar
         self.class_names = class_names
         self.infer_size = infer_size
+        self.temperature = temperature
         if isinstance(payload, dict):
             self.checkpoint_epoch = payload.get("epoch")
             self.checkpoint_kind = payload.get("kind")
@@ -242,7 +255,9 @@ class V2SPipeline:
 
             with torch.no_grad():
                 logits = self.model(tensor)
-                probabilities = torch.softmax(logits.float(), dim=1)[0].cpu().numpy()
+                probabilities = torch.softmax(
+                    logits.float() / self.temperature, dim=1
+                )[0].cpu().numpy()
 
             top_index = int(np.argmax(probabilities))
             with GradCAMV2S(self.model) as cam_gen:

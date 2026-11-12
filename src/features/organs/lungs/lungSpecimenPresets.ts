@@ -1,14 +1,14 @@
 /**
- * The lung specimen rack — one radiograph per class in the 16-class label
- * space, so every class can be exercised without hunting for a file.
+ * The lung specimen rack — one radiograph per class in the 4-class LungV2S
+ * label space, so every class can be exercised without hunting for a file.
  *
- * Each plate is a real image from the training corpus, chosen because its
- * label is unambiguous: the fourteen NIH plates are single-label images, so
- * what the card says is exactly what the annotation says. COVID and TB come
- * from their own collections.
+ * Each plate is a real image from the COVID-19 Radiography Database, chosen
+ * from the corpus the model was trained on. The subtitle names the source, not
+ * a diagnosis — these are annotations, and the card should not claim more than
+ * the label does.
  *
- * The subtitle names the source, not a diagnosis — these are annotations, and
- * the card should not claim more than the label does.
+ * The four classes are, in head order: COVID, Lung_Opacity, Normal,
+ * Viral Pneumonia (see `V2S_CLASS_ORDER` in `lungsApi.ts`).
  */
 
 export interface LungSpecimenPreset {
@@ -19,120 +19,36 @@ export interface LungSpecimenPreset {
   readonly site: string
 }
 
-const NIH = 'NIH ChestX-ray14 · single label'
+const SOURCE = 'COVID-19 Radiography Database'
 
 export const LUNG_SPECIMEN_PRESETS: readonly LungSpecimenPreset[] = [
   {
     plate: 'Pl. A',
-    name: 'Atelectasis',
-    path: '/samples/lungs/atelectasis.png',
-    subtitle: NIH,
-    site: 'Lobar / segmental',
-  },
-  {
-    plate: 'Pl. B',
-    name: 'Cardiomegaly',
-    path: '/samples/lungs/cardiomegaly.png',
-    subtitle: NIH,
-    site: 'Cardiomediastinal silhouette',
-  },
-  {
-    plate: 'Pl. C',
-    name: 'Effusion',
-    path: '/samples/lungs/effusion.png',
-    subtitle: NIH,
-    site: 'Pleural space',
-  },
-  {
-    plate: 'Pl. D',
-    name: 'Infiltration',
-    path: '/samples/lungs/infiltration.png',
-    subtitle: NIH,
-    site: 'Bilateral lung fields',
-  },
-  {
-    plate: 'Pl. E',
-    name: 'Mass',
-    path: '/samples/lungs/mass.png',
-    subtitle: NIH,
-    site: 'Lung parenchyma',
-  },
-  {
-    plate: 'Pl. F',
-    name: 'Nodule',
-    path: '/samples/lungs/nodule.png',
-    subtitle: NIH,
-    site: 'Lung parenchyma',
-  },
-  {
-    plate: 'Pl. G',
-    name: 'Pneumonia',
-    path: '/samples/lungs/pneumonia.png',
-    subtitle: NIH,
-    site: 'Lobar consolidation',
-  },
-  {
-    plate: 'Pl. H',
-    name: 'Pneumothorax',
-    path: '/samples/lungs/pneumothorax.png',
-    subtitle: NIH,
-    site: 'Pleural space',
-  },
-  {
-    plate: 'Pl. I',
-    name: 'Consolidation',
-    path: '/samples/lungs/consolidation.png',
-    subtitle: NIH,
-    site: 'Lobar / segmental',
-  },
-  {
-    plate: 'Pl. J',
-    name: 'Edema',
-    path: '/samples/lungs/edema.png',
-    subtitle: NIH,
-    site: 'Perihilar / bilateral',
-  },
-  {
-    plate: 'Pl. K',
-    name: 'Emphysema',
-    path: '/samples/lungs/emphysema.png',
-    subtitle: NIH,
-    site: 'Upper lobes',
-  },
-  {
-    plate: 'Pl. L',
-    name: 'Fibrosis',
-    path: '/samples/lungs/fibrosis.png',
-    subtitle: NIH,
-    site: 'Basal / peripheral',
-  },
-  {
-    plate: 'Pl. M',
-    name: 'Pleural Thickening',
-    path: '/samples/lungs/pleural_thickening.png',
-    subtitle: NIH,
-    site: 'Pleural space',
-  },
-  {
-    plate: 'Pl. N',
-    name: 'Hernia',
-    path: '/samples/lungs/hernia.png',
-    subtitle: NIH,
-    site: 'Diaphragmatic',
-  },
-  {
-    plate: 'Pl. O',
     name: 'COVID',
     path: '/samples/lungs/covid.png',
-    subtitle: 'COVID-19 Radiography Database',
+    subtitle: SOURCE,
     site: 'Bilateral / peripheral',
   },
   {
-    plate: 'Pl. P',
-    name: 'TB',
-    path: '/samples/lungs/tb.png',
-    subtitle: 'TB Chest Radiography Database',
-    site: 'Apical / upper lobes',
+    plate: 'Pl. B',
+    name: 'Lung Opacity',
+    path: '/samples/lungs/lung_opacity.png',
+    subtitle: SOURCE,
+    site: 'Focal / multifocal opacity',
+  },
+  {
+    plate: 'Pl. C',
+    name: 'Normal',
+    path: '/samples/lungs/normal.png',
+    subtitle: SOURCE,
+    site: 'Clear lung fields',
+  },
+  {
+    plate: 'Pl. D',
+    name: 'Viral Pneumonia',
+    path: '/samples/lungs/viral_pneumonia.png',
+    subtitle: SOURCE,
+    site: 'Bilateral / interstitial',
   },
 ]
 

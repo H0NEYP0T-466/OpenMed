@@ -1,0 +1,542 @@
+{
+  "generated_at": "2026-11-11T11:38:33+00:00",
+  "dataset_root": "/kaggle/input/datasets/tawsifurrahman/covid19-radiography-database/COVID-19_Radiography_Dataset",
+  "hamming_max": 5,
+  "phash_implementation": "imagehash",
+  "num_images": 20858,
+  "num_readable": 20858,
+  "num_unreadable": 0,
+  "class_counts": {
+    "COVID": 3365,
+    "Lung_Opacity": 5889,
+    "Normal": 10278,
+    "Viral Pneumonia": 1326
+  },
+  "class_counts_ordered": [
+    3365,
+    5889,
+    10278,
+    1326
+  ],
+  "imbalance_ratio": 7.7511,
+  "exact_duplicates": {
+    "groups": 0,
+    "images": 0,
+    "clusters": []
+  },
+  "near_duplicates": {
+    "clusters": 518,
+    "images": 1853,
+    "pairs": 1618,
+    "examples": [
+      {
+        "cluster_id": 0,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1.png",
+          "COVID/images/COVID-140.png",
+          "COVID/images/COVID-591.png"
+        ]
+      },
+      {
+        "cluster_id": 2,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-100.png",
+          "COVID/images/COVID-97.png"
+        ]
+      },
+      {
+        "cluster_id": 5,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1002.png",
+          "COVID/images/COVID-322.png"
+        ]
+      },
+      {
+        "cluster_id": 13,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-101.png",
+          "COVID/images/COVID-181.png"
+        ]
+      },
+      {
+        "cluster_id": 15,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1011.png",
+          "COVID/images/COVID-1150.png"
+        ]
+      },
+      {
+        "cluster_id": 18,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1014.png",
+          "COVID/images/COVID-1153.png"
+        ]
+      },
+      {
+        "cluster_id": 21,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1017.png",
+          "COVID/images/COVID-1156.png"
+        ]
+      },
+      {
+        "cluster_id": 25,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1020.png",
+          "COVID/images/COVID-1514.png"
+        ]
+      },
+      {
+        "cluster_id": 55,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1048.png",
+          "Lung_Opacity/images/Lung_Opacity-1765.png",
+          "Lung_Opacity/images/Lung_Opacity-3279.png"
+        ]
+      },
+      {
+        "cluster_id": 65,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1057.png",
+          "COVID/images/COVID-1096.png",
+          "COVID/images/COVID-115.png"
+        ]
+      },
+      {
+        "cluster_id": 69,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1060.png",
+          "COVID/images/COVID-1117.png"
+        ]
+      },
+      {
+        "cluster_id": 79,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-107.png",
+          "COVID/images/COVID-190.png"
+        ]
+      },
+      {
+        "cluster_id": 85,
+        "count": 390,
+        "paths": [
+          "COVID/images/COVID-1075.png",
+          "COVID/images/COVID-1077.png",
+          "COVID/images/COVID-1164.png",
+          "COVID/images/COVID-1191.png",
+          "COVID/images/COVID-129.png",
+          "COVID/images/COVID-1293.png",
+          "COVID/images/COVID-1457.png",
+          "COVID/images/COVID-1537.png",
+          "COVID/images/COVID-157.png",
+          "COVID/images/COVID-1647.png"
+        ]
+      },
+      {
+        "cluster_id": 86,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1076.png",
+          "COVID/images/COVID-1317.png",
+          "COVID/images/COVID-369.png"
+        ]
+      },
+      {
+        "cluster_id": 87,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1078.png",
+          "COVID/images/COVID-57.png"
+        ]
+      },
+      {
+        "cluster_id": 97,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1087.png",
+          "COVID/images/COVID-256.png",
+          "COVID/images/COVID-792.png"
+        ]
+      },
+      {
+        "cluster_id": 100,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-109.png",
+          "COVID/images/COVID-525.png"
+        ]
+      },
+      {
+        "cluster_id": 101,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1090.png",
+          "COVID/images/COVID-1574.png"
+        ]
+      },
+      {
+        "cluster_id": 109,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1099.png",
+          "COVID/images/COVID-377.png"
+        ]
+      },
+      {
+        "cluster_id": 110,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-11.png",
+          "COVID/images/COVID-160.png"
+        ]
+      },
+      {
+        "cluster_id": 122,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-111.png",
+          "COVID/images/COVID-633.png"
+        ]
+      },
+      {
+        "cluster_id": 124,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1111.png",
+          "COVID/images/COVID-60.png"
+        ]
+      },
+      {
+        "cluster_id": 132,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-112.png",
+          "COVID/images/COVID-372.png"
+        ]
+      },
+      {
+        "cluster_id": 136,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1123.png",
+          "COVID/images/COVID-1416.png",
+          "COVID/images/COVID-323.png"
+        ]
+      },
+      {
+        "cluster_id": 139,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1126.png",
+          "COVID/images/COVID-1335.png",
+          "COVID/images/COVID-90.png"
+        ]
+      },
+      {
+        "cluster_id": 142,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1129.png",
+          "COVID/images/COVID-1367.png"
+        ]
+      },
+      {
+        "cluster_id": 146,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1132.png",
+          "COVID/images/COVID-1370.png"
+        ]
+      },
+      {
+        "cluster_id": 149,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1135.png",
+          "COVID/images/COVID-1422.png"
+        ]
+      },
+      {
+        "cluster_id": 152,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1138.png",
+          "COVID/images/COVID-63.png"
+        ]
+      },
+      {
+        "cluster_id": 154,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-114.png",
+          "COVID/images/COVID-766.png"
+        ]
+      },
+      {
+        "cluster_id": 156,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1141.png",
+          "COVID/images/COVID-1413.png"
+        ]
+      },
+      {
+        "cluster_id": 159,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1144.png",
+          "COVID/images/COVID-1419.png"
+        ]
+      },
+      {
+        "cluster_id": 171,
+        "count": 4,
+        "paths": [
+          "COVID/images/COVID-1159.png",
+          "COVID/images/COVID-1200.png",
+          "COVID/images/COVID-483.png",
+          "COVID/images/COVID-93.png"
+        ]
+      },
+      {
+        "cluster_id": 177,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1165.png",
+          "COVID/images/COVID-177.png"
+        ]
+      },
+      {
+        "cluster_id": 179,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1167.png",
+          "COVID/images/COVID-180.png"
+        ]
+      },
+      {
+        "cluster_id": 181,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1169.png",
+          "COVID/images/COVID-124.png",
+          "COVID/images/COVID-1532.png"
+        ]
+      },
+      {
+        "cluster_id": 184,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1171.png",
+          "COVID/images/COVID-183.png"
+        ]
+      },
+      {
+        "cluster_id": 196,
+        "count": 5,
+        "paths": [
+          "COVID/images/COVID-1182.png",
+          "COVID/images/COVID-1407.png",
+          "COVID/images/COVID-3547.png",
+          "COVID/images/COVID-3548.png",
+          "COVID/images/COVID-476.png"
+        ]
+      },
+      {
+        "cluster_id": 202,
+        "count": 4,
+        "paths": [
+          "COVID/images/COVID-1188.png",
+          "COVID/images/COVID-192.png",
+          "COVID/images/COVID-334.png",
+          "COVID/images/COVID-487.png"
+        ]
+      },
+      {
+        "cluster_id": 208,
+        "count": 4,
+        "paths": [
+          "COVID/images/COVID-1194.png",
+          "COVID/images/COVID-189.png",
+          "COVID/images/COVID-331.png",
+          "COVID/images/COVID-492.png"
+        ]
+      },
+      {
+        "cluster_id": 209,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1195.png",
+          "COVID/images/COVID-1835.png",
+          "Normal/images/Normal-6653.png"
+        ]
+      },
+      {
+        "cluster_id": 211,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1197.png",
+          "COVID/images/COVID-127.png"
+        ]
+      },
+      {
+        "cluster_id": 215,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-120.png",
+          "COVID/images/COVID-520.png"
+        ]
+      },
+      {
+        "cluster_id": 224,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1209.png",
+          "COVID/images/COVID-1505.png"
+        ]
+      },
+      {
+        "cluster_id": 238,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-1221.png",
+          "COVID/images/COVID-130.png",
+          "COVID/images/COVID-1538.png"
+        ]
+      },
+      {
+        "cluster_id": 245,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1228.png",
+          "COVID/images/COVID-789.png"
+        ]
+      },
+      {
+        "cluster_id": 247,
+        "count": 3,
+        "paths": [
+          "COVID/images/COVID-123.png",
+          "COVID/images/COVID-247.png",
+          "COVID/images/COVID-567.png"
+        ]
+      },
+      {
+        "cluster_id": 249,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1231.png",
+          "COVID/images/COVID-937.png"
+        ]
+      },
+      {
+        "cluster_id": 251,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1233.png",
+          "COVID/images/COVID-943.png"
+        ]
+      },
+      {
+        "cluster_id": 253,
+        "count": 2,
+        "paths": [
+          "COVID/images/COVID-1235.png",
+          "COVID/images/COVID-946.png"
+        ]
+      }
+    ]
+  },
+  "cross_class_conflicts": [],
+  "unreadable": [],
+  "size_mode_histogram": {
+    "sizes": {
+      "299x299": 20858
+    },
+    "modes": {
+      "L": 20718,
+      "RGB": 140
+    }
+  },
+  "clusters": {
+    "count": 19523,
+    "largest": 390,
+    "histogram": {
+      "1": 19005,
+      "2": 355,
+      "3": 93,
+      "4": 36,
+      "5": 10,
+      "6": 7,
+      "7": 3,
+      "8": 4,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "14": 1,
+      "20": 1,
+      "23": 1,
+      "38": 1,
+      "48": 1,
+      "390": 1
+    },
+    "stats": {
+      "readable": 20858,
+      "unreadable": 0,
+      "clusters": 19523,
+      "pairs_compared": 41707096,
+      "largest_cluster": 390
+    }
+  },
+  "leakage": {
+    "computed": true,
+    "clusters_spanning_splits": 0,
+    "examples": [],
+    "split_counts": {
+      "train": 14598,
+      "val": 3130,
+      "test": 3130
+    },
+    "source_pools": {
+      "covid_mixed": [
+        "test",
+        "train",
+        "val"
+      ],
+      "rsna": [
+        "test",
+        "train",
+        "val"
+      ],
+      "viral": [
+        "test",
+        "train",
+        "val"
+      ]
+    },
+    "source_pools_in_multiple_splits": 3
+  },
+  "splits": {
+    "train": 14598,
+    "val": 3130,
+    "test": 3130
+  },
+  "verdict": "WARN",
+  "verdict_reasons": [
+    "WARN: 518 near-duplicate cluster(s) were grouped",
+    "WARN: class imbalance 7.75:1"
+  ]
+}

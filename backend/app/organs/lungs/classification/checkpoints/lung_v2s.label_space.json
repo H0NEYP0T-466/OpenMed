@@ -1,0 +1,76 @@
+{
+  "class_names": [
+    "COVID",
+    "Lung_Opacity",
+    "Normal",
+    "Viral Pneumonia"
+  ],
+  "num_classes": 4,
+  "model_tag": "tf_efficientnetv2_s.in21k_ft_in1k",
+  "input_size": 300,
+  "infer_size": 300,
+  "normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "metrics": {
+    "test_acc": 0.964217,
+    "test_macro_f1": 0.963798,
+    "test_macro_auc_ovr": 0.995869,
+    "per_class": {
+      "COVID": {
+        "precision": 0.980469,
+        "recall": 0.994059,
+        "f1": 0.987217,
+        "support": 505
+      },
+      "Lung_Opacity": {
+        "precision": 0.953672,
+        "recall": 0.954751,
+        "f1": 0.954211,
+        "support": 884
+      },
+      "Normal": {
+        "precision": 0.972314,
+        "recall": 0.95655,
+        "f1": 0.964367,
+        "support": 1542
+      },
+      "Viral Pneumonia": {
+        "precision": 0.912037,
+        "recall": 0.98995,
+        "f1": 0.949398,
+        "support": 199
+      }
+    }
+  },
+  "thresholds": [
+    0.5,
+    0.5,
+    0.5,
+    0.5
+  ],
+  "split": {
+    "train": 14598,
+    "val": 3130,
+    "test": 3130,
+    "strategy": "phash-cluster-grouped"
+  },
+  "temperature": 0.628468,
+  "calibration": {
+    "method": "temperature-scaling",
+    "fit_split": "val",
+    "n": 1200,
+    "ece_before": 0.138103,
+    "ece_after": 0.037311,
+    "temperature": 0.628468
+  }
+}
