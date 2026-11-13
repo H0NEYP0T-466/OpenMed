@@ -85,6 +85,7 @@ class ModelHealth(BaseModel):
 
 class HealthResponse(BaseModel):
     status: Literal["ok", "degraded", "unavailable"]
+    process_rss_mb: Optional[float] = None
     v2s: ModelHealth
     xrv: ModelHealth
 
@@ -145,6 +146,25 @@ async def classify_lung_scan(
             },
         )
     return result
+
+
+@router.post("/xrv-cam")
+async def xrv_gradcam(file: UploadFile = File(...)) -> dict[str, Any]:
+    """XRV Grad-CAM only.
+
+    The 18 scores already ship with ``/classify``, so opening the detail panel
+    must not re-run both models. This runs XRV alone and returns just the map.
+    """
+    payload = await file.read()
+    image = _validate_upload(file, payload)
+    await _load("xrv")
+    result = await asyncio.to_thread(get_facade().xrv.predict, image, True)
+    if not result.get("gradcam_base64"):
+        raise HTTPException(status_code=503, detail="XRV Grad-CAM could not be produced.")
+    return {
+        "gradcam_base64": result["gradcam_base64"],
+        "inference_ms": result["inference_ms"],
+    }
 
 
 @router.get("/health", response_model=HealthResponse)

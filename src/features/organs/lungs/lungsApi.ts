@@ -178,43 +178,92 @@ export const getLungModelInfo = async (): Promise<LungModelInfo> => {
 }
 
 /**
- * Load the lung models into backend memory.
+ * Residency is owned by the section, but React StrictMode mounts, unmounts and
+ * remounts effects on the same tick. Two warmups plus one interleaved unload
+ * used to load the weights twice and leave the second copy resident.
  *
- * Called by the organ dashboard when the lungs section opens, not by the
- * workspace — residency belongs to the section, so entering and leaving is the
- * only thing that moves weights in and out of memory.
+ * `wantsResident` is the intent, not the current state. An unload waits out an
+ * in-flight warm and then yields for one short grace period: a StrictMode
+ * remount flips the intent back to true and cancels the release. Concurrent
+ * warmups share one request, so only one weight load can ever be in flight.
  */
-export const warmLungModels = async (
+let wantsResident = false
+let warmInFlight: Promise<boolean> | null = null
+const UNLOAD_GRACE_MS = 250
+
+const postResidency = async (
+  path: string,
+  model: LungModelSelector,
+): Promise<Response> =>
+  fetch(`${API_BASE_URL}/${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model }),
+  })
+
+/** Load the lung models into backend memory when the lungs section opens. */
+export const warmLungModels = (
   model: LungModelSelector = 'all',
 ): Promise<boolean> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/warmup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model }),
-    })
-    if (!response.ok) return false
-    const payload = (await response.json()) as LungWarmupResponse
-    return payload.loaded.v2s || payload.loaded.xrv
-  } catch {
-    return false
-  }
+  wantsResident = true
+  if (warmInFlight) return warmInFlight
+
+  const request = (async () => {
+    try {
+      const response = await postResidency('warmup', model)
+      if (!response.ok) return false
+      const payload = (await response.json()) as LungWarmupResponse
+      return payload.loaded.v2s || payload.loaded.xrv
+    } catch {
+      return false
+    }
+  })().finally(() => {
+    warmInFlight = null
+  })
+  warmInFlight = request
+  return request
 }
 
-/** Release the lung models — called when the lungs section closes. */
+/** Release the lung models when the lungs section closes. */
 export const unloadLungModels = async (
   model: LungModelSelector = 'all',
 ): Promise<boolean> => {
+  wantsResident = false
+  if (warmInFlight) {
+    try {
+      await warmInFlight
+    } catch {
+      /* the warm already resolved false; still release */
+    }
+  }
+  await new Promise((resolve) => window.setTimeout(resolve, UNLOAD_GRACE_MS))
+  if (wantsResident) return false
+
   try {
-    const response = await fetch(`${API_BASE_URL}/unload`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model }),
-    })
+    const response = await postResidency('unload', model)
     if (!response.ok) return false
     const payload = (await response.json()) as LungUnloadResponse
     return payload.unloaded.v2s || payload.unloaded.xrv
   } catch {
     return false
   }
+}
+
+/** XRV Grad-CAM only — the 18 scores already arrived with /classify. */
+export const fetchLungXrvCam = async (file: File): Promise<string> => {
+  const body = new FormData()
+  body.append('file', file)
+  const response = await fetch(`${API_BASE_URL}/xrv-cam`, { method: 'POST', body })
+  if (!response.ok) {
+    let detail = `XRV Grad-CAM failed (${response.status}).`
+    try {
+      const payload = (await response.json()) as { detail?: string }
+      if (typeof payload.detail === 'string') detail = payload.detail
+    } catch {
+      /* keep the status line */
+    }
+    throw new Error(detail)
+  }
+  const payload = (await response.json()) as { gradcam_base64: string }
+  return payload.gradcam_base64
 }

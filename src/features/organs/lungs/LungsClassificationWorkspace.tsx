@@ -3,15 +3,16 @@ import {
   V2S_CLASS_ORDER,
   XRV_THRESHOLD,
   classifyLungScan,
+  fetchLungXrvCam,
   getLungHealth,
   getLungModelInfo,
 } from './lungsApi'
+import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import type { LungRequestProgress } from './lungsApi'
 import type {
   LungClassifyResponse,
   LungHealthStatus,
   LungModelInfo,
-  LungXrvResult,
 } from './lungTypes'
 import { LUNG_SPECIMEN_PRESETS } from './lungSpecimenPresets'
 import type { LungSpecimenPreset } from './lungSpecimenPresets'
@@ -150,9 +151,11 @@ export const LungsClassificationWorkspace: React.FC = () => {
   const [modelInfo, setModelInfo] = useState<LungModelInfo | null>(null)
 
   const [detailOpen, setDetailOpen] = useState(false)
-  const [detail, setDetail] = useState<LungXrvResult | null>(null)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detailError, setDetailError] = useState<string | null>(null)
+  // The 18 scores ship with the main classify response. Only the XRV Grad-CAM
+  // is fetched on demand, through the lightweight /xrv-cam endpoint.
+  const [xrvCam, setXrvCam] = useState<string | null>(null)
+  const [camLoading, setCamLoading] = useState(false)
+  const [camError, setCamError] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const objectUrlRef = useRef<string | null>(null)
@@ -206,9 +209,9 @@ export const LungsClassificationWorkspace: React.FC = () => {
     setResult(null)
     setViewMode('original')
     setHeatmapOnlySrc(null)
-    setDetail(null)
     setDetailOpen(false)
-    setDetailError(null)
+    setXrvCam(null)
+    setCamError(null)
     setError(null)
   }, [])
 
@@ -288,9 +291,9 @@ export const LungsClassificationWorkspace: React.FC = () => {
     setResult(null)
     setViewMode('original')
     setHeatmapOnlySrc(null)
-    setDetail(null)
     setDetailOpen(false)
-    setDetailError(null)
+    setXrvCam(null)
+    setCamError(null)
     setError(null)
     setSelectedPlate(null)
   }, [])
@@ -303,9 +306,9 @@ export const LungsClassificationWorkspace: React.FC = () => {
     const startedAt = performance.now()
 
     setResult(null)
-    setDetail(null)
     setDetailOpen(false)
-    setDetailError(null)
+    setXrvCam(null)
+    setCamError(null)
     setHeatmapOnlySrc(null)
     setViewMode('original')
     setError(null)
@@ -367,30 +370,24 @@ export const LungsClassificationWorkspace: React.FC = () => {
     }
   }, [file, isAnalyzing])
 
-  const loadDetail = useCallback(async () => {
-    if (!file || detailLoading) return
-    setDetailLoading(true)
-    setDetailError(null)
+  const loadCam = useCallback(async () => {
+    if (!file || camLoading || xrvCam) return
+    setCamLoading(true)
+    setCamError(null)
     try {
-      const payload = await classifyLungScan(file, { includeXrvDetail: true })
-      if (!payload.xrv) {
-        throw new Error(payload.errors.xrv ?? 'The XRV model did not return a result.')
-      }
-      setDetail(payload.xrv)
+      setXrvCam(await fetchLungXrvCam(file))
     } catch (cause) {
-      setDetailError(
-        cause instanceof Error ? cause.message : 'Detailed XRV scores failed.',
-      )
+      setCamError(cause instanceof Error ? cause.message : 'XRV Grad-CAM failed.')
     } finally {
-      setDetailLoading(false)
+      setCamLoading(false)
     }
-  }, [file, detailLoading])
+  }, [file, camLoading, xrvCam])
 
   const toggleDetail = useCallback(() => {
     const next = !detailOpen
     setDetailOpen(next)
-    if (next && !detail && !detailLoading) void loadDetail()
-  }, [detail, detailLoading, detailOpen, loadDetail])
+    if (next && !xrvCam && !camLoading && !camError) void loadCam()
+  }, [detailOpen, xrvCam, camLoading, camError, loadCam])
 
   const v2s = result?.v2s ?? null
   const xrv = result?.xrv ?? null
@@ -469,6 +466,14 @@ export const LungsClassificationWorkspace: React.FC = () => {
 
   return (
     <section className="lungs-workspace">
+      {/* Inference loading. Learning #51: weights => ThinkingOrbOverlay (no
+          card, owned by OrganDashboard); analysing a scan => this carded HUD. */}
+      <DiagnosticThinkingHUD
+        isVisible={isAnalyzing}
+        classCountLabel="4 classes + 18 XRV labels"
+        task="classification"
+      />
+
       <input
         ref={fileInputRef}
         type="file"
@@ -766,16 +771,18 @@ export const LungsClassificationWorkspace: React.FC = () => {
                 )}
 
                 {xrv && (
-                  <div className="lw-detail">
+                  <section className="lw-detail" aria-label="Detailed XRV scores">
                     <button
                       type="button"
                       className="lw-disclosure"
                       aria-expanded={detailOpen}
                       onClick={toggleDetail}
                     >
-                      <span className="lw-disclosure-title">Detailed XRV scores</span>
-                      <span className="lw-disclosure-hint">
-                        {detailOpen ? 'Hide' : 'All 18 labels + XRV Grad-CAM'}
+                      <span className="lw-disclosure-copy">
+                        <span className="lw-disclosure-title">Detailed XRV scores</span>
+                        <span className="lw-disclosure-hint">
+                          {xrv.scores?.length ?? 18} labels · highest first
+                        </span>
                       </span>
                       <span className="lw-disclosure-mark" aria-hidden="true">
                         {detailOpen ? '−' : '+'}
@@ -784,61 +791,66 @@ export const LungsClassificationWorkspace: React.FC = () => {
 
                     {detailOpen && (
                       <div className="lw-detail-body">
-                        {detailLoading && (
-                          <p className="lw-detail-note">Scoring all 18 labels…</p>
+                        <div className="lw-detail-head">
+                          <span>All pathology labels</span>
+                          <span>{xrv.model_tag}</span>
+                        </div>
+
+                        {xrv.scores && xrv.scores.length > 0 ? (
+                          <ol className="lw-score-list">
+                            {xrv.scores.map((score, index) => (
+                              <li
+                                key={score.finding}
+                                className={score.probability >= XRV_THRESHOLD ? 'is-positive' : ''}
+                              >
+                                <span className="lw-score-rank">
+                                  {String(index + 1).padStart(2, '0')}
+                                </span>
+                                <span className="lw-score-name">
+                                  {formatLabel(score.finding)}
+                                </span>
+                                <span className="lw-score-value">
+                                  {percent(score.probability)}
+                                </span>
+                                <span className="lw-bar">
+                                  <span style={{ width: `${score.probability * 100}%` }} />
+                                </span>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="lw-detail-note">This run returned no XRV scores.</p>
                         )}
 
-                        {detailError && (
+                        {camError && (
                           <div className="lw-detail-fail">
-                            <p className="lw-model-error-body">{detailError}</p>
+                            <p className="lw-model-error-body">{camError}</p>
                             <button
                               type="button"
                               className="btn lw-ghost"
-                              onClick={() => void loadDetail()}
+                              onClick={() => void loadCam()}
                             >
                               Retry
                             </button>
                           </div>
                         )}
 
-                        {detail?.scores && detail.scores.length > 0 && (
-                          <>
-                            <ul className="lw-score-list">
-                              {detail.scores.map((score) => (
-                                <li key={score.finding}>
-                                  <span>{formatLabel(score.finding)}</span>
-                                  <span className="lw-bar">
-                                    <span style={{ width: `${score.probability * 100}%` }} />
-                                  </span>
-                                  <span className="lw-value">{percent(score.probability)}</span>
-                                </li>
-                              ))}
-                            </ul>
-                            {detail.gradcam_base64 && (
-                              <figure className="lw-detail-cam">
-                                <img
-                                  src={`data:image/png;base64,${detail.gradcam_base64}`}
-                                  alt="XRV Grad-CAM"
-                                  loading="lazy"
-                                  decoding="async"
-                                />
-                                <figcaption>XRV Grad-CAM · highest-scoring label</figcaption>
-                              </figure>
-                            )}
-                          </>
+                        {xrvCam && (
+                          <figure className="lw-detail-cam">
+                            <img
+                              src={`data:image/png;base64,${xrvCam}`}
+                              alt="XRV Grad-CAM"
+                              decoding="async"
+                            />
+                            <figcaption>XRV Grad-CAM · highest-scoring label</figcaption>
+                          </figure>
                         )}
-
-                        {detail &&
-                          !detailLoading &&
-                          !detailError &&
-                          (!detail.scores || detail.scores.length === 0) && (
-                            <p className="lw-detail-note">
-                              The detail response carried no scores.
-                            </p>
-                          )}
+                        {camLoading && !xrvCam && (
+                          <p className="lw-detail-note">Generating the XRV activation map…</p>
+                        )}
                       </div>
                     )}
-                  </div>
+                  </section>
                 )}
               </div>
             ) : (

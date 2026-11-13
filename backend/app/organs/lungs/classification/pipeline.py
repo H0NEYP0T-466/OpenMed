@@ -30,10 +30,13 @@ Everything here is import-safe: no torch model is constructed and
 from __future__ import annotations
 
 import base64
+import ctypes
+import gc
 import io
 import logging
 import math
 import os
+import sys
 import threading
 import time
 from typing import Any, Optional
@@ -58,6 +61,36 @@ from .model_v2s import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def release_runtime_memory() -> None:
+    """Actually hand the weights' memory back, not just drop the attribute.
+
+    ``self.model = None`` only decrements a reference. timm modules and XRV
+    DenseNets contain forward-hook closures and autograd graph cycles that keep
+    the parameter storage alive until a full collection runs. Even after that,
+    glibc holds the freed pages in the process arena, so RSS looks unchanged.
+    """
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    if sys.platform.startswith("linux"):
+        try:
+            ctypes.CDLL("libc.so.6").malloc_trim(0)
+        except (OSError, AttributeError):  # best effort on non-glibc systems
+            pass
+
+
+def current_rss_mb() -> Optional[float]:
+    """Live resident set size, so /health can prove an unload released memory."""
+    try:
+        with open("/proc/self/status", encoding="ascii") as handle:
+            for line in handle:
+                if line.startswith("VmRSS:"):
+                    return round(int(line.split()[1]) / 1024.0, 1)
+    except (OSError, ValueError, IndexError):
+        pass
+    return None
 
 # ── XRV constants ────────────────────────────────────────────────────────────
 XRV_WEIGHTS = "densenet121-res224-all"
@@ -215,10 +248,11 @@ class V2SPipeline:
         )
 
     def unload(self) -> None:
+        model = self.model
         self.model = None
         self.load_time_ms = None
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+        del model
+        release_runtime_memory()
 
     def _read_sidecar(self) -> dict[str, Any]:
         """Load the label-space sidecar, or fail closed.
@@ -395,10 +429,11 @@ class XRVPipeline:
         )
 
     def unload(self) -> None:
+        model = self.model
         self.model = None
         self.load_time_ms = None
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+        del model
+        release_runtime_memory()
 
     # ── inference ───────────────────────────────────────────────────────────
 
@@ -438,24 +473,26 @@ class XRVPipeline:
                 if float(probabilities[int(index)]) >= XRV_THRESHOLD
             ]
 
+            # Every probability is already computed by the single forward pass
+            # above. Sending all 18 costs ~1 KB and means opening the detail
+            # panel never needs a second classification just to show scores.
             result: dict[str, Any] = {
                 "findings": findings,
                 "threshold": XRV_THRESHOLD,
                 "count_above_threshold": len(findings),
-                "scores": None,
+                "scores": [
+                    {
+                        "finding": self.class_names[int(index)],
+                        "probability": float(probabilities[int(index)]),
+                    }
+                    for index in order
+                ],
                 "gradcam_base64": None,
                 "inference_ms": 0.0,
                 "model_tag": XRV_MODEL_TAG,
             }
 
             if detail:
-                result["scores"] = [
-                    {
-                        "finding": self.class_names[int(index)],
-                        "probability": float(probabilities[int(index)]),
-                    }
-                    for index in order
-                ]
                 top_index = int(order[0])
                 with xrv_model.GradCAM(self.model) as cam_gen:
                     cam = cam_gen.generate(tensor.detach(), top_index)
@@ -550,6 +587,10 @@ class DualLungPipeline:
             pipeline.unload()
             pipeline.last_error = None
             unloaded[name] = was_loaded
+        # One final collection after both graphs are gone; cross-model cycles
+        # (shared hooks, cached XRV weights) only become unreachable here.
+        if any(unloaded.values()):
+            release_runtime_memory()
         return unloaded
 
     # ── inference ───────────────────────────────────────────────────────────
@@ -596,6 +637,7 @@ class DualLungPipeline:
             status = "unavailable"
         return {
             "status": status,
+            "process_rss_mb": current_rss_mb(),
             "v2s": {
                 "loaded": self.v2s.is_loaded,
                 "checkpoint_present": present["v2s"],

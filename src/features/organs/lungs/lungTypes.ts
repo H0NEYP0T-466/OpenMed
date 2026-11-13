@@ -42,7 +42,7 @@ export interface LungXrvResult {
   readonly findings: LungXrvFinding[]
   readonly threshold: number
   readonly count_above_threshold: number
-  /** All 18 scores, only present when the request asked for detail. */
+  /** All 18 scores from the single XRV forward pass — always present. */
   readonly scores: LungXrvScore[] | null
   /** XRV Grad-CAM PNG base64, only present when the request asked for detail. */
   readonly gradcam_base64: string | null
@@ -70,6 +70,8 @@ export interface LungModelHealth {
 /** `GET /health` */
 export interface LungHealthStatus {
   readonly status: 'ok' | 'degraded' | 'unavailable'
+  /** Live resident set size in MB — proves an unload actually released RAM. */
+  readonly process_rss_mb?: number | null
   readonly v2s: LungModelHealth
   readonly xrv: LungModelHealth
 }

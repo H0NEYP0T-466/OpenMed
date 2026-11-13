@@ -46,6 +46,53 @@ const PER_CLASS: readonly { finding: string; auc: number; sens: number; spec: nu
   { finding: 'TB', auc: 1.0000, sens: 0.986, spec: 0.9995, support: '70 / 25,596' },
 ]
 
+/**
+ * XRV-16 v2 — the same architecture retrained on the de-confounded corpus.
+ * The v1 table above is the record of the first run and its numbers are the
+ * ones the source confound produced; these are the numbers that survived a
+ * cross-source control.
+ */
+const PER_CLASS_V2: readonly { finding: string; auc: number; sens: number; spec: number; support: string }[] = [
+  { finding: 'Atelectasis', auc: 0.8007, sens: 0.420, spec: 0.904, support: '2,294 / 19,695' },
+  { finding: 'Cardiomegaly', auc: 0.9144, sens: 0.496, spec: 0.971, support: '486 / 21,503' },
+  { finding: 'Effusion', auc: 0.8775, sens: 0.673, spec: 0.879, support: '2,711 / 19,278' },
+  { finding: 'Infiltration', auc: 0.7077, sens: 0.322, spec: 0.904, support: '4,040 / 17,949' },
+  { finding: 'Mass', auc: 0.8525, sens: 0.428, spec: 0.959, support: '1,091 / 20,898' },
+  { finding: 'Nodule', auc: 0.7361, sens: 0.170, spec: 0.979, support: '1,224 / 20,765' },
+  { finding: 'Pneumonia', auc: 0.7545, sens: 0.050, spec: 0.993, support: '262 / 21,727' },
+  { finding: 'Pneumothorax', auc: 0.8566, sens: 0.362, spec: 0.956, support: '1,076 / 20,913' },
+  { finding: 'Consolidation', auc: 0.8049, sens: 0.228, spec: 0.952, support: '929 / 21,060' },
+  { finding: 'Edema', auc: 0.8907, sens: 0.380, spec: 0.963, support: '421 / 21,568' },
+  { finding: 'Emphysema', auc: 0.8944, sens: 0.387, spec: 0.978, support: '424 / 21,565' },
+  { finding: 'Fibrosis', auc: 0.7959, sens: 0.140, spec: 0.988, support: '292 / 21,697' },
+  { finding: 'Pleural_Thickening', auc: 0.7813, sens: 0.207, spec: 0.975, support: '709 / 21,280' },
+  { finding: 'Hernia', auc: 0.9335, sens: 0.692, spec: 0.997, support: '39 / 21,950' },
+  { finding: 'COVID', auc: 0.9976, sens: 0.874, spec: 0.999, support: '723 / 24,027' },
+  { finding: 'TB', auc: 0.9999, sens: 0.979, spec: 1.000, support: '140 / 22,689' },
+]
+
+/**
+ * The control that decides whether the source shortcut survived: every head is
+ * scored on every source group, including the groups it has no evidence for.
+ * A head still reading acquisition style fires on `nih` and on the other
+ * collection's normals. Both sit at ~0.000, so the shortcut is gone.
+ */
+const CROSS_SOURCE: readonly { source: string; covidMean: number; covidOver: number; tbMean: number; tbOver: number }[] = [
+  { source: 'NIH', covidMean: 0.0014, covidOver: 0.0, tbMean: 0.0002, tbOver: 0.0 },
+  { source: 'COVID', covidMean: 0.8600, covidOver: 0.872, tbMean: 0.3058, tbOver: 0.292 },
+  { source: 'COVID normal', covidMean: 0.0021, covidOver: 0.0, tbMean: 0.0000, tbOver: 0.0 },
+  { source: 'TB', covidMean: 0.7412, covidOver: 0.729, tbMean: 0.9666, tbOver: 0.979 },
+  { source: 'TB normal', covidMean: 0.0005, covidOver: 0.0, tbMean: 0.0000, tbOver: 0.0 },
+]
+
+/** Model B — LungV2S, 4-class single-label softmax on COVID-19 Radiography DB. */
+const MODEL_B_PER_CLASS: readonly { label: string; precision: number; recall: number; f1: number; support: number }[] = [
+  { label: 'COVID', precision: 0.980, recall: 0.994, f1: 0.987, support: 505 },
+  { label: 'Lung_Opacity', precision: 0.954, recall: 0.955, f1: 0.954, support: 884 },
+  { label: 'Normal', precision: 0.972, recall: 0.957, f1: 0.964, support: 1542 },
+  { label: 'Viral Pneumonia', precision: 0.912, recall: 0.990, f1: 0.949, support: 199 },
+]
+
 export const LungsDocs: React.FC = () => {
   return (
     <div id="model-lungs" className="organ-model-dossier">
@@ -62,6 +109,23 @@ export const LungsDocs: React.FC = () => {
           <span>Open Lungs Workspace</span>
           <ArrowUpRight size={13} />
         </Link>
+      </div>
+
+      <div className="anomaly-breakdown-grid" style={{ marginBottom: '18px' }}>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <Activity size={15} className="text-warning" />
+            <span>Model A, first run — kept as the record, not deleted</span>
+          </div>
+          <p className="anomaly-copy">
+            Everything below this line is the original XRV-16 run and the numbers it produced. Its TB AUC of 1.0000 is
+            the number the source confound produced, and the anomaly box further down says so. The section is kept
+            because it is the honest history of the work: it is where the confound was found, and it is what the later
+            Model A v2 retrain and Model B were built to answer. Two sections follow it —{' '}
+            <strong>Model A v2</strong> (the same head retrained on the de-confounded corpus, with the cross-source
+            control that proves the shortcut is gone) and <strong>Model B</strong> (a 4-class infection specialist).
+          </p>
+        </div>
       </div>
 
 
@@ -466,6 +530,309 @@ export const LungsDocs: React.FC = () => {
             with the brain suite&apos;s assistive-segmentation pattern (click / box prompt) as the interaction model.
             The previous description of a 3D V-Net over LIDC-IDRI was a pre-implementation placeholder and has been
             retired with this page.
+          </p>
+        </div>
+      </div>
+      {/* ── Model A v2 — the same head, retrained without the shortcut ───── */}
+      <div className="task-block classification">
+        <div className="task-header-strip">
+          <div className="task-tag-group">
+            <span className="task-type-tag class">Task · Classification (in production) · Model A v2</span>
+            <span className="task-name-text">XRV-16 Retrained on the De-Confounded Corpus — and the Control That Proves It</span>
+          </div>
+          <span className="task-model-pill">XRV-16 · DenseNet-121 (CXR-pretrained) · 130,128 images · 54 epochs</span>
+        </div>
+        <div className="boilerplate-card">
+          <p className="boilerplate-copy">
+            The TB AUC of 1.0000 above was not a result. The TB head scored <strong>0.9144 / 0.6036 / 0.9969</strong>{' '}
+            on three collections of COVID images that are TB-negative by construction — a tuberculosis detector cannot do
+            that, a source detector can. The label was a synonym for the source folder: every TB and COVID positive came
+            from one collection and nearly every negative came from NIH. v2 rebuilds the corpus with{' '}
+            <strong>13,692 source-matched normals</strong> taken from the COVID and TB collections&apos; own{' '}
+            <code>Normal</code> folders, re-splits it patient-grouped (the first attempt leaked 6,066 patients across
+            splits — grouping by stratum before patient split a patient with two label combinations), and resamples every
+            image through one path: the v1 trainer copied NIH images byte-identical while resizing TB and COVID, so one
+            label group carried one texture and the other carried another. The split was rebuilt rather than inherited, so
+            these findings numbers are <strong>not</strong> comparable with the 0.8021 above.
+          </p>
+        </div>
+      </div>
+
+      <div className="archival-ledger-card">
+        <div className="ledger-card-title-strip">
+          <span className="ledger-tag">Model A v2 — Held-Out Test Ledger</span>
+          <span className="ledger-sub">
+            25,590 test images · best checkpoint epoch 39 (EMA) · 54 epochs · 8 h 32 m on one Tesla T4
+          </span>
+        </div>
+        <div className="stat-monoliths-grid">
+          <div className="stat-monolith">
+            <span className="mono-num">0.8286</span>
+            <span className="mono-label">Findings Mean AUC</span>
+            <span className="mono-desc">
+              The 14 NIH classes. Not comparable with the 0.8021 above — the split was rebuilt, so the official
+              ChestX-ray14 partition no longer exists and <code>zero_shot_baseline.py</code> is the only valid comparator.
+            </span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">1.0000</span>
+            <span className="mono-label">Within-Source TB AUC</span>
+            <span className="mono-desc">
+              140 TB positives against 700 normals from the same collection. Earned rather than leaked — read the
+              cross-source control below before quoting it.
+            </span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.9953</span>
+            <span className="mono-label">Within-Source COVID AUC</span>
+            <span className="mono-desc">723 positives against 2,038 normals from the same collection.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.4255</span>
+            <span className="mono-label">Sensitivity @ 0.5 (macro)</span>
+            <span className="mono-desc">
+              Specificity 0.9624 at the same cut. The ranking is sound; the threshold is not calibrated. Until
+              per-class thresholds land, treat the probabilities as ranks, not decisions.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="class-inventory-table-wrap">
+        <div style={{ padding: '12px 16px', background: 'var(--bone)', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink)' }}>
+            Cross-Source Control — Every Head on Every Source Group
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-soft)' }}>
+            Held-out test split · mean probability and fraction above 0.5
+          </span>
+        </div>
+        <table className="class-inventory-table">
+          <thead>
+            <tr>
+              <th>Source Group</th>
+              <th>COVID Head — Mean</th>
+              <th>COVID Head — &gt; 0.5</th>
+              <th>TB Head — Mean</th>
+              <th>TB Head — &gt; 0.5</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CROSS_SOURCE.map((row) => (
+              <tr key={row.source}>
+                <td className="class-name-cell">{row.source}</td>
+                <td style={{ fontWeight: 600 }}>{row.covidMean.toFixed(4)}</td>
+                <td>{row.covidOver.toFixed(3)}</td>
+                <td style={{ fontWeight: 600 }}>{row.tbMean.toFixed(4)}</td>
+                <td>{row.tbOver.toFixed(3)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="anomaly-breakdown-grid" style={{ marginBottom: '18px' }}>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <AlertTriangle size={15} className="text-warning" />
+            <span>Why the within-source AUC could not have caught this</span>
+          </div>
+          <p className="anomaly-copy">
+            Within-source compares <code>tb</code> against <code>tb_normal</code> — two folders inside the same
+            collection, which is the exact pair the head was trained to separate. It reads 1.0000 whether or not a source
+            shortcut survived, so it cannot fail and therefore cannot be evidence. The control has to cross the boundary:
+            score each head on groups it has no evidence for. Read the NIH, COVID-normal and TB-normal rows — every head
+            sits at <strong>~0.000</strong>, where v1 gave 0.91–0.99. The shortcut is gone, and the near-perfect
+            within-source numbers are now real.
+          </p>
+        </div>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <AlertTriangle size={15} className="text-warning" />
+            <span>TB and COVID still cross-fire — and that is disease, not scanner</span>
+          </div>
+          <p className="anomaly-copy">
+            The COVID head fires on TB images (mean 0.7412, 72.9 % above 0.5) and the TB head fires on COVID images
+            (mean 0.3058, 29.2 %). Both are viral pneumonias with similar radiographic appearance, and neither fires on
+            normals from any collection. Claim the heads as <strong>abnormality consistent with TB or COVID</strong>,
+            not as mutually exclusive diagnoses, and keep the positive counts honest: 700 TB and 3,616 COVID in the
+            corpus.
+          </p>
+        </div>
+      </div>
+
+      <div className="class-inventory-table-wrap">
+        <div style={{ padding: '12px 16px', background: 'var(--bone)', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink)' }}>
+            Model A v2 — Per-Class Test Performance
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-soft)' }}>
+            25,590 test images · thresholds at 0.5
+          </span>
+        </div>
+        <table className="class-inventory-table">
+          <thead>
+            <tr>
+              <th>Finding</th>
+              <th>AUC</th>
+              <th>Sensitivity</th>
+              <th>Specificity</th>
+              <th>Support (n+ / n−)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PER_CLASS_V2.map((row) => (
+              <tr key={row.finding}>
+                <td className="class-name-cell">{row.finding}</td>
+                <td style={{ fontWeight: 600 }}>{row.auc.toFixed(4)}</td>
+                <td>{row.sens.toFixed(3)}</td>
+                <td>{row.spec.toFixed(3)}</td>
+                <td>{row.support}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── Model B — the 4-class infection specialist ────────────────────── */}
+      <div className="task-block classification">
+        <div className="task-header-strip">
+          <div className="task-tag-group">
+            <span className="task-type-tag class">Task · Classification (in production) · Model B</span>
+            <span className="task-name-text">LungV2S — 4-Class Single-Label Infection Specialist</span>
+          </div>
+          <span className="task-model-pill">
+            LungV2S · EfficientNetV2-S (ImageNet-21k → 1k) · 21,165 images · 300 px
+          </span>
+        </div>
+        <div className="boilerplate-card">
+          <p className="boilerplate-copy">
+            Model A answers findings; Model B answers the infection question in one mutually exclusive label —{' '}
+            <strong>COVID · Lung_Opacity · Normal · Viral Pneumonia</strong>. It is a single-label softmax over four
+            classes, so the <code>-1</code> sentinel machinery that made the 16-class head ambiguous is gone: the classes
+            exclude each other by construction. It runs on the COVID-19 Radiography Database alone, which is the point —
+            one collection, one acquisition style, no source cue to learn — and it is trained with mixup, label smoothing,
+            RandAugment and EMA. Both models run on every image; there is no router. Model B owns the infection verdict,
+            Model A owns the 14 findings.
+          </p>
+        </div>
+      </div>
+
+      <div className="archival-ledger-card">
+        <div className="ledger-card-title-strip">
+          <span className="ledger-tag">Model B — Held-Out Test Ledger</span>
+          <span className="ledger-sub">
+            3,130 test images · best checkpoint epoch 48 · 63 epochs · TTA over 2 scales × 4 views
+          </span>
+        </div>
+        <div className="stat-monoliths-grid">
+          <div className="stat-monolith">
+            <span className="mono-num">0.9642</span>
+            <span className="mono-label">Test Accuracy</span>
+            <span className="mono-desc">3,130 held-out radiographs, none of them seen in training.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.9638</span>
+            <span className="mono-label">Macro F1</span>
+            <span className="mono-desc">Unweighted across the four classes — the number to quote, because accuracy hides the rare class.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.9959</span>
+            <span className="mono-label">Macro AUC (OVR)</span>
+            <span className="mono-desc">One-vs-rest, averaged over the four classes.</span>
+          </div>
+          <div className="stat-monolith">
+            <span className="mono-num">0.0373</span>
+            <span className="mono-label">Expected Calibration Error</span>
+            <span className="mono-desc">
+              After temperature scaling at T = 0.6285, down from 0.1381. The model was under-confident; dividing the
+              logits by T sharpens it. Scaling is monotonic, so no prediction changed — only how honestly the confidence
+              reads.
+            </span>
+          </div>
+        </div>
+
+        <div className="split-stratification-card">
+          <div className="card-topline">
+            <span className="card-top-title">Corpus &amp; Split — pHash-Cluster-Grouped</span>
+          </div>
+          <div className="stratification-bar">
+            <div className="strat-segment train" style={{ flex: 14598 }}>
+              <span className="strat-segment-title">Train 70% · 14,598</span>
+            </div>
+            <div className="strat-segment val" style={{ flex: 3130 }}>
+              <span className="strat-segment-title">Val 15% · 3,130</span>
+            </div>
+            <div className="strat-segment test" style={{ flex: 3130 }}>
+              <span className="strat-segment-title">Test 15% · 3,130</span>
+            </div>
+          </div>
+          <p className="chronology-text" style={{ marginTop: 10 }}>
+            21,165 images were hashed and grouped by perceptual hash before the split, so near-duplicates cannot land on
+            both sides of it. The audit closed with <strong>0 cross-class conflicts</strong> and{' '}
+            <strong>0 clusters spanning splits</strong>; 518 near-duplicate clusters were grouped and 42 exact duplicate
+            groups collapsed. Class counts: COVID 3,616 · Lung_Opacity 6,012 · Normal 10,192 · Viral Pneumonia 1,345.
+          </p>
+        </div>
+      </div>
+
+      <div className="class-inventory-table-wrap">
+        <div style={{ padding: '12px 16px', background: 'var(--bone)', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink)' }}>
+            Model B — Per-Class Test Performance
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--ink-soft)' }}>
+            3,130 test images · TTA at 300 and 384 px
+          </span>
+        </div>
+        <table className="class-inventory-table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1</th>
+              <th>Support</th>
+            </tr>
+          </thead>
+          <tbody>
+            {MODEL_B_PER_CLASS.map((row) => (
+              <tr key={row.label}>
+                <td className="class-name-cell">{row.label}</td>
+                <td style={{ fontWeight: 600 }}>{row.precision.toFixed(3)}</td>
+                <td>{row.recall.toFixed(3)}</td>
+                <td>{row.f1.toFixed(3)}</td>
+                <td>{row.support.toLocaleString('en-US')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="anomaly-breakdown-grid" style={{ marginBottom: '18px' }}>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <AlertTriangle size={15} className="text-warning" />
+            <span>TB is not in Model B — it is still Model A&apos;s job</span>
+          </div>
+          <p className="anomaly-copy">
+            Model B is trained on the COVID-19 Radiography Database alone, so it has four classes and no TB. Tuberculosis
+            remains a Model A verdict, read from the XRV-16 head. The two models are complementary, not competing: Model B
+            separates COVID from non-COVID pneumonia, Model A reports the 14 findings and the TB probability. State it
+            that way rather than as one model with six labels.
+          </p>
+        </div>
+        <div className="anomaly-box">
+          <div className="anomaly-box-title">
+            <AlertTriangle size={15} className="text-warning" />
+            <span>One public collection, and 300 px was chosen over 384</span>
+          </div>
+          <p className="anomaly-copy">
+            Model B sees a single collection, so its numbers are clean but not generalisable to a hospital it never
+            touched — say so wherever the accuracy is quoted. The inference size was measured on the validation split
+            rather than assumed: <strong>300 px scored 0.9624 macro F1 against 0.9443 at 384 px</strong>, and test-time
+            augmentation over two scales × four views added the last 0.3 points. The sidecar carries the chosen size, so
+            serving never hardcodes it.
           </p>
         </div>
       </div>

@@ -158,10 +158,16 @@
   }
 }
 
+/* Match the brain lightbox: the mounted scan is a centred 320px plate, not a
+   full-column stretch. Keeping the media box equal to the image box preserves
+   the Grad-CAM bbox percentages, which are relative to .lw-plate-media. */
 .lw-plate {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  max-width: 320px;
+  margin-inline: auto;
 }
 
 /* The media box is exactly the image box at every size, so the bbox
@@ -556,20 +562,36 @@
 /* --- Detailed XRV disclosure --------------------------------------------- */
 
 .lw-detail {
-  border-top: 1px solid var(--line-soft, rgba(21, 20, 15, 0.1));
-  padding-top: 12px;
+  margin-top: 4px;
+  border: 1px solid var(--line, #d8d2c6);
+  border-radius: 8px;
+  background: var(--paper-warm, rgba(21, 20, 15, 0.02));
+  overflow: hidden;
 }
 
 .lw-disclosure {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding: 10px 0;
+  padding: 12px 14px;
   border: 0;
-  background: none;
+  background: transparent;
   cursor: pointer;
   text-align: left;
+  transition: background 0.15s ease;
+}
+
+.lw-disclosure:hover {
+  background: rgba(196, 85, 47, 0.06);
+}
+
+.lw-disclosure-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .lw-disclosure-title {
@@ -582,15 +604,21 @@
 }
 
 .lw-disclosure-hint {
-  margin-left: auto;
   font-family: var(--font-mono, monospace);
   font-size: 10px;
   color: var(--ink-faint, #8b8676);
 }
 
 .lw-disclosure-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line, #d8d2c6);
+  border-radius: 50%;
   font-family: var(--font-mono, monospace);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
   color: var(--accent, #c4552f);
 }
@@ -598,8 +626,96 @@
 .lw-detail-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 6px 0 4px;
+  gap: 14px;
+  padding: 0 14px 14px;
+  border-top: 1px solid var(--line-soft, rgba(21, 20, 15, 0.1));
+}
+
+.lw-detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint, #8b8676);
+}
+
+/* Scoped to .lw-detail: the shared .lw-score-list rule gives every li a
+   3-column grid sized for a full-width panel. Inside a 2-column detail grid
+   that crushes the label, so each score gets its own compact card here. */
+.lw-detail .lw-score-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 620px) {
+  .lw-detail .lw-score-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lw-detail .lw-score-list li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: baseline;
+  gap: 4px 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--line-soft, rgba(21, 20, 15, 0.09));
+  border-radius: 5px;
+  background: var(--bone, #fff);
+  font-size: 12px;
+}
+
+.lw-detail .lw-score-list li.is-positive {
+  border-color: rgba(196, 85, 47, 0.42);
+}
+
+.lw-score-rank {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  color: var(--ink-faint, #8b8676);
+}
+
+.lw-score-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ink, #15140f);
+}
+
+.lw-score-value {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft, #5a5448);
+}
+
+.lw-detail .lw-score-list li.is-positive .lw-score-value {
+  color: var(--accent, #c4552f);
+  font-weight: 600;
+}
+
+.lw-detail .lw-bar {
+  grid-column: 2 / -1;
+  height: 3px;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  background: var(--line-soft, rgba(21, 20, 15, 0.12));
+}
+
+.lw-detail .lw-bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent, #c4552f);
 }
 
 .lw-detail-note {
@@ -611,37 +727,33 @@
 
 .lw-detail-fail {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-.lw-score-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 7px 22px;
-}
-
-.lw-score-list li {
-  font-size: 12px;
-}
-
 .lw-detail-cam {
   margin: 0;
+  padding: 8px;
+  border: 1px solid var(--line, #d8d2c6);
+  border-radius: 6px;
+  background: var(--bone, #fff);
 }
 
 .lw-detail-cam img {
   display: block;
   width: 100%;
-  max-width: 340px;
-  border: 1px solid var(--line, #d8d2c6);
+  max-width: 320px;
+  margin-inline: auto;
+  border-radius: 3px;
 }
 
 .lw-detail-cam figcaption {
-  margin-top: 6px;
+  margin-top: 8px;
   font-family: var(--font-mono, monospace);
   font-size: 10px;
   letter-spacing: 0.06em;
+  text-align: center;
   color: var(--ink-mute, #8a8a8a);
 }
 
