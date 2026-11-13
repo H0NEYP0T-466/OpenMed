@@ -26,7 +26,7 @@ from fastapi import APIRouter, Body, File, HTTPException, Query, UploadFile
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 
-from .pipeline import DualLungPipeline
+from .pipeline import DualLungPipeline, current_rss_mb
 
 logger = logging.getLogger(__name__)
 
@@ -210,6 +210,12 @@ async def unload_lung_classifier(
     facade = get_facade()
     async with _load_lock:
         unloaded = await asyncio.to_thread(facade.unload, which)
+    if any(unloaded.values()):
+        logger.info(
+            "Lung models unloaded (%s), memory freed. RSS=%s MB",
+            which,
+            current_rss_mb(),
+        )
     return {
         "status": "ok",
         "requested": which,
