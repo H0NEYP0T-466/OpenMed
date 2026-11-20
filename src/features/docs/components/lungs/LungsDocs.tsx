@@ -513,26 +513,134 @@ export const LungsDocs: React.FC = () => {
         </div>
       </div>
 
-      {/* Task 2: Segmentation — planned, honestly marked */}
+      {/* Task 2: Segmentation — shipped, with the numbers it actually earned */}
       <div className="task-block segmentation">
         <div className="task-header-strip">
           <div className="task-tag-group">
-            <span className="task-type-tag seg">Task · Segmentation</span>
-            <span className="task-name-text">Thoracic Radiograph Lung-Field Delineation</span>
+            <span className="task-type-tag seg">Task · Segmentation (in production)</span>
+            <span className="task-name-text">COVID Opacity Segmentation — Lung Field and COVID-Type Opacity, One Encoder, Two Heads</span>
           </div>
-          <span className="task-model-pill">Planned · Not Started</span>
+          <span className="task-model-pill">SegFormer-B0 · 4,009,442 params · COVID-QU-Ex · 35 epochs, best at 20 (EMA)</span>
         </div>
+
         <div className="boilerplate-card">
           <p className="boilerplate-copy">
-            Status: pending. The classifier ships first; the segmentation module follows once the trained Z-Net checkpoint
-            is deployed and the Grad-CAM localisation path is validated against the paper&apos;s BBox set. Candidate datasets
-            under consideration include COVID-QU-Ex (~19k masked radiographs) and the Montgomery / Shenzhen TB collections,
-            with the brain suite&apos;s assistive-segmentation pattern (click / box prompt) as the interaction model.
-            The previous description of a 3D V-Net over LIDC-IDRI was a pre-implementation placeholder and has been
-            retired with this page.
+            One <strong>MiT-B0</strong> encoder at 256 px with a fused 1/4-resolution decoder and two independent
+            sigmoid heads. <strong>Head A</strong> delineates the lung field and trains on all 33,916 kept images.
+            <strong> Head B</strong> delineates COVID-type opacity and trains on the 4,369 images that carry a real
+            annotation. Both heads run on every forward pass; the panel merges them into a single display mask —
+            0 background, 1 lung field, 2 opacity clipped to the lung field.
+          </p>
+          <p className="boilerplate-copy">
+            The supervision rule is provenance, not pixel content. COVID-19 and Normal both count, because the
+            infection tree annotates both: 2,913 COVID images with drawn opacities and 1,456 Normal images whose
+            mask files are black <em>on purpose</em>. <strong>Non-COVID is excluded from head B entirely</strong> —
+            its 1,457 black masks are annotation negatives, not true negatives, because bacterial pneumonia has
+            lesions and the annotators only ever drew COVID-type opacities. Deriving supervision from
+            <code> mask.sum() &gt; 0 </code> would have inverted the class balance and left the head with no
+            negatives at all. This is why the task is named <strong>COVID opacity</strong> and not
+            &ldquo;lesion segmentation&rdquo;.
           </p>
         </div>
       </div>
+
+      {/* ── Segmentation: the corpus, the split, the numbers ─────────────── */}
+      <div className="task-block segmentation">
+        <div className="task-header-strip">
+          <div className="task-tag-group">
+            <span className="task-type-tag seg">Corpus &amp; split</span>
+            <span className="task-name-text">33,916 images, clustered and patient-grouped, nothing deleted</span>
+          </div>
+          <span className="task-model-pill">H01–H19 · 4 dropped · 9 near-duplicate pairs resolved</span>
+        </div>
+        <div className="boilerplate-card">
+          <p className="boilerplate-copy">
+            The shipped COVID-QU-Ex partition leaks: duplicate images and, worse, the same patient sit on both
+            sides of it. The split is therefore rebuilt rather than inherited. Hygiene reads every one of the
+            39,746 items and records drops to <code>dropped_files.csv</code> — <strong>nothing is removed from the
+            dataset</strong>, and the cache skips only what that file names. Four images were dropped, all of them
+            clusters holding one image under two different labels. Eighteen pHash pairs were confirmed at the pixel
+            level (3,164 hash-near candidates rejected), and 8,078 BIMCV-style files resolved to
+            <strong>3,186 patient ids</strong> that are unioned into single clusters, so one patient cannot straddle
+            train and test. Against the shipped split, <strong>17,910 images (52.8%) moved</strong>, and the cross-split
+            counts went from 2 exact-pixel pairs, 9 confirmed near-duplicates and 11 straddling clusters to zero on
+            all three.
+          </p>
+          <p className="boilerplate-copy">
+            Resulting split: <strong>train 21,709 · val 5,425 · test 6,782</strong>. Every image and mask is exactly
+            256×256, every mask is strictly {'{0, 255}'}, no lung mask is empty or full-frame, no infection pixel lies
+            outside the lung field, and all 5,826 infection-tree images were checked exhaustively against their
+            lung-tree twins and found identical.
+          </p>
+        </div>
+      </div>
+
+      <div className="task-block segmentation">
+        <div className="task-header-strip">
+          <div className="task-tag-group">
+            <span className="task-type-tag seg">Held-out test</span>
+            <span className="task-name-text">Measured at original resolution through the serving pipeline, not in a notebook</span>
+          </div>
+          <span className="task-model-pill">n = 6,782 · TTA on · thresholds tuned on validation only</span>
+        </div>
+        <div className="boilerplate-card">
+          <p className="boilerplate-copy">
+            <strong>Lung field:</strong> Dice <strong>0.9754</strong> mean / 0.9820 median, IoU 0.9528, HD95
+            <strong> 2.0 px</strong> median. The post-processing search swept 45 threshold and minimum-area settings over
+            2,500 images with both TTA variants and selected threshold 0.50 and minimum area 0 — the defaults were
+            already optimal, which is what a cleanly calibrated head looks like.
+          </p>
+          <p className="boilerplate-copy">
+            <strong>COVID opacity:</strong> Dice <strong>0.7663</strong> mean / 0.8418 median on the 582 COVID-19
+            positives in the test split. The mean-to-median gap is the honest part of this number: typical cases land
+            above 0.84 while a long tail of small and diffuse opacities pulls the mean down. The search selected
+            threshold 0.30 and minimum area 0.5% of the frame.
+          </p>
+          <p className="boilerplate-copy">
+            <strong>Normal images:</strong> false-positive rate <strong>7.56%</strong> — 22 of 291 Normal images had any
+            opacity drawn. This is the module&rsquo;s main weakness and it is reported rather than hidden.
+          </p>
+          <p className="boilerplate-copy">
+            <strong>Non-COVID images:</strong> any opacity drawn on <strong>62.9%</strong>, mean predicted fraction of
+            lung <strong>34.7%</strong>. Descriptive only — these images are not scored against a COVID-opacity
+            reference, and this behaviour is the expected consequence of excluding them from supervision.
+          </p>
+          <p className="boilerplate-copy">
+            <strong>Test-time augmentation is a trade.</strong> With TTA the opacity head gains 1.6 Dice (0.7663 vs
+            0.7503) but the Normal false-positive rate rises from 5.15% to 7.56%. The deployed checkpoint carries TTA
+            because the composite objective prefers it; for a reader-facing deployment the no-TTA variant is the more
+            specific choice, and both sets of numbers are recorded in the checkpoint sidecar.
+          </p>
+        </div>
+      </div>
+
+      <div className="task-block segmentation">
+        <div className="task-header-strip">
+          <div className="task-tag-group">
+            <span className="task-type-tag seg">Training &amp; checkpoint</span>
+            <span className="task-name-text">Two T4s, 2.14 hours, and a checkpoint that refuses to be misread</span>
+          </div>
+          <span className="task-model-pill">lungs_seg.pth · preprocess v1 · AdamW 5e-4 · EMA 0.999</span>
+        </div>
+        <div className="boilerplate-card">
+          <p className="boilerplate-copy">
+            Distributed over 2× T4 with fp16, batch 32 per GPU, 339 steps per epoch, a 3-epoch linear warmup into
+            cosine decay, decoupled weight decay 0.05 exempt on norm and bias, and an EMA that reaches
+            best weight at epoch 20. Early stopping fired at epoch 35 after 15 epochs without improvement — the val
+            score had already sat flat from epoch 11 onward, so the ceiling here is the corpus, not the schedule.
+          </p>
+          <p className="boilerplate-copy">
+            The checkpoint is self-describing and fails closed. It carries the architecture spec, the preprocessing
+            contract (v1: cv2 grayscale, resize to 256, no CLAHE, uint8/255, replicate to three channels), the label
+            space, the tuned post-processing, and the training provenance including a config fingerprint. The serving
+            loader refuses a checkpoint whose preprocessing version, head set or encoder does not match what the code
+            implements, rather than loading it and quietly predicting noise. Export is verified by reloading strictly
+            on CPU and segmenting an image, and train/serve parity is re-checked on held-out files through the same
+            serving path training used.
+          </p>
+        </div>
+      </div>
+
       {/* ── Model A v2 — the same head, retrained without the shortcut ───── */}
       <div className="task-block classification">
         <div className="task-header-strip">

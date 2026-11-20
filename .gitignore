@@ -104,3 +104,6 @@ backend/app/organs/lungs/segmentation/audit_runs/
 # SRS: PNGs under docs/diagrams are renders of the SVGs, rebuilt by render_all.sh.
 # The vector PDFs next to them are the deliverable and are tracked.
 docs/diagrams/*.png
+
+# Lungs segmentation: full Kaggle run artefacts (per-image dumps, 120+ MB)
+backend/app/organs/lungs/segmentation/runs/

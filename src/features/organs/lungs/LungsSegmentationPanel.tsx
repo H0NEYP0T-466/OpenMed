@@ -7,11 +7,12 @@ import {
 } from './lungsSegApi'
 import type {
   LungSegHealth,
-  LungSegMetrics,
   LungSegModelInfoResponse,
   LungSegResponse,
-  LungSegSummary,
 } from './lungSegTypes'
+import { LUNG_SEG_TEMPLATES } from './lungSegTemplates'
+import type { LungSegTemplate } from './lungSegTemplates'
+import { DiagnosticThinkingHUD } from '../../../components/common/ThinkingOrb'
 import './LungsSegmentationPanel.css'
 
 /** Mirrors the router's upload cap. Rejected here so a huge file never leaves the browser. */
@@ -114,14 +115,6 @@ const fmtPct = (value: number | null | undefined, digits = 1): string => {
 const fmtText = (value: string | number | null | undefined): string =>
   value === null || value === undefined || value === '' ? NOT_RECORDED : String(value)
 
-const fmtN = (summary: LungSegSummary | null | undefined): string => {
-  if (!summary || !isFiniteNumber(summary.n)) return NOT_RECORDED
-  const finite = summary.n_finite
-  return isFiniteNumber(finite) && finite !== summary.n
-    ? `${summary.n.toLocaleString()} (${finite.toLocaleString()} finite)`
-    : summary.n.toLocaleString()
-}
-
 const describeError = (error: unknown): string =>
   error instanceof Error ? error.message : 'Unknown error.'
 
@@ -152,103 +145,6 @@ const Figure: React.FC<FigureProps> = ({ label, value }) => (
     <dd>{value}</dd>
   </div>
 )
-
-interface MetricBlockProps {
-  readonly title: string
-  readonly caption?: string
-  readonly figures: ReadonlyArray<FigureProps>
-  readonly n: string
-  readonly note?: string | null
-}
-
-const MetricBlock: React.FC<MetricBlockProps> = ({ title, caption, figures, n, note }) => (
-  <div className="lsp-metric">
-    <h4 className="lsp-metric-title">{title}</h4>
-    {caption ? <p className="lsp-metric-caption">{caption}</p> : null}
-    <dl className="lsp-figures">
-      {figures.map((figure) => (
-        <Figure key={figure.label} label={figure.label} value={figure.value} />
-      ))}
-      <Figure label="n" value={n} />
-    </dl>
-    {note ? <p className="lsp-metric-note">{note}</p> : null}
-  </div>
-)
-
-const HeldOutMetrics: React.FC<{ metrics: LungSegMetrics | null }> = ({ metrics }) => {
-  if (!metrics) {
-    return (
-      <p className="lsp-muted">
-        Held-out test metrics: {NOT_RECORDED}. The checkpoint sidecar has no test-split entry,
-        so no accuracy figure can be shown for this model.
-      </p>
-    )
-  }
-
-  const lung = metrics.lung_field
-  const opacity = metrics.opacity
-
-  return (
-    <div className="lsp-metrics-grid">
-      <MetricBlock
-        title="Lung field: overlap with reference"
-        figures={[
-          { label: 'Dice, mean', value: fmtDice(lung?.dice?.mean) },
-          { label: 'Dice, median', value: fmtDice(lung?.dice?.median) },
-        ]}
-        n={fmtN(lung?.dice)}
-      />
-
-      {opacity ? (
-        <>
-          <MetricBlock
-            title="COVID opacity, positive images: overlap with reference"
-            caption="Images where a COVID-type opacity is present in the reference."
-            figures={[
-              { label: 'Dice, mean', value: fmtDice(opacity.positives?.dice?.mean) },
-              { label: 'Dice, median', value: fmtDice(opacity.positives?.dice?.median) },
-            ]}
-            n={fmtN(opacity.positives?.dice)}
-          />
-          <MetricBlock
-            title="COVID opacity, Normal images: false-positive rate"
-            caption="Share of Normal images where the model drew any opacity."
-            figures={[
-              { label: 'False-positive rate', value: fmtPct(opacity.normal?.false_positive_rate) },
-              {
-                label: 'Normal images with a prediction',
-                value: fmtInt(opacity.normal?.n_with_prediction),
-              },
-              {
-                label: 'Mean predicted fraction of lung',
-                value: fmtPct(opacity.normal?.mean_predicted_fraction_of_lung, 2),
-              },
-            ]}
-            n={fmtInt(opacity.normal?.n)}
-          />
-          <MetricBlock
-            title="COVID opacity, non-COVID images: behaviour"
-            caption="Descriptive only. These images are not scored against a COVID opacity reference."
-            figures={[
-              { label: 'Any opacity drawn', value: fmtPct(opacity.non_covid?.any_opacity_rate) },
-              {
-                label: 'Mean predicted fraction of lung',
-                value: fmtPct(opacity.non_covid?.mean_predicted_fraction_of_lung, 2),
-              },
-            ]}
-            n={fmtInt(opacity.non_covid?.n)}
-            note={opacity.non_covid?.note}
-          />
-        </>
-      ) : (
-        <p className="lsp-muted lsp-metrics-wide">
-          COVID opacity held-out metrics: {NOT_RECORDED}. The sidecar has no opacity entry for
-          the test split.
-        </p>
-      )}
-    </div>
-  )
-}
 
 export const LungsSegmentationPanel: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
@@ -449,6 +345,23 @@ export const LungsSegmentationPanel: React.FC = () => {
     [mountFile],
   )
 
+  const mountTemplate = useCallback(
+    async (preset: LungSegTemplate) => {
+      try {
+        const response = await fetch(preset.path)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const blob = await response.blob()
+        const extension = preset.path.endsWith('.png') ? 'png' : 'jpg'
+        mountFile(
+          new File([blob], `${preset.name}.${extension}`, { type: blob.type || 'image/png' }),
+        )
+      } catch (error) {
+        setInputProblem(`That template could not be loaded: ${describeError(error)}`)
+      }
+    },
+    [mountFile],
+  )
+
   const clear = useCallback(() => {
     abortRef.current?.abort()
     abortRef.current = null
@@ -466,7 +379,6 @@ export const LungsSegmentationPanel: React.FC = () => {
   }, [])
 
   const residency = residencyView(health, healthError)
-  const metrics = modelInfo?.info?.metrics?.test ?? null
   const modelDetails = modelInfo?.available ? modelInfo.info : null
   const opacityDrawn = Boolean(result?.opacity_available && result.opacity_mask_png)
   const scopeNotice = result?.scope_notice ?? modelDetails?.scope_notice ?? null
@@ -551,6 +463,38 @@ export const LungsSegmentationPanel: React.FC = () => {
           {inputProblem}
         </p>
       ) : null}
+
+      {/* One plate per population, so the module can be exercised without a file
+          on hand. The NIH plates say NIH on the plate because the segmenter was
+          never trained on that corpus. */}
+      <div className="lsp-rack" role="group" aria-label="Template radiographs">
+        <p className="lsp-rack-note">
+          Or start from a plate. The three COVID-QU-Ex plates are held-out test images the model
+          never saw; the two NIH plates were never in the training corpus at all.
+        </p>
+        <ul className="lsp-rack-list">
+          {LUNG_SEG_TEMPLATES.map((preset) => (
+            <li key={preset.path}>
+              <button
+                type="button"
+                className="lsp-plate"
+                onClick={() => void mountTemplate(preset)}
+                disabled={isSegmenting}
+                title={preset.expectation}
+              >
+                <span className="lsp-plate-thumb">
+                  <img src={preset.path} alt="" loading="lazy" />
+                  {preset.source === 'NIH' ? <span className="lsp-plate-badge">NIH</span> : null}
+                </span>
+                <span className="lsp-plate-meta">
+                  <span className="lsp-plate-name">{preset.name}</span>
+                  <span className="lsp-plate-detail">{preset.detail}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className="lsp-body">
         <div
@@ -806,46 +750,28 @@ export const LungsSegmentationPanel: React.FC = () => {
         </section>
       ) : null}
 
-      <section className="lsp-section" aria-label="Held-out test metrics">
-        <h3 className="lsp-section-title">Held-out test numbers</h3>
+      <section className="lsp-section" aria-label="Model documentation">
+        <h3 className="lsp-section-title">Model card</h3>
         <p className="lsp-muted">
-          Read from the checkpoint sidecar, not measured on your image and not computed in this
-          browser. Each figure shows the number of images it covers as n.
+          Architecture, training corpus, the post-processing search and the held-out numbers are
+          documented in the Documentation section, under Lungs and then Segmentation.{' '}
+          {modelDetails?.checkpoint?.name
+            ? `This deployment serves ${fmtText(modelDetails.checkpoint.name)}.`
+            : ''}
         </p>
-
         {infoError ? (
           <p className="lsp-notice is-warn">
-            Reading the model information failed: {infoError}.{' '}
+            The checkpoint sidecar could not be read: {infoError}.{' '}
             <button type="button" className="lsp-link" onClick={() => void refreshInfo()}>
               Try again
             </button>
           </p>
-        ) : !modelInfo ? (
-          <p className="lsp-notice">Reading held-out metrics from the checkpoint sidecar.</p>
-        ) : !modelInfo.available ? (
-          <p className="lsp-notice is-warn">
-            <strong>Model information unavailable.</strong>{' '}
-            {modelInfo.detail ?? 'The server gave no detail.'} Held-out numbers cannot be shown
-            without it.
-          </p>
-        ) : (
-          <>
-            <dl className="lsp-figures is-wide lsp-model">
-              <Figure label="Model" value={fmtText(modelDetails?.model_tag)} />
-              <Figure label="Parameters" value={fmtInt(modelDetails?.parameters)} />
-              <Figure label="Input size" value={fmtText(modelDetails?.input_size)} />
-              <Figure label="Heads trained" value={fmtText(modelDetails?.heads_trained?.join(', '))} />
-              <Figure label="Checkpoint" value={fmtText(modelDetails?.checkpoint?.name)} />
-              <Figure label="Test split" value={fmtText(metrics?.split)} />
-              <Figure label="Test images" value={fmtInt(metrics?.n_images)} />
-            </dl>
-            <HeldOutMetrics metrics={metrics} />
-            {metrics?.note ? <p className="lsp-muted">{metrics.note}</p> : null}
-          </>
-        )}
+        ) : null}
       </section>
 
       {scopeNotice ? <p className="lsp-scope">{scopeNotice}</p> : null}
+
+      <DiagnosticThinkingHUD isVisible={isSegmenting} task="segmentation" />
     </section>
   )
 }

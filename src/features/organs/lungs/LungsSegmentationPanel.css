@@ -576,3 +576,109 @@
     transition: none;
   }
 }
+
+/* --- Plate rack ----------------------------------------------------------
+   Five radiographs to exercise the module without a file on hand. The rack is a
+   row of small plates, not cards: one hairline each, the image does the talking,
+   and the NIH badge marks the two plates that were never in the training corpus. */
+
+.lsp-rack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lsp-rack-note {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-mute);
+  max-width: 68ch;
+}
+
+.lsp-rack-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lsp-plate {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  background: var(--paper, #fff);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+
+.lsp-plate:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.lsp-plate:disabled {
+  cursor: progress;
+  opacity: 0.55;
+}
+
+.lsp-plate-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #0b0b0b;
+  border-radius: 1px;
+}
+
+.lsp-plate-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.06);
+}
+
+.lsp-plate-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 1px 5px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(11, 11, 11, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 1px;
+}
+
+.lsp-plate-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lsp-plate-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink, #111);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lsp-plate-detail {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink-mute);
+}
