@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1750" height="1820" viewBox="0 0 1750 1820">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="875" y="36" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="20" font-weight="700" fill="#111">OpenMed — Multi-Organ Diagnostic Workstation, release 1.0</text>
+<rect x="200" y="80" width="1320" height="1560" fill="none" stroke="#263238" stroke-width="2"/>
+<text x="212" y="104" font-family="DejaVu Sans, sans-serif" font-size="14" font-weight="700" fill="#263238">OpenMed Platform</text>
+<rect x="230" y="140" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="140" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="140" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="140" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="440" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="440" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="440" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="440" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="740" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="740" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="740" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="740" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="1040" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="1040" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="1040" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="1040" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="1340" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="230" y="1340" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="1340" width="600" height="280" fill="#f7f9fb" stroke="#78909c" stroke-width="1.2"/>
+<rect x="870" y="1340" width="600" height="26" fill="#e3eaf0" stroke="#78909c" stroke-width="1.2"/>
+<line x1="132.0" y1="250.0" x2="405.3" y2="222.5" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="383.7" y2="263.9" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="448.5" y2="316.8" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1017.1" y2="215.9" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1012.3" y2="268.7" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1063.7" y2="381.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="505.6" y2="552.2" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="499.9" y2="490.4" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="509.4" y2="614.2" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="512.3" y2="676.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1098.6" y2="492.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1110.2" y2="553.4" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1118.8" y2="615.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="515.8" y2="790.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="517.2" y2="852.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1133.9" y2="790.5" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="520.8" y2="1090.0" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="521.4" y2="1152.0" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="250.0" x2="1153.1" y2="1452.1" stroke="#1565c0" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="890.0" x2="514.8" y2="1390.1" stroke="#2e7d32" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="890.0" x2="516.4" y2="1452.1" stroke="#2e7d32" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="890.0" x2="505.3" y2="591.8" stroke="#2e7d32" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="890.0" x2="509.2" y2="529.8" stroke="#2e7d32" stroke-width="1.2" opacity="0.55"/>
+<line x1="132.0" y1="890.0" x2="499.5" y2="653.6" stroke="#2e7d32" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="730.0" x2="618.8" y2="917.4" stroke="#ef6c00" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="730.0" x2="602.8" y2="978.2" stroke="#ef6c00" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="730.0" x2="1196.5" y2="415.7" stroke="#ef6c00" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="730.0" x2="1209.5" y2="529.4" stroke="#ef6c00" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="730.0" x2="1261.8" y2="793.6" stroke="#ef6c00" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="1140.0" x2="1311.0" y2="1119.4" stroke="#6a1b9a" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="1140.0" x2="1308.9" y2="1162.1" stroke="#6a1b9a" stroke-width="1.2" opacity="0.55"/>
+<line x1="1618.0" y1="1140.0" x2="661.6" y2="1222.6" stroke="#6a1b9a" stroke-width="1.2" opacity="0.55"/>
+<line x1="1170.0" y1="292.0" x2="1170.0" y2="314.0" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="1170.0,314.0 1166.1,305.9 1173.9,305.9" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<line x1="530.0" y1="790.0" x2="530.0" y2="716.0" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="530.0,716.0 533.9,724.1 526.1,724.1" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<line x1="530.0" y1="852.0" x2="530.0" y2="830.0" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="530.0,830.0 533.9,838.1 526.1,838.1" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<line x1="1043.5" y1="522.3" x2="656.5" y2="559.7" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="656.5,559.7 664.2,555.1 664.9,562.9" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<line x1="530.0" y1="530.0" x2="530.0" y2="552.0" stroke="#8d6e63" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="530.0,552.0 526.1,543.9 533.9,543.9" fill="#ffffff" stroke="#8d6e63" stroke-width="1.2"/>
+<line x1="530.0" y1="614.0" x2="530.0" y2="592.0" stroke="#8d6e63" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="530.0,592.0 533.9,600.1 526.1,600.1" fill="#ffffff" stroke="#8d6e63" stroke-width="1.2"/>
+<line x1="1170.0" y1="1452.0" x2="1170.0" y2="1430.0" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="1170.0,1430.0 1173.9,1438.1 1166.1,1438.1" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<line x1="1170.0" y1="1492.0" x2="1170.0" y2="1514.0" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="1170.0,1514.0 1166.1,1505.9 1173.9,1505.9" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<line x1="530.0" y1="1430.0" x2="530.0" y2="1452.0" stroke="#455a64" stroke-width="1.3" stroke-dasharray="5,4" opacity="1.0"/>
+<polygon points="530.0,1452.0 526.1,1443.9 533.9,1443.9" fill="#ffffff" stroke="#455a64" stroke-width="1.2"/>
+<ellipse cx="530.0" cy="210" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="213.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Create Case &amp; Upload Scan</text>
+<ellipse cx="530.0" cy="272" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="275.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Review Scan &amp; Orientation</text>
+<ellipse cx="530.0" cy="334" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="337.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Reject Invalid Scan</text>
+<ellipse cx="1170.0" cy="210" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="213.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Select Organ Department</text>
+<ellipse cx="1170.0" cy="272" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="275.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Run Organ Analysis</text>
+<ellipse cx="1170.0" cy="334" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="337.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Preprocess &amp; Normalize Scan</text>
+<ellipse cx="1170.0" cy="396" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="399.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Review Diagnostic Findings</text>
+<ellipse cx="530.0" cy="510" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="513.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Refine with Point Prompts</text>
+<ellipse cx="530.0" cy="572" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="575.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Run Automated Segmentation</text>
+<ellipse cx="530.0" cy="634" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="637.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Refine with Box Prompt</text>
+<ellipse cx="530.0" cy="696" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="699.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Measure Lesion Area &amp; Volume</text>
+<ellipse cx="1170.0" cy="510" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="513.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">View 3D Organ &amp; Lesion</text>
+<ellipse cx="1170.0" cy="572" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="575.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Explore Full-Body Atlas</text>
+<ellipse cx="1170.0" cy="634" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="637.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Apply Camera Preset</text>
+<ellipse cx="530.0" cy="810" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="813.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Generate &amp; Edit Report</text>
+<ellipse cx="530.0" cy="872" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="875.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Sign Off &amp; Export PDF</text>
+<ellipse cx="530.0" cy="934" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="937.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">View Finalized Report</text>
+<ellipse cx="530.0" cy="996" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="999.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Add Consultation Note</text>
+<ellipse cx="1170.0" cy="810" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="813.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Consult Case Assistant</text>
+<ellipse cx="530.0" cy="1110" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="1113.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Review Case History</text>
+<ellipse cx="530.0" cy="1172" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="1175.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Compare Automated vs Adjusted</text>
+<ellipse cx="530.0" cy="1234" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="1237.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Review Audit Trail</text>
+<ellipse cx="1170.0" cy="1110" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="1113.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Manage Users &amp; Roles</text>
+<ellipse cx="1170.0" cy="1172" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="1175.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Configure Storage &amp; Monitor Health</text>
+<ellipse cx="530.0" cy="1410" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="1413.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Practice on Teaching Case</text>
+<ellipse cx="530.0" cy="1472" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="530.0" y="1475.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Compare Observation vs Model</text>
+<ellipse cx="1170.0" cy="1410" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="1413.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Load Organ Pipeline</text>
+<ellipse cx="1170.0" cy="1472" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="1475.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Switch Organ Workspace</text>
+<ellipse cx="1170.0" cy="1534" rx="160" ry="20" fill="#ffffff" stroke="#263238" stroke-width="1.4"/>
+<text x="1170.0" y="1537.5" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="10.5" fill="#1c1c1c">Unload &amp; Free Memory</text>
+<rect x="1051.0" y="297.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="1078.0" y="306.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<rect x="443" y="729" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="470" y="738" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<rect x="411.0" y="835.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="438.0" y="844.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<rect x="823.0" y="535.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="850.0" y="544.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<rect x="411.0" y="535.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="438.0" y="544.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#8d6e63">&lt;&lt;extend&gt;&gt;</text>
+<rect x="411.0" y="597.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="438.0" y="606.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#8d6e63">&lt;&lt;extend&gt;&gt;</text>
+<rect x="1051.0" y="1435.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="1078.0" y="1444.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<rect x="1051.0" y="1497.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="1078.0" y="1506.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<rect x="411.0" y="1435.0" width="54" height="12" fill="#ffffff" opacity="0.95"/>
+<text x="438.0" y="1444.0" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="8" font-style="italic" fill="#455a64">&lt;&lt;include&gt;&gt;</text>
+<text x="530.0" y="158" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Case &amp; Scan Intake</text>
+<text x="1170.0" y="158" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Diagnosis</text>
+<text x="530.0" y="458" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Segmentation</text>
+<text x="1170.0" y="458" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">3D Visualization</text>
+<text x="530.0" y="758" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Reporting</text>
+<text x="1170.0" y="758" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Decision Support</text>
+<text x="530.0" y="1058" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Case Management &amp; Audit</text>
+<text x="1170.0" y="1058" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Administration</text>
+<text x="530.0" y="1358" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Training Mode</text>
+<text x="1170.0" y="1358" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12.5" font-weight="700" fill="#263238" paint-order="stroke" stroke="#e3eaf0" stroke-width="4">Model Lifecycle</text>
+<g stroke="#1565c0" stroke-width="2" fill="none">
+<circle cx="110" cy="226" r="12"/>
+<line x1="110" y1="238" x2="110" y2="268"/>
+<line x1="90" y1="250" x2="130" y2="250"/>
+<line x1="110" y1="268" x2="94" y2="296"/>
+<line x1="110" y1="268" x2="126" y2="296"/>
+</g>
+<text x="110" y="316" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12" font-weight="600" fill="#1565c0" paint-order="stroke" stroke="#ffffff" stroke-width="3">Radiologist /</text>
+<text x="110" y="331" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12" font-weight="600" fill="#1565c0" paint-order="stroke" stroke="#ffffff" stroke-width="3">Medical Specialist</text>
+<g stroke="#2e7d32" stroke-width="2" fill="none">
+<circle cx="110" cy="866" r="12"/>
+<line x1="110" y1="878" x2="110" y2="908"/>
+<line x1="90" y1="890" x2="130" y2="890"/>
+<line x1="110" y1="908" x2="94" y2="936"/>
+<line x1="110" y1="908" x2="126" y2="936"/>
+</g>
+<text x="110" y="956" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12" font-weight="600" fill="#2e7d32" paint-order="stroke" stroke="#ffffff" stroke-width="3">Radiology Resident</text>
+<text x="110" y="971" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12" font-weight="600" fill="#2e7d32" paint-order="stroke" stroke="#ffffff" stroke-width="3">/ Student</text>
+<g stroke="#ef6c00" stroke-width="2" fill="none">
+<circle cx="1640" cy="706" r="12"/>
+<line x1="1640" y1="718" x2="1640" y2="748"/>
+<line x1="1620" y1="730" x2="1660" y2="730"/>
+<line x1="1640" y1="748" x2="1624" y2="776"/>
+<line x1="1640" y1="748" x2="1656" y2="776"/>
+</g>
+<text x="1640" y="796" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12" font-weight="600" fill="#ef6c00" paint-order="stroke" stroke="#ffffff" stroke-width="3">Referring Doctor</text>
+<g stroke="#6a1b9a" stroke-width="2" fill="none">
+<circle cx="1640" cy="1116" r="12"/>
+<line x1="1640" y1="1128" x2="1640" y2="1158"/>
+<line x1="1620" y1="1140" x2="1660" y2="1140"/>
+<line x1="1640" y1="1158" x2="1624" y2="1186"/>
+<line x1="1640" y1="1158" x2="1656" y2="1186"/>
+</g>
+<text x="1640" y="1206" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="12" font-weight="600" fill="#6a1b9a" paint-order="stroke" stroke="#ffffff" stroke-width="3">Administrator</text>
+<text x="115" y="996" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="9.5" font-style="italic" paint-order="stroke" stroke="#ffffff" stroke-width="3" fill="#2e7d32">{training mode:</text>
+<text x="115" y="1008" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="9.5" font-style="italic" paint-order="stroke" stroke="#ffffff" stroke-width="3" fill="#2e7d32">no official records, no sign-off}</text>
+<path d="M220,1680 h666 l14,14 v90 h-680 z" fill="#fffde7" stroke="#9e9d24" stroke-width="1.2"/>
+<path d="M886,1680 v14 h14" fill="none" stroke="#9e9d24" stroke-width="1.2"/>
+<text x="230" y="1698" font-family="DejaVu Sans, sans-serif" font-size="10.5" font-weight="700" fill="#33691e">Organ departments (Select Organ Department)</text>
+<text x="230" y="1713" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">Brain · Lungs · Heart · Kidneys · Eye/Retina · Blood/Vascular ·</text>
+<text x="230" y="1726" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">Liver · Bone/Skeleton · Breast · Skin · Pancreas · Intestines</text>
+<text x="230" y="1739" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">+ Full-Body Atlas. Each department plugs its own classification and</text>
+<text x="230" y="1752" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">segmentation pipeline into the same clinical workspace; some departments</text>
+<text x="230" y="1765" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">run a two-model mixture of experts.</text>
+<path d="M920,1680 h586 l14,14 v90 h-600 z" fill="#fffde7" stroke="#9e9d24" stroke-width="1.2"/>
+<path d="M1506,1680 v14 h14" fill="none" stroke="#9e9d24" stroke-width="1.2"/>
+<text x="930" y="1698" font-family="DejaVu Sans, sans-serif" font-size="10.5" font-weight="700" fill="#33691e">Business rules</text>
+<text x="930" y="1713" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">AI findings are assistive only; licensed clinician sign-off is required before export.</text>
+<text x="930" y="1726" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">Residents and students cannot finalize official records.</text>
+<text x="930" y="1739" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">Patient data never leaves the local clinic network.</text>
+<text x="930" y="1752" font-family="DejaVu Sans, sans-serif" font-size="10" fill="#33691e">Only one organ pipeline is resident in memory at a time.</text>
+</svg>
