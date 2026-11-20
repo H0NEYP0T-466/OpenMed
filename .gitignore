@@ -97,3 +97,10 @@ graphify-out/
 AGENTS.md
 CLAUDE.md
 
+# Lungs segmentation: per-run audit output (33k-row manifests, machine paths).
+# Regenerate with --audit-only; the files stay on disk, they just do not belong in git.
+backend/app/organs/lungs/segmentation/audit_runs/
+
+# SRS: PNGs under docs/diagrams are renders of the SVGs, rebuilt by render_all.sh.
+# The vector PDFs next to them are the deliverable and are tracked.
+docs/diagrams/*.png

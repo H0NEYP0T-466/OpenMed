@@ -14,6 +14,10 @@ timm>=0.9.7
 # Model weight download
 gdown>=5.0.0
 
+# Lungs segmentation: MiT-B0 / SegFormer encoder (architecture + ImageNet weights).
+# Imported lazily, only when the network is built; Kaggle ships it preinstalled.
+transformers>=4.44.0
+
 # Image processing
 Pillow>=10.0.0
 opencv-python-headless>=4.8.0
