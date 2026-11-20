@@ -16,6 +16,7 @@ import type {
   LungUnloadResponse,
   LungWarmupResponse,
 } from './lungTypes'
+import { unloadLungSegmenter, warmLungSegmenter } from './lungsSegApi'
 
 const API_BASE_URL: string =
   import.meta.env.VITE_LUNGS_API_BASE ?? 'http://localhost:8016/api/lungs'
@@ -209,6 +210,9 @@ export const warmLungModels = (
   if (warmInFlight) return warmInFlight
 
   const request = (async () => {
+    // The segmenter warms alongside the classifiers but is independent of them:
+    // its outcome never changes what this function reports.
+    const segmenterWarm = warmLungSegmenter().catch(() => undefined)
     try {
       const response = await postResidency('warmup', model)
       if (!response.ok) return false
@@ -216,6 +220,8 @@ export const warmLungModels = (
       return payload.loaded.v2s || payload.loaded.xrv
     } catch {
       return false
+    } finally {
+      await segmenterWarm
     }
   })().finally(() => {
     warmInFlight = null
@@ -239,6 +245,8 @@ export const unloadLungModels = async (
   await new Promise((resolve) => window.setTimeout(resolve, UNLOAD_GRACE_MS))
   if (wantsResident) return false
 
+  // Best-effort and independent of the classifier unload below.
+  const segmenterUnload = unloadLungSegmenter().catch(() => undefined)
   try {
     const response = await postResidency('unload', model)
     if (!response.ok) return false
@@ -246,6 +254,8 @@ export const unloadLungModels = async (
     return payload.unloaded.v2s || payload.unloaded.xrv
   } catch {
     return false
+  } finally {
+    await segmenterUnload
   }
 }
 

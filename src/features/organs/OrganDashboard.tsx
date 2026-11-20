@@ -18,6 +18,7 @@ import { ThinkingOrbOverlay } from '../../components/common/ThinkingOrb'
 import { BrainClassificationWorkspace } from './brain/BrainClassificationWorkspace'
 import { warmBrainModels, unloadBrainModels } from './brain/brainApi'
 import { LungsClassificationWorkspace } from './lungs/LungsClassificationWorkspace'
+import { LungsSegmentationPanel } from './lungs/LungsSegmentationPanel'
 import { warmLungModels, unloadLungModels } from './lungs/lungsApi'
 import './OrganDashboard.css'
 
@@ -353,7 +354,12 @@ export const OrganDashboard: React.FC = () => {
         {isWholeBodyView ? (
           <AtlasDossier />
         ) : selectedOrganId === 'lungs' ? (
-          modelsWarming ? null : <LungsClassificationWorkspace />
+          modelsWarming ? null : (
+            <>
+              <LungsClassificationWorkspace />
+              <LungsSegmentationPanel />
+            </>
+          )
         ) : selectedOrganId === 'brain' ? (
           modelsWarming ? null : (
             <BrainClassificationWorkspace
