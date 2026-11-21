@@ -249,10 +249,12 @@ class V2SPipeline:
 
     def unload(self) -> None:
         model = self.model
+        resident = model is not None
         self.model = None
         self.load_time_ms = None
         del model
         release_runtime_memory()
+        logger.info("LungV2S unloaded (was resident=%s), RSS=%s MB", resident, current_rss_mb())
 
     def _read_sidecar(self) -> dict[str, Any]:
         """Load the label-space sidecar, or fail closed.
@@ -430,10 +432,12 @@ class XRVPipeline:
 
     def unload(self) -> None:
         model = self.model
+        resident = model is not None
         self.model = None
         self.load_time_ms = None
         del model
         release_runtime_memory()
+        logger.info("XRV stock unloaded (was resident=%s), RSS=%s MB", resident, current_rss_mb())
 
     # ── inference ───────────────────────────────────────────────────────────
 

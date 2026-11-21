@@ -465,12 +465,13 @@ export const LungsSegmentationPanel: React.FC = () => {
       ) : null}
 
       {/* One plate per population, so the module can be exercised without a file
-          on hand. The NIH plates say NIH on the plate because the segmenter was
-          never trained on that corpus. */}
+          on hand. All three are held-out COVID-QU-Ex test images; the NIH plates
+          live in the classification rack, where the XRV suite was trained on
+          them. */}
       <div className="lsp-rack" role="group" aria-label="Template radiographs">
         <p className="lsp-rack-note">
-          Or start from a plate. The three COVID-QU-Ex plates are held-out test images the model
-          never saw; the two NIH plates were never in the training corpus at all.
+          Or start from a plate. All three are held-out test images from the COVID-QU-Ex
+          corpus, never seen in training.
         </p>
         <ul className="lsp-rack-list">
           {LUNG_SEG_TEMPLATES.map((preset) => (
@@ -484,7 +485,6 @@ export const LungsSegmentationPanel: React.FC = () => {
               >
                 <span className="lsp-plate-thumb">
                   <img src={preset.path} alt="" loading="lazy" />
-                  {preset.source === 'NIH' ? <span className="lsp-plate-badge">NIH</span> : null}
                 </span>
                 <span className="lsp-plate-meta">
                   <span className="lsp-plate-name">{preset.name}</span>
@@ -771,7 +771,11 @@ export const LungsSegmentationPanel: React.FC = () => {
 
       {scopeNotice ? <p className="lsp-scope">{scopeNotice}</p> : null}
 
-      <DiagnosticThinkingHUD isVisible={isSegmenting} task="segmentation" />
+      {/* Inference loading. Learning #51: weights => ThinkingOrbOverlay (no
+          card), a running request => this carded HUD. `exitFadeMs={0}`: the
+          overlay is tied to the request and nothing else — the moment the
+          response lands the result paints, with no dwell time on screen. */}
+      <DiagnosticThinkingHUD isVisible={isSegmenting} task="segmentation" exitFadeMs={0} />
     </section>
   )
 }

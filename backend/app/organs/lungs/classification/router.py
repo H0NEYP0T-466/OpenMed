@@ -208,14 +208,18 @@ async def unload_lung_classifier(
 ) -> dict[str, Any]:
     which = (payload or ModelSelection()).model
     facade = get_facade()
+    rss_before = current_rss_mb()
     async with _load_lock:
         unloaded = await asyncio.to_thread(facade.unload, which)
-    if any(unloaded.values()):
-        logger.info(
-            "Lung models unloaded (%s), memory freed. RSS=%s MB",
-            which,
-            current_rss_mb(),
-        )
+    # Always logged, resident or not. Silence used to mean "nothing was loaded",
+    # which is indistinguishable in a terminal from "the unload never ran".
+    logger.info(
+        "Lung classifier release request (%s): %s, RSS %s -> %s MB",
+        which,
+        unloaded,
+        rss_before,
+        current_rss_mb(),
+    )
     return {
         "status": "ok",
         "requested": which,

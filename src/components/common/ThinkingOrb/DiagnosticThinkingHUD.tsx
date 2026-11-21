@@ -28,6 +28,12 @@ export interface DiagnosticThinkingHUDProps {
    * Grad-CAM stage, the assistive segmentation run does not.
    */
   readonly task?: 'classification' | 'segmentation'
+  /**
+   * How long the overlay stays on screen after `isVisible` flips false, purely
+   * for the CSS fade. Pass `0` when the overlay must not outlive the request it
+   * reports on: the answer paints the same frame it arrives, with no dwell.
+   */
+  readonly exitFadeMs?: number
 }
 
 /** Must match the opacity transition on `.diagnostic-hud-fullscreen-backdrop`. */
@@ -147,6 +153,7 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
   isVisible,
   classCountLabel = '4 classes',
   task = 'classification',
+  exitFadeMs = FADE_MS,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const animFrameRef = useRef<number>(0)
@@ -183,13 +190,20 @@ export const DiagnosticThinkingHUD: React.FC<DiagnosticThinkingHUDProps> = ({
     }
     if (!openedRef.current) return
 
+    // No dwell: an overlay that reports on a request must not outlive it.
+    if (exitFadeMs <= 0) {
+      openedRef.current = false
+      setStage('hidden')
+      return
+    }
+
     setStage('closing')
     const timer = window.setTimeout(() => {
       openedRef.current = false
       setStage('hidden')
-    }, FADE_MS)
+    }, exitFadeMs)
     return () => window.clearTimeout(timer)
-  }, [isVisible])
+  }, [isVisible, exitFadeMs])
 
   // Orb animation. Only runs while open — it stops the instant the overlay
   // begins closing, so the fade-out costs nothing.

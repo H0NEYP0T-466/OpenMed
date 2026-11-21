@@ -467,11 +467,14 @@ export const LungsClassificationWorkspace: React.FC = () => {
   return (
     <section className="lungs-workspace">
       {/* Inference loading. Learning #51: weights => ThinkingOrbOverlay (no
-          card, owned by OrganDashboard); analysing a scan => this carded HUD. */}
+          card, owned by OrganDashboard); analysing a scan => this carded HUD.
+          `exitFadeMs={0}` keeps the overlay tied to the request: the verdict
+          paints the instant the response lands, with no dwell time. */}
       <DiagnosticThinkingHUD
         isVisible={isAnalyzing}
         classCountLabel="4 classes + 18 XRV labels"
         task="classification"
+        exitFadeMs={0}
       />
 
       <input
@@ -530,7 +533,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
         <div className="lung-rack-head">
           <span className="lung-rack-title">Curated Specimen Plates</span>
           <span className="lung-rack-sub">
-            Sixteen labelled radiographs · click to mount
+            Six curated plates · click to mount
           </span>
         </div>
         <div className="lung-rack-strip">

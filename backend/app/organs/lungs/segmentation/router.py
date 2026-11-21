@@ -39,6 +39,7 @@ from .model import MODEL_TAG
 from .pipeline import (
     LungSegmenter,
     SegResult,
+    current_rss_mb,
     encode_label_map_png,
     encode_mask_png,
     info_from_payload,
@@ -331,6 +332,13 @@ async def seg_unload() -> SegUnload:
         if segmenter is not None:
             await run_in_threadpool(segmenter.unload)
     freed = segmenter is not None
+    # Always logged, resident or not: the terminal has to answer "did it unload?"
+    # without the reader having to guess whether silence meant "nothing to do".
+    logger.info(
+        "Lungs segmenter release request: released=%s, RSS=%s MB",
+        freed,
+        current_rss_mb(),
+    )
     return SegUnload(
         unloaded=freed,
         message="Lungs segmenter released; memory freed." if freed else "Lungs segmenter was not resident.",

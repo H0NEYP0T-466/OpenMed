@@ -354,12 +354,15 @@ export const OrganDashboard: React.FC = () => {
         {isWholeBodyView ? (
           <AtlasDossier />
         ) : selectedOrganId === 'lungs' ? (
-          modelsWarming ? null : (
-            <>
-              <LungsClassificationWorkspace />
-              <LungsSegmentationPanel />
-            </>
-          )
+          // Lungs renders immediately and warms behind the user. Gating the
+          // section on the warm made entry wait for two weight loads (classifier
+          // + segmenter) before the page existed, which is the seconds of blank
+          // screen the section used to show. The per-request HUD is the only
+          // loading indicator here now, and it ends with the request.
+          <>
+            <LungsClassificationWorkspace />
+            <LungsSegmentationPanel />
+          </>
         ) : selectedOrganId === 'brain' ? (
           modelsWarming ? null : (
             <BrainClassificationWorkspace
@@ -387,12 +390,11 @@ export const OrganDashboard: React.FC = () => {
           onSelectOrgan={handleSelectOrgan}
         />
       </footer>
-      {modelsWarming && (
-        <ThinkingOrbOverlay
-          isVisible
-          label={selectedOrganId === 'lungs' ? 'Loading thoracic model…' : 'Loading neural suite…'}
-          size={210}
-        />
+      {/* Weights overlay belongs to the organ that waits for its models. Lungs
+          does not: it renders while it warms, so a full-screen overlay there
+          would cover a page that is already usable. */}
+      {modelsWarming && selectedOrganId !== 'lungs' && (
+        <ThinkingOrbOverlay isVisible label="Loading neural suite…" size={210} />
       )}
     </AppShell>
   )

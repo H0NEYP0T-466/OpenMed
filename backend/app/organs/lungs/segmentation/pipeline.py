@@ -79,6 +79,18 @@ __all__ = [
 ]
 
 
+def current_rss_mb() -> float | None:
+    """Live resident set size, so an unload can show what it actually released."""
+    try:
+        with open("/proc/self/status", encoding="ascii") as handle:
+            for line in handle:
+                if line.startswith("VmRSS:"):
+                    return round(int(line.split()[1]) / 1024.0, 1)
+    except (OSError, ValueError, IndexError):
+        pass
+    return None
+
+
 def release_runtime_memory() -> None:
     """Hand the weights' memory back, not just drop the attribute."""
     gc.collect()
@@ -308,9 +320,20 @@ class LungSegmenter:
 
     def unload(self) -> None:
         model = self.model
+        resident = model is not None
+        rss_before = current_rss_mb()
         self.model = None
         del model
         release_runtime_memory()
+        # The release is the point of this method, so it leaves a line: a silent
+        # unload is indistinguishable from one that never happened.
+        logger.info(
+            "Lungs segmenter unloaded (%.2fM params, was resident=%s); RSS %s -> %s MB",
+            self.parameters / 1e6 if self.parameters else 0.0,
+            resident,
+            rss_before,
+            current_rss_mb(),
+        )
 
     # --------------------------------------------------------------- capability
 
