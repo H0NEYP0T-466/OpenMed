@@ -533,7 +533,7 @@ export const LungsClassificationWorkspace: React.FC = () => {
         <div className="lung-rack-head">
           <span className="lung-rack-title">Curated Specimen Plates</span>
           <span className="lung-rack-sub">
-            Six curated plates · click to mount
+            Five curated plates · click to mount
           </span>
         </div>
         <div className="lung-rack-strip">

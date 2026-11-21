@@ -8,18 +8,22 @@
  * classifier and returns its own class as the top label, so a plate never
  * promises an answer the model will not give.
  *
- * The last two are NIH ChestX-ray14 images, and they belong here rather than in
- * the segmentation rack because XRV's DenseNet was trained on that corpus: the
+ * The fifth is an NIH ChestX-ray14 image, and it belongs here rather than in the
+ * segmentation rack because XRV's DenseNet was trained on that corpus: the
  * 18-label head actually names findings on these. LungV2S has never seen NIH, so
- * its 4-class read on them is a domain-shift observation, not a score. Both
- * plates were picked after a live run — every NIH sample in `samples/chest` was
- * classified and these are the two whose findings the models return correctly:
+ * its 4-class read on it is a domain-shift observation, not a score. The plate
+ * was picked after a live run over every sample in `samples/chest`:
  *
- *   pneumonia.png      XRV: Lung Opacity 0.74, Pneumonia 0.65   v2s: Lung_Opacity 0.94
  *   consolidation.png  XRV: Lung Opacity 0.79, Pneumonia 0.65   v2s: Lung_Opacity 0.97
  *
- * (infiltration.png, the previous NIH plate, scored 0 findings above threshold and
- * read Normal on LungV2S — it was dropped rather than shipped as a wrong answer.)
+ * Two NIH candidates were dropped rather than shipped as wrong answers:
+ * infiltration.png returned zero findings above threshold and read Normal on
+ * LungV2S, and pneumonia.png read Lung_Opacity on a plate named Pneumonia. The
+ * 4-class head has no bacterial pneumonia class and NIH is outside its training
+ * corpus, so no NIH pneumonia image can display Pneumonia; 40 real NIH Pneumonia
+ * files were classified and 24 came back Normal, 16 Lung_Opacity, none Viral
+ * Pneumonia. A plate named for a class the model cannot return is the bug, so
+ * the slot is a Lung Opacity plate, which is what the model actually sees.
  *
  * The four classes are, in head order: COVID, Lung_Opacity, Normal,
  * Viral Pneumonia (see `V2S_CLASS_ORDER` in `lungsApi.ts`).
@@ -67,14 +71,7 @@ export const LUNG_SPECIMEN_PRESETS: readonly LungSpecimenPreset[] = [
   },
   {
     plate: 'Pl. E',
-    name: 'Pneumonia',
-    path: '/samples/chest/pneumonia.png',
-    subtitle: NIH,
-    site: 'NIH · XRV Pneumonia 0.65',
-  },
-  {
-    plate: 'Pl. F',
-    name: 'Consolidation',
+    name: 'Lung Opacity',
     path: '/samples/chest/consolidation.png',
     subtitle: NIH,
     site: 'NIH · XRV Opacity 0.79',
